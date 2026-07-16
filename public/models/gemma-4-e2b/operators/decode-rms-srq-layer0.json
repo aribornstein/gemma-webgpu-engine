@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "sourceFixture": {
+    "file": "gemma-4-e2b-layer0-reference.safetensors",
+    "sha256": "e511c4e9e201266a9f32e06a9672a6377aacdd32d44ecb143e6e000a8cc3f03e"
+  },
+  "sourceCapture": {
+    "file": "layer0-q-proj-buza-decode.json",
+    "sha256": "78dcbadb59abdb04d51facaa1af5674fc40b7260503fcc900239cd00890f1ae9",
+    "upstreamCommit": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+    "bundleSha256": "0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62"
+  },
+  "operator": "com.xenova.gemma4.DecodeRmsSrq",
+  "tokenId": 9259,
+  "hiddenSize": 1536,
+  "epsilon": 1e-06,
+  "inputScale": 0.6088034510612488,
+  "tensorFile": "decode-rms-srq-layer0.safetensors",
+  "tensorFileSha256": "75edf39811df47143afcf92fd8e64931820eae808e9a6a11a2b57e4464202c36",
+  "tensors": {
+    "hidden": {
+      "dtype": "float32",
+      "shape": [
+        1536
+      ],
+      "sha256": "4b7c92982f60cc985f150bdbb22a28a8e276bf516edd2b6a24c284fb810ed6a2"
+    },
+    "weight": {
+      "dtype": "float32",
+      "shape": [
+        1536
+      ],
+      "sha256": "9232aeea8b9e2234079a69227143f63eb07b358755c4c325f5709ac91ce6e91d"
+    },
+    "output": {
+      "dtype": "float32",
+      "shape": [
+        1536
+      ],
+      "sha256": "4fc6cc0893feceddf48e1c8f89a0e152d067ac5f5b655d3cef7853d961be66ae"
+    },
+    "sum_a": {
+      "dtype": "float32",
+      "shape": [
+        1
+      ],
+      "sha256": "fd8d3caba9e940d6a742a81b0bfa0faf6af8f6ec8a4fa21fca2ab54d7b117350"
+    }
+  }
+}

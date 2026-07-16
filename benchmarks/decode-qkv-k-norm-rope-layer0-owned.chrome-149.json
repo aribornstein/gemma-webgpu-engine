@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-12T16:13:02Z",
+  "status": "exact-owned-only-awaiting-equivalent-huggingface-pair",
+  "speedupClaim": null,
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "fullArtifactSha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4",
+    "qkvFixtureSha256": "63482ab46577cc82b15879a8db0b0fea4515fc690741c34f4e47fb2d6faab1e3",
+    "kNormRopeFixtureSha256": "b0a44ef55d5dc0d9a827d7f4171fe36c15a6f37a4f74be98bae701708e88a374",
+    "qkvReferenceSha256": "78dcbadb59abdb04d51facaa1af5674fc40b7260503fcc900239cd00890f1ae9",
+    "kNormRopeSourceCaptureSha256": "adc161c83071906c53ecf521d4c9fa140d01f729e5ecb6017d06860592306106"
+  },
+  "sourceRuntime": {
+    "owner": "Hugging Face webml-community",
+    "repository": "https://huggingface.co/spaces/webml-community/gemma-4-webgpu-kernels",
+    "commit": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+    "bundleSha256": "0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62",
+    "operators": [
+      "com.xenova.gemma4.DecodeQkvProj",
+      "com.xenova.gemma4.DecodeQkNormRope"
+    ]
+  },
+  "environment": {
+    "browser": "Headless Chrome 149.0.0.0",
+    "platform": "macOS",
+    "adapterVendor": "apple",
+    "adapterArchitecture": "metal-3",
+    "subgroupMinSize": 32,
+    "subgroupMaxSize": 32,
+    "powerPreference": "high-performance",
+    "timestampUnit": "milliseconds per dispatch or ordered QKV/K-norm-RoPE pair"
+  },
+  "boundary": {
+    "input": "exact F32 layer-0 SRQ activation and sumA for token 9259",
+    "intermediate": "QKV combined-storage buffer with K rebound at byte offset 8192",
+    "output": "normalized and rotated K written directly to persistent cache position 10",
+    "cacheElementOffset": 2560,
+    "cpuReadbacksBetweenKernels": 0,
+    "gpuCopiesBetweenKernels": 0
+  },
+  "correctness": {
+    "qMaximumAbsoluteError": 0,
+    "qMaximumRelativeError": 0,
+    "kMaximumAbsoluteError": 0,
+    "kMaximumRelativeError": 0,
+    "vMaximumAbsoluteError": 0,
+    "vMaximumRelativeError": 0,
+    "normalizedKMaximumAbsoluteError": 0,
+    "normalizedKMaximumRelativeError": 0
+  },
+  "ownedKNormRope": {
+    "implementation": "source-equivalent DecodeQkNormRope scalar",
+    "workgroupSize": 128,
+    "workgroupCount": 1,
+    "persistentGpuBuffers": 7,
+    "persistentGpuBytes": 5136,
+    "allocationsPerDispatch": 0,
+    "gpuTimestamp": {
+      "samples": 10,
+      "warmupSamples": 2,
+      "dispatchesPerSample": 100,
+      "medianMs": 0.003932,
+      "p95Ms": 0.004588
+    }
+  },
+  "ownedComposed": {
+    "implementation": "shared-storage DecodeQkvProj then DecodeQkNormRope with direct K-cache destination",
+    "persistentGpuBuffers": 12,
+    "persistentGpuBytes": 2017316,
+    "allocationsPerDispatch": 0,
+    "gpuTimestamp": {
+      "samples": 10,
+      "warmupSamples": 2,
+      "kernelPairsPerSample": 100,
+      "computePassesPerPair": 2,
+      "medianMsPerPair": 0.037356,
+      "p95MsPerPair": 0.047841
+    }
+  },
+  "comparison": {
+    "equivalentHuggingFacePairMeasured": false,
+    "equivalentTimingMechanism": false,
+    "equivalentOperationBoundary": true,
+    "conclusion": "The owned path is exact; no speedup or slowdown is claimed until the pinned Hugging Face QKV/K-norm-RoPE pair is measured in the same warm Chrome tab."
+  }
+}

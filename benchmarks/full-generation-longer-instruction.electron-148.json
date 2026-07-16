@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-15T21:36:08.149Z",
+  "status": "owned-full-generation-baseline",
+  "speedupClaim": null,
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "sourceKey": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+    "fileSize": 2458111846
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.128.0 Chrome/148.0.7778.271 Electron/42.5.0 Safari/537.36",
+    "adapterInfo": {
+      "vendor": "apple",
+      "architecture": "metal-3"
+    },
+    "powerPreference": "high-performance"
+  },
+  "configuration": {
+    "caseId": "longer-instruction",
+    "prompt": "Name the three primary colors in one short sentence.",
+    "promptTokens": 19,
+    "expectedOutputTokens": 11,
+    "maxNewTokens": 16,
+    "cacheCapacity": 512,
+    "prefillStrategy": "fixed-32",
+    "warmupIterations": 1,
+    "iterations": 3
+  },
+  "correctness": {
+    "expectedTokenIds": [818, 5905, 7913, 659, 2604, 236764, 7070, 236764, 532, 3730, 236761],
+    "expectedText": "The primary colors are red, yellow, and blue.",
+    "allIterationsMatchGolden": true
+  },
+  "load": {
+    "sessionLoadMs": 14788.6,
+    "note": "Includes device/cache/tokenizer initialization, model resource loading, pipeline creation, and fixed-32 prefill resource creation in the current browser process."
+  },
+  "memory": {
+    "retainedGpuBufferCount": 2849,
+    "retainedGpuBufferBytes": 847810772,
+    "scope": "retained-resource-graph",
+    "note": "Deduplicated byte sum of GPUBuffer objects retained by the composed decode graph, fixed-32 prefill graph, and logits readback buffer. Driver and pipeline memory are excluded."
+  },
+  "samples": [
+    {
+      "iteration": 0,
+      "timing": {
+        "requestSetupMs": 0.9,
+        "cacheResetMs": 0.1,
+        "prefillMs": 537.8,
+        "prefillMode": "fixed-32",
+        "timeToFirstTokenMs": 538.8,
+        "decodeTokenMs": [32.4, 27.5, 26.8, 28.9, 28.2, 26.8, 28.5, 28, 29.2, 26.2, 28.1],
+        "logitsReadbackMs": 0,
+        "callbackMs": 0,
+        "totalMs": 849.5
+      },
+      "generatedTokenIds": [818, 5905, 7913, 659, 2604, 236764, 7070, 236764, 532, 3730, 236761],
+      "text": "The primary colors are red, yellow, and blue.",
+      "stopReason": "end-token",
+      "exactGoldenMatch": true
+    },
+    {
+      "iteration": 1,
+      "timing": {
+        "requestSetupMs": 1.2,
+        "cacheResetMs": 0,
+        "prefillMs": 792.1,
+        "prefillMode": "fixed-32",
+        "timeToFirstTokenMs": 793.3,
+        "decodeTokenMs": [35.8, 30.6, 32.5, 30.8, 31.2, 30.5, 30.7, 32.2, 32.8, 28.3, 30.4],
+        "logitsReadbackMs": 0,
+        "callbackMs": 0.1,
+        "totalMs": 1139.4
+      },
+      "generatedTokenIds": [818, 5905, 7913, 659, 2604, 236764, 7070, 236764, 532, 3730, 236761],
+      "text": "The primary colors are red, yellow, and blue.",
+      "stopReason": "end-token",
+      "exactGoldenMatch": true
+    },
+    {
+      "iteration": 2,
+      "timing": {
+        "requestSetupMs": 0.8,
+        "cacheResetMs": 0,
+        "prefillMs": 726.2,
+        "prefillMode": "fixed-32",
+        "timeToFirstTokenMs": 727,
+        "decodeTokenMs": [50, 42.5, 56.3, 37.8, 37.5, 40.5, 33.5, 33.2, 35.4, 35.1, 38.6],
+        "logitsReadbackMs": 0,
+        "callbackMs": 0.2,
+        "totalMs": 1167.6
+      },
+      "generatedTokenIds": [818, 5905, 7913, 659, 2604, 236764, 7070, 236764, 532, 3730, 236761],
+      "text": "The primary colors are red, yellow, and blue.",
+      "stopReason": "end-token",
+      "exactGoldenMatch": true
+    }
+  ],
+  "summary": {
+    "prefill": { "medianMs": 726.2, "p95Ms": 792.1, "averageMs": 685.367 },
+    "timeToFirstToken": { "medianMs": 727, "p95Ms": 793.3, "averageMs": 686.367 },
+    "decodeToken": { "medianMs": 31.2, "p95Ms": 50, "averageMs": 33.236 },
+    "total": { "medianMs": 1139.4, "p95Ms": 1167.6, "averageMs": 1052.167 },
+    "warmDecodeTokensPerSecond": 30.088,
+    "endToEndTokensPerSecond": 10.455
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "name": "gemma-webgpu-engine",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Inspectable Gemma 4 E2B inference runtime with owned WebGPU kernels and complete decoding controls.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "playwright test",
+    "test:unit": "playwright test tests/sampling.spec.ts tests/qat-linear.spec.ts tests/cached-safetensors.spec.ts tests/gemma-layer-plan.spec.ts tests/gemma-layer-weights.spec.ts tests/gemma-layer-materializer.spec.ts",
+    "test:gpu": "playwright test tests/qat-linear-gpu.spec.ts",
+    "verify:materializer": "node --experimental-strip-types tools/verify_layer0_materializer.mjs"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@webgpu/types": "^0.1.71",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
+    "ajv": "^8.20.0",
+    "refa": "^0.12.1"
+  }
+}

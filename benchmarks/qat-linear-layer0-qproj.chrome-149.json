@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-12T08:33:31.682Z",
+  "status": "owned-baseline-only",
+  "speedupClaim": null,
+  "speedupGate": "Requires an equivalent same-device measurement from the existing runtime; the vendored runtime does not currently expose per-operator timing.",
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "artifactSha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4"
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/149.0.0.0 Safari/537.36",
+    "adapterInfo": {},
+    "adapterInfoNote": "Chrome did not expose adapter identity fields through GPUAdapter.info in this run.",
+    "powerPreference": "high-performance"
+  },
+  "correctness": {
+    "reference": "src/reference/qat-linear.ts",
+    "input": "deterministic synthetic activation and packed int4 weights",
+    "absoluteTolerance": 0.00002,
+    "relativeTolerance": 0.0002
+  },
+  "cold": {
+    "operator": "model.language_model.layers.0.self_attn.q_proj",
+    "bits": 4,
+    "inFeatures": 1536,
+    "outFeatures": 2048,
+    "iterations": 20,
+    "setupMs": 0.3,
+    "shaderCompilationMs": 0.9,
+    "pipelineCacheHit": false,
+    "dispatchMedianMs": 0.8,
+    "dispatchP95Ms": 1.6,
+    "dispatchAverageMs": 1.07,
+    "readbackMs": 0.2,
+    "cpuReferenceMs": 6.2,
+    "maximumAbsoluteError": 1.1920928955078125e-7,
+    "maximumRelativeError": 0.00010953211699720406,
+    "tolerancePassed": true,
+    "gpuBufferAllocations": 6,
+    "bytesAllocated": 1603600,
+    "allocationsPerDispatch": 0
+  },
+  "warm": {
+    "operator": "model.language_model.layers.0.self_attn.q_proj",
+    "bits": 4,
+    "inFeatures": 1536,
+    "outFeatures": 2048,
+    "iterations": 20,
+    "setupMs": 0.1,
+    "shaderCompilationMs": 0,
+    "pipelineCacheHit": true,
+    "dispatchMedianMs": 0.9,
+    "dispatchP95Ms": 3.9,
+    "dispatchAverageMs": 1.305,
+    "readbackMs": 0.3,
+    "cpuReferenceMs": 6.1,
+    "maximumAbsoluteError": 1.1920928955078125e-7,
+    "maximumRelativeError": 0.00010953211699720406,
+    "tolerancePassed": true,
+    "gpuBufferAllocations": 6,
+    "bytesAllocated": 1603600,
+    "allocationsPerDispatch": 0
+  }
+}

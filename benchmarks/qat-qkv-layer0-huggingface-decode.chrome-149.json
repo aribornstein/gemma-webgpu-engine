@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-12T14:30:00Z",
+  "status": "equivalent-fused-qkv-boundary-owned-slower",
+  "speedupClaim": null,
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "fullArtifactSha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4",
+    "qkvFixtureSha256": "63482ab46577cc82b15879a8db0b0fea4515fc690741c34f4e47fb2d6faab1e3",
+    "referenceFixtureSha256": "78dcbadb59abdb04d51facaa1af5674fc40b7260503fcc900239cd00890f1ae9"
+  },
+  "sourceRuntime": {
+    "owner": "Hugging Face webml-community",
+    "repository": "https://huggingface.co/spaces/webml-community/gemma-4-webgpu-kernels",
+    "commit": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+    "bundleSha256": "0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62",
+    "hostIntegration": "Buza byte-identical vendored bundle",
+    "operator": "com.xenova.gemma4.DecodeQkvProj",
+    "variant": "presrq"
+  },
+  "environment": {
+    "browser": "HeadlessChrome/149.0.0.0",
+    "platform": "macOS",
+    "adapterVendor": "apple",
+    "adapterArchitecture": "metal-3",
+    "subgroupMinSize": 32,
+    "subgroupMaxSize": 32,
+    "powerPreference": "high-performance",
+    "comparisonPage": "http://localhost:8753/",
+    "timestampUnit": "milliseconds per dispatch"
+  },
+  "boundary": {
+    "input": "captured layer-0 DecodeRmsSrq activation and sumA",
+    "outputs": {
+      "q": 2048,
+      "k": 256,
+      "v": 256
+    },
+    "workgroupSize": 32,
+    "rowsPerWorkgroup": 2,
+    "workgroups": {
+      "q": 1024,
+      "k": 128,
+      "v": 128,
+      "total": 1280
+    }
+  },
+  "correctness": {
+    "qMaximumAbsoluteError": 0,
+    "qMaximumRelativeError": 0,
+    "kMaximumAbsoluteError": 0,
+    "kMaximumRelativeError": 0,
+    "vMaximumAbsoluteError": 0,
+    "vMaximumRelativeError": 0
+  },
+  "huggingFace": {
+    "implementation": "DecodeQkvProj presrq from pinned bundle",
+    "gpuTimestamp": {
+      "samples": 20,
+      "warmupSamples": 2,
+      "dispatchesPerSample": 100,
+      "medianMs": 0.01769472,
+      "p95Ms": 0.02031616
+    }
+  },
+  "owned": {
+    "implementation": "combined-storage DecodeQkvProj presrq",
+    "persistentGpuBuffers": 7,
+    "allocationsPerDispatch": 0,
+    "gpuTimestamp": {
+      "samples": 10,
+      "warmupSamples": 2,
+      "dispatchesPerSample": 100,
+      "medianMs": 0.030802,
+      "p95Ms": 0.060948
+    }
+  },
+  "comparison": {
+    "sameBrowserTab": true,
+    "equivalentTimingMechanism": true,
+    "equivalentOperationBoundary": true,
+    "ownedOverHuggingFaceMedianRatio": 1.7407452618634258,
+    "huggingFaceOverOwnedMedianRatio": 0.5744665930783716,
+    "conclusion": "The owned fused kernel is exact but 1.74x slower; the 1.5x speedup gate is not met."
+  }
+}

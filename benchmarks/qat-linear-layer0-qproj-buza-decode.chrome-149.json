@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-12T10:47:02Z",
+  "status": "real-buza-decode-parity-non-equivalent-performance-boundaries",
+  "speedupClaim": null,
+  "speedupGate": "Measure upstream Q-only QatMatMul or owned fused DecodeQkvProj with the same same-device batched GPU timestamp protocol.",
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "fullArtifactSha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4",
+    "operatorFixtureSha256": "932bfa1d84087dba4ef2104a801431a9b8c9a0fd7a25f7ff65d83bea1d062be6",
+    "referenceFixtureSha256": "78dcbadb59abdb04d51facaa1af5674fc40b7260503fcc900239cd00890f1ae9"
+  },
+  "upstreamRuntime": {
+    "repository": "https://huggingface.co/spaces/webml-community/gemma-4-webgpu-kernels",
+    "commit": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+    "bundleSha256": "0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62",
+    "buzaBundleByteIdentical": true,
+    "decodeOperators": ["DecodeRmsSrq", "DecodeQkvProj"],
+    "logicalOutputWidths": {
+      "q": 2048,
+      "k": 256,
+      "v": 256
+    }
+  },
+  "environment": {
+    "browser": "HeadlessChrome/149.0.0.0",
+    "platform": "macOS",
+    "powerPreference": "high-performance",
+    "timestampUnit": "milliseconds per dispatch"
+  },
+  "correctness": {
+    "reference": "public/models/gemma-4-e2b/operators/layer0-q-proj-buza-decode.json",
+    "input": "real layer-0 decode activation captured after upstream DecodeRmsSrq",
+    "output": "logical Q slice captured after upstream fused DecodeQkvProj",
+    "outputValuesCompared": 2048,
+    "maximumAbsoluteError": 0,
+    "maximumRelativeError": 0,
+    "absoluteTolerance": 0.00002,
+    "relativeTolerance": 0.0002
+  },
+  "ownedStandaloneQ": {
+    "operator": "model.language_model.layers.0.self_attn.q_proj",
+    "inFeatures": 1536,
+    "outFeatures": 2048,
+    "hostObserved": {
+      "iterations": 20,
+      "medianMs": 1.3,
+      "p95Ms": 2,
+      "averageMs": 1.39,
+      "includes": ["command encoding", "queue submission", "queue synchronization"]
+    },
+    "gpuTimestamp": {
+      "samples": 10,
+      "warmupSamples": 2,
+      "dispatchesPerSample": 10,
+      "medianMs": 0.603,
+      "p95Ms": 1.001
+    },
+    "allocationsPerDispatch": 0
+  },
+  "buzaFusedQkv": {
+    "operators": ["q_proj", "k_proj", "v_proj"],
+    "gpuTimestamp": {
+      "dispatchesPerSample": 100,
+      "medianMs": 0.01769472,
+      "p95Ms": 0.0196608
+    }
+  },
+  "comparison": {
+    "equivalentTimingMechanism": true,
+    "equivalentOperationBoundary": false,
+    "ratio": null,
+    "reason": "Owned timing covers standalone Q using one workgroup per output, while Buza timing covers a fused QKV kernel with a different dispatch and workgroup structure."
+  }
+}

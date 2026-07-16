@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-12T17:41:58Z",
+  "status": "exact-owned-attention-chrome-149",
+  "speedupClaim": null,
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "fullArtifactSha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4",
+    "attentionFixtureSha256": "4ad8f65ebbaf1f71fbcb4ea20e22906e5bd4fa2765b077a6ddf3183b22277b97",
+    "sourceCaptureSha256": "fa4d670c13f3f7e1d271040b994aefb85106fe0b0343646907fb54cc9b907f2b",
+    "outputSha256": "3273707bd3456f41e904caa6aeaad622db0abda6c972840c3d8d69310bd913eb"
+  },
+  "sourceRuntime": {
+    "owner": "Hugging Face webml-community",
+    "commit": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+    "bundleSha256": "0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62",
+    "operator": "Gemma4DecodeAttentionPartial"
+  },
+  "environment": {
+    "browser": "Headless Chrome 149.0.0.0",
+    "platform": "macOS",
+    "adapterVendor": "apple",
+    "adapterArchitecture": "metal-3",
+    "subgroupMinSize": 32,
+    "subgroupMaxSize": 32,
+    "powerPreference": "high-performance"
+  },
+  "boundary": {
+    "qHeads": 8,
+    "kvHeads": 1,
+    "headDim": 256,
+    "keyLength": 11,
+    "queryOffset": 10,
+    "window": 512,
+    "fusedOperations": [
+      "Q RMSNorm",
+      "Q split-half RoPE",
+      "grouped-query attention",
+      "flash partial merge",
+      "output SRQ"
+    ]
+  },
+  "correctness": {
+    "outputElements": 2048,
+    "maximumAbsoluteError": 0,
+    "maximumRelativeError": 0
+  },
+  "owned": {
+    "variant": "fixed-subgroup-32",
+    "workgroupSize": 256,
+    "chunkCount": 32,
+    "workgroupCount": 256,
+    "persistentGpuBuffers": 10,
+    "persistentGpuBytes": 313408,
+    "allocationsPerDispatch": 0,
+    "gpuTimestamp": {
+      "samplesMs": [
+        0.042292,
+        0.043012,
+        0.043058,
+        0.043094,
+        0.043202,
+        0.043742,
+        0.043771,
+        0.045977,
+        0.055583,
+        0.056177
+      ],
+      "warmupSamples": 2,
+      "dispatchesPerSample": 20,
+      "medianMs": 0.043202,
+      "p95Ms": 0.056177
+    }
+  },
+  "comparison": {
+    "equivalentHuggingFaceMeasuredInThisEnvironment": false,
+    "conclusion": "Owned output is exact. No Chrome 149 comparative claim is made."
+  }
+}

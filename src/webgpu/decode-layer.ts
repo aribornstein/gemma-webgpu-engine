@@ -1,0 +1,85 @@
+import type { GemmaLayerProfile } from "../model/gemma-layer-plan";
+import {
+  compileDecodeAttentionBlockPipelines,
+  encodeDecodeAttentionBlock,
+  type DecodeAttentionBlockPipelines,
+  type DecodeAttentionBlockResources,
+} from "./decode-attention-block";
+import {
+  compileDecodeMlpPleBlockPipelines,
+  encodeDecodeMlpPleBlock,
+  type DecodeMlpPleBlockPipelines,
+  type DecodeMlpPleBlockResources,
+} from "./decode-mlp-ple-block";
+
+export interface GemmaDecodeLayerPipelines {
+  profile: GemmaLayerProfile;
+  attention: DecodeAttentionBlockPipelines;
+  mlp: DecodeMlpPleBlockPipelines;
+}
+
+export interface GemmaDecodeLayerResources {
+  attention: DecodeAttentionBlockResources;
+  mlp: DecodeMlpPleBlockResources;
+}
+
+const pipelineCache = new WeakMap<
+  GPUDevice,
+  Map<GemmaLayerProfile, Promise<GemmaDecodeLayerPipelines>>
+>();
+
+export function getGemmaDecodeLayerPipelines(
+  device: GPUDevice,
+  profile: GemmaLayerProfile,
+): Promise<GemmaDecodeLayerPipelines> {
+  let devicePipelines = pipelineCache.get(device);
+  if (!devicePipelines) {
+    devicePipelines = new Map();
+    pipelineCache.set(device, devicePipelines);
+  }
+  const cached = devicePipelines.get(profile);
+  if (cached) return cached;
+
+  const compiled = compileGemmaDecodeLayerPipelines(device, profile).catch((error) => {
+    devicePipelines?.delete(profile);
+    throw error;
+  });
+  devicePipelines.set(profile, compiled);
+  return compiled;
+}
+
+export async function compileGemmaDecodeLayerPipelines(
+  device: GPUDevice,
+  profile: GemmaLayerProfile,
+): Promise<GemmaDecodeLayerPipelines> {
+  const [attention, mlp] = await Promise.all([
+    compileDecodeAttentionBlockPipelines(device, profile),
+    compileDecodeMlpPleBlockPipelines(device, profile),
+  ]);
+  return { profile, attention, mlp };
+}
+
+export function encodeGemmaDecodeLayer(
+  encoder: GPUCommandEncoder,
+  pipelines: GemmaDecodeLayerPipelines,
+  resources: GemmaDecodeLayerResources,
+): void {
+  if (pipelines.profile !== pipelines.attention.profile ||
+      pipelines.attention.headDim !== resources.attention.cache.headDim ||
+      pipelines.mlp.bitWidth !== (pipelines.profile.endsWith("int2") ? 2 : 4)) {
+    throw new Error("Gemma decode layer pipeline geometry is inconsistent");
+  }
+  encodeDecodeAttentionBlock(encoder, pipelines.attention, resources.attention);
+  encodeDecodeMlpPleBlock(encoder, pipelines.mlp, resources.mlp);
+}
+
+export function gemmaDecodeLayerDispatchCount(
+  resources: GemmaDecodeLayerResources,
+): 7 | 8 | 9 | 10 {
+  const attentionDispatches =
+    Number(resources.attention.runsInputRms) +
+    1 +
+    (resources.attention.writesKvCache ? 2 : 0) +
+    2;
+  return (attentionDispatches + 4) as 7 | 8 | 9 | 10;
+}

@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "modelId": "google/gemma-4-E2B-it-qat-mobile-transformers",
+  "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+  "resolvedAt": "2026-07-12",
+  "source": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers",
+  "licenseReference": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/blob/9fcec64df66cb1e4d972fc5cdc142afb25b2362c/README.md",
+  "artifacts": [
+    {
+      "path": ".gitattributes",
+      "size": 1570,
+      "sha256": "34448b82c17d60fec9b65b1f093c115ddbaadc04beb1b0140b6bfed2e012a930"
+    },
+    {
+      "path": "README.md",
+      "size": 28916,
+      "sha256": "6e6fb66955a238fd177878d71190bef0db8b4fd51fe2a0233b287b27939c98c7"
+    },
+    {
+      "path": "chat_template.jinja",
+      "size": 17336,
+      "sha256": "2f1b4d75d067bae3fe44e676721c7f077d243bc007156cb9c2f8b5836613d082"
+    },
+    {
+      "path": "config.json",
+      "size": 6204,
+      "sha256": "cf6d7dc22738b5e6beb364bac833d78b869f5a6ffd57dfc96c6be3f2abc80424"
+    },
+    {
+      "path": "generation_config.json",
+      "size": 209,
+      "sha256": "fb53f4c64e58896a63472e8eb304397db4a39453e1da0f5d57625ec5a8c1050e"
+    },
+    {
+      "path": "model.safetensors",
+      "size": 2458111846,
+      "sha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4"
+    },
+    {
+      "path": "preprocessor_config.json",
+      "size": 511,
+      "sha256": "ea2ae257e901064abdd98dceb19f2b0da06af600bed15e0f99f5c85c37ee9d78"
+    },
+    {
+      "path": "processor_config.json",
+      "size": 1689,
+      "sha256": "32bdf45d2ad4cc29a0822ddd157a182de76644f0419a6228d151495256e9813c"
+    },
+    {
+      "path": "tokenizer.json",
+      "size": 32169626,
+      "sha256": "cc8d3a0ce36466ccc1278bf987df5f71db1719b9ca6b4118264f45cb627bfe0f"
+    },
+    {
+      "path": "tokenizer_config.json",
+      "size": 2095,
+      "sha256": "68e2ea668d2b18a3c9b2868cccc1911e3c3b432c8f786557b17f164b346d9667"
+    }
+  ],
+  "weights": {
+    "format": "safetensors",
+    "file": "model.safetensors",
+    "indexFile": null,
+    "headerBytes": 375392,
+    "tensorCount": 2780,
+    "parameterCounts": {
+      "F32": 29978144,
+      "BF16": 30418211,
+      "I8": 178520064,
+      "U8": 2098462720,
+      "total": 2337379139
+    }
+  },
+  "textBackbone": {
+    "modelType": "gemma4_text",
+    "dtype": "bfloat16",
+    "vocabSize": 262144,
+    "hiddenSize": 1536,
+    "hiddenSizePerLayerInput": 256,
+    "intermediateSize": 6144,
+    "numHiddenLayers": 35,
+    "numAttentionHeads": 8,
+    "numKeyValueHeads": 1,
+    "numKvSharedLayers": 20,
+    "headDim": 256,
+    "globalHeadDim": 512,
+    "slidingWindow": 512,
+    "maxPositionEmbeddings": 131072,
+    "rmsNormEps": 0.000001,
+    "finalLogitSoftcapping": 30,
+    "rope": {
+      "slidingAttention": {
+        "ropeType": "default",
+        "ropeTheta": 10000
+      },
+      "fullAttention": {
+        "ropeType": "proportional",
+        "ropeTheta": 1000000,
+        "partialRotaryFactor": 0.25
+      }
+    }
+  },
+  "quantization": {
+    "method": "gemma",
+    "defaultBits": 4,
+    "quantizeEmbeddings": true,
+    "moduleRules": [
+      { "pattern": "^lm_head$", "bits": 2 },
+      { "pattern": "audio_tower(?!.*lconv1d\\.linear_start)", "bits": 2 },
+      { "pattern": "audio_tower\\.layers\\.\\d+\\.lconv1d\\.linear_start\\.", "bits": 4 },
+      { "pattern": "language_model\\.embed_tokens$", "bits": 2 },
+      { "pattern": "language_model\\.embed_tokens_per_layer$", "bits": 4 },
+      { "pattern": "language_model\\.layers\\.(\\d|1[0-4])\\.mlp\\.", "bits": 4 },
+      { "pattern": "language_model\\.layers\\.\\d+\\.mlp\\.", "bits": 2 },
+      { "pattern": "language_model\\.layers\\.\\d+\\.per_layer_input_gate$", "bits": 8 },
+      { "pattern": "language_model\\.layers\\.\\d+\\.per_layer_projection$", "bits": 8 },
+      { "pattern": "language_model\\.layers\\.\\d+\\.self_attn\\.", "bits": 4 },
+      { "pattern": "vision_tower", "bits": 8 }
+    ],
+    "modulesNotConverted": [
+      "model.vision_tower.patch_embedder",
+      "model.audio_tower.subsample_conv_projection",
+      "model.audio_tower.output_proj",
+      "relative_k_proj",
+      "model.embed_audio",
+      "model.embed_vision",
+      "per_layer_model_projection"
+    ],
+    "linearRepresentation": {
+      "weightTensor": "packed U8",
+      "scaleTensor": "per-output-row F32",
+      "activationScales": "input and output scalar F32",
+      "zeroPoint": "1 << (bits - 1)",
+      "dequantizedDot": "weight_scale[row] * (sum(q * activation) - zero_point * sum(activation))"
+    }
+  },
+  "representativeOperator": {
+    "name": "model.language_model.layers.0.self_attn.q_proj",
+    "bits": 4,
+    "logicalShape": [2048, 1536],
+    "storedWeight": {
+      "dtype": "U8",
+      "shape": [2048, 768]
+    },
+    "weightScale": {
+      "dtype": "F32",
+      "shape": [2048, 1]
+    },
+    "inputActivationScale": { "dtype": "F32", "shape": [] },
+    "outputActivationScale": { "dtype": "F32", "shape": [] },
+    "fixture": {
+      "path": "operators/layer0-q-proj.safetensors",
+      "size": 1581728,
+      "sha256": "932bfa1d84087dba4ef2104a801431a9b8c9a0fd7a25f7ff65d83bea1d062be6",
+      "source": "readonly export from Buza IndexedDB safetensors-cache-v1",
+      "payloadsVerifiedAgainstRevision": true
+    },
+    "referenceFixture": {
+      "path": "operators/layer0-q-proj-golden.safetensors",
+      "metadataPath": "operators/layer0-q-proj-golden.json",
+      "size": 20704,
+      "sha256": "e9ef6a3b477cda98572611840f6a87965a9460221f4bc2b5473f535b50b876f2",
+      "metadataSha256": "3fa063c3aa3f7cbd5c7f0c127756bfc2a787cf64378db25031d5a4e14bf71ef7",
+      "sourceFixtureSha256": "e511c4e9e201266a9f32e06a9672a6377aacdd32d44ecb143e6e000a8cc3f03e",
+      "transformersCommit": "63f32a8782cb70da3365acab16f2b67947737985",
+      "prompt": "Write one short greeting.",
+      "selectedTokenIndex": 13,
+      "selectedTokenId": 107,
+      "tensors": {
+        "q_input": { "dtype": "F32", "shape": [1536] },
+        "q_input_srq": { "dtype": "F32", "shape": [1536] },
+        "q_output": { "dtype": "F32", "shape": [2048] }
+      },
+      "webgpuMaximumAbsoluteError": 0,
+      "webgpuMaximumRelativeError": 0
+    }
+  },
+  "tokenizer": {
+    "class": "GemmaTokenizer",
+    "processorClass": "Gemma4Processor",
+    "backend": "tokenizers",
+    "paddingSide": "left",
+    "chatTemplateFile": "chat_template.jinja",
+    "chatTemplateSha256": "2f1b4d75d067bae3fe44e676721c7f077d243bc007156cb9c2f8b5836613d082",
+    "turnFormat": "<bos><|turn>{role}\\n{content}<turn|>\\n",
+    "generationPrompt": "<|turn>model\\n",
+    "specialTokens": {
+      "pad": "<pad>",
+      "eos": "<eos>",
+      "bos": "<bos>",
+      "image": "<|image|>",
+      "audio": "<|audio|>",
+      "video": "<|video|>"
+    }
+  },
+  "generation": {
+    "doSample": true,
+    "temperature": 1,
+    "topK": 64,
+    "topP": 0.95,
+    "bosTokenId": 2,
+    "padTokenId": 0,
+    "configEosTokenIds": [1, 106],
+    "generationEosTokenIds": [1, 106, 50]
+  },
+  "cacheCompatibility": {
+    "existingRuntimeDatabase": "safetensors-cache-v1",
+    "existingRuntimeStores": ["chunks", "meta"],
+    "browserStorageIsOriginScoped": true,
+    "verifiedOrigin": "http://localhost:8753",
+    "cachedSourceKey": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+    "cachedBytes": 2108569318,
+    "cachedRangeCount": 1371,
+    "tensorCoverage": {
+      "cached": 1371,
+      "missing": 1409,
+      "missingBytes": 349167128,
+      "languageModelCached": 1367,
+      "languageModelMissing": 230,
+      "languageModelMissingBytes": 9486936,
+      "lmHeadCached": 4
+    },
+    "reuseRequirement": "Run migration/export code on the exact Buza origin or serve the owned engine on that origin; a different host or port cannot directly open the existing IndexedDB database.",
+    "verification": "File size, header size, tensor count, first/last cached range hashes, and all four layer-0 Q projection tensor hashes match revision 9fcec64df66cb1e4d972fc5cdc142afb25b2362c.",
+    "destructiveOperationsAllowed": false
+  }
+}

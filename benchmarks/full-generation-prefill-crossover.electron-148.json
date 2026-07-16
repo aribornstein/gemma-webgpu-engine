@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-15T21:42:33.753Z",
+  "status": "fixed-32-speedup-gate-failed",
+  "speedupClaim": null,
+  "speedupGate": "Fixed-32 must improve median and p95 TTFT without changing exact output before automatic routing can select it.",
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c"
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.128.0 Chrome/148.0.7778.271 Electron/42.5.0 Safari/537.36",
+    "adapterInfo": {
+      "vendor": "apple",
+      "architecture": "metal-3"
+    },
+    "powerPreference": "high-performance"
+  },
+  "configuration": {
+    "caseId": "prefill-32-boundary",
+    "promptTokens": 32,
+    "expectedTokenIds": [7676],
+    "expectedText": "OK",
+    "cacheCapacity": 512,
+    "warmupIterationsPerStrategy": 1,
+    "measuredIterationsPerStrategy": 3
+  },
+  "correctness": {
+    "sequentialAllIterationsMatchGolden": true,
+    "fixed32AllIterationsMatchGolden": true
+  },
+  "comparison": {
+    "sequentialMedianTtftMs": 745.8,
+    "fixed32MedianTtftMs": 783.8,
+    "sequentialP95TtftMs": 1175.5,
+    "fixed32P95TtftMs": 785.8,
+    "sequentialMedianTotalMs": 770,
+    "fixed32MedianTotalMs": 816.3,
+    "fixed32MedianTtftChangePercent": 5.095,
+    "fixed32MedianTotalChangePercent": 6.013,
+    "fixed32AdditionalRetainedGpuBytes": 15229440,
+    "fixed32AdditionalRetainedGpuBuffers": 1209,
+    "result": "Fixed-32 improves this sample's p95 but regresses median TTFT and median total latency, so it does not pass the automatic-routing speedup gate."
+  },
+  "sequential": {
+    "memory": {
+      "retainedGpuBufferCount": 1640,
+      "retainedGpuBufferBytes": 832581332,
+      "scope": "retained-resource-graph"
+    },
+    "samples": [
+      {
+        "iteration": 0,
+        "prefillMs": 643.7,
+        "timeToFirstTokenMs": 644.2,
+        "decodeTokenMs": [20],
+        "totalMs": 664.3
+      },
+      {
+        "iteration": 1,
+        "prefillMs": 745.4,
+        "timeToFirstTokenMs": 745.8,
+        "decodeTokenMs": [24.1],
+        "totalMs": 770
+      },
+      {
+        "iteration": 2,
+        "prefillMs": 1175.1,
+        "timeToFirstTokenMs": 1175.5,
+        "decodeTokenMs": [45.7],
+        "totalMs": 1221.4
+      }
+    ],
+    "summary": {
+      "prefill": { "medianMs": 745.4, "p95Ms": 1175.1, "averageMs": 854.733 },
+      "timeToFirstToken": { "medianMs": 745.8, "p95Ms": 1175.5, "averageMs": 855.167 },
+      "decodeToken": { "medianMs": 24.1, "p95Ms": 45.7, "averageMs": 29.933 },
+      "total": { "medianMs": 770, "p95Ms": 1221.4, "averageMs": 885.233 }
+    }
+  },
+  "fixed32": {
+    "memory": {
+      "retainedGpuBufferCount": 2849,
+      "retainedGpuBufferBytes": 847810772,
+      "scope": "retained-resource-graph"
+    },
+    "samples": [
+      {
+        "iteration": 0,
+        "prefillMs": 567.3,
+        "timeToFirstTokenMs": 568.1,
+        "decodeTokenMs": [32.7],
+        "totalMs": 600.9
+      },
+      {
+        "iteration": 1,
+        "prefillMs": 783,
+        "timeToFirstTokenMs": 783.8,
+        "decodeTokenMs": [33.9],
+        "totalMs": 817.8
+      },
+      {
+        "iteration": 2,
+        "prefillMs": 785.2,
+        "timeToFirstTokenMs": 785.8,
+        "decodeTokenMs": [30.4],
+        "totalMs": 816.3
+      }
+    ],
+    "summary": {
+      "prefill": { "medianMs": 783, "p95Ms": 785.2, "averageMs": 711.833 },
+      "timeToFirstToken": { "medianMs": 783.8, "p95Ms": 785.8, "averageMs": 712.567 },
+      "decodeToken": { "medianMs": 32.7, "p95Ms": 33.9, "averageMs": 32.333 },
+      "total": { "medianMs": 816.3, "p95Ms": 817.8, "averageMs": 745 }
+    }
+  }
+}

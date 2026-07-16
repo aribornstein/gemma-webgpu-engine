@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "modelId": "google/gemma-4-E2B-it-qat-mobile-transformers",
+  "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+  "fixture": {
+    "file": "gemma-4-e2b-layer0-reference.safetensors",
+    "sha256": "e511c4e9e201266a9f32e06a9672a6377aacdd32d44ecb143e6e000a8cc3f03e",
+    "tensors": {
+      "model.language_model.embed_tokens.embedding_quantized": {
+        "dtype": "torch.uint8",
+        "shape": [
+          262144,
+          384
+        ]
+      },
+      "model.language_model.embed_tokens.embedding_scale": {
+        "dtype": "torch.float32",
+        "shape": [
+          262144,
+          1
+        ]
+      },
+      "model.language_model.layers.0.input_layernorm.weight": {
+        "dtype": "torch.bfloat16",
+        "shape": [
+          1536
+        ]
+      },
+      "model.language_model.layers.0.self_attn.q_proj.input_activation_scale": {
+        "dtype": "torch.float32",
+        "shape": []
+      },
+      "model.language_model.layers.0.self_attn.q_proj.output_activation_scale": {
+        "dtype": "torch.float32",
+        "shape": []
+      },
+      "model.language_model.layers.0.self_attn.q_proj.weight": {
+        "dtype": "torch.uint8",
+        "shape": [
+          2048,
+          768
+        ]
+      },
+      "model.language_model.layers.0.self_attn.q_proj.weight_scale": {
+        "dtype": "torch.float32",
+        "shape": [
+          2048,
+          1
+        ]
+      }
+    }
+  },
+  "prompt": "Write one short greeting.",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Write one short greeting."
+    }
+  ],
+  "renderedPrompt": "<bos><|turn>user\nWrite one short greeting.<turn|>\n<|turn>model\n",
+  "inputIds": [
+    2,
+    105,
+    2364,
+    107,
+    6974,
+    886,
+    2822,
+    26227,
+    236761,
+    106,
+    107,
+    105,
+    4368,
+    107
+  ],
+  "selectedTokenIndex": 13,
+  "selectedTokenId": 107,
+  "goldenTensorFile": "layer0-q-proj-golden.safetensors",
+  "goldenTensorSha256": "e9ef6a3b477cda98572611840f6a87965a9460221f4bc2b5473f535b50b876f2",
+  "goldenTensors": {
+    "q_input": {
+      "dtype": "torch.float32",
+      "shape": [
+        1536
+      ]
+    },
+    "q_input_srq": {
+      "dtype": "torch.float32",
+      "shape": [
+        1536
+      ]
+    },
+    "q_output": {
+      "dtype": "torch.float32",
+      "shape": [
+        2048
+      ]
+    }
+  },
+  "environment": {
+    "python": "3.12.13",
+    "torch": "2.8.0",
+    "transformers": "5.14.0.dev0",
+    "numpy": "2.5.1",
+    "device": "cpu",
+    "modelDtype": "bfloat16",
+    "exportDtype": "float32"
+  }
+}

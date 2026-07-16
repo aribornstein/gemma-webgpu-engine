@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "sourceCapture": {
+    "metadataFile": "layer0-decode-oproj-capture.json",
+    "metadataSha256": "1b81dd537bc0418ce74d93ee5dcf8c0b5d4b70c4c8621bb2ec3ae15c3d0dacdf",
+    "tensorFile": "layer0-decode-oproj-capture.safetensors",
+    "tensorSha256": "b5eff21d1af5f8826cd00a2a01d0830462fad78505a803c50ef1ca12b8e2ac52",
+    "upstreamCommit": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+    "bundleSha256": "0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62"
+  },
+  "operator": {
+    "name": "DecodeOprojNorm",
+    "bits": 4,
+    "inFeatures": 2048,
+    "outFeatures": 1536,
+    "outputScale": 0.21056734025478363,
+    "epsilon": 1e-06,
+    "inScale2": 0.9406865835189819,
+    "rows": 0
+  },
+  "tokens": {
+    "inputIds": [
+      2,
+      105,
+      2364,
+      107,
+      9259,
+      106,
+      107,
+      105,
+      4368,
+      107
+    ],
+    "decodeInputToken": 9259,
+    "position": 10
+  },
+  "tensorFile": "decode-oproj-norm-layer0.safetensors",
+  "tensorFileSha256": "d8ec21da0edcccdfd478c76e90215b79d4bae5a4f58eebf8b1de355c474a223d",
+  "tensors": {
+    "attention": {
+      "dtype": "float32",
+      "shape": [
+        1,
+        2048
+      ],
+      "sha256": "3273707bd3456f41e904caa6aeaad622db0abda6c972840c3d8d69310bd913eb"
+    },
+    "packed_weights": {
+      "dtype": "uint32",
+      "shape": [
+        1536,
+        256
+      ],
+      "sha256": "a6bccc46f469f441df077de2d07b4b07cc3b1b14358384938a139562eb76f6e2"
+    },
+    "row_scales": {
+      "dtype": "float32",
+      "shape": [
+        1536
+      ],
+      "sha256": "f2070a12a9ecf0c3a8874cb19c345253461edb517cae7f062c795cbee7b75e8e"
+    },
+    "hidden_before": {
+      "dtype": "float32",
+      "shape": [
+        1,
+        1536
+      ],
+      "sha256": "4b7c92982f60cc985f150bdbb22a28a8e276bf516edd2b6a24c284fb810ed6a2"
+    },
+    "norm_weights": {
+      "dtype": "float32",
+      "shape": [
+        2,
+        1536
+      ],
+      "sha256": "0ed24ca107f0365f5e72538f1042c566b7c9cf73fb418c5183c8aa510ae122d8"
+    },
+    "hidden_after": {
+      "dtype": "float32",
+      "shape": [
+        1,
+        1536
+      ],
+      "sha256": "6bfbb8d43ec4bee447817403dd693194d438b3a3b9b390eca438922d77ac7e6a"
+    },
+    "ffn_input": {
+      "dtype": "float16",
+      "shape": [
+        1,
+        1536
+      ],
+      "sha256": "b5be5add660db27528dc03e0ce096b435db77f97a2429aeadc56252ba637e487"
+    },
+    "ffn_input_sum": {
+      "dtype": "float32",
+      "shape": [
+        1
+      ],
+      "sha256": "7e7adb267c616e101e6817e8426bc641289047bc2624e955abb90aeb25ee700f"
+    }
+  }
+}

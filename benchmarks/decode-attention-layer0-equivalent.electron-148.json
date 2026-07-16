@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-12T17:41:58Z",
+  "status": "equivalent-attention-boundary-timer-bucket-parity",
+  "speedupClaim": null,
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "fullArtifactSha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4",
+    "attentionFixtureSha256": "4ad8f65ebbaf1f71fbcb4ea20e22906e5bd4fa2765b077a6ddf3183b22277b97",
+    "sourceCaptureSha256": "fa4d670c13f3f7e1d271040b994aefb85106fe0b0343646907fb54cc9b907f2b",
+    "outputSha256": "3273707bd3456f41e904caa6aeaad622db0abda6c972840c3d8d69310bd913eb"
+  },
+  "sourceRuntime": {
+    "owner": "Hugging Face webml-community",
+    "commit": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+    "bundleSha256": "0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62",
+    "operator": "Gemma4DecodeAttentionPartial"
+  },
+  "environment": {
+    "browser": "Electron 42.5.0 / Chrome 148.0.7778.271",
+    "platform": "macOS",
+    "adapterVendor": "apple",
+    "adapterArchitecture": "metal-3",
+    "subgroupMinSize": 32,
+    "subgroupMaxSize": 32,
+    "comparisonPage": "http://localhost:8753/",
+    "ownedModuleOrigin": "http://127.0.0.1:5173/"
+  },
+  "protocol": {
+    "sameBrowserTab": true,
+    "samePhysicalAdapter": true,
+    "equivalentTimingMechanism": true,
+    "equivalentOperationBoundary": true,
+    "alternatingRounds": 3,
+    "samplesPerRoundPerImplementation": 10,
+    "warmupSamples": 2,
+    "dispatchesPerSample": 20
+  },
+  "boundary": {
+    "qHeads": 8,
+    "kvHeads": 1,
+    "headDim": 256,
+    "keyLength": 11,
+    "queryOffset": 10,
+    "window": 512
+  },
+  "correctness": {
+    "outputElements": 2048,
+    "maximumAbsoluteError": 0,
+    "maximumRelativeError": 0
+  },
+  "owned": {
+    "samplesMs": [
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983,
+      0.00983
+    ],
+    "medianMs": 0.00983,
+    "p95Ms": 0.00983
+  },
+  "huggingFace": {
+    "samplesMs": [
+      0.0098304,
+      0.0098304,
+      0.0131072,
+      0.0098304,
+      0.0131072,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0131072,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0131072,
+      0.0098304,
+      0.0098304,
+      0.0131072,
+      0.0131072,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304,
+      0.0098304
+    ],
+    "medianMs": 0.0098304,
+    "p95Ms": 0.0131072
+  },
+  "comparison": {
+    "ownedOverHuggingFaceMedianRatio": 0.9999593098958334,
+    "ownedOverHuggingFaceP95Ratio": 0.749969482421875,
+    "meetsProjectSpeedupGate": false,
+    "conclusion": "Owned and Hugging Face occupy the same median timer bucket. Owned had no upper timer-bucket samples in this run, but no meaningful speedup is claimed at this timer resolution."
+  }
+}

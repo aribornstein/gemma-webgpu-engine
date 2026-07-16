@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-12T15:36:14Z",
+  "status": "equivalent-rms-qkv-boundary-owned-slower",
+  "speedupClaim": null,
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "fullArtifactSha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4",
+    "rmsFixtureSha256": "75edf39811df47143afcf92fd8e64931820eae808e9a6a11a2b57e4464202c36",
+    "qkvFixtureSha256": "63482ab46577cc82b15879a8db0b0fea4515fc690741c34f4e47fb2d6faab1e3",
+    "referenceFixtureSha256": "78dcbadb59abdb04d51facaa1af5674fc40b7260503fcc900239cd00890f1ae9"
+  },
+  "sourceRuntime": {
+    "owner": "Hugging Face webml-community",
+    "repository": "https://huggingface.co/spaces/webml-community/gemma-4-webgpu-kernels",
+    "commit": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+    "bundleSha256": "0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62",
+    "operators": [
+      "com.xenova.gemma4.DecodeRmsSrq",
+      "com.xenova.gemma4.DecodeQkvProj"
+    ]
+  },
+  "environment": {
+    "browser": "Chrome 149",
+    "platform": "macOS",
+    "adapterVendor": "apple",
+    "adapterArchitecture": "metal-3",
+    "subgroupMinSize": 32,
+    "subgroupMaxSize": 32,
+    "powerPreference": "high-performance",
+    "comparisonPage": "http://localhost:8753/",
+    "timestampUnit": "milliseconds per RMS/QKV pair"
+  },
+  "boundary": {
+    "input": "exact F32 layer-0 hidden state for token 9259",
+    "intermediate": "shared F32 SRQ activation and sumA GPU buffers",
+    "outputs": {
+      "q": 2048,
+      "k": 256,
+      "v": 256
+    },
+    "cpuReadbacksBetweenKernels": 0
+  },
+  "correctness": {
+    "rmsOutputMaximumAbsoluteError": 0,
+    "rmsOutputMaximumRelativeError": 0,
+    "rmsSumMaximumAbsoluteError": 0,
+    "rmsSumMaximumRelativeError": 0,
+    "qMaximumAbsoluteError": 0,
+    "qMaximumRelativeError": 0,
+    "kMaximumAbsoluteError": 0,
+    "kMaximumRelativeError": 0,
+    "vMaximumAbsoluteError": 0,
+    "vMaximumRelativeError": 0
+  },
+  "ownedRms": {
+    "implementation": "source-equivalent DecodeRmsSrq main",
+    "workgroupSize": 256,
+    "workgroupCount": 1,
+    "persistentGpuBuffers": 6,
+    "allocationsPerDispatch": 0,
+    "gpuTimestamp": {
+      "samples": 10,
+      "warmupSamples": 2,
+      "dispatchesPerSample": 100,
+      "dispatchesEncodedInOneComputePass": true,
+      "medianMs": 0.015073,
+      "p95Ms": 0.038666
+    }
+  },
+  "ownedComposed": {
+    "implementation": "shared-storage DecodeRmsSrq then DecodeQkvProj",
+    "persistentGpuBuffers": 10,
+    "persistentGpuBytes": 2015268,
+    "allocationsPerDispatch": 0,
+    "gpuTimestamp": {
+      "samples": 10,
+      "warmupSamples": 2,
+      "kernelPairsPerSample": 100,
+      "computePassesPerPair": 2,
+      "medianMsPerPair": 0.034734,
+      "p95MsPerPair": 0.041288
+    }
+  },
+  "huggingFaceComposed": {
+    "implementation": "pinned DecodeRmsSrq then DecodeQkvProj prepared steps",
+    "gpuTimestamp": {
+      "samples": 20,
+      "warmupSamples": 2,
+      "kernelPairsPerSample": 100,
+      "computePassesPerPair": 2,
+      "medianMsPerPair": 0.02097152,
+      "p95MsPerPair": 0.02228224
+    }
+  },
+  "comparison": {
+    "equivalentHuggingFacePairMeasured": true,
+    "sameBrowserTab": true,
+    "equivalentTimingMechanism": true,
+    "equivalentOperationBoundary": true,
+    "ownedOverHuggingFaceMedianRatio": 1.6562461853027344,
+    "huggingFaceOverOwnedMedianRatio": 0.6037749755283008,
+    "conclusion": "The owned composed path is exact but 1.66x slower than the pinned Hugging Face pair; no speedup is claimed."
+  }
+}
