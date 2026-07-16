@@ -41,6 +41,8 @@ export interface GemmaGenerationBenchmarkSummary {
   prefill: GemmaBenchmarkDistribution;
   timeToFirstToken: GemmaBenchmarkDistribution;
   decodeToken: GemmaBenchmarkDistribution;
+  interTokenLatency: GemmaBenchmarkDistribution | null;
+  timePerOutputToken: GemmaBenchmarkDistribution | null;
   total: GemmaBenchmarkDistribution;
   warmDecodeTokensPerSecond: number;
   endToEndTokensPerSecond: number;
@@ -70,6 +72,7 @@ export interface GemmaGenerationBenchmarkArtifact {
     maxNewTokens: number;
     cacheCapacity: number;
     prefillStrategy: "auto" | "fixed-32" | "chunked-32" | "sequential";
+    reusePromptCache: false;
     warmupIterations: number;
     iterations: number;
   };
@@ -118,6 +121,7 @@ export async function benchmarkGemmaGeneration(
     for (let iteration = 0; iteration < warmupIterations; iteration += 1) {
       const result = await session.generate(testCase.prompt, {
         maxNewTokens: testCase.maxNewTokens,
+        reusePromptCache: false,
       });
       assertGoldenMatch(testCase, result.generatedTokenIds, result.text, result.stoppedOnEndToken);
     }
@@ -126,6 +130,7 @@ export async function benchmarkGemmaGeneration(
     for (let iteration = 0; iteration < iterations; iteration += 1) {
       const measured = await session.generateMeasured(testCase.prompt, {
         maxNewTokens: testCase.maxNewTokens,
+        reusePromptCache: false,
       });
       const exactGoldenMatch = matchesGolden(
         testCase,
@@ -175,6 +180,7 @@ export async function benchmarkGemmaGeneration(
         maxNewTokens: testCase.maxNewTokens,
         cacheCapacity: session.cacheCapacity,
         prefillStrategy,
+        reusePromptCache: false,
         warmupIterations,
         iterations,
       },
@@ -211,6 +217,14 @@ export function summarizeGemmaBenchmarkSamples(
   if (decodeSamples.length === 0) {
     throw new Error("Gemma benchmark requires at least one measured decode step");
   }
+  const interTokenLatencySamples = samples.flatMap(
+    (sample) => sample.timing.interTokenLatencyMs,
+  );
+  const timePerOutputTokenSamples = samples.flatMap((sample) =>
+    sample.timing.timePerOutputTokenMs === null
+      ? []
+      : [sample.timing.timePerOutputTokenMs]
+  );
   const totalGeneratedTokens = samples.reduce(
     (sum, sample) => sum + sample.generatedTokenIds.length,
     0,
@@ -225,6 +239,8 @@ export function summarizeGemmaBenchmarkSamples(
       samples.map((sample) => sample.timing.timeToFirstTokenMs),
     ),
     decodeToken: distribution(decodeSamples),
+    interTokenLatency: optionalDistribution(interTokenLatencySamples),
+    timePerOutputToken: optionalDistribution(timePerOutputTokenSamples),
     total: distribution(samples.map((sample) => sample.timing.totalMs)),
     warmDecodeTokensPerSecond: round(throughput.warmDecodeTokensPerSecond!),
     endToEndTokensPerSecond: round(throughput.endToEndTokensPerSecond!),
@@ -280,6 +296,12 @@ function distribution(values: readonly number[]): GemmaBenchmarkDistribution {
   };
 }
 
+function optionalDistribution(
+  values: readonly number[],
+): GemmaBenchmarkDistribution | null {
+  return values.length === 0 ? null : distribution(values);
+}
+
 function percentile(sortedValues: readonly number[], quantile: number): number {
   const index = Math.min(
     sortedValues.length - 1,
@@ -303,6 +325,10 @@ function roundTiming(timing: GemmaGenerationTiming): GemmaGenerationTiming {
     prefillMode: timing.prefillMode,
     timeToFirstTokenMs: round(timing.timeToFirstTokenMs),
     decodeTokenMs: Object.freeze(timing.decodeTokenMs.map(round)),
+    interTokenLatencyMs: Object.freeze(timing.interTokenLatencyMs.map(round)),
+    timePerOutputTokenMs: timing.timePerOutputTokenMs === null
+      ? null
+      : round(timing.timePerOutputTokenMs),
     logitsReadbackMs: round(timing.logitsReadbackMs),
     callbackMs: round(timing.callbackMs),
     totalMs: round(timing.totalMs),

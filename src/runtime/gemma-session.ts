@@ -4,6 +4,7 @@ import { loadDecodeMlpPleFixture } from "../model/decode-mlp-ple-fixture";
 import {
   loadGemmaTokenInputBatch,
   loadGemmaTokenInputs,
+  type GemmaTokenInputs,
 } from "../model/gemma-input-weights";
 import { createGemmaRotaryBlock, createGemmaRotaryRows } from "../model/gemma-rope";
 import { getWebGpuDevice } from "../webgpu/device";
@@ -16,6 +17,8 @@ import {
   loadGemmaDecodeModelResources,
   submitGemmaDecodeModel,
   type GemmaDecodeModelResources,
+  type GemmaModelOutput,
+  type GemmaModelOutputMode,
 } from "../webgpu/decode-model";
 import { updateGemmaDecodeStackToken } from "../webgpu/decode-stack";
 import {
@@ -65,6 +68,7 @@ import {
   GEMMA_VALIDATED_CONTEXT_CAPACITY,
 } from "./gemma-context";
 import {
+  isFinalGemmaPrefillSegment,
   planGemmaPrefillSegments,
   type GemmaPrefillMode,
   type GemmaPrefillStrategy,
@@ -96,6 +100,8 @@ export interface GemmaGenerationTiming {
   prefillMode: GemmaPrefillMode;
   timeToFirstTokenMs: number;
   decodeTokenMs: readonly number[];
+  interTokenLatencyMs: readonly number[];
+  timePerOutputTokenMs: number | null;
   logitsReadbackMs: number;
   callbackMs: number;
   totalMs: number;
@@ -117,6 +123,8 @@ interface MutableGemmaGenerationTiming {
   prefillMode: GemmaPrefillMode;
   timeToFirstTokenMs: number | null;
   decodeTokenMs: number[];
+  interTokenLatencyMs: number[];
+  lastTokenEmittedAt: number | null;
   logitsReadbackMs: number;
   callbackMs: number;
 }
@@ -146,6 +154,7 @@ interface GemmaSoftTokenSource {
 
 const GEMMA_PAD_TOKEN_ID = 0;
 const GEMMA_TEXT_HIDDEN_SIZE = 1536;
+const GEMMA_TOKEN_INPUT_CACHE_CAPACITY = 256;
 
 export class GemmaGenerationSession {
   private position = 0;
@@ -159,6 +168,7 @@ export class GemmaGenerationSession {
   private readonly prefill: GemmaFixedPrefillResources | null;
   private readonly prefillStrategy: GemmaPrefillStrategy;
   private readonly logitsReadback: GPUBuffer;
+  private readonly tokenInputCache = new Map<number, GemmaTokenInputs>();
   private tokenByteTrie: TokenByteTrie | null = null;
   private visionSource: Promise<PinnedSafetensorsSource> | null = null;
   private activeTiming: MutableGemmaGenerationTiming | null = null;
@@ -269,6 +279,7 @@ export class GemmaGenerationSession {
       onVisionProgress,
       onPrefillProgress,
       constraint,
+      reusePromptCache = true,
       ...decodingOptions
     } = options;
     throwIfGemmaGenerationAborted(signal);
@@ -277,6 +288,9 @@ export class GemmaGenerationSession {
       ? compileGenerationConstraint(constraint)
       : null;
     const tokenByteTrie = compiledConstraint ? this.getTokenByteTrie() : null;
+    const outputMode: GemmaModelOutputMode = compiledConstraint || !usesGemmaGpuGreedy(config)
+      ? "logits"
+      : "greedy";
     const maxNewTokens = config.maxNewTokens;
     this.generating = true;
     const visionResources: GemmaVisionImageResources[] = [];
@@ -340,14 +354,14 @@ export class GemmaGenerationSession {
       const resetStartedAt = performance.now();
       const promptTokensReused = this.preparePromptCache(
         promptTokenIds,
-        visionResources.length === 0,
+        visionResources.length === 0 && reusePromptCache,
       );
       if (this.activeTiming) {
         this.activeTiming.cacheResetMs = performance.now() - resetStartedAt;
         this.activeTiming.promptTokensReused = promptTokensReused;
       }
       throwIfGemmaGenerationAborted(signal);
-      let prediction = null;
+      let modelOutput: GemmaModelOutput | null = null;
       const prefillStartedAt = performance.now();
       const pendingPromptTokenIds = promptTokenIds.slice(promptTokensReused);
       const prefillSegments = planGemmaPrefillSegments(
@@ -378,11 +392,15 @@ export class GemmaGenerationSession {
       for (const segment of prefillSegments) {
         if (segment.mode === "fixed-32") {
           throwIfGemmaGenerationAborted(signal);
-          prediction = await this.evaluatePromptBlock(
+          const blockOutput = await this.evaluatePromptBlock(
             pendingPromptTokenIds.slice(segment.start, segment.start + segment.rows),
             promptTokensReused + segment.start,
             softTokens,
+            isFinalGemmaPrefillSegment(segment, pendingPromptTokenIds.length)
+              ? outputMode
+              : "none",
           );
+          if (blockOutput.prediction || blockOutput.logits) modelOutput = blockOutput;
           throwIfGemmaGenerationAborted(signal);
           onPrefillProgress?.({
             completedPromptTokens: promptTokensReused + segment.start + segment.rows,
@@ -394,10 +412,12 @@ export class GemmaGenerationSession {
         }
         for (let index = segment.start; index < segment.start + segment.rows; index += 1) {
           throwIfGemmaGenerationAborted(signal);
-          prediction = await this.evaluateToken(
+          const tokenOutput = await this.evaluateToken(
             pendingPromptTokenIds[index],
             softTokens.get(promptTokensReused + index),
+            index === pendingPromptTokenIds.length - 1 ? outputMode : "none",
           );
+          if (tokenOutput.prediction || tokenOutput.logits) modelOutput = tokenOutput;
           throwIfGemmaGenerationAborted(signal);
         }
         onPrefillProgress?.({
@@ -410,7 +430,7 @@ export class GemmaGenerationSession {
       if (this.activeTiming) {
         this.activeTiming.prefillMs = performance.now() - prefillStartedAt;
       }
-      if (!prediction) throw new Error("Gemma prompt produced no prediction");
+      if (!modelOutput) throw new Error("Gemma prompt produced no model output");
 
       const generatedTokenIds: number[] = [];
       const history = [...promptTokenIds];
@@ -420,13 +440,12 @@ export class GemmaGenerationSession {
       let stoppedOnStopToken = false;
       for (let index = 0; index < maxNewTokens; index += 1) {
         throwIfGemmaGenerationAborted(signal);
-        let token = prediction.token;
+        let token = modelOutput.prediction?.token ?? 0;
+        if (outputMode === "greedy" && !modelOutput.prediction) {
+          throw new Error("Gemma greedy mode produced no prediction");
+        }
         if (compiledConstraint && tokenByteTrie) {
-          const readbackStartedAt = performance.now();
-          const logits = await this.readCurrentLogits();
-          if (this.activeTiming) {
-            this.activeTiming.logitsReadbackMs += performance.now() - readbackStartedAt;
-          }
+          const logits = requiredGemmaLogits(modelOutput);
           throwIfGemmaGenerationAborted(signal);
           token = this.selectConstrainedToken(
             logits,
@@ -438,11 +457,7 @@ export class GemmaGenerationSession {
             customStopTokens,
           );
         } else if (!usesGemmaGpuGreedy(config)) {
-          const readbackStartedAt = performance.now();
-          const logits = await this.readCurrentLogits();
-          if (this.activeTiming) {
-            this.activeTiming.logitsReadbackMs += performance.now() - readbackStartedAt;
-          }
+          const logits = requiredGemmaLogits(modelOutput);
           throwIfGemmaGenerationAborted(signal);
           token = sampleToken(logits, history, config, () => random.next());
         }
@@ -464,6 +479,13 @@ export class GemmaGenerationSession {
         }
         generatedTokenIds.push(token);
         history.push(token);
+        const tokenEmittedAt = performance.now();
+        if (this.activeTiming?.lastTokenEmittedAt !== null && this.activeTiming) {
+          this.activeTiming.interTokenLatencyMs.push(
+            tokenEmittedAt - this.activeTiming.lastTokenEmittedAt,
+          );
+        }
+        if (this.activeTiming) this.activeTiming.lastTokenEmittedAt = tokenEmittedAt;
         const callbackStartedAt = performance.now();
         await emitGemmaGenerationUpdate(
           token,
@@ -477,7 +499,7 @@ export class GemmaGenerationSession {
         throwIfGemmaGenerationAborted(signal);
         if (index + 1 < maxNewTokens) {
           const decodeStartedAt = performance.now();
-          prediction = await this.evaluateToken(token);
+          modelOutput = await this.evaluateToken(token, undefined, outputMode);
           if (this.activeTiming) {
             this.activeTiming.decodeTokenMs.push(performance.now() - decodeStartedAt);
           }
@@ -532,6 +554,8 @@ export class GemmaGenerationSession {
       prefillMode: "sequential",
       timeToFirstTokenMs: null,
       decodeTokenMs: [],
+      interTokenLatencyMs: [],
+      lastTokenEmittedAt: null,
       logitsReadbackMs: 0,
       callbackMs: 0,
     };
@@ -539,6 +563,7 @@ export class GemmaGenerationSession {
     try {
       const result = await this.generate(input, options);
       const totalMs = performance.now() - timing.startedAt;
+      const timePerOutputTokenMs = averageGemmaLatency(timing.interTokenLatencyMs);
       return {
         result,
         timing: {
@@ -551,6 +576,8 @@ export class GemmaGenerationSession {
           prefillMode: timing.prefillMode,
           timeToFirstTokenMs: timing.timeToFirstTokenMs ?? totalMs,
           decodeTokenMs: Object.freeze([...timing.decodeTokenMs]),
+          interTokenLatencyMs: Object.freeze([...timing.interTokenLatencyMs]),
+          timePerOutputTokenMs,
           logitsReadbackMs: timing.logitsReadbackMs,
           callbackMs: timing.callbackMs,
           totalMs,
@@ -595,6 +622,7 @@ export class GemmaGenerationSession {
     if (this.prefill) destroyGemmaFixedPrefillResources(this.prefill);
     this.logitsReadback.destroy();
     destroyGemmaDecodeModelResources(this.resources);
+    this.tokenInputCache.clear();
     this.cache.close();
   }
 
@@ -635,11 +663,9 @@ export class GemmaGenerationSession {
   private async evaluateToken(
     tokenId: number,
     softToken?: GemmaSoftTokenSource,
+    outputMode: GemmaModelOutputMode = "greedy",
   ) {
-    const inputs = await loadGemmaTokenInputs(
-      this.cache,
-      softToken ? GEMMA_PAD_TOKEN_ID : tokenId,
-    );
+    const inputs = await this.loadTokenInputs(softToken ? GEMMA_PAD_TOKEN_ID : tokenId);
     uploadGemmaTokenInputs(this.device, this.resources.input, inputs);
     if (softToken) this.copySoftTokens(this.resources.input.hiddenUpload, [[0, softToken]]);
     const rotary = createGemmaRotaryRows(this.position);
@@ -650,16 +676,39 @@ export class GemmaGenerationSession {
       rotary.sliding,
       rotary.full,
     );
-    const prediction = await submitGemmaDecodeModel(this.device, this.resources);
+    const output = await submitGemmaDecodeModel(
+      this.device,
+      this.resources,
+      outputMode,
+      outputMode === "logits" ? this.logitsReadback : undefined,
+    );
+    if (this.activeTiming) this.activeTiming.logitsReadbackMs += output.logitsReadbackMs;
     this.position += 1;
     this.evaluatedTokenIds.push(tokenId);
-    return prediction;
+    return output;
+  }
+
+  private async loadTokenInputs(tokenId: number): Promise<GemmaTokenInputs> {
+    const cached = this.tokenInputCache.get(tokenId);
+    if (cached) {
+      this.tokenInputCache.delete(tokenId);
+      this.tokenInputCache.set(tokenId, cached);
+      return cached;
+    }
+    const inputs = await loadGemmaTokenInputs(this.cache, tokenId);
+    this.tokenInputCache.set(tokenId, inputs);
+    if (this.tokenInputCache.size > GEMMA_TOKEN_INPUT_CACHE_CAPACITY) {
+      const oldest = this.tokenInputCache.keys().next().value;
+      if (oldest !== undefined) this.tokenInputCache.delete(oldest);
+    }
+    return inputs;
   }
 
   private async evaluatePromptBlock(
     tokenIds: readonly number[],
     promptStart = 0,
     softTokens: ReadonlyMap<number, GemmaSoftTokenSource> = new Map(),
+    outputMode: GemmaModelOutputMode = "greedy",
   ) {
     if (!this.prefill || tokenIds.length < 1 || tokenIds.length > GEMMA_FIXED_PREFILL_ROWS) {
       throw new Error("Gemma fixed prefill token block is invalid");
@@ -688,15 +737,18 @@ export class GemmaGenerationSession {
       tokenIds.length,
       rotary,
     );
-    const prediction = await submitGemmaFixedPrefill(
+    const output = await submitGemmaFixedPrefill(
       this.device,
       this.prefill,
       this.position,
       tokenIds.length,
+      outputMode,
+      outputMode === "logits" ? this.logitsReadback : undefined,
     );
+    if (this.activeTiming) this.activeTiming.logitsReadbackMs += output.logitsReadbackMs;
     this.position += tokenIds.length;
     this.evaluatedTokenIds.push(...tokenIds);
-    return prediction;
+    return output;
   }
 
   private copySoftTokens(
@@ -777,22 +829,6 @@ export class GemmaGenerationSession {
     return this.visionSource;
   }
 
-  private async readCurrentLogits(): Promise<Float32Array> {
-    const encoder = this.device.createCommandEncoder({ label: "Read Gemma logits for sampling" });
-    encoder.copyBufferToBuffer(
-      this.resources.logits,
-      0,
-      this.logitsReadback,
-      0,
-      this.resources.logits.size,
-    );
-    this.device.queue.submit([encoder.finish()]);
-    await this.logitsReadback.mapAsync(GPUMapMode.READ);
-    const logits = new Float32Array(this.logitsReadback.getMappedRange().slice(0));
-    this.logitsReadback.unmap();
-    return logits;
-  }
-
   private getTokenByteTrie(): TokenByteTrie {
     this.tokenByteTrie ??= new TokenByteTrie(this.tokenizer);
     return this.tokenByteTrie;
@@ -831,6 +867,16 @@ export function loadGemmaGenerationSession(
   options?: GemmaSessionLoadOptions,
 ): Promise<GemmaGenerationSession> {
   return GemmaGenerationSession.load(options);
+}
+
+function requiredGemmaLogits(output: GemmaModelOutput): Float32Array {
+  if (!output.logits) throw new Error("Gemma model output is missing logits");
+  return output.logits;
+}
+
+function averageGemmaLatency(samples: readonly number[]): number | null {
+  if (samples.length === 0) return null;
+  return samples.reduce((sum, sample) => sum + sample, 0) / samples.length;
 }
 
 function isGpuBuffer(value: object): value is GPUBuffer {

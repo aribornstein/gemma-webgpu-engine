@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 2,
+  "capturedAt": "2026-07-16T12:51:02.713Z",
+  "status": "fixed-32-boundary-passed-chunked-tail-gate-failed",
+  "speedupClaim": null,
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c"
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.128.0 Chrome/148.0.7778.271 Electron/42.5.0 Safari/537.36",
+    "adapterInfo": {
+      "vendor": "apple",
+      "architecture": "metal-3"
+    },
+    "powerPreference": "high-performance"
+  },
+  "configuration": {
+    "reusePromptCache": false,
+    "warmupIterationsPerStrategy": 1,
+    "measuredIterationsPerStrategy": 3,
+    "note": "Every measured sample reported promptTokensReused = 0 and preserved exact output IDs and text."
+  },
+  "fixed32Boundary": {
+    "caseId": "prefill-32-boundary",
+    "promptTokens": 32,
+    "expectedTokenIds": [7676],
+    "expectedText": "OK",
+    "cacheCapacity": 512,
+    "correctness": {
+      "sequentialAllIterationsMatchGolden": true,
+      "fixed32AllIterationsMatchGolden": true
+    },
+    "comparison": {
+      "sequentialMedianTtftMs": 367.6,
+      "fixed32MedianTtftMs": 302.3,
+      "sequentialP95TtftMs": 396.1,
+      "fixed32P95TtftMs": 304.1,
+      "fixed32MedianTtftChangePercent": -17.764,
+      "fixed32P95TtftChangePercent": -23.226,
+      "sequentialMedianTotalMs": 381,
+      "fixed32MedianTotalMs": 319.7,
+      "fixed32MedianTotalChangePercent": -16.089,
+      "fixed32AdditionalRetainedGpuBytes": 15229440,
+      "fixed32AdditionalRetainedGpuBuffers": 1209,
+      "result": "Fixed-32 now improves both median and p95 TTFT with exact output, so the 32-token boundary gate passes on this sample."
+    },
+    "sequential": {
+      "memory": {
+        "retainedGpuBufferCount": 1469,
+        "retainedGpuBufferBytes": 832566596,
+        "scope": "retained-resource-graph"
+      },
+      "summary": {
+        "prefill": { "medianMs": 367.3, "p95Ms": 395.7, "averageMs": 373.833 },
+        "timeToFirstToken": { "medianMs": 367.6, "p95Ms": 396.1, "averageMs": 374.167 },
+        "decodeToken": { "medianMs": 12.2, "p95Ms": 13.4, "averageMs": 12.567 },
+        "interTokenLatency": null,
+        "timePerOutputToken": null,
+        "total": { "medianMs": 381, "p95Ms": 408.3, "averageMs": 386.733 },
+        "warmDecodeTokensPerSecond": 79.576,
+        "endToEndTokensPerSecond": 2.586
+      },
+      "rawSamplesArtifact": "full-generation-canonical-suite.optimized.electron-148.json"
+    },
+    "fixed32": {
+      "sessionLoadMs": 7667.6,
+      "memory": {
+        "retainedGpuBufferCount": 2678,
+        "retainedGpuBufferBytes": 847796036,
+        "scope": "retained-resource-graph"
+      },
+      "samples": [
+        {
+          "iteration": 0,
+          "timing": {
+            "requestSetupMs": 0.3,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 303.8,
+            "prefillMode": "fixed-32",
+            "timeToFirstTokenMs": 304.1,
+            "decodeTokenMs": [16.1],
+            "interTokenLatencyMs": [],
+            "timePerOutputTokenMs": null,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 320.3
+          },
+          "generatedTokenIds": [7676],
+          "text": "OK",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 1,
+          "timing": {
+            "requestSetupMs": 0.4,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 301.8,
+            "prefillMode": "fixed-32",
+            "timeToFirstTokenMs": 302.3,
+            "decodeTokenMs": [17.4],
+            "interTokenLatencyMs": [],
+            "timePerOutputTokenMs": null,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 319.7
+          },
+          "generatedTokenIds": [7676],
+          "text": "OK",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 2,
+          "timing": {
+            "requestSetupMs": 0.4,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 296,
+            "prefillMode": "fixed-32",
+            "timeToFirstTokenMs": 296.4,
+            "decodeTokenMs": [17.9],
+            "interTokenLatencyMs": [],
+            "timePerOutputTokenMs": null,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 314.4
+          },
+          "generatedTokenIds": [7676],
+          "text": "OK",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        }
+      ],
+      "summary": {
+        "prefill": { "medianMs": 301.8, "p95Ms": 303.8, "averageMs": 300.533 },
+        "timeToFirstToken": { "medianMs": 302.3, "p95Ms": 304.1, "averageMs": 300.933 },
+        "decodeToken": { "medianMs": 17.4, "p95Ms": 17.9, "averageMs": 17.133 },
+        "interTokenLatency": null,
+        "timePerOutputToken": null,
+        "total": { "medianMs": 319.7, "p95Ms": 320.3, "averageMs": 318.133 },
+        "warmDecodeTokensPerSecond": 58.366,
+        "endToEndTokensPerSecond": 3.143
+      }
+    }
+  },
+  "crossover153": {
+    "prompt": "Repeat the word blue once. (repeated 24 times)",
+    "promptTokens": 153,
+    "expectedTokenIds": [9503, 107, 9503, 107],
+    "expectedText": "blue\nblue\n",
+    "cacheCapacity": 8192,
+    "correctness": {
+      "sequentialAllIterationsMatch": true,
+      "chunked32AllIterationsMatch": true
+    },
+    "comparison": {
+      "sequentialMedianTtftMs": 1916.1,
+      "chunked32MedianTtftMs": 1818.4,
+      "chunked32MedianTtftChangePercent": -5.099,
+      "sequentialP95TtftMs": 1969,
+      "chunked32P95TtftMs": 3840.3,
+      "chunked32P95TtftChangePercent": 95.038,
+      "sequentialMedianTotalMs": 1958.3,
+      "chunked32MedianTotalMs": 1867,
+      "chunked32MedianTotalChangePercent": -4.662,
+      "sequentialMedianDecodeMs": 14.8,
+      "chunked32MedianDecodeMs": 16.5,
+      "chunked32MedianDecodeChangePercent": 11.486,
+      "chunked32AdditionalRetainedGpuBytes": 15229440,
+      "chunked32AdditionalRetainedGpuBuffers": 1209,
+      "result": "Chunked-32 improves median TTFT modestly but nearly doubles p95 due to one 3.84-second outlier. The automatic long-prompt route does not pass the tail-latency gate on this three-sample sweep."
+    },
+    "sequential": {
+      "sessionLoadMs": 8079.4,
+      "memory": {
+        "retainedGpuBufferCount": 1469,
+        "retainedGpuBufferBytes": 926938436,
+        "scope": "retained-resource-graph"
+      },
+      "samples": [
+        { "iteration": 0, "prefillMs": 1858.2, "timeToFirstTokenMs": 1860.1, "decodeTokenMs": [15.5, 14.8, 16], "interTokenLatencyMs": [15.5, 14.8, 16], "timePerOutputTokenMs": 15.433, "totalMs": 1906.4 },
+        { "iteration": 1, "prefillMs": 1967.4, "timeToFirstTokenMs": 1969, "decodeTokenMs": [12.3, 13.1, 15.7], "interTokenLatencyMs": [12.3, 13.1, 15.7], "timePerOutputTokenMs": 13.7, "totalMs": 2010.2 },
+        { "iteration": 2, "prefillMs": 1914.8, "timeToFirstTokenMs": 1916.1, "decodeTokenMs": [13.7, 13.7, 14.8], "interTokenLatencyMs": [13.7, 13.7, 14.8], "timePerOutputTokenMs": 14.067, "totalMs": 1958.3 }
+      ],
+      "summary": {
+        "prefill": { "medianMs": 1914.8, "p95Ms": 1967.4, "averageMs": 1913.467 },
+        "timeToFirstToken": { "medianMs": 1916.1, "p95Ms": 1969, "averageMs": 1915.067 },
+        "decodeToken": { "medianMs": 14.8, "p95Ms": 16, "averageMs": 14.4 },
+        "interTokenLatency": { "medianMs": 14.8, "p95Ms": 16, "averageMs": 14.4 },
+        "timePerOutputToken": { "medianMs": 14.067, "p95Ms": 15.433, "averageMs": 14.4 },
+        "total": { "medianMs": 1958.3, "p95Ms": 2010.2, "averageMs": 1958.3 },
+        "warmDecodeTokensPerSecond": 69.444,
+        "endToEndTokensPerSecond": 2.043
+      }
+    },
+    "chunked32": {
+      "sessionLoadMs": 9184.9,
+      "memory": {
+        "retainedGpuBufferCount": 2678,
+        "retainedGpuBufferBytes": 942167876,
+        "scope": "retained-resource-graph"
+      },
+      "samples": [
+        { "iteration": 0, "prefillMs": 1634.7, "timeToFirstTokenMs": 1638, "decodeTokenMs": [19.8, 17.6, 20.8], "interTokenLatencyMs": [19.8, 17.6, 20.8], "timePerOutputTokenMs": 19.4, "totalMs": 1696.8 },
+        { "iteration": 1, "prefillMs": 1814.5, "timeToFirstTokenMs": 1818.4, "decodeTokenMs": [16.5, 15.5, 16.6], "interTokenLatencyMs": [16.5, 15.5, 16.6], "timePerOutputTokenMs": 16.2, "totalMs": 1867 },
+        { "iteration": 2, "prefillMs": 3838.6, "timeToFirstTokenMs": 3840.3, "decodeTokenMs": [15.5, 15.9, 14.8], "interTokenLatencyMs": [15.5, 15.9, 14.8], "timePerOutputTokenMs": 15.4, "totalMs": 3886.6 }
+      ],
+      "summary": {
+        "prefill": { "medianMs": 1814.5, "p95Ms": 3838.6, "averageMs": 2429.267 },
+        "timeToFirstToken": { "medianMs": 1818.4, "p95Ms": 3840.3, "averageMs": 2432.233 },
+        "decodeToken": { "medianMs": 16.5, "p95Ms": 20.8, "averageMs": 17 },
+        "interTokenLatency": { "medianMs": 16.5, "p95Ms": 20.8, "averageMs": 17 },
+        "timePerOutputToken": { "medianMs": 16.2, "p95Ms": 19.4, "averageMs": 17 },
+        "total": { "medianMs": 1867, "p95Ms": 3886.6, "averageMs": 2483.467 },
+        "warmDecodeTokensPerSecond": 58.824,
+        "endToEndTokensPerSecond": 1.611
+      }
+    }
+  }
+}

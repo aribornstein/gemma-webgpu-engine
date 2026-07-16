@@ -149,14 +149,23 @@ export function encodeGemmaPrefillAttention(
   resources: GemmaPrefillAttentionResources,
   sequence: number,
 ): void {
+  const pass = encoder.beginComputePass({ label: "Gemma prefill tiled attention" });
+  encodeGemmaPrefillAttentionPass(pass, compiled, resources, sequence);
+  pass.end();
+}
+
+export function encodeGemmaPrefillAttentionPass(
+  pass: GPUComputePassEncoder,
+  compiled: GemmaPrefillAttentionPipeline,
+  resources: GemmaPrefillAttentionResources,
+  sequence: number,
+): void {
   if (!Number.isInteger(sequence) || sequence < 1 || sequence > resources.sequenceCapacity) {
     throw new Error("Gemma prefill attention dispatch exceeds sequence capacity");
   }
-  const pass = encoder.beginComputePass({ label: "Gemma prefill tiled attention" });
   pass.setPipeline(compiled.pipeline);
   pass.setBindGroup(0, resources.bindGroup);
   pass.dispatchWorkgroups(Math.ceil(sequence / compiled.queryTile), resources.queryHeads);
-  pass.end();
 }
 
 export function destroyGemmaPrefillAttentionResources(

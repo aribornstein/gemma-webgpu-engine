@@ -230,7 +230,9 @@ app.innerHTML = `
 
       <div class="telemetry" aria-label="Generation telemetry">
         <div><span>TTFT</span><strong id="metric-ttft">-</strong></div>
-        <div><span>Decode</span><strong id="metric-decode">-</strong></div>
+        <div title="Average wall-clock time between emitted tokens"><span>TPOT</span><strong id="metric-tpot">-</strong></div>
+        <div title="Median and p95 wall-clock latency between emitted tokens"><span>ITL</span><strong id="metric-itl">-</strong></div>
+        <div title="Model evaluation only, excluding callback and CPU selection"><span>Decode</span><strong id="metric-decode">-</strong></div>
         <div title="Generated tokens after the first token, divided by measured decode time"><span>Decode tok/s</span><strong id="metric-decode-rate">-</strong></div>
         <div title="All emitted tokens divided by total request time, including prefill"><span>Overall tok/s</span><strong id="metric-overall-rate">-</strong></div>
         <div><span>Total</span><strong id="metric-total">-</strong></div>
@@ -944,6 +946,13 @@ function renderTelemetry(
 ): void {
   const throughput = calculateGemmaGenerationThroughput([timing], generatedTokenCount);
   element<HTMLElement>("metric-ttft").textContent = formatMilliseconds(timing.timeToFirstTokenMs);
+  element<HTMLElement>("metric-tpot").textContent = timing.timePerOutputTokenMs === null
+    ? "-"
+    : formatMilliseconds(timing.timePerOutputTokenMs);
+  const sortedItl = [...timing.interTokenLatencyMs].sort((left, right) => left - right);
+  element<HTMLElement>("metric-itl").textContent = sortedItl.length > 0
+    ? `${formatMilliseconds(median(sortedItl))} / ${formatMilliseconds(percentile(sortedItl, 0.95))}`
+    : "-";
   element<HTMLElement>("metric-decode").textContent = timing.decodeTokenMs.length > 0
     ? `${formatMilliseconds(median(timing.decodeTokenMs))} med.`
     : "-";
@@ -969,6 +978,8 @@ function renderTelemetry(
 function clearTelemetry(): void {
   for (const id of [
     "metric-ttft",
+    "metric-tpot",
+    "metric-itl",
     "metric-decode",
     "metric-decode-rate",
     "metric-overall-rate",
@@ -1142,6 +1153,14 @@ function numberValue(data: FormData, name: string): number {
 function median(values: readonly number[]): number {
   const sorted = [...values].sort((left, right) => left - right);
   return sorted[Math.floor(sorted.length / 2)];
+}
+
+function percentile(values: readonly number[], quantile: number): number {
+  const index = Math.min(
+    values.length - 1,
+    Math.max(0, Math.ceil(values.length * quantile) - 1),
+  );
+  return values[index];
 }
 
 function formatMilliseconds(value: number): string {

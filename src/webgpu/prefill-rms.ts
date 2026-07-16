@@ -120,10 +120,18 @@ export function encodeGemmaPrefillRms(
   resources: GemmaPrefillRmsResources,
 ): void {
   const pass = encoder.beginComputePass({ label: "Gemma prefill exact RMS" });
+  encodeGemmaPrefillRmsPass(pass, compiled, resources);
+  pass.end();
+}
+
+export function encodeGemmaPrefillRmsPass(
+  pass: GPUComputePassEncoder,
+  compiled: GemmaPrefillRmsPipeline,
+  resources: GemmaPrefillRmsResources,
+): void {
   pass.setPipeline(compiled.pipeline);
   pass.setBindGroup(0, resources.bindGroup);
   pass.dispatchWorkgroups(Math.ceil(resources.rows / 64));
-  pass.end();
 }
 
 export function destroyGemmaPrefillRmsResources(

@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
-import { planGemmaPrefillSegments } from "../src/runtime/gemma-prefill-plan";
+import {
+  isFinalGemmaPrefillSegment,
+  planGemmaPrefillSegments,
+} from "../src/runtime/gemma-prefill-plan";
 
 test("uses sequential prefill for short automatic prompts", () => {
   expect(planGemmaPrefillSegments(0, 32, 8_192, "auto", true)).toEqual([
@@ -21,6 +24,20 @@ test("uses a sequential tail when a padded block would exceed capacity", () => {
   ]);
   expect(planGemmaPrefillSegments(8_170, 22, 8_192, "chunked-32", true)).toEqual([
     { mode: "sequential", start: 0, rows: 22 },
+  ]);
+});
+
+test("predicts only from the final segment", () => {
+  const segments = planGemmaPrefillSegments(0, 9, 10, "chunked-32", true, 4);
+  expect(segments).toEqual([
+    { mode: "fixed-32", start: 0, rows: 4 },
+    { mode: "fixed-32", start: 4, rows: 4 },
+    { mode: "sequential", start: 8, rows: 1 },
+  ]);
+  expect(segments.map((segment) => isFinalGemmaPrefillSegment(segment, 9))).toEqual([
+    false,
+    false,
+    true,
   ]);
 });
 

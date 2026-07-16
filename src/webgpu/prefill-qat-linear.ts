@@ -202,21 +202,27 @@ export function encodeGemmaPrefillQatLinear(
   pipelines: GemmaPrefillQatLinearPipelines,
   resources: GemmaPrefillQatLinearResources,
 ): void {
+  const pass = encoder.beginComputePass({ label: "Gemma prefill exact QAT linear" });
+  encodeGemmaPrefillQatLinearPass(pass, pipelines, resources);
+  pass.end();
+}
+
+export function encodeGemmaPrefillQatLinearPass(
+  pass: GPUComputePassEncoder,
+  pipelines: GemmaPrefillQatLinearPipelines,
+  resources: GemmaPrefillQatLinearResources,
+): void {
   if (resources.runsSrq) {
     if (!resources.srqBindGroup) throw new Error("Gemma prefill SRQ bind group is missing");
-    const srq = encoder.beginComputePass({ label: "Gemma prefill staged SRQ" });
-    srq.setPipeline(pipelines.srq);
-    srq.setBindGroup(0, resources.srqBindGroup);
-    srq.dispatchWorkgroups(
+    pass.setPipeline(pipelines.srq);
+    pass.setBindGroup(0, resources.srqBindGroup);
+    pass.dispatchWorkgroups(
       Math.ceil(pipelines.rows * pipelines.inFeatures / SRQ_WORKGROUP_SIZE),
     );
-    srq.end();
   }
-  const projection = encoder.beginComputePass({ label: "Gemma prefill exact QAT linear" });
-  projection.setPipeline(pipelines.projection);
-  projection.setBindGroup(0, resources.projectionBindGroup);
-  projection.dispatchWorkgroups(resources.workgroupCount, 1, resources.rowTileCount);
-  projection.end();
+  pass.setPipeline(pipelines.projection);
+  pass.setBindGroup(0, resources.projectionBindGroup);
+  pass.dispatchWorkgroups(resources.workgroupCount, 1, resources.rowTileCount);
 }
 
 export function destroyGemmaPrefillQatLinearResources(

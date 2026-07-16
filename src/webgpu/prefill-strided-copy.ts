@@ -93,10 +93,19 @@ export function encodeGemmaPrefillStridedCopy(
   rows: number,
 ): void {
   const pass = encoder.beginComputePass({ label: "Gemma prefill strided copy" });
+  encodeGemmaPrefillStridedCopyPass(pass, pipeline, resources, rows);
+  pass.end();
+}
+
+export function encodeGemmaPrefillStridedCopyPass(
+  pass: GPUComputePassEncoder,
+  pipeline: GPUComputePipeline,
+  resources: GemmaPrefillStridedCopyResources,
+  rows: number,
+): void {
   pass.setPipeline(pipeline);
   pass.setBindGroup(0, resources.bindGroup);
   pass.dispatchWorkgroups(rows);
-  pass.end();
 }
 
 export function destroyGemmaPrefillStridedCopyResources(

@@ -17,6 +17,9 @@ test("summarizes retained full-generation timing samples", async ({ page }) => {
       prefillMode: "fixed-32" as const,
       timeToFirstTokenMs,
       decodeTokenMs,
+      interTokenLatencyMs: decodeTokenMs,
+      timePerOutputTokenMs: decodeTokenMs.reduce((sum, value) => sum + value, 0) /
+        decodeTokenMs.length,
       logitsReadbackMs: 0,
       callbackMs: 0,
       totalMs,
@@ -45,6 +48,8 @@ test("summarizes retained full-generation timing samples", async ({ page }) => {
     prefill: { medianMs: 80, p95Ms: 100, averageMs: 90 },
     timeToFirstToken: { medianMs: 100, p95Ms: 120, averageMs: 110 },
     decodeToken: { medianMs: 200, p95Ms: 300, averageMs: 200 },
+    interTokenLatency: { medianMs: 200, p95Ms: 300, averageMs: 200 },
+    timePerOutputToken: { medianMs: 150, p95Ms: 250, averageMs: 200 },
     total: { medianMs: 800, p95Ms: 1000, averageMs: 900 },
     warmDecodeTokensPerSecond: 5,
     endToEndTokensPerSecond: 2.222,

@@ -220,26 +220,28 @@ export function encodeGemmaDecodeInput(
   pipelines: GemmaDecodeInputPipeline,
   resources: GemmaDecodeInputResources,
 ): void {
-  const projection = encoder.beginComputePass({ label: "Gemma initial per-layer projection" });
-  projection.setPipeline(pipelines.projection);
-  projection.setBindGroup(0, resources.projectionBindGroup);
-  projection.dispatchWorkgroups(PER_LAYER_TOTAL / 8, resources.rowCount);
-  projection.end();
-  const rms = encoder.beginComputePass({ label: "Gemma initial per-layer exact RMS" });
-  rms.setPipeline(pipelines.rms);
-  rms.setBindGroup(0, resources.rmsBindGroup);
-  rms.dispatchWorkgroups(resources.rowCount);
-  rms.end();
-  const add = encoder.beginComputePass({ label: "Gemma initial per-layer embedding add" });
-  add.setPipeline(pipelines.add);
-  add.setBindGroup(0, resources.addBindGroup);
-  add.dispatchWorkgroups(LAYER_COUNT, resources.rowCount);
-  add.end();
-  const scale = encoder.beginComputePass({ label: "Gemma initial per-layer scale" });
-  scale.setPipeline(pipelines.scale);
-  scale.setBindGroup(0, resources.scaleBindGroup);
-  scale.dispatchWorkgroups(LAYER_COUNT, resources.rowCount);
-  scale.end();
+  const pass = encoder.beginComputePass({ label: "Gemma decode input" });
+  encodeGemmaDecodeInputPass(pass, pipelines, resources);
+  pass.end();
+}
+
+export function encodeGemmaDecodeInputPass(
+  pass: GPUComputePassEncoder,
+  pipelines: GemmaDecodeInputPipeline,
+  resources: GemmaDecodeInputResources,
+): void {
+  pass.setPipeline(pipelines.projection);
+  pass.setBindGroup(0, resources.projectionBindGroup);
+  pass.dispatchWorkgroups(PER_LAYER_TOTAL / 8, resources.rowCount);
+  pass.setPipeline(pipelines.rms);
+  pass.setBindGroup(0, resources.rmsBindGroup);
+  pass.dispatchWorkgroups(resources.rowCount);
+  pass.setPipeline(pipelines.add);
+  pass.setBindGroup(0, resources.addBindGroup);
+  pass.dispatchWorkgroups(LAYER_COUNT, resources.rowCount);
+  pass.setPipeline(pipelines.scale);
+  pass.setBindGroup(0, resources.scaleBindGroup);
+  pass.dispatchWorkgroups(LAYER_COUNT, resources.rowCount);
 }
 
 export function destroyGemmaDecodeInputResources(resources: GemmaDecodeInputResources): void {

@@ -58,7 +58,8 @@ The console owns one persistent session and exposes exact greedy or seeded sampl
 and probability control, custom stop IDs, regex/JSON/closed-schema constraints, streamed output,
 and cancellation. Editable examples populate the prompt and matching controls for greedy, sampling,
 regex, bounded JSON, and closed JSON Schema generation. Its telemetry reports session load, retained GPU-buffer memory, TTFT, median
-decode latency, total latency, prefill route, and stop reason from the same measured runtime path.
+decode latency, TPOT, ITL (median/p95), total latency, prefill route, and stop reason from the same measured runtime path.
+`Decode` remains model-evaluation latency only; `TPOT` and `ITL` are wall-clock token-emission latency metrics.
 `Decode tok/s` divides post-first-token decode evaluations by their measured decode time, while
 `Overall tok/s` divides every emitted token by the complete request time including prefill.
 The cache-origin browser gate loaded the model, generated the longer golden exactly, cancelled after
@@ -88,6 +89,8 @@ owner caches before prefill. Every completed result records its resolved decodin
 stop reason. IndexedDB is origin-scoped, so this
 module must run in the origin that owns the immutable `safetensors-cache-v1` database. It opens
 that database readonly and never creates, upgrades, or writes either object store.
+Text requests reuse a retained common prompt prefix by default. Set `reusePromptCache: false` for
+controlled fresh-prefill measurements or requests that intentionally require a full cache reset.
 
 ## Images
 
@@ -148,17 +151,30 @@ length. It binds decode-owned model weights rather than uploading a second model
 goldens retain exact generated IDs, EOS behavior, and text after the block-to-decode handoff.
 
 `benchmarkGemmaGeneration()` records session load, request setup, cache reset, prefill, TTFT, every
-decode step, logits readback, callback time, total latency, throughput, exact golden parity, adapter
+decode step, inter-token latency, logits readback, callback time, total latency, throughput, exact golden parity, adapter
 identity, and deduplicated retained GPU-buffer bytes. In Electron 42.5.0 / Chrome 148 on Apple
-Metal 3, the 19-token longer golden measured median TTFT `727.0 ms` fixed versus `379.0 ms`
-sequential and median total latency `1139.4 ms` versus `612.4 ms`. At the exact 32-token boundary,
-fixed measured `783.8 ms` median TTFT versus `745.8 ms` sequential; fixed had the better p95 but did
-not improve median latency. It also retained 2,849 buffers / 847,810,772 bytes versus 1,640 buffers /
-832,581,332 bytes. The speedup gate therefore failed and automatic routing remains sequential.
+Metal 3, the optimized fresh-prefill 19-token golden measures `216.7 ms` median TTFT, `12.6 ms`
+median decode, and `361.0 ms` median total latency. The retained July 15 baseline measured
+`379.0 ms`, `20.7 ms`, and `612.4 ms`, respectively: reductions of `42.8%`, `39.1%`, and `41.1%`.
+Warm decode throughput increased from `49.254` to `74.358 tok/s`, and end-to-end throughput from
+`18.119` to `30.309 tok/s`, with exact output in every iteration. The retained graph also fell from
+1,640 to 1,469 GPU buffers without increasing model memory.
 [benchmarks/full-generation-longer-instruction.electron-148.json](benchmarks/full-generation-longer-instruction.electron-148.json),
 [benchmarks/full-generation-longer-instruction-sequential.electron-148.json](benchmarks/full-generation-longer-instruction-sequential.electron-148.json),
-and [benchmarks/full-generation-prefill-crossover.electron-148.json](benchmarks/full-generation-prefill-crossover.electron-148.json)
-retain the raw samples; no fixed-prefill speedup is claimed.
+[benchmarks/full-generation-canonical-suite.optimized.electron-148.json](benchmarks/full-generation-canonical-suite.optimized.electron-148.json),
+and [benchmarks/full-generation-prefill-optimized.electron-148.json](benchmarks/full-generation-prefill-optimized.electron-148.json)
+retain the raw samples and comparison metadata.
+
+At the exact 32-token boundary, optimized fixed-32 now beats current sequential prefill in both
+median TTFT (`302.3 ms` versus `367.6 ms`) and p95 (`304.1 ms` versus `396.1 ms`) with exact output,
+so that focused gate passes. At 153 tokens, chunked-32 improves median TTFT by `5.1%` but one
+`3.84 s` sample nearly doubles p95; automatic long-prompt routing therefore still needs a larger
+tail-latency sweep before promotion.
+
+The active runtime path now includes output-mode specialization (`none`/`greedy`/`logits`), one-pass
+decode and fixed-32 prefill command encoding, packed per-layer token-parameter updates, shared rotary
+buffers across layer profiles, and profile-specialized decode-attention cache addressing. These
+changes preserve exact greedy/sampling/constraint parity while reducing avoidable host-side overhead.
 
 The complete path uses four input-preparation dispatches, the 276-dispatch transformer stack, one
 LM-head dispatch, and two deterministic argmax dispatches: 283 compute dispatches per evaluated

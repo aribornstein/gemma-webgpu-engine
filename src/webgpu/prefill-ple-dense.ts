@@ -128,10 +128,18 @@ export function encodeGemmaPrefillPleDense(
   resources: GemmaPrefillPleDenseResources,
 ): void {
   const pass = encoder.beginComputePass({ label: compiled.pipeline.label });
+  encodeGemmaPrefillPleDensePass(pass, compiled, resources);
+  pass.end();
+}
+
+export function encodeGemmaPrefillPleDensePass(
+  pass: GPUComputePassEncoder,
+  compiled: GemmaPrefillPleDensePipeline,
+  resources: GemmaPrefillPleDenseResources,
+): void {
   pass.setPipeline(compiled.pipeline);
   pass.setBindGroup(0, resources.bindGroup);
   pass.dispatchWorkgroups(resources.workgroupCountX, resources.workgroupCountY);
-  pass.end();
 }
 
 export function destroyGemmaPrefillPleDenseResources(

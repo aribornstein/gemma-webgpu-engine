@@ -30,6 +30,7 @@ export type GemmaGenerationOptions = Partial<DecodingConfig> & {
   onVisionProgress?: (progress: GemmaVisionGenerationProgress) => void;
   onPrefillProgress?: (progress: GemmaPrefillGenerationProgress) => void;
   constraint?: GenerationConstraint;
+  reusePromptCache?: boolean;
 };
 
 export const DEFAULT_GENERATION_CONFIG: DecodingConfig = {

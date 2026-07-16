@@ -344,6 +344,15 @@ export function encodeDecodeMlpPleBlock(
   resources: DecodeMlpPleBlockResources,
 ): void {
   const pass = encoder.beginComputePass({ label: "Layer-0 MLP/PLE four-dispatch block" });
+  encodeDecodeMlpPleBlockPass(pass, pipelines, resources);
+  pass.end();
+}
+
+export function encodeDecodeMlpPleBlockPass(
+  pass: GPUComputePassEncoder,
+  pipelines: DecodeMlpPleBlockPipelines,
+  resources: DecodeMlpPleBlockResources,
+): void {
   pass.setPipeline(pipelines.gateUp);
   pass.setBindGroup(0, resources.gateUpBindGroup);
   pass.dispatchWorkgroups(pipelines.gateUpWorkgroupCount);
@@ -356,7 +365,6 @@ export function encodeDecodeMlpPleBlock(
   pass.setPipeline(pipelines.pleProjection);
   pass.setBindGroup(0, resources.pleProjectionBindGroup);
   pass.dispatchWorkgroups(96);
-  pass.end();
 }
 
 export function destroyDecodeMlpPleBlockResources(

@@ -1,18 +1,21 @@
 import type { GemmaRotaryBlock } from "../model/gemma-rope";
 import {
   createGemmaDecodeInputResources,
-  encodeGemmaDecodeInput,
+  encodeGemmaDecodeInputPass,
   type GemmaDecodeInputResources,
 } from "./decode-input";
 import {
-  encodeGemmaGreedy,
+  encodeGemmaGreedyPass,
   readGemmaGreedyResult,
-  type GemmaGreedyResult,
 } from "./decode-greedy";
-import type { GemmaDecodeModelResources } from "./decode-model";
+import type {
+  GemmaDecodeModelResources,
+  GemmaModelOutput,
+  GemmaModelOutputMode,
+} from "./decode-model";
 import {
   createGemmaPrefillAttentionResources,
-  encodeGemmaPrefillAttention,
+  encodeGemmaPrefillAttentionPass,
   getGemmaPrefillAttentionPipeline,
   updateGemmaPrefillAttention,
   type GemmaPrefillAttentionPipeline,
@@ -22,21 +25,21 @@ import {
   createGemmaPrefillAddResources,
   createGemmaPrefillGeluMultiplyResources,
   createGemmaPrefillMultiplyResources,
-  encodeGemmaPrefillElementwise,
+  encodeGemmaPrefillElementwisePass,
   getGemmaPrefillElementwisePipelines,
   type GemmaPrefillElementwisePipelines,
   type GemmaPrefillElementwiseResources,
 } from "./prefill-elementwise";
 import {
   createGemmaPrefillPleDenseResources,
-  encodeGemmaPrefillPleDense,
+  encodeGemmaPrefillPleDensePass,
   getGemmaPrefillPleDensePipeline,
   type GemmaPrefillPleDensePipeline,
   type GemmaPrefillPleDenseResources,
 } from "./prefill-ple-dense";
 import {
   createGemmaPrefillQatLinearResources,
-  encodeGemmaPrefillQatLinear,
+  encodeGemmaPrefillQatLinearPass,
   getGemmaPrefillQatLinearPipelines,
   type GemmaPrefillBufferSlice,
   type GemmaPrefillQatLinearPipelines,
@@ -45,7 +48,7 @@ import {
 } from "./prefill-qat-linear";
 import {
   createGemmaPrefillRmsResources,
-  encodeGemmaPrefillRms,
+  encodeGemmaPrefillRmsPass,
   getGemmaPrefillRmsPipeline,
   type GemmaPrefillRmsBufferSlice,
   type GemmaPrefillRmsPipeline,
@@ -53,7 +56,7 @@ import {
 } from "./prefill-rms";
 import {
   createGemmaPrefillRopeResources,
-  encodeGemmaPrefillRope,
+  encodeGemmaPrefillRopePass,
   getGemmaPrefillRopePipeline,
   updateGemmaPrefillRope,
   type GemmaPrefillRopePipeline,
@@ -61,7 +64,7 @@ import {
 } from "./prefill-rope";
 import {
   createGemmaPrefillStridedCopyResources,
-  encodeGemmaPrefillStridedCopy,
+  encodeGemmaPrefillStridedCopyPass,
   getGemmaPrefillStridedCopyPipeline,
   updateGemmaPrefillStridedCopy,
   type GemmaPrefillStridedCopyResources,
@@ -846,100 +849,127 @@ export function updateGemmaFixedPrefill(
 export function encodeGemmaFixedPrefill(
   encoder: GPUCommandEncoder,
   resources: GemmaFixedPrefillResources,
+  outputMode: GemmaModelOutputMode = "greedy",
+  logitsReadback?: GPUBuffer,
 ): void {
-  encodeGemmaDecodeInput(encoder, resources.decode.inputPipeline, resources.input);
+  const pass = encoder.beginComputePass({ label: "Gemma fixed-32 prefill" });
+  encodeGemmaDecodeInputPass(pass, resources.decode.inputPipeline, resources.input);
   for (const layer of resources.layers) {
-    encodeNorm(encoder, layer.inputNorm);
-    encodeProjection(encoder, layer.query);
-    encodeNorm(encoder, layer.queryNorm);
-    encodeRope(encoder, layer.queryRope);
+    encodeNorm(pass, layer.inputNorm);
+    encodeProjection(pass, layer.query);
+    encodeNorm(pass, layer.queryNorm);
+    encodeRope(pass, layer.queryRope);
     if (layer.key && layer.keyNorm && layer.keyRope && layer.value && layer.valueNorm &&
         layer.keyCopy && layer.valueCopy) {
-      encodeProjection(encoder, layer.key);
-      encodeNorm(encoder, layer.keyNorm);
-      encodeRope(encoder, layer.keyRope);
-      encodeProjection(encoder, layer.value);
-      encodeNorm(encoder, layer.valueNorm);
-      encodeGemmaPrefillStridedCopy(
-        encoder,
+      encodeProjection(pass, layer.key);
+      encodeNorm(pass, layer.keyNorm);
+      encodeRope(pass, layer.keyRope);
+      encodeProjection(pass, layer.value);
+      encodeNorm(pass, layer.valueNorm);
+      encodeGemmaPrefillStridedCopyPass(
+        pass,
         resources.stridedCopyPipeline,
         layer.keyCopy,
         GEMMA_FIXED_PREFILL_ROWS,
       );
-      encodeGemmaPrefillStridedCopy(
-        encoder,
+      encodeGemmaPrefillStridedCopyPass(
+        pass,
         resources.stridedCopyPipeline,
         layer.valueCopy,
         GEMMA_FIXED_PREFILL_ROWS,
       );
     }
-    encodeGemmaPrefillAttention(
-      encoder,
+    encodeGemmaPrefillAttentionPass(
+      pass,
       layer.attentionPipeline,
       layer.attention,
       GEMMA_FIXED_PREFILL_ROWS,
     );
-    encodeProjection(encoder, layer.outputProjection);
-    encodeNorm(encoder, layer.postAttentionNorm);
-    encodeGemmaPrefillElementwise(
-      encoder,
+    encodeProjection(pass, layer.outputProjection);
+    encodeNorm(pass, layer.postAttentionNorm);
+    encodeGemmaPrefillElementwisePass(
+      pass,
       resources.elementwisePipelines.add,
       layer.attentionResidual,
     );
-    encodeNorm(encoder, layer.preFeedforwardNorm);
-    encodeProjection(encoder, layer.gate);
-    encodeProjection(encoder, layer.up);
-    encodeGemmaPrefillElementwise(
-      encoder,
+    encodeNorm(pass, layer.preFeedforwardNorm);
+    encodeProjection(pass, layer.gate);
+    encodeProjection(pass, layer.up);
+    encodeGemmaPrefillElementwisePass(
+      pass,
       resources.elementwisePipelines.geluMultiply,
       layer.gateActivation,
     );
-    encodeProjection(encoder, layer.down);
-    encodeNorm(encoder, layer.postFeedforwardNorm);
-    encodeGemmaPrefillElementwise(
-      encoder,
+    encodeProjection(pass, layer.down);
+    encodeNorm(pass, layer.postFeedforwardNorm);
+    encodeGemmaPrefillElementwisePass(
+      pass,
       resources.elementwisePipelines.add,
       layer.feedforwardResidual,
     );
-    encodeGemmaPrefillStridedCopy(
-      encoder,
+    encodeGemmaPrefillStridedCopyPass(
+      pass,
       resources.stridedCopyPipeline,
       layer.pleInputCopy,
       GEMMA_FIXED_PREFILL_ROWS,
     );
-    encodePleProjection(encoder, layer.pleGate);
-    encodeGemmaPrefillElementwise(
-      encoder,
+    encodePleProjection(pass, layer.pleGate);
+    encodeGemmaPrefillElementwisePass(
+      pass,
       resources.elementwisePipelines.geluMultiply,
       layer.pleActivation,
     );
-    encodePleProjection(encoder, layer.pleProjection);
-    encodeNorm(encoder, layer.postPleNorm);
-    encodeGemmaPrefillElementwise(
-      encoder,
+    encodePleProjection(pass, layer.pleProjection);
+    encodeNorm(pass, layer.postPleNorm);
+    encodeGemmaPrefillElementwisePass(
+      pass,
       resources.elementwisePipelines.add,
       layer.pleResidual,
     );
-    encodeGemmaPrefillElementwise(
-      encoder,
+    encodeGemmaPrefillElementwisePass(
+      pass,
       resources.elementwisePipelines.multiply,
       layer.layerScale,
     );
   }
-  encodeNorm(encoder, resources.finalNorm);
-  encodeGemmaPrefillStridedCopy(
-    encoder,
-    resources.stridedCopyPipeline,
-    resources.lastRowCopy,
-    1,
-  );
-  encodeProjection(encoder, resources.lmHead);
-  encodeGemmaGreedy(
-    encoder,
-    resources.decode.greedyPipelines,
-    resources.decode.greedy,
-    true,
-  );
+  if (outputMode !== "none") {
+    encodeNorm(pass, resources.finalNorm);
+    encodeGemmaPrefillStridedCopyPass(
+      pass,
+      resources.stridedCopyPipeline,
+      resources.lastRowCopy,
+      1,
+    );
+    encodeProjection(pass, resources.lmHead);
+    if (outputMode === "greedy") {
+      encodeGemmaGreedyPass(
+        pass,
+        resources.decode.greedyPipelines,
+        resources.decode.greedy,
+      );
+    }
+  }
+  pass.end();
+  if (outputMode === "greedy") {
+    encoder.copyBufferToBuffer(
+      resources.decode.greedy.result,
+      0,
+      resources.decode.greedy.readback,
+      0,
+      8,
+    );
+  } else if (outputMode === "logits") {
+    if (!logitsReadback || logitsReadback.size < resources.decode.logits.size) {
+      throw new Error("Gemma prefill logits output requires a matching readback buffer");
+    }
+    encoder.copyBufferToBuffer(
+      resources.decode.logits,
+      0,
+      logitsReadback,
+      0,
+      resources.decode.logits.size,
+    );
+  }
 }
 
 export async function submitGemmaFixedPrefill(
@@ -947,15 +977,37 @@ export async function submitGemmaFixedPrefill(
   resources: GemmaFixedPrefillResources,
   position: number,
   validRows: number,
-): Promise<GemmaGreedyResult> {
+  outputMode: GemmaModelOutputMode = "greedy",
+  logitsReadback?: GPUBuffer,
+): Promise<GemmaModelOutput> {
   const encoder = device.createCommandEncoder({ label: "Gemma fixed-32 prefill" });
-  encodeGemmaFixedPrefill(encoder, resources);
+  encodeGemmaFixedPrefill(encoder, resources, outputMode, logitsReadback);
   device.queue.submit([encoder.finish()]);
-  await device.queue.onSubmittedWorkDone();
+  if (outputMode === "none") await device.queue.onSubmittedWorkDone();
   for (const cache of resources.decode.stack.ownerCaches.values()) {
     cache.commitWrite(position, validRows);
   }
-  return readGemmaGreedyResult(resources.decode.greedy);
+  if (outputMode === "greedy") {
+    return {
+      prediction: await readGemmaGreedyResult(resources.decode.greedy),
+      logits: null,
+      logitsReadbackMs: 0,
+    };
+  }
+  if (outputMode === "logits") {
+    const startedAt = performance.now();
+    await logitsReadback!.mapAsync(GPUMapMode.READ);
+    const logits = new Float32Array(
+      logitsReadback!.getMappedRange(0, resources.decode.logits.size).slice(0),
+    );
+    logitsReadback!.unmap();
+    return {
+      prediction: null,
+      logits,
+      logitsReadbackMs: performance.now() - startedAt,
+    };
+  }
+  return { prediction: null, logits: null, logitsReadbackMs: 0 };
 }
 
 export function destroyGemmaFixedPrefillResources(
@@ -964,20 +1016,20 @@ export function destroyGemmaFixedPrefillResources(
   for (const buffer of resources.ownedBuffers.toReversed()) buffer.destroy();
 }
 
-function encodeNorm(encoder: GPUCommandEncoder, norm: GemmaPrefillNorm): void {
-  encodeGemmaPrefillRms(encoder, norm.pipeline, norm.resources);
+function encodeNorm(pass: GPUComputePassEncoder, norm: GemmaPrefillNorm): void {
+  encodeGemmaPrefillRmsPass(pass, norm.pipeline, norm.resources);
 }
 
 function encodeProjection(
-  encoder: GPUCommandEncoder,
+  pass: GPUComputePassEncoder,
   projection: GemmaPrefillProjection,
 ): void {
-  encodeGemmaPrefillQatLinear(encoder, projection.pipelines, projection.resources);
+  encodeGemmaPrefillQatLinearPass(pass, projection.pipelines, projection.resources);
 }
 
-function encodeRope(encoder: GPUCommandEncoder, rope: GemmaPrefillRope): void {
-  encodeGemmaPrefillRope(
-    encoder,
+function encodeRope(pass: GPUComputePassEncoder, rope: GemmaPrefillRope): void {
+  encodeGemmaPrefillRopePass(
+    pass,
     rope.pipeline,
     rope.resources,
     GEMMA_FIXED_PREFILL_ROWS,
@@ -985,10 +1037,10 @@ function encodeRope(encoder: GPUCommandEncoder, rope: GemmaPrefillRope): void {
 }
 
 function encodePleProjection(
-  encoder: GPUCommandEncoder,
+  pass: GPUComputePassEncoder,
   projection: GemmaPrefillPleProjection,
 ): void {
-  encodeGemmaPrefillPleDense(encoder, projection.pipeline, projection.resources);
+  encodeGemmaPrefillPleDensePass(pass, projection.pipeline, projection.resources);
 }
 
 function slice(buffer: GPUBuffer, offset: number, size: number): GemmaPrefillBufferSlice {

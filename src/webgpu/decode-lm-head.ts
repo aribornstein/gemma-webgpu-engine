@@ -147,10 +147,18 @@ export function encodeGemmaLmHead(
   resources: GemmaLmHeadResources,
 ): void {
   const pass = encoder.beginComputePass({ label: "Gemma int2 LM head" });
+  encodeGemmaLmHeadPass(pass, pipeline, resources);
+  pass.end();
+}
+
+export function encodeGemmaLmHeadPass(
+  pass: GPUComputePassEncoder,
+  pipeline: GemmaLmHeadPipeline,
+  resources: GemmaLmHeadResources,
+): void {
   pass.setPipeline(pipeline.pipeline);
   pass.setBindGroup(0, resources.bindGroup);
   pass.dispatchWorkgroups(pipeline.workgroupCount);
-  pass.end();
 }
 
 export function destroyGemmaLmHeadResources(resources: GemmaLmHeadResources): void {

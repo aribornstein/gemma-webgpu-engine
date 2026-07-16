@@ -1,0 +1,869 @@
+{
+  "schemaVersion": 2,
+  "capturedAt": "2026-07-16T12:50:31.519Z",
+  "status": "owned-full-generation-optimized-canonical-suite",
+  "speedupClaim": null,
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "sourceKey": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+    "fileSize": 2458111846
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.128.0 Chrome/148.0.7778.271 Electron/42.5.0 Safari/537.36",
+    "adapterInfo": {
+      "vendor": "apple",
+      "architecture": "metal-3"
+    },
+    "powerPreference": "high-performance"
+  },
+  "configuration": {
+    "cacheCapacity": 512,
+    "prefillStrategy": "sequential",
+    "reusePromptCache": false,
+    "warmupIterations": 1,
+    "iterations": 3
+  },
+  "load": {
+    "sessionLoadMs": 6997.4,
+    "note": "One warm session; one warmup and three measured fresh-prefill runs per canonical case."
+  },
+  "memory": {
+    "gpuBufferCount": 1469,
+    "gpuBufferBytes": 832566596,
+    "scope": "retained-resource-graph"
+  },
+  "correctness": {
+    "allCasesMatchGolden": true,
+    "allSamplesUsedFreshPrefill": true
+  },
+  "cases": [
+    {
+      "id": "short-greeting",
+      "prompt": "Say hi in one short sentence.",
+      "maxNewTokens": 8,
+      "promptTokens": 16,
+      "expectedTokenIds": [
+        10979,
+        236888
+      ],
+      "expectedText": "Hi!",
+      "samples": [
+        {
+          "iteration": 0,
+          "timing": {
+            "requestSetupMs": 0.5,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 197.29999995231628,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 197.79999995231628,
+            "decodeTokenMs": [
+              15.300000071525574,
+              13.399999976158142
+            ],
+            "interTokenLatencyMs": [
+              15.300000071525574
+            ],
+            "timePerOutputTokenMs": 15.300000071525574,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 226.5
+          },
+          "generatedTokenIds": [
+            10979,
+            236888
+          ],
+          "text": "Hi!",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 1,
+          "timing": {
+            "requestSetupMs": 0.6999999284744263,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0.10000002384185791,
+            "promptTokensReused": 0,
+            "prefillMs": 214.10000002384186,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 214.89999997615814,
+            "decodeTokenMs": [
+              16.399999976158142,
+              15.299999952316284
+            ],
+            "interTokenLatencyMs": [
+              16.399999976158142
+            ],
+            "timePerOutputTokenMs": 16.399999976158142,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 246.79999995231628
+          },
+          "generatedTokenIds": [
+            10979,
+            236888
+          ],
+          "text": "Hi!",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 2,
+          "timing": {
+            "requestSetupMs": 0.5,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 219.39999997615814,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 219.89999997615814,
+            "decodeTokenMs": [
+              16.299999952316284,
+              18
+            ],
+            "interTokenLatencyMs": [
+              16.299999952316284
+            ],
+            "timePerOutputTokenMs": 16.299999952316284,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 254.19999992847443
+          },
+          "generatedTokenIds": [
+            10979,
+            236888
+          ],
+          "text": "Hi!",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        }
+      ],
+      "correctness": {
+        "allIterationsMatchGolden": true
+      },
+      "summary": {
+        "prefill": {
+          "medianMs": 214.1,
+          "p95Ms": 219.4,
+          "averageMs": 210.267
+        },
+        "timeToFirstToken": {
+          "medianMs": 214.9,
+          "p95Ms": 219.9,
+          "averageMs": 210.867
+        },
+        "decodeToken": {
+          "medianMs": 15.3,
+          "p95Ms": 18,
+          "averageMs": 15.783
+        },
+        "interTokenLatency": {
+          "medianMs": 16.3,
+          "p95Ms": 16.4,
+          "averageMs": 16
+        },
+        "timePerOutputToken": {
+          "medianMs": 16.3,
+          "p95Ms": 16.4,
+          "averageMs": 16
+        },
+        "total": {
+          "medianMs": 246.8,
+          "p95Ms": 254.2,
+          "averageMs": 242.5
+        },
+        "warmDecodeTokensPerSecond": 63.358,
+        "endToEndTokensPerSecond": 8.247
+      }
+    },
+    {
+      "id": "arithmetic",
+      "prompt": "Reply with only the number: 7 + 5.",
+      "maxNewTokens": 8,
+      "promptTokens": 21,
+      "expectedTokenIds": [
+        236770,
+        236778
+      ],
+      "expectedText": "12",
+      "samples": [
+        {
+          "iteration": 0,
+          "timing": {
+            "requestSetupMs": 0.2999999523162842,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0.10000002384185791,
+            "promptTokensReused": 0,
+            "prefillMs": 244.5,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 244.89999997615814,
+            "decodeTokenMs": [
+              12.899999976158142,
+              12.700000047683716
+            ],
+            "interTokenLatencyMs": [
+              12.899999976158142
+            ],
+            "timePerOutputTokenMs": 12.899999976158142,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 270.59999990463257
+          },
+          "generatedTokenIds": [
+            236770,
+            236778
+          ],
+          "text": "12",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 1,
+          "timing": {
+            "requestSetupMs": 0.30000007152557373,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 239.19999992847443,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 239.5,
+            "decodeTokenMs": [
+              13.300000071525574,
+              12.299999952316284
+            ],
+            "interTokenLatencyMs": [
+              13.300000071525574
+            ],
+            "timePerOutputTokenMs": 13.300000071525574,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 265.2000000476837
+          },
+          "generatedTokenIds": [
+            236770,
+            236778
+          ],
+          "text": "12",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 2,
+          "timing": {
+            "requestSetupMs": 0.3999999761581421,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0.10000002384185791,
+            "promptTokensReused": 0,
+            "prefillMs": 256.59999990463257,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 257.09999990463257,
+            "decodeTokenMs": [
+              14.700000047683716,
+              14.100000023841858
+            ],
+            "interTokenLatencyMs": [
+              14.700000047683716
+            ],
+            "timePerOutputTokenMs": 14.700000047683716,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 286
+          },
+          "generatedTokenIds": [
+            236770,
+            236778
+          ],
+          "text": "12",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        }
+      ],
+      "correctness": {
+        "allIterationsMatchGolden": true
+      },
+      "summary": {
+        "prefill": {
+          "medianMs": 244.5,
+          "p95Ms": 256.6,
+          "averageMs": 246.767
+        },
+        "timeToFirstToken": {
+          "medianMs": 244.9,
+          "p95Ms": 257.1,
+          "averageMs": 247.167
+        },
+        "decodeToken": {
+          "medianMs": 12.9,
+          "p95Ms": 14.7,
+          "averageMs": 13.333
+        },
+        "interTokenLatency": {
+          "medianMs": 13.3,
+          "p95Ms": 14.7,
+          "averageMs": 13.633
+        },
+        "timePerOutputToken": {
+          "medianMs": 13.3,
+          "p95Ms": 14.7,
+          "averageMs": 13.633
+        },
+        "total": {
+          "medianMs": 270.6,
+          "p95Ms": 286,
+          "averageMs": 273.933
+        },
+        "warmDecodeTokensPerSecond": 75,
+        "endToEndTokensPerSecond": 7.301
+      }
+    },
+    {
+      "id": "arabic",
+      "prompt": "قل مرحباً بجملة قصيرة.",
+      "maxNewTokens": 12,
+      "promptTokens": 18,
+      "expectedTokenIds": [
+        237143,
+        236910,
+        70436,
+        60774,
+        236888
+      ],
+      "expectedText": "أهلاً بك!",
+      "samples": [
+        {
+          "iteration": 0,
+          "timing": {
+            "requestSetupMs": 0.30000007152557373,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 215,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 215.30000007152557,
+            "decodeTokenMs": [
+              13.399999976158142,
+              12.799999952316284,
+              12.300000071525574,
+              12,
+              13.299999952316284
+            ],
+            "interTokenLatencyMs": [
+              13.399999976158142,
+              12.799999952316284,
+              12.300000071525574,
+              12
+            ],
+            "timePerOutputTokenMs": 12.625,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 279.10000002384186
+          },
+          "generatedTokenIds": [
+            237143,
+            236910,
+            70436,
+            60774,
+            236888
+          ],
+          "text": "أهلاً بك!",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 1,
+          "timing": {
+            "requestSetupMs": 0.30000007152557373,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0.09999990463256836,
+            "promptTokensReused": 0,
+            "prefillMs": 203.5,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 203.89999997615814,
+            "decodeTokenMs": [
+              12.900000095367432,
+              13.099999904632568,
+              12.300000071525574,
+              12,
+              12.699999928474426
+            ],
+            "interTokenLatencyMs": [
+              12.900000095367432,
+              13.099999904632568,
+              12.300000071525574,
+              12
+            ],
+            "timePerOutputTokenMs": 12.575000017881393,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 266.89999997615814
+          },
+          "generatedTokenIds": [
+            237143,
+            236910,
+            70436,
+            60774,
+            236888
+          ],
+          "text": "أهلاً بك!",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 2,
+          "timing": {
+            "requestSetupMs": 0.30000007152557373,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0.10000002384185791,
+            "promptTokensReused": 0,
+            "prefillMs": 205.29999995231628,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 205.70000004768372,
+            "decodeTokenMs": [
+              12.299999952316284,
+              13.200000047683716,
+              11.899999976158142,
+              13.800000071525574,
+              13.5
+            ],
+            "interTokenLatencyMs": [
+              12.299999952316284,
+              13.200000047683716,
+              11.899999976158142,
+              13.800000071525574
+            ],
+            "timePerOutputTokenMs": 12.800000011920929,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 270.40000009536743
+          },
+          "generatedTokenIds": [
+            237143,
+            236910,
+            70436,
+            60774,
+            236888
+          ],
+          "text": "أهلاً بك!",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        }
+      ],
+      "correctness": {
+        "allIterationsMatchGolden": true
+      },
+      "summary": {
+        "prefill": {
+          "medianMs": 205.3,
+          "p95Ms": 215,
+          "averageMs": 207.933
+        },
+        "timeToFirstToken": {
+          "medianMs": 205.7,
+          "p95Ms": 215.3,
+          "averageMs": 208.3
+        },
+        "decodeToken": {
+          "medianMs": 12.8,
+          "p95Ms": 13.8,
+          "averageMs": 12.767
+        },
+        "interTokenLatency": {
+          "medianMs": 12.3,
+          "p95Ms": 13.8,
+          "averageMs": 12.667
+        },
+        "timePerOutputToken": {
+          "medianMs": 12.625,
+          "p95Ms": 12.8,
+          "averageMs": 12.667
+        },
+        "total": {
+          "medianMs": 270.4,
+          "p95Ms": 279.1,
+          "averageMs": 272.133
+        },
+        "warmDecodeTokensPerSecond": 78.329,
+        "endToEndTokensPerSecond": 18.373
+      }
+    },
+    {
+      "id": "longer-instruction",
+      "prompt": "Name the three primary colors in one short sentence.",
+      "maxNewTokens": 16,
+      "promptTokens": 19,
+      "expectedTokenIds": [
+        818,
+        5905,
+        7913,
+        659,
+        2604,
+        236764,
+        7070,
+        236764,
+        532,
+        3730,
+        236761
+      ],
+      "expectedText": "The primary colors are red, yellow, and blue.",
+      "samples": [
+        {
+          "iteration": 0,
+          "timing": {
+            "requestSetupMs": 0.19999992847442627,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0.10000002384185791,
+            "promptTokensReused": 0,
+            "prefillMs": 202.79999995231628,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 203.09999990463257,
+            "decodeTokenMs": [
+              11.200000047683716,
+              11.899999976158142,
+              12.5,
+              14.200000047683716,
+              14.299999952316284,
+              15.700000047683716,
+              14.299999952316284,
+              16.5,
+              17.899999976158142,
+              18.100000023841858,
+              20.700000047683716
+            ],
+            "interTokenLatencyMs": [
+              11.200000047683716,
+              11.899999976158142,
+              12.5,
+              14.200000047683716,
+              14.299999952316284,
+              15.700000047683716,
+              14.299999952316284,
+              16.5,
+              17.899999976158142,
+              18.100000023841858
+            ],
+            "timePerOutputTokenMs": 14.660000002384185,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 370.39999997615814
+          },
+          "generatedTokenIds": [
+            818,
+            5905,
+            7913,
+            659,
+            2604,
+            236764,
+            7070,
+            236764,
+            532,
+            3730,
+            236761
+          ],
+          "text": "The primary colors are red, yellow, and blue.",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 1,
+          "timing": {
+            "requestSetupMs": 0.5,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 224.5,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 225,
+            "decodeTokenMs": [
+              12.100000023841858,
+              12.599999904632568,
+              12,
+              11.899999976158142,
+              12.300000071525574,
+              12,
+              11.199999928474426,
+              12.400000095367432,
+              12.099999904632568,
+              11.900000095367432,
+              11.799999952316284
+            ],
+            "interTokenLatencyMs": [
+              12.100000023841858,
+              12.699999928474426,
+              12,
+              11.899999976158142,
+              12.300000071525574,
+              12,
+              11.199999928474426,
+              12.400000095367432,
+              12.099999904632568,
+              11.900000095367432
+            ],
+            "timePerOutputTokenMs": 12.060000002384186,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 357.39999997615814
+          },
+          "generatedTokenIds": [
+            818,
+            5905,
+            7913,
+            659,
+            2604,
+            236764,
+            7070,
+            236764,
+            532,
+            3730,
+            236761
+          ],
+          "text": "The primary colors are red, yellow, and blue.",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 2,
+          "timing": {
+            "requestSetupMs": 0.2999999523162842,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 216.40000009536743,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 216.70000004768372,
+            "decodeTokenMs": [
+              12.399999976158142,
+              14.199999928474426,
+              12.600000023841858,
+              14.100000023841858,
+              13.399999976158142,
+              13.700000047683716,
+              13,
+              12.399999976158142,
+              13.399999976158142,
+              12.100000023841858,
+              12.899999976158142
+            ],
+            "interTokenLatencyMs": [
+              12.399999976158142,
+              14.299999952316284,
+              12.600000023841858,
+              14.100000023841858,
+              13.399999976158142,
+              13.700000047683716,
+              13,
+              12.399999976158142,
+              13.399999976158142,
+              12.100000023841858
+            ],
+            "timePerOutputTokenMs": 13.139999997615813,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 361
+          },
+          "generatedTokenIds": [
+            818,
+            5905,
+            7913,
+            659,
+            2604,
+            236764,
+            7070,
+            236764,
+            532,
+            3730,
+            236761
+          ],
+          "text": "The primary colors are red, yellow, and blue.",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        }
+      ],
+      "correctness": {
+        "allIterationsMatchGolden": true
+      },
+      "summary": {
+        "prefill": {
+          "medianMs": 216.4,
+          "p95Ms": 224.5,
+          "averageMs": 214.567
+        },
+        "timeToFirstToken": {
+          "medianMs": 216.7,
+          "p95Ms": 225,
+          "averageMs": 214.933
+        },
+        "decodeToken": {
+          "medianMs": 12.6,
+          "p95Ms": 18.1,
+          "averageMs": 13.448
+        },
+        "interTokenLatency": {
+          "medianMs": 12.5,
+          "p95Ms": 17.9,
+          "averageMs": 13.287
+        },
+        "timePerOutputToken": {
+          "medianMs": 13.14,
+          "p95Ms": 14.66,
+          "averageMs": 13.287
+        },
+        "total": {
+          "medianMs": 361,
+          "p95Ms": 370.4,
+          "averageMs": 362.933
+        },
+        "warmDecodeTokensPerSecond": 74.358,
+        "endToEndTokensPerSecond": 30.309
+      }
+    },
+    {
+      "id": "prefill-32-boundary",
+      "prompt": "Reply with only OK. word word word word word word word word word word word word word word word word word word",
+      "maxNewTokens": 8,
+      "promptTokens": 32,
+      "expectedTokenIds": [
+        7676
+      ],
+      "expectedText": "OK",
+      "samples": [
+        {
+          "iteration": 0,
+          "timing": {
+            "requestSetupMs": 0.30000007152557373,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 367.2999999523163,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 367.60000002384186,
+            "decodeTokenMs": [
+              13.399999976158142
+            ],
+            "interTokenLatencyMs": [],
+            "timePerOutputTokenMs": null,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 381
+          },
+          "generatedTokenIds": [
+            7676
+          ],
+          "text": "OK",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 1,
+          "timing": {
+            "requestSetupMs": 0.3999999761581421,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 395.7000000476837,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 396.10000002384186,
+            "decodeTokenMs": [
+              12.200000047683716
+            ],
+            "interTokenLatencyMs": [],
+            "timePerOutputTokenMs": null,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 408.3000000715256
+          },
+          "generatedTokenIds": [
+            7676
+          ],
+          "text": "OK",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        },
+        {
+          "iteration": 2,
+          "timing": {
+            "requestSetupMs": 0.19999992847442627,
+            "visionPreprocessMs": 0,
+            "visionEncodeMs": 0,
+            "cacheResetMs": 0,
+            "promptTokensReused": 0,
+            "prefillMs": 358.5,
+            "prefillMode": "sequential",
+            "timeToFirstTokenMs": 358.7999999523163,
+            "decodeTokenMs": [
+              12.100000023841858
+            ],
+            "interTokenLatencyMs": [],
+            "timePerOutputTokenMs": null,
+            "logitsReadbackMs": 0,
+            "callbackMs": 0,
+            "totalMs": 370.89999997615814
+          },
+          "generatedTokenIds": [
+            7676
+          ],
+          "text": "OK",
+          "stopReason": "end-token",
+          "exactGoldenMatch": true
+        }
+      ],
+      "correctness": {
+        "allIterationsMatchGolden": true
+      },
+      "summary": {
+        "prefill": {
+          "medianMs": 367.3,
+          "p95Ms": 395.7,
+          "averageMs": 373.833
+        },
+        "timeToFirstToken": {
+          "medianMs": 367.6,
+          "p95Ms": 396.1,
+          "averageMs": 374.167
+        },
+        "decodeToken": {
+          "medianMs": 12.2,
+          "p95Ms": 13.4,
+          "averageMs": 12.567
+        },
+        "interTokenLatency": null,
+        "timePerOutputToken": null,
+        "total": {
+          "medianMs": 381,
+          "p95Ms": 408.3,
+          "averageMs": 386.733
+        },
+        "warmDecodeTokensPerSecond": 79.576,
+        "endToEndTokensPerSecond": 2.586
+      }
+    }
+  ],
+  "comparisonToJuly15LongerInstruction": {
+    "baselineArtifact": "full-generation-longer-instruction-sequential.electron-148.json",
+    "baselineCapturedAt": "2026-07-15T21:38:02.232Z",
+    "medianPrefillChangePercent": -42.827,
+    "medianTtftChangePercent": -42.823,
+    "medianDecodeChangePercent": -39.13,
+    "medianTotalChangePercent": -41.052,
+    "warmDecodeTokensPerSecondChangePercent": 50.968,
+    "endToEndTokensPerSecondChangePercent": 67.277,
+    "retainedGpuBufferChange": -171,
+    "retainedGpuByteChange": -14736,
+    "note": "Same checkpoint, Electron 42.5.0 / Chrome 148, Apple Metal 3, canonical prompt and three measured iterations. The new artifact explicitly disables prompt-prefix reuse; the July 15 samples predate the reuse metric but their full prompt-scale prefill timings make them the retained fresh-prefill baseline."
+  }
+}

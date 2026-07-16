@@ -1,13 +1,13 @@
 import type { GemmaLayerProfile } from "../model/gemma-layer-plan";
 import {
   compileDecodeAttentionBlockPipelines,
-  encodeDecodeAttentionBlock,
+  encodeDecodeAttentionBlockPass,
   type DecodeAttentionBlockPipelines,
   type DecodeAttentionBlockResources,
 } from "./decode-attention-block";
 import {
   compileDecodeMlpPleBlockPipelines,
-  encodeDecodeMlpPleBlock,
+  encodeDecodeMlpPleBlockPass,
   type DecodeMlpPleBlockPipelines,
   type DecodeMlpPleBlockResources,
 } from "./decode-mlp-ple-block";
@@ -64,13 +64,23 @@ export function encodeGemmaDecodeLayer(
   pipelines: GemmaDecodeLayerPipelines,
   resources: GemmaDecodeLayerResources,
 ): void {
+  const pass = encoder.beginComputePass({ label: "Gemma decode layer" });
+  encodeGemmaDecodeLayerPass(pass, pipelines, resources);
+  pass.end();
+}
+
+export function encodeGemmaDecodeLayerPass(
+  pass: GPUComputePassEncoder,
+  pipelines: GemmaDecodeLayerPipelines,
+  resources: GemmaDecodeLayerResources,
+): void {
   if (pipelines.profile !== pipelines.attention.profile ||
       pipelines.attention.headDim !== resources.attention.cache.headDim ||
       pipelines.mlp.bitWidth !== (pipelines.profile.endsWith("int2") ? 2 : 4)) {
     throw new Error("Gemma decode layer pipeline geometry is inconsistent");
   }
-  encodeDecodeAttentionBlock(encoder, pipelines.attention, resources.attention);
-  encodeDecodeMlpPleBlock(encoder, pipelines.mlp, resources.mlp);
+  encodeDecodeAttentionBlockPass(pass, pipelines.attention, resources.attention);
+  encodeDecodeMlpPleBlockPass(pass, pipelines.mlp, resources.mlp);
 }
 
 export function gemmaDecodeLayerDispatchCount(

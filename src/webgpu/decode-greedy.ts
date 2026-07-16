@@ -129,19 +129,25 @@ export function encodeGemmaGreedy(
   resources: GemmaGreedyResources,
   copyResult = false,
 ): void {
-  const partialPass = encoder.beginComputePass({ label: "Gemma greedy partial reduction" });
-  partialPass.setPipeline(pipelines.partial);
-  partialPass.setBindGroup(0, resources.partialBindGroup);
-  partialPass.dispatchWorkgroups(pipelines.partialCount);
-  partialPass.end();
-  const finalPass = encoder.beginComputePass({ label: "Gemma greedy final reduction" });
-  finalPass.setPipeline(pipelines.final);
-  finalPass.setBindGroup(0, resources.finalBindGroup);
-  finalPass.dispatchWorkgroups(1);
-  finalPass.end();
+  const pass = encoder.beginComputePass({ label: "Gemma greedy reduction" });
+  encodeGemmaGreedyPass(pass, pipelines, resources);
+  pass.end();
   if (copyResult) {
     encoder.copyBufferToBuffer(resources.result, 0, resources.readback, 0, 8);
   }
+}
+
+export function encodeGemmaGreedyPass(
+  pass: GPUComputePassEncoder,
+  pipelines: GemmaGreedyPipelines,
+  resources: GemmaGreedyResources,
+): void {
+  pass.setPipeline(pipelines.partial);
+  pass.setBindGroup(0, resources.partialBindGroup);
+  pass.dispatchWorkgroups(pipelines.partialCount);
+  pass.setPipeline(pipelines.final);
+  pass.setBindGroup(0, resources.finalBindGroup);
+  pass.dispatchWorkgroups(1);
 }
 
 export async function readGemmaGreedyResult(

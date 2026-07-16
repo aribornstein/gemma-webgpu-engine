@@ -126,14 +126,23 @@ export function encodeGemmaPrefillRope(
   resources: GemmaPrefillRopeResources,
   rows: number,
 ): void {
+  const pass = encoder.beginComputePass({ label: "Gemma prefill exact RoPE" });
+  encodeGemmaPrefillRopePass(pass, compiled, resources, rows);
+  pass.end();
+}
+
+export function encodeGemmaPrefillRopePass(
+  pass: GPUComputePassEncoder,
+  compiled: GemmaPrefillRopePipeline,
+  resources: GemmaPrefillRopeResources,
+  rows: number,
+): void {
   if (!Number.isInteger(rows) || rows < 1 || rows > resources.rowCapacity) {
     throw new Error("Gemma prefill RoPE dispatch rows exceed resource capacity");
   }
-  const pass = encoder.beginComputePass({ label: "Gemma prefill exact RoPE" });
   pass.setPipeline(compiled.pipeline);
   pass.setBindGroup(0, resources.bindGroup);
   pass.dispatchWorkgroups(rows, resources.heads);
-  pass.end();
 }
 
 export function destroyGemmaPrefillRopeResources(

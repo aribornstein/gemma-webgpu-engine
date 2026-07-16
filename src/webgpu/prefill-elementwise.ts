@@ -109,10 +109,18 @@ export function encodeGemmaPrefillElementwise(
   resources: GemmaPrefillElementwiseResources,
 ): void {
   const pass = encoder.beginComputePass({ label: pipeline.label });
+  encodeGemmaPrefillElementwisePass(pass, pipeline, resources);
+  pass.end();
+}
+
+export function encodeGemmaPrefillElementwisePass(
+  pass: GPUComputePassEncoder,
+  pipeline: GPUComputePipeline,
+  resources: GemmaPrefillElementwiseResources,
+): void {
   pass.setPipeline(pipeline);
   pass.setBindGroup(0, resources.bindGroup);
   pass.dispatchWorkgroups(Math.ceil(resources.count / 256));
-  pass.end();
 }
 
 export function destroyGemmaPrefillElementwiseResources(

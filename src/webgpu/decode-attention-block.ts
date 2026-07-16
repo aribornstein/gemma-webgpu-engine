@@ -6,6 +6,7 @@ import type { MaterializedGemmaLayer } from "../model/gemma-layer-materializer";
 import type { GemmaLayerProfile } from "../model/gemma-layer-plan";
 import { loadCapturedQatQkvFixture } from "../model/qat-linear-fixture";
 import { createDecodeAttentionShader } from "./decode-attention";
+import { gemmaDecodeAttentionChunkCount } from "./decode-attention-chunks";
 import { createDecodeKNormRopeShader } from "./decode-k-norm-rope";
 import { DecodeKvCache, resolveDecodeKvCacheAllocation } from "./decode-kv-cache";
 import { createDecodeOprojNormShader } from "./decode-oproj-norm";
@@ -18,6 +19,11 @@ const Q_OUT = 2048;
 const KV_OUT = 256;
 const ATTENTION_CHUNK_COUNT = 32;
 const OPROJ_WORKGROUP_COUNT = 192;
+const QKV_PARAMS_OFFSET = 0;
+const K_NORM_PARAMS_OFFSET = 256;
+const V_NORM_PARAMS_OFFSET = 512;
+const ATTENTION_PARAMS_OFFSET = 768;
+const TOKEN_PARAMS_BYTES = ATTENTION_PARAMS_OFFSET + 32;
 
 export interface DecodeAttentionBlockBenchmarkResult {
   sourceOperators: [
@@ -88,12 +94,15 @@ export interface DecodeAttentionBlockResources {
   readBuffer: GPUBuffer;
   cache: DecodeKvCache;
   cachePosition: number;
+  attentionWindow: number;
+  attentionChunkCount: number;
   cosineBuffer: GPUBuffer;
   sineBuffer: GPUBuffer;
   qkvParamsBuffer: GPUBuffer;
   kNormParamsBuffer: GPUBuffer;
   vNormParamsBuffer: GPUBuffer;
   attentionParamsBuffer: GPUBuffer;
+  tokenParamsUpload: ArrayBuffer;
   modelWeights: DecodeAttentionModelWeightBuffers;
   modelScales: DecodeAttentionModelScales;
   runsInputRms: boolean;
@@ -127,6 +136,11 @@ export interface DecodeAttentionActivationBuffers {
   input: GPUBuffer;
   inputSum: GPUBuffer;
   hidden: GPUBuffer;
+}
+
+export interface DecodeAttentionRotaryBuffers {
+  cosine: GPUBuffer;
+  sine: GPUBuffer;
 }
 
 export interface DecodeAttentionRuntimeInputs {
@@ -378,7 +392,10 @@ export async function compileDecodeAttentionBlockPipelines(
   });
   const vNormModule = device.createShaderModule({ code: createDecodeVRmsShader() });
   const attentionModule = device.createShaderModule({
-    code: createDecodeAttentionShader(headDim),
+    code: createDecodeAttentionShader(
+      headDim,
+      fullAttention ? "linear" : "sliding-512",
+    ),
   });
   const oprojNormModule = device.createShaderModule({
     code: createDecodeOprojNormShader(qOutFeatures),
@@ -482,6 +499,7 @@ export function createGemmaDecodeAttentionBlockResources(
   layer: MaterializedGemmaLayer,
   runtime: DecodeAttentionRuntimeInputs,
   activations?: DecodeAttentionActivationBuffers,
+  rotaryBuffers?: DecodeAttentionRotaryBuffers,
 ): DecodeAttentionBlockResources {
   if (layer.profile !== pipelines.profile) {
     throw new Error(
@@ -506,7 +524,7 @@ export function createGemmaDecodeAttentionBlockResources(
     oprojNormWeights: layer.norms.oProjectionFused,
     oprojOutputScale: layer.outputProjection.outputScale,
     preMlpInputScale: layer.mlp.gate.inputScale,
-  }, runtime, true, undefined, activations);
+  }, runtime, true, undefined, activations, rotaryBuffers);
 }
 
 export function createGemmaDecodeSharedKvAttentionBlockResources(
@@ -515,6 +533,7 @@ export function createGemmaDecodeSharedKvAttentionBlockResources(
   layer: MaterializedGemmaLayer,
   runtime: DecodeSharedKvAttentionRuntimeInputs,
   activations?: DecodeAttentionActivationBuffers,
+  rotaryBuffers?: DecodeAttentionRotaryBuffers,
 ): DecodeAttentionBlockResources {
   if (layer.profile !== pipelines.profile) {
     throw new Error(
@@ -551,7 +570,7 @@ export function createGemmaDecodeSharedKvAttentionBlockResources(
     qHeads: runtime.qHeads,
     kvHeads: runtime.kvHeads,
     window: runtime.window,
-  }, false, runtime.sourceCache, activations);
+  }, false, runtime.sourceCache, activations, rotaryBuffers);
 }
 
 function createAttentionBlockResources(
@@ -562,6 +581,7 @@ function createAttentionBlockResources(
   writesKvCache = true,
   sourceCache?: DecodeKvCache,
   activations?: DecodeAttentionActivationBuffers,
+  rotaryBuffers?: DecodeAttentionRotaryBuffers,
 ): DecodeAttentionBlockResources {
   if (runtime.qHeads * pipelines.headDim !== pipelines.qOutFeatures ||
       runtime.kvHeads * pipelines.headDim !== pipelines.kvOutFeatures) {
@@ -615,20 +635,23 @@ function createAttentionBlockResources(
   const qkvOutputElements = pipelines.qOutFeatures +
     (writesKvCache ? pipelines.kvOutFeatures : 0);
   const qkvOutputBuffer = storageBuffer(device, "Decode block Q and raw K", qkvOutputElements * 4, false, true);
-  const qkvParamsBuffer = uniformBuffer(device, "Decode block QKV parameters", 16);
+  const tokenParamsBuffer = uniformBuffer(device, "Decode block token parameters", TOKEN_PARAMS_BYTES);
   const kNormWeightBuffer = weights.kNormWeight
     ? storageBuffer(device, "Decode block K norm weight", weights.kNormWeight.byteLength, true)
     : null;
-  const cosineBuffer = storageBuffer(device, "Decode block cosine", runtime.cosine.byteLength, true);
-  const sineBuffer = storageBuffer(device, "Decode block sine", runtime.sine.byteLength, true);
-  const kNormParamsBuffer = uniformBuffer(device, "Decode block K norm parameters", 16);
-  const vNormParamsBuffer = uniformBuffer(device, "Decode block V norm parameters", 16);
+  if (rotaryBuffers && (rotaryBuffers.cosine.size !== runtime.cosine.byteLength ||
+      rotaryBuffers.sine.size !== runtime.sine.byteLength)) {
+    throw new Error("Shared decode rotary buffers do not match the attention profile");
+  }
+  const cosineBuffer = rotaryBuffers?.cosine ??
+    storageBuffer(device, "Decode block cosine", runtime.cosine.byteLength, true);
+  const sineBuffer = rotaryBuffers?.sine ??
+    storageBuffer(device, "Decode block sine", runtime.sine.byteLength, true);
   const qNormWeightBuffer = storageBuffer(device, "Decode block Q norm weight", weights.qNormWeight.byteLength, true);
   const partialElements = runtime.qHeads * ATTENTION_CHUNK_COUNT *
     (pipelines.headDim + 2) + runtime.qHeads;
   const partialBuffer = storageBuffer(device, "Decode block attention partials", partialElements * 4, false);
   const attentionOutputBuffer = storageBuffer(device, "Decode block attention output", pipelines.qOutFeatures * 4, false, true);
-  const attentionParamsBuffer = uniformBuffer(device, "Decode block attention parameters", 32);
   const oprojWeightBuffer = storageBuffer(device, "Decode block O projection weights", weights.oprojWeights.byteLength, true);
   const oprojScaleBuffer = storageBuffer(device, "Decode block O projection scales", weights.oprojScales.byteLength, true);
   const oprojNormWeightBuffer = storageBuffer(device, "Decode block O projection norm weights", weights.oprojNormWeights.byteLength, true);
@@ -655,16 +678,12 @@ function createAttentionBlockResources(
     weightBuffer,
     scaleBuffer,
     qkvOutputBuffer,
-    qkvParamsBuffer,
+    tokenParamsBuffer,
     ...(kNormWeightBuffer ? [kNormWeightBuffer] : []),
-    cosineBuffer,
-    sineBuffer,
-    kNormParamsBuffer,
-    vNormParamsBuffer,
+    ...(rotaryBuffers ? [] : [cosineBuffer, sineBuffer]),
     qNormWeightBuffer,
     partialBuffer,
     attentionOutputBuffer,
-    attentionParamsBuffer,
     oprojWeightBuffer,
     oprojScaleBuffer,
     oprojNormWeightBuffer,
@@ -687,35 +706,33 @@ function createAttentionBlockResources(
   }
   device.queue.writeBuffer(weightBuffer, 0, weights.qkvWeights);
   device.queue.writeBuffer(scaleBuffer, 0, weights.qkvScales);
-  device.queue.writeBuffer(qkvParamsBuffer, 0, weights.qkvOutputScales);
-  device.queue.writeBuffer(qkvParamsBuffer, 12, new Uint32Array([cache.elementOffset(cachePosition)]));
+  const tokenParamsUpload = new ArrayBuffer(TOKEN_PARAMS_BYTES);
+  const tokenParamsView = new DataView(tokenParamsUpload);
+  new Float32Array(tokenParamsUpload, QKV_PARAMS_OFFSET, 3).set(weights.qkvOutputScales);
+  tokenParamsView.setUint32(QKV_PARAMS_OFFSET + 12, cache.elementOffset(cachePosition), true);
   if (kNormWeightBuffer && weights.kNormWeight) {
     device.queue.writeBuffer(kNormWeightBuffer, 0, weights.kNormWeight);
   }
-  device.queue.writeBuffer(cosineBuffer, 0, runtime.cosine);
-  device.queue.writeBuffer(sineBuffer, 0, runtime.sine);
-  device.queue.writeBuffer(
-    kNormParamsBuffer,
-    0,
-    new Uint32Array([1, 1, cache.elementOffset(cachePosition), 0]),
-  );
-  device.queue.writeBuffer(
-    vNormParamsBuffer,
-    0,
-    new Uint32Array([1, pipelines.kvOutFeatures, cache.elementOffset(cachePosition), 0]),
-  );
+  if (!rotaryBuffers) {
+    device.queue.writeBuffer(cosineBuffer, 0, runtime.cosine);
+    device.queue.writeBuffer(sineBuffer, 0, runtime.sine);
+  }
+  tokenParamsView.setUint32(K_NORM_PARAMS_OFFSET, 1, true);
+  tokenParamsView.setUint32(K_NORM_PARAMS_OFFSET + 4, 1, true);
+  tokenParamsView.setUint32(K_NORM_PARAMS_OFFSET + 8, cache.elementOffset(cachePosition), true);
+  tokenParamsView.setUint32(V_NORM_PARAMS_OFFSET, 1, true);
+  tokenParamsView.setUint32(V_NORM_PARAMS_OFFSET + 4, pipelines.kvOutFeatures, true);
+  tokenParamsView.setUint32(V_NORM_PARAMS_OFFSET + 8, cache.elementOffset(cachePosition), true);
   device.queue.writeBuffer(qNormWeightBuffer, 0, weights.qNormWeight);
-  const attentionParams = new ArrayBuffer(32);
-  const attentionParamsView = new DataView(attentionParams);
-  attentionParamsView.setUint32(0, 1, true);
-  attentionParamsView.setUint32(4, runtime.keyLength, true);
-  attentionParamsView.setUint32(8, runtime.queryOffset, true);
-  attentionParamsView.setUint32(12, runtime.qHeads, true);
-  attentionParamsView.setUint32(16, runtime.kvHeads, true);
-  attentionParamsView.setUint32(20, runtime.window, true);
-  attentionParamsView.setFloat32(24, weights.attentionOutputScale, true);
-  attentionParamsView.setUint32(28, cache.capacity, true);
-  device.queue.writeBuffer(attentionParamsBuffer, 0, attentionParams);
+  tokenParamsView.setUint32(ATTENTION_PARAMS_OFFSET, 1, true);
+  tokenParamsView.setUint32(ATTENTION_PARAMS_OFFSET + 4, runtime.keyLength, true);
+  tokenParamsView.setUint32(ATTENTION_PARAMS_OFFSET + 8, runtime.queryOffset, true);
+  tokenParamsView.setUint32(ATTENTION_PARAMS_OFFSET + 12, runtime.qHeads, true);
+  tokenParamsView.setUint32(ATTENTION_PARAMS_OFFSET + 16, runtime.kvHeads, true);
+  tokenParamsView.setUint32(ATTENTION_PARAMS_OFFSET + 20, runtime.window, true);
+  tokenParamsView.setFloat32(ATTENTION_PARAMS_OFFSET + 24, weights.attentionOutputScale, true);
+  tokenParamsView.setUint32(ATTENTION_PARAMS_OFFSET + 28, cache.capacity, true);
+  device.queue.writeBuffer(tokenParamsBuffer, 0, tokenParamsUpload);
   device.queue.writeBuffer(oprojWeightBuffer, 0, weights.oprojWeights);
   device.queue.writeBuffer(oprojScaleBuffer, 0, weights.oprojScales);
   device.queue.writeBuffer(oprojNormWeightBuffer, 0, weights.oprojNormWeights);
@@ -746,7 +763,7 @@ function createAttentionBlockResources(
         { binding: 2, resource: { buffer: scaleBuffer } },
         { binding: 3, resource: { buffer: rmsSumBuffer } },
         { binding: 4, resource: { buffer: qkvOutputBuffer } },
-        { binding: 5, resource: { buffer: qkvParamsBuffer } },
+        { binding: 5, resource: { buffer: tokenParamsBuffer, offset: QKV_PARAMS_OFFSET, size: 16 } },
         { binding: 6, resource: { buffer: cache.valueBuffer } },
       ],
     }),
@@ -758,14 +775,14 @@ function createAttentionBlockResources(
         { binding: 2, resource: { buffer: cosineBuffer } },
         { binding: 3, resource: { buffer: sineBuffer } },
         { binding: 4, resource: { buffer: cache.keyBuffer } },
-        { binding: 5, resource: { buffer: kNormParamsBuffer } },
+        { binding: 5, resource: { buffer: tokenParamsBuffer, offset: K_NORM_PARAMS_OFFSET, size: 16 } },
       ],
     }) : null,
     vNormBindGroup: writesKvCache ? device.createBindGroup({
       layout: pipelines.vNorm.getBindGroupLayout(0),
       entries: [
         { binding: 0, resource: { buffer: cache.valueBuffer } },
-        { binding: 1, resource: { buffer: vNormParamsBuffer } },
+        { binding: 1, resource: { buffer: tokenParamsBuffer, offset: V_NORM_PARAMS_OFFSET, size: 16 } },
       ],
     }) : null,
     attentionBindGroup: device.createBindGroup({
@@ -779,7 +796,7 @@ function createAttentionBlockResources(
         { binding: 5, resource: { buffer: cache.valueBuffer } },
         { binding: 6, resource: { buffer: partialBuffer } },
         { binding: 7, resource: { buffer: attentionOutputBuffer } },
-        { binding: 8, resource: { buffer: attentionParamsBuffer } },
+        { binding: 8, resource: { buffer: tokenParamsBuffer, offset: ATTENTION_PARAMS_OFFSET, size: 32 } },
       ],
     }),
     oprojNormBindGroup: device.createBindGroup({
@@ -804,12 +821,15 @@ function createAttentionBlockResources(
     readBuffer,
     cache,
     cachePosition,
+    attentionWindow: runtime.window,
+    attentionChunkCount: gemmaDecodeAttentionChunkCount(cachePosition, runtime.window),
     cosineBuffer,
     sineBuffer,
-    qkvParamsBuffer,
-    kNormParamsBuffer,
-    vNormParamsBuffer,
-    attentionParamsBuffer,
+    qkvParamsBuffer: tokenParamsBuffer,
+    kNormParamsBuffer: tokenParamsBuffer,
+    vNormParamsBuffer: tokenParamsBuffer,
+    attentionParamsBuffer: tokenParamsBuffer,
+    tokenParamsUpload,
     modelWeights: {
       inputNorm: rmsWeightBuffer,
       qkvPacked: weightBuffer,
@@ -845,6 +865,7 @@ export function updateDecodeAttentionBlockToken(
   position: number,
   cosine: Float32Array,
   sine: Float32Array,
+  uploadRotary = true,
 ): void {
   if (!Number.isInteger(position) || position < 0 ||
       (resources.cache.mode === "linear" && position >= resources.cache.capacity)) {
@@ -860,17 +881,22 @@ export function updateDecodeAttentionBlockToken(
     throw new Error("Decode attention rotary row does not match its profile");
   }
   const destinationOffset = resources.cache.elementOffset(position);
-  device.queue.writeBuffer(resources.cosineBuffer, 0, cosine);
-  device.queue.writeBuffer(resources.sineBuffer, 0, sine);
-  device.queue.writeBuffer(resources.qkvParamsBuffer, 12, new Uint32Array([destinationOffset]));
-  device.queue.writeBuffer(resources.kNormParamsBuffer, 8, new Uint32Array([destinationOffset]));
-  device.queue.writeBuffer(resources.vNormParamsBuffer, 8, new Uint32Array([destinationOffset]));
-  device.queue.writeBuffer(
-    resources.attentionParamsBuffer,
-    4,
-    new Uint32Array([position + 1, position]),
-  );
+  if (uploadRotary) {
+    device.queue.writeBuffer(resources.cosineBuffer, 0, cosine);
+    device.queue.writeBuffer(resources.sineBuffer, 0, sine);
+  }
+  const tokenParamsView = new DataView(resources.tokenParamsUpload);
+  tokenParamsView.setUint32(QKV_PARAMS_OFFSET + 12, destinationOffset, true);
+  tokenParamsView.setUint32(K_NORM_PARAMS_OFFSET + 8, destinationOffset, true);
+  tokenParamsView.setUint32(V_NORM_PARAMS_OFFSET + 8, destinationOffset, true);
+  tokenParamsView.setUint32(ATTENTION_PARAMS_OFFSET + 4, position + 1, true);
+  tokenParamsView.setUint32(ATTENTION_PARAMS_OFFSET + 8, position, true);
+  device.queue.writeBuffer(resources.qkvParamsBuffer, 0, resources.tokenParamsUpload);
   resources.cachePosition = position;
+  resources.attentionChunkCount = gemmaDecodeAttentionChunkCount(
+    position,
+    resources.attentionWindow,
+  );
 }
 
 export function commitDecodeAttentionBlockCache(
@@ -905,46 +931,44 @@ export function encodeDecodeAttentionBlock(
   pipelines: DecodeAttentionBlockPipelines,
   resources: DecodeAttentionBlockResources,
 ): void {
+  const pass = encoder.beginComputePass({ label: "Gemma decode attention block" });
+  encodeDecodeAttentionBlockPass(pass, pipelines, resources);
+  pass.end();
+}
+
+export function encodeDecodeAttentionBlockPass(
+  pass: GPUComputePassEncoder,
+  pipelines: DecodeAttentionBlockPipelines,
+  resources: DecodeAttentionBlockResources,
+): void {
   if (resources.runsInputRms) {
     if (!resources.rmsBindGroup) {
       throw new Error("Initial attention resources are missing their RMS bind group");
     }
-    const rmsPass = encoder.beginComputePass({ label: "Decode block RMS SRQ" });
-    rmsPass.setPipeline(pipelines.rms);
-    rmsPass.setBindGroup(0, resources.rmsBindGroup);
-    rmsPass.dispatchWorkgroups(1, 1, 1);
-    rmsPass.end();
+    pass.setPipeline(pipelines.rms);
+    pass.setBindGroup(0, resources.rmsBindGroup);
+    pass.dispatchWorkgroups(1, 1, 1);
   }
-  const qkvPass = encoder.beginComputePass({ label: "Decode block QKV" });
-  qkvPass.setPipeline(pipelines.qkv);
-  qkvPass.setBindGroup(0, resources.qkvBindGroup);
-  qkvPass.dispatchWorkgroups(resources.qkvWorkgroupCount, 1, 1);
-  qkvPass.end();
+  pass.setPipeline(pipelines.qkv);
+  pass.setBindGroup(0, resources.qkvBindGroup);
+  pass.dispatchWorkgroups(resources.qkvWorkgroupCount, 1, 1);
   if (resources.writesKvCache) {
     if (!resources.kNormRopeBindGroup || !resources.vNormBindGroup) {
       throw new Error("K/V-owning attention resources are incomplete");
     }
-    const kNormPass = encoder.beginComputePass({ label: "Decode block K norm RoPE" });
-    kNormPass.setPipeline(pipelines.kNormRope);
-    kNormPass.setBindGroup(0, resources.kNormRopeBindGroup);
-    kNormPass.dispatchWorkgroups(1, 1, 1);
-    kNormPass.end();
-    const vNormPass = encoder.beginComputePass({ label: "Decode block V RMSNorm" });
-    vNormPass.setPipeline(pipelines.vNorm);
-    vNormPass.setBindGroup(0, resources.vNormBindGroup);
-    vNormPass.dispatchWorkgroups(1, 1, 1);
-    vNormPass.end();
+    pass.setPipeline(pipelines.kNormRope);
+    pass.setBindGroup(0, resources.kNormRopeBindGroup);
+    pass.dispatchWorkgroups(1, 1, 1);
+    pass.setPipeline(pipelines.vNorm);
+    pass.setBindGroup(0, resources.vNormBindGroup);
+    pass.dispatchWorkgroups(1, 1, 1);
   }
-  const attentionPass = encoder.beginComputePass({ label: "Decode block attention" });
-  attentionPass.setPipeline(pipelines.attention);
-  attentionPass.setBindGroup(0, resources.attentionBindGroup);
-  attentionPass.dispatchWorkgroups(8, ATTENTION_CHUNK_COUNT, 1);
-  attentionPass.end();
-  const oprojNormPass = encoder.beginComputePass({ label: "Decode block O projection norm" });
-  oprojNormPass.setPipeline(pipelines.oprojNorm);
-  oprojNormPass.setBindGroup(0, resources.oprojNormBindGroup);
-  oprojNormPass.dispatchWorkgroups(pipelines.oprojWorkgroupCount, 1, 1);
-  oprojNormPass.end();
+  pass.setPipeline(pipelines.attention);
+  pass.setBindGroup(0, resources.attentionBindGroup);
+  pass.dispatchWorkgroups(8, resources.attentionChunkCount, 1);
+  pass.setPipeline(pipelines.oprojNorm);
+  pass.setBindGroup(0, resources.oprojNormBindGroup);
+  pass.dispatchWorkgroups(pipelines.oprojWorkgroupCount, 1, 1);
 }
 
 function storageBuffer(

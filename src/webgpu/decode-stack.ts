@@ -18,10 +18,11 @@ import {
   createGemmaDecodeSharedKvAttentionBlockResources,
   destroyDecodeAttentionBlockResources,
   updateDecodeAttentionBlockToken,
+  type DecodeAttentionRotaryBuffers,
 } from "./decode-attention-block";
 import type { DecodeKvCache } from "./decode-kv-cache";
 import {
-  encodeGemmaDecodeLayer,
+  encodeGemmaDecodeLayerPass,
   gemmaDecodeLayerDispatchCount,
   getGemmaDecodeLayerPipelines,
   type GemmaDecodeLayerPipelines,
@@ -68,6 +69,7 @@ export interface GemmaDecodeStackResources {
   hidden: GPUBuffer;
   finalInput: GPUBuffer;
   finalSum: GPUBuffer;
+  rotaryBuffers: readonly DecodeAttentionRotaryBuffers[];
 }
 
 export interface GemmaDecodeStackScheduleEntry {
@@ -162,6 +164,28 @@ async function buildGemmaDecodeStackResources(
   const layers: GemmaDecodeLayerResources[] = [];
   const stackPipelines: GemmaDecodeLayerPipelines[] = [];
   const ownerCaches = new Map<number, DecodeKvCache>();
+  const createRotaryBuffers = (
+    label: string,
+    rotary: GemmaDecodeRotaryRow,
+  ): DecodeAttentionRotaryBuffers => ({
+    cosine: device.createBuffer({
+      label: `${label} cosine`,
+      size: rotary.cosine.byteLength,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    }),
+    sine: device.createBuffer({
+      label: `${label} sine`,
+      size: rotary.sine.byteLength,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    }),
+  });
+  const slidingRotaryBuffers = createRotaryBuffers("Gemma sliding rotary", runtime.slidingRotary);
+  const fullRotaryBuffers = createRotaryBuffers("Gemma full rotary", runtime.fullRotary);
+  const rotaryBuffers = [slidingRotaryBuffers, fullRotaryBuffers] as const;
+  device.queue.writeBuffer(slidingRotaryBuffers.cosine, 0, runtime.slidingRotary.cosine);
+  device.queue.writeBuffer(slidingRotaryBuffers.sine, 0, runtime.slidingRotary.sine);
+  device.queue.writeBuffer(fullRotaryBuffers.cosine, 0, runtime.fullRotary.cosine);
+  device.queue.writeBuffer(fullRotaryBuffers.sine, 0, runtime.fullRotary.sine);
   let layer = await loadLayer(0);
   let nextLayerPromise: Promise<MaterializedGemmaLayer> | null = loadLayer(1);
 
@@ -175,6 +199,9 @@ async function buildGemmaDecodeStackResources(
       const rotary = plan.attention.type === "full_attention"
         ? runtime.fullRotary
         : runtime.slidingRotary;
+      const layerRotaryBuffers = plan.attention.type === "full_attention"
+        ? fullRotaryBuffers
+        : slidingRotaryBuffers;
       const previous = layers.at(-1);
       const activations = previous
         ? {
@@ -209,6 +236,7 @@ async function buildGemmaDecodeStackResources(
           layer,
           { ...commonRuntime, sourceCache },
           activations,
+          layerRotaryBuffers,
         );
       } else {
         const prefix = runtime.cachePrefixes?.get(layerIndex);
@@ -221,6 +249,7 @@ async function buildGemmaDecodeStackResources(
           layer,
           { ...commonRuntime, keyCache, valueCache },
           activations,
+          layerRotaryBuffers,
         );
         ownerCaches.set(layerIndex, attention.cache);
       }
@@ -261,6 +290,10 @@ async function buildGemmaDecodeStackResources(
     }
   } catch (error) {
     destroyLayers(layers);
+    for (const rotary of rotaryBuffers) {
+      rotary.cosine.destroy();
+      rotary.sine.destroy();
+    }
     throw error;
   }
 
@@ -276,6 +309,7 @@ async function buildGemmaDecodeStackResources(
     hidden: finalLayer.mlp.hidden,
     finalInput: finalLayer.mlp.nextInput,
     finalSum: finalLayer.mlp.nextSum,
+    rotaryBuffers,
   };
 }
 
@@ -283,12 +317,21 @@ export function encodeGemmaDecodeStack(
   encoder: GPUCommandEncoder,
   resources: GemmaDecodeStackResources,
 ): void {
+  const pass = encoder.beginComputePass({ label: "Gemma 35-layer decode stack" });
+  encodeGemmaDecodeStackPass(pass, resources);
+  pass.end();
+}
+
+export function encodeGemmaDecodeStackPass(
+  pass: GPUComputePassEncoder,
+  resources: GemmaDecodeStackResources,
+): void {
   if (resources.layers.length !== LAYER_COUNT) {
     throw new Error(`Gemma decode stack requires ${LAYER_COUNT} layers`);
   }
   for (let layerIndex = 0; layerIndex < LAYER_COUNT; layerIndex += 1) {
-    encodeGemmaDecodeLayer(
-      encoder,
+    encodeGemmaDecodeLayerPass(
+      pass,
       resources.pipelines[layerIndex],
       resources.layers[layerIndex],
     );
@@ -309,6 +352,11 @@ export function updateGemmaDecodeStackToken(
       );
     }
   }
+  const [slidingRotaryBuffers, fullRotaryBuffers] = resources.rotaryBuffers;
+  device.queue.writeBuffer(slidingRotaryBuffers.cosine, 0, slidingRotary.cosine);
+  device.queue.writeBuffer(slidingRotaryBuffers.sine, 0, slidingRotary.sine);
+  device.queue.writeBuffer(fullRotaryBuffers.cosine, 0, fullRotary.cosine);
+  device.queue.writeBuffer(fullRotaryBuffers.sine, 0, fullRotary.sine);
   for (let layerIndex = 0; layerIndex < resources.layers.length; layerIndex += 1) {
     const rotary = resources.pipelines[layerIndex].attention.profile.startsWith("full")
       ? fullRotary
@@ -319,6 +367,7 @@ export function updateGemmaDecodeStackToken(
       position,
       rotary.cosine,
       rotary.sine,
+      false,
     );
   }
 }
@@ -346,6 +395,10 @@ export function destroyGemmaDecodeStackResources(
   resources: GemmaDecodeStackResources,
 ): void {
   destroyLayers(resources.layers);
+  for (const rotary of resources.rotaryBuffers) {
+    rotary.cosine.destroy();
+    rotary.sine.destroy();
+  }
 }
 
 function destroyLayers(layers: readonly GemmaDecodeLayerResources[]): void {

@@ -155,11 +155,23 @@ async function compilePipeline(device: GPUDevice): Promise<CompiledPipeline> {
 
 export function createDecodeAttentionShader(
   headDim: 256 | 512 = 256,
+  cacheMode: "generic" | "linear" | "sliding-512" = "generic",
 ): string {
   const halfDim = headDim / 2;
   const vec4Dimensions = headDim / 4;
   const valueGroups = 256 / vec4Dimensions;
   const partialCounterBase = 8 * 32 * (headDim + 2);
+  const physicalKey = cacheMode === "linear"
+    ? (logicalKey: string) => logicalKey
+    : (logicalKey: string) => `physical_cache_key(${logicalKey})`;
+  const cacheAddressing = cacheMode === "linear" ? "" : `
+fn physical_cache_key(logical_key: u32) -> u32 {
+  ${cacheMode === "sliding-512"
+    ? "if (params.cacheCapacity == 512u) { return logical_key & 511u; }"
+    : ""}
+  return logical_key % params.cacheCapacity;
+}
+`;
   return `enable subgroups;
 
 struct Params {
@@ -191,6 +203,7 @@ const EPS: f32 = 0.000001;
 const SCALE: f32 = 1.0;
 const NEG_INF: f32 = -3.4028234663852886e38;
 const PP_COUNTER_BASE: u32 = ${partialCounterBase}u;
+${cacheAddressing}
 
 var<workgroup> lastFlag: u32;
 var<workgroup> qn_sh: array<f32, ${headDim}>;
@@ -306,7 +319,7 @@ fn main(
       let key_in_tile = round * 8u + (thread / 32u);
       var score_accumulator = 0.0;
       if (key_in_tile < tile_count_for_scores) {
-        let physical_key = (tile + key_in_tile) % params.cacheCapacity;
+        let physical_key = ${physicalKey("tile + key_in_tile")};
         let key_base = (physical_key * params.kvHeads + kv_head) * ${vec4Dimensions}u;
         for (var dimension4 = thread & 31u; dimension4 < ${vec4Dimensions}u; dimension4 = dimension4 + 32u) {
           let key4 = k[key_base + dimension4];
@@ -350,7 +363,7 @@ fn main(
     var key_offset = key_group;
     loop {
       if (key_offset >= tile_count) { break; }
-      let physical_key = (tile + key_offset) % params.cacheCapacity;
+      let physical_key = ${physicalKey("tile + key_offset")};
       let value_base = (physical_key * params.kvHeads + kv_head) * ${vec4Dimensions}u;
       value_accumulator = value_accumulator +
         probs[key_offset] * v[value_base + value_dimension4];

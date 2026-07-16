@@ -42,6 +42,7 @@ export class ReadonlySafetensorsCache {
   readonly spec: Readonly<SafetensorsCacheSpec>;
   readonly descriptors: ReadonlyMap<string, CachedTensorDescriptor>;
   private readonly database: IDBDatabase;
+  private readonly blobValues = new Map<string, Blob>();
 
   private constructor(
     database: IDBDatabase,
@@ -111,11 +112,12 @@ export class ReadonlySafetensorsCache {
         byteOffset + byteLength > descriptor.byteLength) {
       throw new Error(`Tensor ${name} slice exceeds its ${descriptor.byteLength}-byte range`);
     }
-    const value = await readStoreValue(
+    const value = this.blobValues.get(name) ?? await readStoreValue(
       this.database,
       CHUNKS_STORE,
       [this.spec.sourceKey, descriptor.begin, descriptor.end],
     );
+    if (value instanceof Blob) this.blobValues.set(name, value);
     const bytes = await copyBinarySlice(value, byteOffset, byteLength);
     if (!bytes) {
       throw new Error(`Tensor ${name} is not present in the readonly cache`);
@@ -138,14 +140,24 @@ export class ReadonlySafetensorsCache {
     const uniqueDescriptors = Array.from(
       new Map(descriptors.map((descriptor) => [descriptor.name, descriptor])).values(),
     );
-    const values = await readStoreValues(
+    const missingDescriptors = uniqueDescriptors.filter(
+      ({ name }) => !this.blobValues.has(name),
+    );
+    const missingValues = await readStoreValues(
       this.database,
       CHUNKS_STORE,
-      uniqueDescriptors.map(({ begin, end }) => [this.spec.sourceKey, begin, end]),
+      missingDescriptors.map(({ begin, end }) => [this.spec.sourceKey, begin, end]),
     );
-    const valuesByName = new Map(
-      uniqueDescriptors.map((descriptor, index) => [descriptor.name, values[index]]),
-    );
+    const valuesByName = new Map<string, unknown>();
+    for (const descriptor of uniqueDescriptors) {
+      const value = this.blobValues.get(descriptor.name);
+      if (value) valuesByName.set(descriptor.name, value);
+    }
+    missingDescriptors.forEach((descriptor, index) => {
+      const value = missingValues[index];
+      valuesByName.set(descriptor.name, value);
+      if (value instanceof Blob) this.blobValues.set(descriptor.name, value);
+    });
     return Promise.all(requests.map(async ({ name, byteOffset, byteLength }) => {
       const bytes = await copyBinarySlice(valuesByName.get(name), byteOffset, byteLength);
       if (!bytes) throw new Error(`Tensor ${name} is not present in the readonly cache`);
@@ -180,6 +192,7 @@ export class ReadonlySafetensorsCache {
   }
 
   close(): void {
+    this.blobValues.clear();
     this.database.close();
   }
 }

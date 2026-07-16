@@ -7,6 +7,13 @@ export interface GemmaPrefillSegment {
   rows: number;
 }
 
+export function isFinalGemmaPrefillSegment(
+  segment: GemmaPrefillSegment,
+  pendingRows: number,
+): boolean {
+  return segment.start + segment.rows === pendingRows;
+}
+
 export function planGemmaPrefillSegments(
   position: number,
   pendingRows: number,
