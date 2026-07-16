@@ -33,7 +33,12 @@ import {
   GEMMA_FIXED_PREFILL_ROWS,
   submitGemmaFixedPrefill,
   updateGemmaFixedPrefill,
+  type GemmaFixedPrefillGpuProfile,
   type GemmaFixedPrefillResources,
+  type GemmaPrefillGateUpMode,
+  type GemmaPrefillPleInputMode,
+  type GemmaPrefillQkvSrqMode,
+  type GemmaPrefillRmsEpilogueMode,
 } from "../webgpu/prefill-model";
 import {
   resolveGemmaGenerationConfig,
@@ -98,6 +103,7 @@ export interface GemmaGenerationTiming {
   promptTokensReused: number;
   prefillMs: number;
   prefillMode: GemmaPrefillMode;
+  prefillGpuProfiles: readonly GemmaFixedPrefillGpuProfile[] | null;
   timeToFirstTokenMs: number;
   decodeTokenMs: readonly number[];
   interTokenLatencyMs: readonly number[];
@@ -112,6 +118,10 @@ export interface MeasuredGemmaGenerationResult {
   timing: GemmaGenerationTiming;
 }
 
+export interface GemmaMeasuredGenerationOptions extends GemmaGenerationOptions {
+  profilePrefillStages?: boolean;
+}
+
 interface MutableGemmaGenerationTiming {
   startedAt: number;
   requestSetupMs: number;
@@ -121,6 +131,8 @@ interface MutableGemmaGenerationTiming {
   promptTokensReused: number;
   prefillMs: number;
   prefillMode: GemmaPrefillMode;
+  profilePrefillStages: boolean;
+  prefillGpuProfiles: GemmaFixedPrefillGpuProfile[];
   timeToFirstTokenMs: number | null;
   decodeTokenMs: number[];
   interTokenLatencyMs: number[];
@@ -132,6 +144,11 @@ interface MutableGemmaGenerationTiming {
 export interface GemmaSessionLoadOptions {
   cacheCapacity?: number;
   prefillStrategy?: GemmaPrefillStrategy;
+  prefillGateUpMode?: GemmaPrefillGateUpMode;
+  prefillRmsEpilogueMode?: GemmaPrefillRmsEpilogueMode;
+  prefillQkvSrqMode?: GemmaPrefillQkvSrqMode;
+  prefillPleInputMode?: GemmaPrefillPleInputMode;
+  prefillMaxInFlightBlocks?: 1 | 2 | 4 | 8;
 }
 
 export interface GemmaSessionMemoryEstimate {
@@ -155,6 +172,7 @@ interface GemmaSoftTokenSource {
 const GEMMA_PAD_TOKEN_ID = 0;
 const GEMMA_TEXT_HIDDEN_SIZE = 1536;
 const GEMMA_TOKEN_INPUT_CACHE_CAPACITY = 256;
+const GEMMA_DEFAULT_MAX_IN_FLIGHT_PREFILL_BLOCKS = 4;
 
 export class GemmaGenerationSession {
   private position = 0;
@@ -167,6 +185,7 @@ export class GemmaGenerationSession {
   private readonly resources: GemmaDecodeModelResources;
   private readonly prefill: GemmaFixedPrefillResources | null;
   private readonly prefillStrategy: GemmaPrefillStrategy;
+  private readonly prefillMaxInFlightBlocks: 1 | 2 | 4 | 8;
   private readonly logitsReadback: GPUBuffer;
   private readonly tokenInputCache = new Map<number, GemmaTokenInputs>();
   private tokenByteTrie: TokenByteTrie | null = null;
@@ -181,6 +200,7 @@ export class GemmaGenerationSession {
     resources: GemmaDecodeModelResources,
     prefill: GemmaFixedPrefillResources | null,
     prefillStrategy: GemmaPrefillStrategy,
+    prefillMaxInFlightBlocks: 1 | 2 | 4 | 8,
     logitsReadback: GPUBuffer,
     cacheCapacity: number,
   ) {
@@ -190,6 +210,7 @@ export class GemmaGenerationSession {
     this.resources = resources;
     this.prefill = prefill;
     this.prefillStrategy = prefillStrategy;
+    this.prefillMaxInFlightBlocks = prefillMaxInFlightBlocks;
     this.logitsReadback = logitsReadback;
     this.cacheCapacity = cacheCapacity;
   }
@@ -197,6 +218,12 @@ export class GemmaGenerationSession {
   static async load(options: GemmaSessionLoadOptions = {}): Promise<GemmaGenerationSession> {
     const cacheCapacity = options.cacheCapacity ?? GEMMA_VALIDATED_CONTEXT_CAPACITY;
     const prefillStrategy = options.prefillStrategy ?? "auto";
+    const prefillGateUpMode = options.prefillGateUpMode ?? "fused";
+    const prefillRmsEpilogueMode = options.prefillRmsEpilogueMode ?? "fused";
+    const prefillQkvSrqMode = options.prefillQkvSrqMode ?? "separate";
+    const prefillPleInputMode = options.prefillPleInputMode ?? "copied";
+    const prefillMaxInFlightBlocks = options.prefillMaxInFlightBlocks ??
+      GEMMA_DEFAULT_MAX_IN_FLIGHT_PREFILL_BLOCKS;
     if (!Number.isInteger(cacheCapacity) || cacheCapacity < 1) {
       throw new Error("Gemma cache capacity must be a positive integer");
     }
@@ -206,6 +233,23 @@ export class GemmaGenerationSession {
       throw new Error(
         "Gemma prefill strategy must be auto, fixed-32, chunked-32, or sequential",
       );
+    }
+    if (prefillGateUpMode !== "fused-activated" && prefillGateUpMode !== "fused" &&
+        prefillGateUpMode !== "separate") {
+      throw new Error("Gemma prefill gate/up mode is invalid");
+    }
+    if (prefillRmsEpilogueMode !== "fused" && prefillRmsEpilogueMode !== "separate") {
+      throw new Error("Gemma prefill RMS epilogue mode is invalid");
+    }
+    if (prefillQkvSrqMode !== "shared" && prefillQkvSrqMode !== "separate") {
+      throw new Error("Gemma prefill QKV SRQ mode is invalid");
+    }
+    if (prefillPleInputMode !== "direct" && prefillPleInputMode !== "copied") {
+      throw new Error("Gemma prefill PLE input mode is invalid");
+    }
+    if (prefillMaxInFlightBlocks !== 1 && prefillMaxInFlightBlocks !== 2 &&
+        prefillMaxInFlightBlocks !== 4 && prefillMaxInFlightBlocks !== 8) {
+      throw new Error("Gemma prefill in-flight block count must be 1, 2, 4, or 8");
     }
     const [device, cache, tokenizer, fixture] = await Promise.all([
       getWebGpuDevice(),
@@ -232,7 +276,14 @@ export class GemmaGenerationSession {
       try {
         if (prefillStrategy !== "sequential" &&
           cacheCapacity >= GEMMA_FIXED_PREFILL_ROWS) {
-          prefill = await createGemmaFixedPrefillResources(device, resources);
+          prefill = await createGemmaFixedPrefillResources(
+            device,
+            resources,
+            prefillGateUpMode,
+            prefillRmsEpilogueMode,
+            prefillQkvSrqMode,
+            prefillPleInputMode,
+          );
         }
       } catch (error) {
         destroyGemmaDecodeModelResources(resources);
@@ -257,6 +308,7 @@ export class GemmaGenerationSession {
         resources,
         prefill,
         prefillStrategy,
+        prefillMaxInFlightBlocks,
         logitsReadback,
         cacheCapacity,
       );
@@ -389,18 +441,30 @@ export class GemmaGenerationSession {
         reusedPromptTokens: promptTokensReused,
         mode: prefillMode,
       });
+      let inFlightPrefillBlocks = 0;
       for (const segment of prefillSegments) {
         if (segment.mode === "fixed-32") {
           throwIfGemmaGenerationAborted(signal);
+          const isFinalSegment = isFinalGemmaPrefillSegment(
+            segment,
+            pendingPromptTokenIds.length,
+          );
           const blockOutput = await this.evaluatePromptBlock(
             pendingPromptTokenIds.slice(segment.start, segment.start + segment.rows),
             promptTokensReused + segment.start,
             softTokens,
-            isFinalGemmaPrefillSegment(segment, pendingPromptTokenIds.length)
-              ? outputMode
-              : "none",
+            isFinalSegment ? outputMode : "none",
           );
           if (blockOutput.prediction || blockOutput.logits) modelOutput = blockOutput;
+          if (!isFinalSegment) {
+            inFlightPrefillBlocks += 1;
+            if (inFlightPrefillBlocks >= this.prefillMaxInFlightBlocks) {
+              await this.device.queue.onSubmittedWorkDone();
+              inFlightPrefillBlocks = 0;
+            }
+          } else {
+            inFlightPrefillBlocks = 0;
+          }
           throwIfGemmaGenerationAborted(signal);
           onPrefillProgress?.({
             completedPromptTokens: promptTokensReused + segment.start + segment.rows,
@@ -409,6 +473,10 @@ export class GemmaGenerationSession {
             mode: prefillMode,
           });
           continue;
+        }
+        if (inFlightPrefillBlocks > 0) {
+          await this.device.queue.onSubmittedWorkDone();
+          inFlightPrefillBlocks = 0;
         }
         for (let index = segment.start; index < segment.start + segment.rows; index += 1) {
           throwIfGemmaGenerationAborted(signal);
@@ -540,7 +608,7 @@ export class GemmaGenerationSession {
 
   async generateMeasured(
     input: GemmaGenerationInput,
-    options: GemmaGenerationOptions = {},
+    options: GemmaMeasuredGenerationOptions = {},
   ): Promise<MeasuredGemmaGenerationResult> {
     if (this.activeTiming) throw new Error("Gemma generation timing is already active");
     const timing: MutableGemmaGenerationTiming = {
@@ -552,6 +620,8 @@ export class GemmaGenerationSession {
       promptTokensReused: 0,
       prefillMs: 0,
       prefillMode: "sequential",
+      profilePrefillStages: options.profilePrefillStages === true,
+      prefillGpuProfiles: [],
       timeToFirstTokenMs: null,
       decodeTokenMs: [],
       interTokenLatencyMs: [],
@@ -574,6 +644,9 @@ export class GemmaGenerationSession {
           promptTokensReused: timing.promptTokensReused,
           prefillMs: timing.prefillMs,
           prefillMode: timing.prefillMode,
+          prefillGpuProfiles: timing.profilePrefillStages
+            ? Object.freeze([...timing.prefillGpuProfiles])
+            : null,
           timeToFirstTokenMs: timing.timeToFirstTokenMs ?? totalMs,
           decodeTokenMs: Object.freeze([...timing.decodeTokenMs]),
           interTokenLatencyMs: Object.freeze([...timing.interTokenLatencyMs]),
@@ -744,7 +817,9 @@ export class GemmaGenerationSession {
       tokenIds.length,
       outputMode,
       outputMode === "logits" ? this.logitsReadback : undefined,
+      this.activeTiming?.profilePrefillStages === true,
     );
+    if (output.gpuProfile) this.activeTiming?.prefillGpuProfiles.push(output.gpuProfile);
     if (this.activeTiming) this.activeTiming.logitsReadbackMs += output.logitsReadbackMs;
     this.position += tokenIds.length;
     this.evaluatedTokenIds.push(...tokenIds);

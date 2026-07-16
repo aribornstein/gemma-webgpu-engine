@@ -1,3 +1,10 @@
+import {
+  createGemmaPrefillParameter,
+  gemmaPrefillParameterBinding,
+  writeGemmaPrefillParameter,
+  type GemmaPrefillParameterArena,
+} from "./prefill-parameter-arena";
+
 const WORKGROUP_SIZE = 32;
 const SRQ_WORKGROUP_SIZE = 256;
 
@@ -107,6 +114,7 @@ export function createGemmaPrefillQatLinearResources(
   weights: GemmaPrefillQatLinearWeights,
   output?: GPUBuffer,
   srqOutput?: GPUBuffer,
+  parameterArena?: GemmaPrefillParameterArena,
 ): GemmaPrefillQatLinearResources {
   const inputBytes = pipelines.rows * pipelines.inFeatures * 4;
   const weightBytes = pipelines.outFeatures * pipelines.inFeatures * pipelines.bits / 8;
@@ -136,14 +144,16 @@ export function createGemmaPrefillQatLinearResources(
       inputBytes,
       GPUBufferUsage.STORAGE,
     );
-    const srqParams = make(
-      "Gemma prefill SRQ parameters",
+    const srqParams = createGemmaPrefillParameter(
+      device,
       16,
-      GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      "Gemma prefill SRQ parameters",
+      parameterArena,
     );
-    device.queue.writeBuffer(
-      srqParams,
-      0,
+    ownedBuffers.push(...srqParams.ownedBuffers);
+    writeGemmaPrefillParameter(
+      device,
+      srqParams.slice,
       new Float32Array([
         weights.inputScale,
         Math.fround(1 / weights.inputScale),
@@ -156,7 +166,7 @@ export function createGemmaPrefillQatLinearResources(
       entries: [
         binding(0, activation),
         binding(1, projectionInput),
-        binding(2, srqParams),
+        gemmaPrefillParameterBinding(2, srqParams.slice),
       ],
     });
   }
@@ -166,14 +176,16 @@ export function createGemmaPrefillQatLinearResources(
     outputBytes,
     GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
   );
-  const projectionParams = make(
-    "Gemma prefill QAT parameters",
+  const projectionParams = createGemmaPrefillParameter(
+    device,
     16,
-    GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    "Gemma prefill QAT parameters",
+    parameterArena,
   );
-  device.queue.writeBuffer(
-    projectionParams,
-    0,
+  ownedBuffers.push(...projectionParams.ownedBuffers);
+  writeGemmaPrefillParameter(
+    device,
+    projectionParams.slice,
     new Float32Array([0, weights.outputScale, 0, 0]),
   );
   const projectionBindGroup = device.createBindGroup({
@@ -183,7 +195,7 @@ export function createGemmaPrefillQatLinearResources(
       sliceBinding(1, weights.packedWeights),
       sliceBinding(2, weights.rowScales),
       binding(3, outputBuffer),
-      binding(4, projectionParams),
+      gemmaPrefillParameterBinding(4, projectionParams.slice),
     ],
   });
   return {

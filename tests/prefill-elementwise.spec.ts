@@ -124,3 +124,152 @@ test("runs exact batched prefill elementwise arithmetic", async ({ page }) => {
 
   expect(result).toEqual({ mismatchCount: 0, gpuError: null });
 });
+
+test("reads strided PLE multipliers without changing activation bits", async ({ page }) => {
+  await page.goto("/");
+  const webGpuAvailable = await page.evaluate(() => Boolean(navigator.gpu));
+  test.skip(!webGpuAvailable, "Chrome does not expose WebGPU on this machine");
+
+  const result = await page.evaluate(async () => {
+    const elementwiseModulePath = "/src/webgpu/prefill-elementwise.ts";
+    const copyModulePath = "/src/webgpu/prefill-strided-copy.ts";
+    const deviceModulePath = "/src/webgpu/device.ts";
+    const {
+      createGemmaPrefillGeluMultiplyResources,
+      createGemmaPrefillStridedGeluMultiplyResources,
+      destroyGemmaPrefillElementwiseResources,
+      encodeGemmaPrefillElementwisePass,
+      getGemmaPrefillElementwisePipelines,
+    } = await import(elementwiseModulePath);
+    const {
+      createGemmaPrefillStridedCopyResources,
+      destroyGemmaPrefillStridedCopyResources,
+      encodeGemmaPrefillStridedCopyPass,
+      getGemmaPrefillStridedCopyPipeline,
+    } = await import(copyModulePath);
+    const { getWebGpuDevice } = await import(deviceModulePath);
+    const device = await getWebGpuDevice();
+    const rows = 32;
+    const columns = 256;
+    const layers = 35;
+    const layerIndex = 17;
+    const count = rows * columns;
+    const sourceStride = layers * columns;
+    const sourceStart = layerIndex * columns;
+    const gate = Float32Array.from(
+      { length: count },
+      (_, index) => Math.fround(((index % 257) - 128) * 0.03125),
+    );
+    const multiplier = Float32Array.from(
+      { length: rows * sourceStride },
+      (_, index) => Math.fround(Math.sin(index * 0.013) * 2.5),
+    );
+    const lookup = Float32Array.from(
+      { length: 256 },
+      (_, index) => Math.fround(Math.cos((index - 128) * 0.021) * 1.75),
+    );
+    const uploadUsage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
+    const upload = (values: Float32Array) => {
+      const buffer = device.createBuffer({ size: values.byteLength, usage: uploadUsage });
+      device.queue.writeBuffer(buffer, 0, values);
+      return buffer;
+    };
+    const gateBuffer = upload(gate);
+    const multiplierBuffer = upload(multiplier);
+    const lookupBuffer = upload(lookup);
+    const copiedMultiplier = device.createBuffer({
+      size: count * 4,
+      usage: GPUBufferUsage.STORAGE,
+    });
+    const baselineOutput = device.createBuffer({
+      size: count * 4,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+    });
+    const stridedOutput = device.createBuffer({
+      size: count * 4,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
+    });
+    const pipelines = await getGemmaPrefillElementwisePipelines(device);
+    const copyPipeline = await getGemmaPrefillStridedCopyPipeline(device);
+    const copy = createGemmaPrefillStridedCopyResources(
+      device,
+      copyPipeline,
+      multiplierBuffer,
+      copiedMultiplier,
+      {
+        rows,
+        sourceStride,
+        sourceStart,
+        destinationStride: columns,
+        destinationStart: 0,
+        copyColumns: columns,
+      },
+    );
+    const baseline = createGemmaPrefillGeluMultiplyResources(
+      device,
+      pipelines.geluMultiply,
+      gateBuffer,
+      copiedMultiplier,
+      lookupBuffer,
+      baselineOutput,
+      count,
+      0.03125,
+    );
+    const strided = createGemmaPrefillStridedGeluMultiplyResources(
+      device,
+      pipelines.geluMultiplyStrided,
+      gateBuffer,
+      multiplierBuffer,
+      lookupBuffer,
+      stridedOutput,
+      rows,
+      columns,
+      sourceStride,
+      sourceStart,
+      0.03125,
+    );
+    const readback = device.createBuffer({
+      size: count * 8,
+      usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+    });
+    try {
+      device.pushErrorScope("validation");
+      device.pushErrorScope("internal");
+      const encoder = device.createCommandEncoder();
+      const pass = encoder.beginComputePass();
+      encodeGemmaPrefillStridedCopyPass(pass, copyPipeline, copy, rows);
+      encodeGemmaPrefillElementwisePass(pass, pipelines.geluMultiply, baseline);
+      encodeGemmaPrefillElementwisePass(pass, pipelines.geluMultiplyStrided, strided);
+      pass.end();
+      encoder.copyBufferToBuffer(baselineOutput, 0, readback, 0, count * 4);
+      encoder.copyBufferToBuffer(stridedOutput, 0, readback, count * 4, count * 4);
+      device.queue.submit([encoder.finish()]);
+      await readback.mapAsync(GPUMapMode.READ);
+      const outputs = new Uint32Array(readback.getMappedRange().slice(0));
+      readback.unmap();
+      let bitMismatches = 0;
+      for (let index = 0; index < count; index += 1) {
+        if (outputs[index] !== outputs[count + index]) bitMismatches += 1;
+      }
+      const internalError = await device.popErrorScope();
+      const validationError = await device.popErrorScope();
+      return {
+        bitMismatches,
+        gpuError: internalError?.message ?? validationError?.message ?? null,
+      };
+    } finally {
+      readback.destroy();
+      destroyGemmaPrefillStridedCopyResources(copy);
+      destroyGemmaPrefillElementwiseResources(baseline);
+      destroyGemmaPrefillElementwiseResources(strided);
+      gateBuffer.destroy();
+      multiplierBuffer.destroy();
+      lookupBuffer.destroy();
+      copiedMultiplier.destroy();
+      baselineOutput.destroy();
+      stridedOutput.destroy();
+    }
+  });
+
+  expect(result).toEqual({ bitMismatches: 0, gpuError: null });
+});

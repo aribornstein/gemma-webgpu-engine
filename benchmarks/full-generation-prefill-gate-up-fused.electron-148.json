@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-16T13:47:27Z",
+  "status": "exact-parity-and-median-p95-gates-passed",
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c"
+  },
+  "environment": {
+    "origin": "http://localhost:8753/gemma-engine.html",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.128.0 Chrome/148.0.7778.271 Electron/42.5.0 Safari/537.36",
+    "adapterInfo": {
+      "vendor": "apple",
+      "architecture": "metal-3"
+    },
+    "bundle": "/assets/gemma-session-Cs96n1qt.js"
+  },
+  "configuration": {
+    "cacheCapacity": 8192,
+    "prefillStrategy": "fixed-32",
+    "reusePromptCache": false,
+    "profilePrefillStages": true,
+    "iterationsPerImplementation": 5,
+    "alternatingImplementationOrder": true,
+    "maxNewTokens": 1,
+    "temperature": 0,
+    "note": "The opt-in profiler splits existing dependencies into timestamped passes and drains each profiled block. Production encoding remains one compute pass per fixed block. Compare implementations only within this sweep."
+  },
+  "change": {
+    "name": "exact fused fixed-prefill gate/up QAT projection",
+    "baseline": "separate",
+    "candidate": "fused",
+    "dispatchesRemovedPerLayer": 2,
+    "dispatchesRemovedPerFixedBlock": 70,
+    "description": "One staged SRQ and one dual-output projection replace two staged SRQs and two projection dispatches. Gate and up retain their independent weights, row scales, output scales, accumulation order, and F32 outputs."
+  },
+  "targetSelection": {
+    "singleSamplePreFusionStageShares": {
+      "32": { "feedforward": 0.818251, "attention": 0.117276, "ple": 0.052803, "input": 0.005739, "output": 0.005931 },
+      "153": { "feedforward": 0.833492, "attention": 0.113085, "ple": 0.048229, "input": 0.004029, "output": 0.001164 },
+      "639": { "feedforward": 0.803246, "attention": 0.143039, "ple": 0.048803, "input": 0.004489, "output": 0.000423 }
+    },
+    "result": "Feed-forward represented 80.3-83.3% of fixed-prefill GPU time, selecting gate/up ahead of QKV."
+  },
+  "correctness": {
+    "primitiveInt4BitMismatches": 0,
+    "primitiveInt2BitMismatches": 0,
+    "gpuValidationOrInternalErrors": [],
+    "all30MeasuredGenerationsExact": true,
+    "boundary32": { "expectedTokenIds": [7676], "expectedText": "OK" },
+    "crossover153": { "expectedFirstTokenIds": [9503], "expectedText": "blue" },
+    "separateFourToken153Golden": { "tokenIds": [9503, 107, 9503, 107], "text": "blue\nblue\n" },
+    "fusedFourToken153Golden": { "tokenIds": [9503, 107, 9503, 107], "text": "blue\nblue\n" }
+  },
+  "retainedMemory": {
+    "separate": { "gpuBufferCount": 1600, "gpuBufferBytes": 942476612 },
+    "fused": { "gpuBufferCount": 1599, "gpuBufferBytes": 942411076 },
+    "difference": { "gpuBufferCount": -1, "gpuBufferBytes": -65536 }
+  },
+  "cases": {
+    "boundary32": {
+      "promptTokens": 32,
+      "blocks": 1,
+      "separate": {
+        "prefillMs": [371.2, 832.2, 747.0, 644.4, 614.6],
+        "totalGpuMs": [330.695, 781.058, 697.631, 597.754, 580.78],
+        "feedforwardGpuMs": [269.025, 642.449, 574.423, 490.537, 472.58]
+      },
+      "fused": {
+        "prefillMs": [399.1, 562.6, 475.1, 528.9, 504.0],
+        "totalGpuMs": [359.662, 513.54, 414.45, 476.643, 468.189],
+        "feedforwardGpuMs": [288.227, 412.68, 328.401, 375.063, 370.278]
+      },
+      "comparison": {
+        "prefillMedianChangePercent": -21.788,
+        "prefillP95ChangePercent": -32.396,
+        "totalGpuMedianChangePercent": -21.675,
+        "totalGpuP95ChangePercent": -34.251,
+        "feedforwardGpuMedianChangePercent": -24.516,
+        "feedforwardGpuP95ChangePercent": -35.765
+      }
+    },
+    "crossover153": {
+      "promptTokens": 153,
+      "blocks": 5,
+      "separate": {
+        "prefillMs": [3212.5, 3125.7, 3298.1, 3033.0, 3125.6],
+        "totalGpuMs": [3055.092, 2977.694, 3163.685, 2844.459, 2970.354],
+        "feedforwardGpuMs": [2523.005, 2468.217, 2608.726, 2358.706, 2453.602]
+      },
+      "fused": {
+        "prefillMs": [2485.4, 2648.4, 2627.5, 2563.5, 2850.4],
+        "totalGpuMs": [2310.996, 2481.717, 2486.567, 2386.297, 2681.471],
+        "feedforwardGpuMs": [1823.867, 1966.408, 1970.34, 1894.973, 2087.977]
+      },
+      "comparison": {
+        "prefillMedianChangePercent": -15.939,
+        "prefillP95ChangePercent": -13.574,
+        "totalGpuMedianChangePercent": -16.656,
+        "totalGpuP95ChangePercent": -15.242,
+        "feedforwardGpuMedianChangePercent": -20.331,
+        "feedforwardGpuP95ChangePercent": -19.962
+      }
+    },
+    "long639": {
+      "promptTokens": 639,
+      "blocks": 20,
+      "separate": {
+        "prefillMs": [13724.9, 18471.1, 15735.1, 15901.3, 15715.4],
+        "totalGpuMs": [13092.979, 17041.916, 14724.628, 14543.356, 14432.928],
+        "feedforwardGpuMs": [10578.952, 13565.362, 11761.68, 11673.403, 11613.307]
+      },
+      "fused": {
+        "prefillMs": [11363.0, 13178.0, 11504.5, 13055.8, 13105.6],
+        "totalGpuMs": [10555.818, 12511.412, 10343.154, 11756.896, 11732.124],
+        "feedforwardGpuMs": [8116.961, 9552.462, 7928.48, 9018.737, 9016.508]
+      },
+      "comparison": {
+        "prefillMedianChangePercent": -17.028,
+        "prefillP95ChangePercent": -28.656,
+        "totalGpuMedianChangePercent": -19.33,
+        "totalGpuP95ChangePercent": -26.584,
+        "feedforwardGpuMedianChangePercent": -22.76,
+        "feedforwardGpuP95ChangePercent": -29.582
+      }
+    }
+  },
+  "conclusion": "Promote fused gate/up as the default fixed-prefill implementation. It preserves primitive bits and full-model tokens/text, reduces retained resources slightly, and improves both median and p95 wall/GPU timings at 32, 153, and 639 prompt tokens in the alternating same-build sweep. The separate implementation remains a load-time diagnostic fallback."
+}

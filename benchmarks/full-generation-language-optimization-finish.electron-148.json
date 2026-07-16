@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-16T14:47:55Z",
+  "status": "language-optimization-plan-completed",
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c"
+  },
+  "environment": {
+    "origin": "http://localhost:8753/gemma-engine.html",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.128.0 Chrome/148.0.7778.271 Electron/42.5.0 Safari/537.36",
+    "adapterInfo": { "vendor": "apple", "architecture": "metal-3" },
+    "finalBundle": "/assets/gemma-session-2uTdfPQb.js"
+  },
+  "configuration": {
+    "cacheCapacity": 8192,
+    "prefillStrategy": "fixed-32",
+    "reusePromptCache": false,
+    "profilePrefillStages": false,
+    "temperature": 0,
+    "alternatingImplementationOrder": true,
+    "percentileMethod": "linear interpolation at (n - 1) * p"
+  },
+  "promoted": {
+    "name": "exact RMS residual and residual-scale epilogues",
+    "default": "fused",
+    "diagnosticBaseline": "separate",
+    "dispatchesRemovedPerLayer": 4,
+    "dispatchesRemovedPerFixedBlock": 140,
+    "primitiveResidualBitMismatches": 0,
+    "primitiveResidualScaleBitMismatches": 0,
+    "gpuValidationOrInternalErrors": [],
+    "all80MeasuredGenerationsExact": true,
+    "memory": {
+      "separate": { "gpuBufferCount": 1599, "gpuBufferBytes": 942411076 },
+      "fused": { "gpuBufferCount": 1599, "gpuBufferBytes": 942411076 }
+    },
+    "cases": {
+      "boundary32": {
+        "promptTokens": 32,
+        "expectedTokenIds": [7676],
+        "expectedText": "OK",
+        "separateTtftMs": [258.2, 320.0, 321.1, 290.6, 296.5, 325.0, 321.5, 312.1, 286.5, 315.0, 972.7, 676.8, 532.3, 589.9, 700.2, 702.0, 634.9, 624.8, 584.8, 704.8],
+        "fusedTtftMs": [296.3, 316.8, 277.0, 282.6, 306.5, 326.6, 320.8, 294.5, 266.3, 294.9, 779.9, 630.9, 478.1, 686.9, 654.6, 655.8, 633.7, 629.1, 495.7, 678.1],
+        "comparison": {
+          "separateMedianMs": 428.65,
+          "fusedMedianMs": 402.35,
+          "medianChangePercent": -6.136,
+          "separateP95Ms": 718.195,
+          "fusedP95Ms": 691.55,
+          "p95ChangePercent": -3.71
+        }
+      },
+      "crossover153": {
+        "promptTokens": 153,
+        "expectedTokenIds": [9503, 107, 9503, 107],
+        "expectedText": "blue\nblue\n",
+        "separateTtftMs": [1553.6, 1751.8, 1822.1, 1741.9, 1737.9, 1871.4, 1861.6, 1983.1, 1970.6, 2031.9],
+        "fusedTtftMs": [1508.6, 1584.1, 1713.4, 1766.6, 1786.3, 1738.9, 1949.8, 1922.6, 1957.3, 1946.6],
+        "comparison": {
+          "separateMedianMs": 1841.85,
+          "fusedMedianMs": 1776.45,
+          "medianChangePercent": -3.551,
+          "separateP95Ms": 2009.94,
+          "fusedP95Ms": 1953.925,
+          "p95ChangePercent": -2.787
+        }
+      },
+      "long639": {
+        "promptTokens": 639,
+        "expectedFirstTokenIds": [9503],
+        "expectedText": "blue",
+        "separateTtftMs": [10390.1, 10324.9, 9422.4, 9844.6, 9948.3, 9926.4, 9884.3, 9616.3, 9831.2, 9191.9],
+        "fusedTtftMs": [10020.7, 9300.6, 8881.7, 9089.1, 9882.4, 10209.2, 9852.4, 9343.3, 9760.6, 9349.2],
+        "comparison": {
+          "separateMedianMs": 9864.45,
+          "fusedMedianMs": 9554.9,
+          "medianChangePercent": -3.138,
+          "separateP95Ms": 10360.76,
+          "fusedP95Ms": 10124.375,
+          "p95ChangePercent": -2.282
+        }
+      }
+    }
+  },
+  "rejectedCandidates": {
+    "gateUpGeluDownSrq": {
+      "reason": "exact primitive and full-model output, but 153-token median and p95 regressed",
+      "productionDefaultUnchanged": true
+    },
+    "submissionWindow8": {
+      "reason": "639-token median regressed despite improved p95",
+      "all50MeasuredGenerationsExact": true,
+      "screen153": {
+        "window4TtftMs": [2247.4, 2716.9, 2195.3, 2265.9, 2281.8],
+        "window8TtftMs": [2193.3, 2171.8, 2088.8, 2054.8, 2131.7],
+        "medianChangePercent": -5.923,
+        "p95ChangePercent": -16.764
+      },
+      "long639": {
+        "window4TtftMs": [8439.3, 8915.6, 9916.6, 8919.9, 9012.1, 8727.5, 8675.7, 8306.7, 8258.2, 8321.1],
+        "window8TtftMs": [9055.9, 8718.3, 8999.9, 8934.0, 8781.0, 8780.3, 8506.7, 8386.9, 8311.6, 8292.9],
+        "medianChangePercent": 0.548,
+        "p95ChangePercent": -5.036
+      },
+      "productionDefault": 4
+    },
+    "sharedQkvSrq": {
+      "reason": "153-token median and p95 regressed",
+      "primitiveBitMismatches": 0,
+      "all40MeasuredGenerationsExact": true,
+      "boundary32": {
+        "separateTtftMs": [376.4, 516.9, 530.0, 480.1, 477.8, 469.8, 422.9, 511.5, 433.0, 434.7],
+        "sharedTtftMs": [456.0, 501.7, 514.6, 497.0, 471.3, 474.0, 446.4, 532.2, 447.0, 450.4],
+        "medianChangePercent": -0.243,
+        "p95ChangePercent": 0.033
+      },
+      "crossover153": {
+        "separateTtftMs": [2240.9, 2356.6, 2332.0, 2375.3, 2326.1, 2315.5, 2345.8, 2358.0, 2186.9, 2329.0],
+        "sharedTtftMs": [2423.1, 2363.6, 2370.0, 2360.2, 2348.1, 2377.7, 2332.2, 2374.6, 2149.4, 2301.9],
+        "medianChangePercent": 1.347,
+        "p95ChangePercent": 1.485
+      },
+      "productionDefault": "separate"
+    },
+    "directPleInput": {
+      "reason": "32- and 153-token medians regressed despite slightly improved p95",
+      "primitiveBitMismatches": 0,
+      "all40MeasuredGenerationsExact": true,
+      "boundary32": {
+        "copiedTtftMs": [375.1, 528.2, 499.1, 465.3, 466.3, 467.0, 468.6, 467.6, 479.7, 441.4],
+        "directTtftMs": [456.9, 514.8, 482.0, 470.9, 474.0, 476.2, 472.2, 476.3, 453.6, 472.7],
+        "medianChangePercent": 1.295,
+        "p95ChangePercent": -2.925
+      },
+      "crossover153": {
+        "copiedTtftMs": [2366.9, 2183.8, 2115.9, 2347.5, 2230.3, 2251.9, 2201.4, 2303.5, 2308.0, 2164.2],
+        "directTtftMs": [2236.9, 2308.8, 2221.4, 2280.0, 2331.0, 2198.9, 2263.3, 2377.4, 2279.6, 2322.8],
+        "medianChangePercent": 1.727,
+        "p95ChangePercent": -0.07
+      },
+      "productionDefault": "copied"
+    }
+  },
+  "finalCertification": {
+    "canonicalCasesExact": ["short-greeting", "arithmetic", "arabic", "longer-instruction", "prefill-32-boundary", "crossover-153"],
+    "cancellationAfterFirstFixedBlock": "AbortError",
+    "postCancellationRecoveryExact": true,
+    "focusedPlaywright": { "passed": 40, "failed": 0 },
+    "typecheck": "passed",
+    "build": "passed"
+  }
+}

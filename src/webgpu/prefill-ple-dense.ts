@@ -1,3 +1,10 @@
+import {
+  createGemmaPrefillParameter,
+  gemmaPrefillParameterBinding,
+  writeGemmaPrefillParameter,
+  type GemmaPrefillParameterArena,
+} from "./prefill-parameter-arena";
+
 export interface GemmaPrefillPleDenseGeometry {
   rows: number;
   inFeatures: number;
@@ -72,6 +79,7 @@ export function createGemmaPrefillPleDenseResources(
   activation: GPUBuffer,
   weights: GemmaPrefillPleDenseWeights,
   output?: GPUBuffer,
+  parameterArena?: GemmaPrefillParameterArena,
 ): GemmaPrefillPleDenseResources {
   const activationBytes = compiled.rows * compiled.inFeatures * 4;
   const codeBytes = compiled.outFeatures * compiled.inFeatures;
@@ -91,15 +99,16 @@ export function createGemmaPrefillPleDenseResources(
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
   });
   if (!output) ownedBuffers.push(outputBuffer);
-  const parameters = device.createBuffer({
-    label: "Gemma prefill PLE dense parameters",
-    size: 16,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
-  ownedBuffers.push(parameters);
-  device.queue.writeBuffer(
-    parameters,
-    0,
+  const parameters = createGemmaPrefillParameter(
+    device,
+    16,
+    "Gemma prefill PLE dense parameters",
+    parameterArena,
+  );
+  ownedBuffers.push(...parameters.ownedBuffers);
+  writeGemmaPrefillParameter(
+    device,
+    parameters.slice,
     new Float32Array([weights.inputScale, weights.outputScale, 0, 0]),
   );
   const groups = Math.ceil(compiled.outFeatures / compiled.outputRowsPerWorkgroup);
@@ -112,7 +121,7 @@ export function createGemmaPrefillPleDenseResources(
         { binding: 1, resource: { buffer: weights.codes } },
         { binding: 2, resource: { buffer: weights.rowScales } },
         { binding: 3, resource: { buffer: outputBuffer } },
-        { binding: 4, resource: { buffer: parameters } },
+        gemmaPrefillParameterBinding(4, parameters.slice),
       ],
     }),
     output: outputBuffer,

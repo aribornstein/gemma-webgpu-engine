@@ -165,15 +165,58 @@ Warm decode throughput increased from `49.254` to `74.358 tok/s`, and end-to-end
 and [benchmarks/full-generation-prefill-optimized.electron-148.json](benchmarks/full-generation-prefill-optimized.electron-148.json)
 retain the raw samples and comparison metadata.
 
-At the exact 32-token boundary, optimized fixed-32 now beats current sequential prefill in both
-median TTFT (`302.3 ms` versus `367.6 ms`) and p95 (`304.1 ms` versus `396.1 ms`) with exact output,
-so that focused gate passes. At 153 tokens, chunked-32 improves median TTFT by `5.1%` but one
-`3.84 s` sample nearly doubles p95; automatic long-prompt routing therefore still needs a larger
-tail-latency sweep before promotion.
+Fixed-prefill submissions now run with at most four non-final blocks in flight, and their 16/32-byte
+uniforms use aligned shared arenas instead of one GPU buffer per primitive. The retained fixed graph
+falls from 2,678 to 1,600 buffers while preserving exact output, reducing its additional buffer count
+over sequential from 1,209 to 131. Same-session cancellation after the first submitted block also
+recovers to the exact 153-token golden. In the current alternating sweeps, fixed-32 improves 32-token
+median TTFT by `5.5%` but regresses p95 by `38.2%`; at 153 tokens, chunked-32 improves median TTFT by
+`1.9%` and regresses p95 by `0.8%`. The prior `3.84 s` chunked outlier is absent, but neither latency
+gate passes on p95, so no speedup or broader automatic routing is claimed.
+[benchmarks/full-generation-prefill-batched-arena.electron-148.json](benchmarks/full-generation-prefill-batched-arena.electron-148.json)
+retains the raw samples, memory counts, exact parity, and cancellation/recovery evidence.
+
+Measured generation can now opt into fixed-prefill GPU stage timestamps with
+`profilePrefillStages: true`. The diagnostic path reports input, per-layer attention,
+feed-forward, PLE, and final-output samples plus aggregate GPU time; unsupported devices report
+`null`. Profiling splits the fixed graph only for that measured request, while normal production
+encoding remains one compute pass per block. At 32, 153, and 639 prompt tokens, pre-fusion
+feed-forward work represented `81.8%`, `83.3%`, and `80.3%` of measured fixed-prefill GPU time.
+
+The production fixed graph therefore now uses an exact fused gate/up QAT kernel. It shares one
+staged SRQ and one activation traversal while retaining independent packed weights, row scales,
+output scales, accumulation order, and F32 gate/up outputs. GPU primitive tests cover both int4 and
+int2 with zero bit mismatches, and the retained 32/153-token full-model goldens remain exact. In a
+five-sample alternating same-build sweep, fused prefill improves median/p95 wall time by
+`21.8%`/`32.4%` at 32 tokens, `15.9%`/`13.6%` at 153, and `17.0%`/`28.7%` at 639. Retained fixed
+resources fall slightly from 1,600 buffers / 942,476,612 bytes to 1,599 / 942,411,076. The load-time
+`prefillGateUpMode: "separate"` option preserves the prior graph for diagnostic A/B runs; `"fused"`
+is the default. [benchmarks/full-generation-prefill-gate-up-fused.electron-148.json](benchmarks/full-generation-prefill-gate-up-fused.electron-148.json)
+retains the raw samples, stage evidence, memory counts, and exact-output gates.
+
+An unprofiled ten-sample production confirmation also passes exactness and both latency gates:
+fused gate/up improves median/p95 TTFT by `10.7%`/`23.9%` at 32 tokens,
+`10.9%`/`9.7%` at 153, and `13.1%`/`15.6%` at 639. Exact RMS residual epilogues are now promoted
+as well. They preserve the existing RMS reduction and use explicit rounded FMA boundaries for the
+weighted product and residual add, then write the optional layer scale in the same dispatch. Raw-bit
+GPU tests match RMS-plus-add and RMS-plus-add-plus-scale exactly. Removing 140 dispatches per fixed
+block improves unprofiled median/p95 TTFT by `6.1%`/`3.7%` at 32 tokens, `3.6%`/`2.8%` at 153,
+and `3.1%`/`2.3%` at 639. `prefillRmsEpilogueMode: "separate"` retains the prior graph for A/B;
+`"fused"` is the default.
+
+Three later exact candidates were measured but not promoted. An eight-block submission window
+regressed 639-token median TTFT by `0.5%`; shared-SRQ QKV regressed 153-token median/p95 by
+`1.3%`/`1.5%`; and direct strided PLE activation input regressed 32/153-token medians by
+`1.3%`/`1.7%`. The production defaults therefore remain a four-block window, separate QKV SRQ,
+and copied PLE input. The exact alternatives remain load-time diagnostics. The final default graph
+passes all canonical text goldens, first-block cancellation and same-session recovery, and the
+40-test focused language suite. [benchmarks/full-generation-language-optimization-finish.electron-148.json](benchmarks/full-generation-language-optimization-finish.electron-148.json)
+retains raw alternating samples and every promotion decision.
 
 The active runtime path now includes output-mode specialization (`none`/`greedy`/`logits`), one-pass
-decode and fixed-32 prefill command encoding, packed per-layer token-parameter updates, shared rotary
-buffers across layer profiles, and profile-specialized decode-attention cache addressing. These
+decode and fixed-32 prefill command encoding, bounded fixed-prefill submissions, shared prefill
+parameter arenas, packed per-layer token-parameter updates, shared rotary buffers across layer
+profiles, and profile-specialized decode-attention cache addressing. These
 changes preserve exact greedy/sampling/constraint parity while reducing avoidable host-side overhead.
 
 The complete path uses four input-preparation dispatches, the 276-dispatch transformer stack, one

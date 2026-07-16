@@ -25,6 +25,7 @@ import {
   createGemmaPrefillAddResources,
   createGemmaPrefillGeluMultiplyResources,
   createGemmaPrefillMultiplyResources,
+  createGemmaPrefillStridedGeluMultiplyResources,
   encodeGemmaPrefillElementwisePass,
   getGemmaPrefillElementwisePipelines,
   type GemmaPrefillElementwisePipelines,
@@ -37,6 +38,18 @@ import {
   type GemmaPrefillPleDensePipeline,
   type GemmaPrefillPleDenseResources,
 } from "./prefill-ple-dense";
+import { GemmaPrefillParameterArena } from "./prefill-parameter-arena";
+import {
+  createGemmaPrefillQatGateUpActivationResources,
+  createGemmaPrefillQatGateUpResources,
+  encodeGemmaPrefillQatGateUpActivationPass,
+  encodeGemmaPrefillQatGateUpPass,
+  getGemmaPrefillQatGateUpActivationPipelines,
+  getGemmaPrefillQatGateUpPipelines,
+  type GemmaPrefillQatGateUpActivationResources,
+  type GemmaPrefillQatGateUpPipelines,
+  type GemmaPrefillQatGateUpResources,
+} from "./prefill-qat-gate-up";
 import {
   createGemmaPrefillQatLinearResources,
   encodeGemmaPrefillQatLinearPass,
@@ -47,11 +60,15 @@ import {
   type GemmaPrefillQatLinearWeights,
 } from "./prefill-qat-linear";
 import {
+  createGemmaPrefillRmsResidualResources,
   createGemmaPrefillRmsResources,
+  encodeGemmaPrefillRmsResidualPass,
   encodeGemmaPrefillRmsPass,
   getGemmaPrefillRmsPipeline,
+  getGemmaPrefillRmsResidualPipeline,
   type GemmaPrefillRmsBufferSlice,
   type GemmaPrefillRmsPipeline,
+  type GemmaPrefillRmsResidualResources,
   type GemmaPrefillRmsResources,
 } from "./prefill-rms";
 import {
@@ -71,6 +88,10 @@ import {
 } from "./prefill-strided-copy";
 
 export const GEMMA_FIXED_PREFILL_ROWS = 32;
+export type GemmaPrefillGateUpMode = "fused-activated" | "fused" | "separate";
+export type GemmaPrefillRmsEpilogueMode = "fused" | "separate";
+export type GemmaPrefillQkvSrqMode = "shared" | "separate";
+export type GemmaPrefillPleInputMode = "direct" | "copied";
 
 const LAYER_COUNT = 35;
 const HIDDEN_SIZE = 1536;
@@ -81,14 +102,66 @@ const MAX_HEAD_OUTPUT = 4096;
 const MAX_INTERMEDIATE = 12288;
 const VOCAB_SIZE = 262144;
 
+export type GemmaFixedPrefillGpuStage =
+  | "input"
+  | "attention"
+  | "feedforward"
+  | "ple"
+  | "output";
+
+export interface GemmaFixedPrefillGpuSample {
+  stage: GemmaFixedPrefillGpuStage;
+  layerIndex: number | null;
+  gpuMs: number;
+}
+
+export interface GemmaFixedPrefillGpuProfile {
+  position: number;
+  validRows: number;
+  samples: readonly GemmaFixedPrefillGpuSample[];
+  stageGpuMs: Readonly<Record<GemmaFixedPrefillGpuStage, number>>;
+  totalGpuMs: number;
+}
+
+export interface GemmaFixedPrefillSubmission extends GemmaModelOutput {
+  gpuProfile: GemmaFixedPrefillGpuProfile | null;
+}
+
+interface GemmaFixedPrefillProfileRecord {
+  stage: GemmaFixedPrefillGpuStage;
+  layerIndex: number | null;
+}
+
+interface GemmaFixedPrefillProfileResources {
+  querySet: GPUQuerySet;
+  resolveBuffer: GPUBuffer;
+  readBuffer: GPUBuffer;
+  records: GemmaFixedPrefillProfileRecord[];
+}
+
 interface GemmaPrefillProjection {
   pipelines: GemmaPrefillQatLinearPipelines;
   resources: GemmaPrefillQatLinearResources;
 }
 
+interface GemmaPrefillGateUpProjection {
+  pipelines: GemmaPrefillQatGateUpPipelines;
+  resources: GemmaPrefillQatGateUpResources;
+}
+
+interface GemmaPrefillGateUpActivationProjection {
+  pipelines: GemmaPrefillQatGateUpPipelines;
+  resources: GemmaPrefillQatGateUpActivationResources;
+}
+
 interface GemmaPrefillNorm {
   pipeline: GemmaPrefillRmsPipeline;
   resources: GemmaPrefillRmsResources;
+}
+
+interface GemmaPrefillNormResidual {
+  pipeline: GemmaPrefillRmsPipeline;
+  resources: GemmaPrefillRmsResidualResources;
 }
 
 interface GemmaPrefillRope {
@@ -121,22 +194,27 @@ interface GemmaPrefillLayerResources {
   attentionPipeline: GemmaPrefillAttentionPipeline;
   attention: GemmaPrefillAttentionResources;
   outputProjection: GemmaPrefillProjection;
-  postAttentionNorm: GemmaPrefillNorm;
-  attentionResidual: GemmaPrefillElementwiseResources;
+  postAttentionNorm: GemmaPrefillNorm | null;
+  attentionResidual: GemmaPrefillElementwiseResources | null;
+  attentionNormResidual: GemmaPrefillNormResidual | null;
   preFeedforwardNorm: GemmaPrefillNorm;
-  gate: GemmaPrefillProjection;
-  up: GemmaPrefillProjection;
-  gateActivation: GemmaPrefillElementwiseResources;
+  gateUpActivation: GemmaPrefillGateUpActivationProjection | null;
+  gateUp: GemmaPrefillGateUpProjection | null;
+  gate: GemmaPrefillProjection | null;
+  up: GemmaPrefillProjection | null;
+  gateActivation: GemmaPrefillElementwiseResources | null;
   down: GemmaPrefillProjection;
-  postFeedforwardNorm: GemmaPrefillNorm;
-  feedforwardResidual: GemmaPrefillElementwiseResources;
-  pleInputCopy: GemmaPrefillStridedCopyResources;
+  postFeedforwardNorm: GemmaPrefillNorm | null;
+  feedforwardResidual: GemmaPrefillElementwiseResources | null;
+  feedforwardNormResidual: GemmaPrefillNormResidual | null;
+  pleInputCopy: GemmaPrefillStridedCopyResources | null;
   pleGate: GemmaPrefillPleProjection;
   pleActivation: GemmaPrefillElementwiseResources;
   pleProjection: GemmaPrefillPleProjection;
-  postPleNorm: GemmaPrefillNorm;
-  pleResidual: GemmaPrefillElementwiseResources;
-  layerScale: GemmaPrefillElementwiseResources;
+  postPleNorm: GemmaPrefillNorm | null;
+  pleResidual: GemmaPrefillElementwiseResources | null;
+  layerScale: GemmaPrefillElementwiseResources | null;
+  pleNormResidualScale: GemmaPrefillNormResidual | null;
 }
 
 export interface GemmaFixedPrefillResources {
@@ -179,7 +257,24 @@ interface GemmaPrefillScratch {
 export async function createGemmaFixedPrefillResources(
   device: GPUDevice,
   decode: GemmaDecodeModelResources,
+  gateUpMode: GemmaPrefillGateUpMode = "fused",
+  rmsEpilogueMode: GemmaPrefillRmsEpilogueMode = "fused",
+  qkvSrqMode: GemmaPrefillQkvSrqMode = "separate",
+  pleInputMode: GemmaPrefillPleInputMode = "copied",
 ): Promise<GemmaFixedPrefillResources> {
+  if (gateUpMode !== "fused-activated" && gateUpMode !== "fused" &&
+      gateUpMode !== "separate") {
+    throw new Error("Gemma prefill gate/up mode is invalid");
+  }
+  if (rmsEpilogueMode !== "fused" && rmsEpilogueMode !== "separate") {
+    throw new Error("Gemma prefill RMS epilogue mode is invalid");
+  }
+  if (qkvSrqMode !== "shared" && qkvSrqMode !== "separate") {
+    throw new Error("Gemma prefill QKV SRQ mode is invalid");
+  }
+  if (pleInputMode !== "direct" && pleInputMode !== "copied") {
+    throw new Error("Gemma prefill PLE input mode is invalid");
+  }
   if (decode.stack.layers.length !== LAYER_COUNT || decode.stack.ownerCaches.size !== 15) {
     throw new Error("Gemma fixed prefill requires the complete 35-layer decode model");
   }
@@ -191,6 +286,7 @@ export async function createGemmaFixedPrefillResources(
   }
 
   const ownedBuffers: GPUBuffer[] = [];
+  const parameterArena = new GemmaPrefillParameterArena(device);
   const own = <T extends { ownedBuffers: GPUBuffer[] }>(resources: T): T => {
     ownedBuffers.push(...resources.ownedBuffers);
     return resources;
@@ -276,6 +372,34 @@ export async function createGemmaFixedPrefillResources(
             source,
             weight,
             output,
+            parameterArena,
+          )),
+        };
+      };
+      const normResidual = async (
+        source: GPUBuffer,
+        weight: GemmaPrefillRmsBufferSlice,
+        residual: GPUBuffer,
+        factors: GPUBuffer | null = null,
+        factorIndex = 0,
+      ): Promise<GemmaPrefillNormResidual> => {
+        const pipeline = await getGemmaPrefillRmsResidualPipeline(
+          device,
+          HIDDEN_SIZE,
+          factors !== null,
+        );
+        return {
+          pipeline,
+          resources: own(createGemmaPrefillRmsResidualResources(
+            device,
+            pipeline,
+            GEMMA_FIXED_PREFILL_ROWS,
+            source,
+            weight,
+            residual,
+            factors,
+            factorIndex,
+            parameterArena,
           )),
         };
       };
@@ -302,6 +426,7 @@ export async function createGemmaFixedPrefillResources(
             weights,
             output,
             scratch.srq,
+            parameterArena,
           )),
         };
       };
@@ -322,6 +447,7 @@ export async function createGemmaFixedPrefillResources(
             GEMMA_FIXED_PREFILL_ROWS,
             heads,
             rotary,
+            parameterArena,
           )),
         };
       };
@@ -348,6 +474,7 @@ export async function createGemmaFixedPrefillResources(
             source,
             { codes, rowScales, inputScale, outputScale },
             output,
+            parameterArena,
           )),
         };
       };
@@ -407,7 +534,7 @@ export async function createGemmaFixedPrefillResources(
           HIDDEN_SIZE,
           kvFeatures,
           attentionBits,
-          scratch.hiddenNorm,
+          qkvSrqMode === "shared" ? scratch.srq : scratch.hiddenNorm,
           {
             packedWeights: slice(
               attentionWeights.qkvPacked,
@@ -419,7 +546,7 @@ export async function createGemmaFixedPrefillResources(
               queryFeatures * 4,
               kvFeatures * 4,
             ),
-            inputScale: attentionScales.qkvInput,
+            inputScale: qkvSrqMode === "shared" ? 0 : attentionScales.qkvInput,
             outputScale: attentionScales.qkvOutput[1],
           },
           scratch.key,
@@ -436,7 +563,7 @@ export async function createGemmaFixedPrefillResources(
           HIDDEN_SIZE,
           kvFeatures,
           attentionBits,
-          scratch.hiddenNorm,
+          qkvSrqMode === "shared" ? scratch.srq : scratch.hiddenNorm,
           {
             packedWeights: slice(
               attentionWeights.qkvPacked,
@@ -448,7 +575,7 @@ export async function createGemmaFixedPrefillResources(
               (queryFeatures + kvFeatures) * 4,
               kvFeatures * 4,
             ),
-            inputScale: attentionScales.qkvInput,
+            inputScale: qkvSrqMode === "shared" ? 0 : attentionScales.qkvInput,
             outputScale: attentionScales.qkvOutput[2],
           },
           scratch.value,
@@ -466,6 +593,7 @@ export async function createGemmaFixedPrefillResources(
           scratch.keyNorm,
           cache.keyBuffer,
           copyParameters(kvFeatures),
+          parameterArena,
         ));
         valueCopy = own(createGemmaPrefillStridedCopyResources(
           device,
@@ -473,6 +601,7 @@ export async function createGemmaFixedPrefillResources(
           scratch.valueNorm,
           cache.valueBuffer,
           copyParameters(kvFeatures),
+          parameterArena,
         ));
       }
 
@@ -494,6 +623,7 @@ export async function createGemmaFixedPrefillResources(
           window,
         },
         scratch.attention,
+        parameterArena,
       ));
       const outputProjection = await projection(
         queryFeatures,
@@ -508,20 +638,33 @@ export async function createGemmaFixedPrefillResources(
         },
         scratch.projection,
       );
-      const postAttentionNorm = await norm(
-        HIDDEN_SIZE,
-        true,
-        scratch.projection,
-        slice(attentionWeights.postAttentionAndPreFeedforwardNorm, 0, HIDDEN_BYTES),
-        scratch.residualNorm,
+      const postAttentionWeight = slice(
+        attentionWeights.postAttentionAndPreFeedforwardNorm,
+        0,
+        HIDDEN_BYTES,
       );
-      const attentionResidual = own(createGemmaPrefillAddResources(
-        device,
-        elementwisePipelines.add,
-        input.hidden,
-        scratch.residualNorm,
-        GEMMA_FIXED_PREFILL_ROWS * HIDDEN_SIZE,
-      ));
+      const postAttentionNorm = rmsEpilogueMode === "separate"
+        ? await norm(
+            HIDDEN_SIZE,
+            true,
+            scratch.projection,
+            postAttentionWeight,
+            scratch.residualNorm,
+          )
+        : null;
+      const attentionResidual = rmsEpilogueMode === "separate"
+        ? own(createGemmaPrefillAddResources(
+            device,
+            elementwisePipelines.add,
+            input.hidden,
+            scratch.residualNorm,
+            GEMMA_FIXED_PREFILL_ROWS * HIDDEN_SIZE,
+            parameterArena,
+          ))
+        : null;
+      const attentionNormResidual = rmsEpilogueMode === "fused"
+        ? await normResidual(scratch.projection, postAttentionWeight, input.hidden)
+        : null;
       const preFeedforwardNorm = await norm(
         HIDDEN_SIZE,
         true,
@@ -533,83 +676,148 @@ export async function createGemmaFixedPrefillResources(
         ),
         scratch.hiddenNorm,
       );
-      const gate = await projection(
-        HIDDEN_SIZE,
-        intermediateFeatures,
-        mlpBits,
-        scratch.hiddenNorm,
-        {
-          packedWeights: mlpWeights.gatePacked,
-          rowScales: mlpWeights.gateRowScales,
-          inputScale: mlpScales.gateInput,
-          outputScale: mlpScales.gateOutput,
-        },
-        scratch.gate,
+      const gateWeights: GemmaPrefillQatLinearWeights = {
+        packedWeights: mlpWeights.gatePacked,
+        rowScales: mlpWeights.gateRowScales,
+        inputScale: mlpScales.gateInput,
+        outputScale: mlpScales.gateOutput,
+      };
+      const upWeights: GemmaPrefillQatLinearWeights = {
+        packedWeights: mlpWeights.upPacked,
+        rowScales: mlpWeights.upRowScales,
+        inputScale: mlpScales.gateInput,
+        outputScale: mlpScales.upOutput,
+      };
+      let gateUpActivation: GemmaPrefillGateUpActivationProjection | null = null;
+      let gateUp: GemmaPrefillGateUpProjection | null = null;
+      let gate: GemmaPrefillProjection | null = null;
+      let up: GemmaPrefillProjection | null = null;
+      if (gateUpMode === "fused-activated") {
+        const gateUpPipelines = await getGemmaPrefillQatGateUpActivationPipelines(device, {
+          rows: GEMMA_FIXED_PREFILL_ROWS,
+          inFeatures: HIDDEN_SIZE,
+          outFeatures: intermediateFeatures,
+          bits: mlpBits,
+        });
+        gateUpActivation = {
+          pipelines: gateUpPipelines,
+          resources: own(createGemmaPrefillQatGateUpActivationResources(
+            device,
+            gateUpPipelines,
+            scratch.hiddenNorm,
+            gateWeights,
+            upWeights,
+            mlpWeights.gateGeluLut,
+            mlpScales.downInput,
+            scratch.srq,
+            scratch.activated,
+            parameterArena,
+          )),
+        };
+      } else if (gateUpMode === "fused") {
+        const gateUpPipelines = await getGemmaPrefillQatGateUpPipelines(device, {
+          rows: GEMMA_FIXED_PREFILL_ROWS,
+          inFeatures: HIDDEN_SIZE,
+          outFeatures: intermediateFeatures,
+          bits: mlpBits,
+        });
+        gateUp = {
+          pipelines: gateUpPipelines,
+          resources: own(createGemmaPrefillQatGateUpResources(
+            device,
+            gateUpPipelines,
+            scratch.hiddenNorm,
+            gateWeights,
+            upWeights,
+            scratch.gate,
+            scratch.up,
+            scratch.srq,
+            parameterArena,
+          )),
+        };
+      } else {
+        gate = await projection(
+          HIDDEN_SIZE,
+          intermediateFeatures,
+          mlpBits,
+          scratch.hiddenNorm,
+          gateWeights,
+          scratch.gate,
+        );
+        up = await projection(
+          HIDDEN_SIZE,
+          intermediateFeatures,
+          mlpBits,
+          scratch.hiddenNorm,
+          upWeights,
+          scratch.up,
+        );
+      }
+      const gateActivation = gateUpActivation ? null : own(
+        createGemmaPrefillGeluMultiplyResources(
+          device,
+          elementwisePipelines.geluMultiply,
+          scratch.gate,
+          scratch.up,
+          mlpWeights.gateGeluLut,
+          scratch.activated,
+          GEMMA_FIXED_PREFILL_ROWS * intermediateFeatures,
+          mlpScales.gateOutput,
+          parameterArena,
+        ),
       );
-      const up = await projection(
-        HIDDEN_SIZE,
-        intermediateFeatures,
-        mlpBits,
-        scratch.hiddenNorm,
-        {
-          packedWeights: mlpWeights.upPacked,
-          rowScales: mlpWeights.upRowScales,
-          inputScale: mlpScales.gateInput,
-          outputScale: mlpScales.upOutput,
-        },
-        scratch.up,
-      );
-      const gateActivation = own(createGemmaPrefillGeluMultiplyResources(
-        device,
-        elementwisePipelines.geluMultiply,
-        scratch.gate,
-        scratch.up,
-        mlpWeights.gateGeluLut,
-        scratch.activated,
-        GEMMA_FIXED_PREFILL_ROWS * intermediateFeatures,
-        mlpScales.gateOutput,
-      ));
       const down = await projection(
         intermediateFeatures,
         HIDDEN_SIZE,
         mlpBits,
-        scratch.activated,
+        gateUpActivation ? scratch.srq : scratch.activated,
         {
           packedWeights: mlpWeights.downPacked,
           rowScales: mlpWeights.downRowScales,
-          inputScale: mlpScales.downInput,
+          inputScale: gateUpActivation ? 0 : mlpScales.downInput,
           outputScale: mlpScales.downOutput,
         },
         scratch.down,
       );
-      const postFeedforwardNorm = await norm(
-        HIDDEN_SIZE,
-        true,
-        scratch.down,
-        mlpWeights.postFeedforwardNorm,
-        scratch.residualNorm,
-      );
-      const feedforwardResidual = own(createGemmaPrefillAddResources(
-        device,
-        elementwisePipelines.add,
-        input.hidden,
-        scratch.residualNorm,
-        GEMMA_FIXED_PREFILL_ROWS * HIDDEN_SIZE,
-      ));
-      const pleInputCopy = own(createGemmaPrefillStridedCopyResources(
-        device,
-        stridedCopyPipeline,
-        input.perLayerInputs,
-        scratch.pleInput,
-        {
-          rows: GEMMA_FIXED_PREFILL_ROWS,
-          sourceStride: LAYER_COUNT * PLE_SIZE,
-          sourceStart: layerIndex * PLE_SIZE,
-          destinationStride: PLE_SIZE,
-          destinationStart: 0,
-          copyColumns: PLE_SIZE,
-        },
-      ));
+      const postFeedforwardNorm = rmsEpilogueMode === "separate"
+        ? await norm(
+            HIDDEN_SIZE,
+            true,
+            scratch.down,
+            mlpWeights.postFeedforwardNorm,
+            scratch.residualNorm,
+          )
+        : null;
+      const feedforwardResidual = rmsEpilogueMode === "separate"
+        ? own(createGemmaPrefillAddResources(
+            device,
+            elementwisePipelines.add,
+            input.hidden,
+            scratch.residualNorm,
+            GEMMA_FIXED_PREFILL_ROWS * HIDDEN_SIZE,
+            parameterArena,
+          ))
+        : null;
+      const feedforwardNormResidual = rmsEpilogueMode === "fused"
+        ? await normResidual(scratch.down, mlpWeights.postFeedforwardNorm, input.hidden)
+        : null;
+      const pleInputCopy = pleInputMode === "copied"
+        ? own(createGemmaPrefillStridedCopyResources(
+            device,
+            stridedCopyPipeline,
+            input.perLayerInputs,
+            scratch.pleInput,
+            {
+              rows: GEMMA_FIXED_PREFILL_ROWS,
+              sourceStride: LAYER_COUNT * PLE_SIZE,
+              sourceStart: layerIndex * PLE_SIZE,
+              destinationStride: PLE_SIZE,
+              destinationStart: 0,
+              copyColumns: PLE_SIZE,
+            },
+            parameterArena,
+          ))
+        : null;
       const pleGate = await pleProjection(
         HIDDEN_SIZE,
         PLE_SIZE,
@@ -620,16 +828,32 @@ export async function createGemmaFixedPrefillResources(
         mlpScales.pleGateOutput,
         scratch.pleGate,
       );
-      const pleActivation = own(createGemmaPrefillGeluMultiplyResources(
-        device,
-        elementwisePipelines.geluMultiply,
-        scratch.pleGate,
-        scratch.pleInput,
-        mlpWeights.pleGeluLut,
-        scratch.pleActivated,
-        GEMMA_FIXED_PREFILL_ROWS * PLE_SIZE,
-        mlpScales.pleGateOutput,
-      ));
+      const pleActivation = pleInputMode === "direct"
+        ? own(createGemmaPrefillStridedGeluMultiplyResources(
+            device,
+            elementwisePipelines.geluMultiplyStrided,
+            scratch.pleGate,
+            input.perLayerInputs,
+            mlpWeights.pleGeluLut,
+            scratch.pleActivated,
+            GEMMA_FIXED_PREFILL_ROWS,
+            PLE_SIZE,
+            LAYER_COUNT * PLE_SIZE,
+            layerIndex * PLE_SIZE,
+            mlpScales.pleGateOutput,
+            parameterArena,
+          ))
+        : own(createGemmaPrefillGeluMultiplyResources(
+            device,
+            elementwisePipelines.geluMultiply,
+            scratch.pleGate,
+            scratch.pleInput,
+            mlpWeights.pleGeluLut,
+            scratch.pleActivated,
+            GEMMA_FIXED_PREFILL_ROWS * PLE_SIZE,
+            mlpScales.pleGateOutput,
+            parameterArena,
+          ));
       const pleProjectionResult = await pleProjection(
         PLE_SIZE,
         HIDDEN_SIZE,
@@ -640,28 +864,50 @@ export async function createGemmaFixedPrefillResources(
         mlpScales.pleProjectionOutput,
         scratch.pleProjection,
       );
-      const postPleNorm = await norm(
-        HIDDEN_SIZE,
-        true,
-        scratch.pleProjection,
-        slice(mlpWeights.postPleNextInputNormAndLayerScale, 0, HIDDEN_BYTES),
-        scratch.residualNorm,
-      );
-      const pleResidual = own(createGemmaPrefillAddResources(
-        device,
-        elementwisePipelines.add,
-        input.hidden,
-        scratch.residualNorm,
-        GEMMA_FIXED_PREFILL_ROWS * HIDDEN_SIZE,
-      ));
-      const layerScale = own(createGemmaPrefillMultiplyResources(
-        device,
-        elementwisePipelines.multiply,
-        input.hidden,
+      const postPleWeight = slice(
         mlpWeights.postPleNextInputNormAndLayerScale,
-        GEMMA_FIXED_PREFILL_ROWS * HIDDEN_SIZE,
-        HIDDEN_SIZE * 2,
-      ));
+        0,
+        HIDDEN_BYTES,
+      );
+      const postPleNorm = rmsEpilogueMode === "separate"
+        ? await norm(
+            HIDDEN_SIZE,
+            true,
+            scratch.pleProjection,
+            postPleWeight,
+            scratch.residualNorm,
+          )
+        : null;
+      const pleResidual = rmsEpilogueMode === "separate"
+        ? own(createGemmaPrefillAddResources(
+            device,
+            elementwisePipelines.add,
+            input.hidden,
+            scratch.residualNorm,
+            GEMMA_FIXED_PREFILL_ROWS * HIDDEN_SIZE,
+            parameterArena,
+          ))
+        : null;
+      const layerScale = rmsEpilogueMode === "separate"
+        ? own(createGemmaPrefillMultiplyResources(
+            device,
+            elementwisePipelines.multiply,
+            input.hidden,
+            mlpWeights.postPleNextInputNormAndLayerScale,
+            GEMMA_FIXED_PREFILL_ROWS * HIDDEN_SIZE,
+            HIDDEN_SIZE * 2,
+            parameterArena,
+          ))
+        : null;
+      const pleNormResidualScale = rmsEpilogueMode === "fused"
+        ? await normResidual(
+            scratch.pleProjection,
+            postPleWeight,
+            input.hidden,
+            mlpWeights.postPleNextInputNormAndLayerScale,
+            HIDDEN_SIZE * 2,
+          )
+        : null;
 
       layers.push({
         layerIndex,
@@ -685,13 +931,17 @@ export async function createGemmaFixedPrefillResources(
         outputProjection,
         postAttentionNorm,
         attentionResidual,
+        attentionNormResidual,
         preFeedforwardNorm,
+        gateUpActivation,
+        gateUp,
         gate,
         up,
         gateActivation,
         down,
         postFeedforwardNorm,
         feedforwardResidual,
+        feedforwardNormResidual,
         pleInputCopy,
         pleGate,
         pleActivation,
@@ -699,6 +949,7 @@ export async function createGemmaFixedPrefillResources(
         postPleNorm,
         pleResidual,
         layerScale,
+        pleNormResidualScale,
       });
     }
 
@@ -717,6 +968,7 @@ export async function createGemmaFixedPrefillResources(
           HIDDEN_BYTES,
         ),
         scratch.finalNorm,
+        parameterArena,
       )),
     };
     const lastRow = allocate("Gemma prefill actual last row", HIDDEN_SIZE);
@@ -733,6 +985,7 @@ export async function createGemmaFixedPrefillResources(
         destinationStart: 0,
         copyColumns: HIDDEN_SIZE,
       },
+      parameterArena,
     ));
     const lmHeadPipelines = await getGemmaPrefillQatLinearPipelines(device, {
       rows: 1,
@@ -754,8 +1007,10 @@ export async function createGemmaFixedPrefillResources(
         },
         decode.logits,
         scratch.srq,
+        parameterArena,
       )),
     };
+    ownedBuffers.push(...parameterArena.buffers);
     return {
       input,
       layers,
@@ -771,6 +1026,7 @@ export async function createGemmaFixedPrefillResources(
     };
   } catch (error) {
     for (const buffer of ownedBuffers.toReversed()) buffer.destroy();
+    parameterArena.destroy();
     throw error;
   }
 }
@@ -855,101 +1111,95 @@ export function encodeGemmaFixedPrefill(
   const pass = encoder.beginComputePass({ label: "Gemma fixed-32 prefill" });
   encodeGemmaDecodeInputPass(pass, resources.decode.inputPipeline, resources.input);
   for (const layer of resources.layers) {
-    encodeNorm(pass, layer.inputNorm);
-    encodeProjection(pass, layer.query);
-    encodeNorm(pass, layer.queryNorm);
-    encodeRope(pass, layer.queryRope);
-    if (layer.key && layer.keyNorm && layer.keyRope && layer.value && layer.valueNorm &&
-        layer.keyCopy && layer.valueCopy) {
-      encodeProjection(pass, layer.key);
-      encodeNorm(pass, layer.keyNorm);
-      encodeRope(pass, layer.keyRope);
-      encodeProjection(pass, layer.value);
-      encodeNorm(pass, layer.valueNorm);
-      encodeGemmaPrefillStridedCopyPass(
-        pass,
-        resources.stridedCopyPipeline,
-        layer.keyCopy,
-        GEMMA_FIXED_PREFILL_ROWS,
-      );
-      encodeGemmaPrefillStridedCopyPass(
-        pass,
-        resources.stridedCopyPipeline,
-        layer.valueCopy,
-        GEMMA_FIXED_PREFILL_ROWS,
-      );
-    }
-    encodeGemmaPrefillAttentionPass(
-      pass,
-      layer.attentionPipeline,
-      layer.attention,
-      GEMMA_FIXED_PREFILL_ROWS,
+    encodeLayerAttentionStage(pass, resources, layer);
+    encodeLayerFeedforwardStage(pass, resources, layer);
+    encodeLayerPleStage(pass, resources, layer);
+  }
+  if (outputMode !== "none") {
+    encodeOutputStage(pass, resources, outputMode);
+  }
+  pass.end();
+  encodeOutputReadback(encoder, resources, outputMode, logitsReadback);
+}
+
+function encodeGemmaFixedPrefillProfiled(
+  encoder: GPUCommandEncoder,
+  resources: GemmaFixedPrefillResources,
+  outputMode: GemmaModelOutputMode,
+  logitsReadback: GPUBuffer | undefined,
+  profile: GemmaFixedPrefillProfileResources,
+): void {
+  const encodeStage = (
+    label: string,
+    stage: GemmaFixedPrefillGpuStage,
+    layerIndex: number | null,
+    encode: (pass: GPUComputePassEncoder) => void,
+  ) => {
+    const beginningOfPassWriteIndex = profile.records.length * 2;
+    const pass = encoder.beginComputePass({
+      label,
+      timestampWrites: {
+        querySet: profile.querySet,
+        beginningOfPassWriteIndex,
+        endOfPassWriteIndex: beginningOfPassWriteIndex + 1,
+      },
+    });
+    encode(pass);
+    pass.end();
+    profile.records.push({ stage, layerIndex });
+  };
+
+  encodeStage("Gemma fixed prefill input", "input", null, (pass) => {
+    encodeGemmaDecodeInputPass(pass, resources.decode.inputPipeline, resources.input);
+  });
+  for (const layer of resources.layers) {
+    encodeStage(
+      `Gemma fixed prefill layer ${layer.layerIndex} attention`,
+      "attention",
+      layer.layerIndex,
+      (pass) => encodeLayerAttentionStage(pass, resources, layer),
     );
-    encodeProjection(pass, layer.outputProjection);
-    encodeNorm(pass, layer.postAttentionNorm);
-    encodeGemmaPrefillElementwisePass(
-      pass,
-      resources.elementwisePipelines.add,
-      layer.attentionResidual,
+    encodeStage(
+      `Gemma fixed prefill layer ${layer.layerIndex} feedforward`,
+      "feedforward",
+      layer.layerIndex,
+      (pass) => encodeLayerFeedforwardStage(pass, resources, layer),
     );
-    encodeNorm(pass, layer.preFeedforwardNorm);
-    encodeProjection(pass, layer.gate);
-    encodeProjection(pass, layer.up);
-    encodeGemmaPrefillElementwisePass(
-      pass,
-      resources.elementwisePipelines.geluMultiply,
-      layer.gateActivation,
-    );
-    encodeProjection(pass, layer.down);
-    encodeNorm(pass, layer.postFeedforwardNorm);
-    encodeGemmaPrefillElementwisePass(
-      pass,
-      resources.elementwisePipelines.add,
-      layer.feedforwardResidual,
-    );
-    encodeGemmaPrefillStridedCopyPass(
-      pass,
-      resources.stridedCopyPipeline,
-      layer.pleInputCopy,
-      GEMMA_FIXED_PREFILL_ROWS,
-    );
-    encodePleProjection(pass, layer.pleGate);
-    encodeGemmaPrefillElementwisePass(
-      pass,
-      resources.elementwisePipelines.geluMultiply,
-      layer.pleActivation,
-    );
-    encodePleProjection(pass, layer.pleProjection);
-    encodeNorm(pass, layer.postPleNorm);
-    encodeGemmaPrefillElementwisePass(
-      pass,
-      resources.elementwisePipelines.add,
-      layer.pleResidual,
-    );
-    encodeGemmaPrefillElementwisePass(
-      pass,
-      resources.elementwisePipelines.multiply,
-      layer.layerScale,
+    encodeStage(
+      `Gemma fixed prefill layer ${layer.layerIndex} PLE`,
+      "ple",
+      layer.layerIndex,
+      (pass) => encodeLayerPleStage(pass, resources, layer),
     );
   }
   if (outputMode !== "none") {
-    encodeNorm(pass, resources.finalNorm);
-    encodeGemmaPrefillStridedCopyPass(
-      pass,
-      resources.stridedCopyPipeline,
-      resources.lastRowCopy,
-      1,
-    );
-    encodeProjection(pass, resources.lmHead);
-    if (outputMode === "greedy") {
-      encodeGemmaGreedyPass(
-        pass,
-        resources.decode.greedyPipelines,
-        resources.decode.greedy,
-      );
-    }
+    encodeStage("Gemma fixed prefill output", "output", null, (pass) => {
+      encodeOutputStage(pass, resources, outputMode);
+    });
   }
-  pass.end();
+  encodeOutputReadback(encoder, resources, outputMode, logitsReadback);
+  encoder.resolveQuerySet(
+    profile.querySet,
+    0,
+    profile.records.length * 2,
+    profile.resolveBuffer,
+    0,
+  );
+  encoder.copyBufferToBuffer(
+    profile.resolveBuffer,
+    0,
+    profile.readBuffer,
+    0,
+    profile.records.length * 16,
+  );
+}
+
+function encodeOutputReadback(
+  encoder: GPUCommandEncoder,
+  resources: GemmaFixedPrefillResources,
+  outputMode: GemmaModelOutputMode,
+  logitsReadback?: GPUBuffer,
+): void {
   if (outputMode === "greedy") {
     encoder.copyBufferToBuffer(
       resources.decode.greedy.result,
@@ -979,35 +1229,59 @@ export async function submitGemmaFixedPrefill(
   validRows: number,
   outputMode: GemmaModelOutputMode = "greedy",
   logitsReadback?: GPUBuffer,
-): Promise<GemmaModelOutput> {
+  profileGpuStages = false,
+): Promise<GemmaFixedPrefillSubmission> {
   const encoder = device.createCommandEncoder({ label: "Gemma fixed-32 prefill" });
-  encodeGemmaFixedPrefill(encoder, resources, outputMode, logitsReadback);
+  const profile = profileGpuStages && device.features.has("timestamp-query")
+    ? createProfileResources(device, outputMode)
+    : null;
+  if (profile) {
+    encodeGemmaFixedPrefillProfiled(
+      encoder,
+      resources,
+      outputMode,
+      logitsReadback,
+      profile,
+    );
+  } else {
+    encodeGemmaFixedPrefill(encoder, resources, outputMode, logitsReadback);
+  }
   device.queue.submit([encoder.finish()]);
-  if (outputMode === "none") await device.queue.onSubmittedWorkDone();
   for (const cache of resources.decode.stack.ownerCaches.values()) {
     cache.commitWrite(position, validRows);
   }
-  if (outputMode === "greedy") {
+  try {
+    let output: GemmaModelOutput;
+    if (outputMode === "greedy") {
+      output = {
+        prediction: await readGemmaGreedyResult(resources.decode.greedy),
+        logits: null,
+        logitsReadbackMs: 0,
+      };
+    } else if (outputMode === "logits") {
+      const startedAt = performance.now();
+      await logitsReadback!.mapAsync(GPUMapMode.READ);
+      const logits = new Float32Array(
+        logitsReadback!.getMappedRange(0, resources.decode.logits.size).slice(0),
+      );
+      logitsReadback!.unmap();
+      output = {
+        prediction: null,
+        logits,
+        logitsReadbackMs: performance.now() - startedAt,
+      };
+    } else {
+      output = { prediction: null, logits: null, logitsReadbackMs: 0 };
+    }
     return {
-      prediction: await readGemmaGreedyResult(resources.decode.greedy),
-      logits: null,
-      logitsReadbackMs: 0,
+      ...output,
+      gpuProfile: profile
+        ? await readProfile(profile, position, validRows)
+        : null,
     };
+  } finally {
+    destroyProfileResources(profile);
   }
-  if (outputMode === "logits") {
-    const startedAt = performance.now();
-    await logitsReadback!.mapAsync(GPUMapMode.READ);
-    const logits = new Float32Array(
-      logitsReadback!.getMappedRange(0, resources.decode.logits.size).slice(0),
-    );
-    logitsReadback!.unmap();
-    return {
-      prediction: null,
-      logits,
-      logitsReadbackMs: performance.now() - startedAt,
-    };
-  }
-  return { prediction: null, logits: null, logitsReadbackMs: 0 };
 }
 
 export function destroyGemmaFixedPrefillResources(
@@ -1018,6 +1292,239 @@ export function destroyGemmaFixedPrefillResources(
 
 function encodeNorm(pass: GPUComputePassEncoder, norm: GemmaPrefillNorm): void {
   encodeGemmaPrefillRmsPass(pass, norm.pipeline, norm.resources);
+}
+
+function encodeLayerAttentionStage(
+  pass: GPUComputePassEncoder,
+  resources: GemmaFixedPrefillResources,
+  layer: GemmaPrefillLayerResources,
+): void {
+  encodeNorm(pass, layer.inputNorm);
+  encodeProjection(pass, layer.query);
+  encodeNorm(pass, layer.queryNorm);
+  encodeRope(pass, layer.queryRope);
+  if (layer.key && layer.keyNorm && layer.keyRope && layer.value && layer.valueNorm &&
+      layer.keyCopy && layer.valueCopy) {
+    encodeProjection(pass, layer.key);
+    encodeNorm(pass, layer.keyNorm);
+    encodeRope(pass, layer.keyRope);
+    encodeProjection(pass, layer.value);
+    encodeNorm(pass, layer.valueNorm);
+    encodeGemmaPrefillStridedCopyPass(
+      pass,
+      resources.stridedCopyPipeline,
+      layer.keyCopy,
+      GEMMA_FIXED_PREFILL_ROWS,
+    );
+    encodeGemmaPrefillStridedCopyPass(
+      pass,
+      resources.stridedCopyPipeline,
+      layer.valueCopy,
+      GEMMA_FIXED_PREFILL_ROWS,
+    );
+  }
+  encodeGemmaPrefillAttentionPass(
+    pass,
+    layer.attentionPipeline,
+    layer.attention,
+    GEMMA_FIXED_PREFILL_ROWS,
+  );
+  encodeProjection(pass, layer.outputProjection);
+  if (layer.attentionNormResidual) {
+    encodeGemmaPrefillRmsResidualPass(
+      pass,
+      layer.attentionNormResidual.pipeline,
+      layer.attentionNormResidual.resources,
+    );
+  } else if (layer.postAttentionNorm && layer.attentionResidual) {
+    encodeNorm(pass, layer.postAttentionNorm);
+    encodeGemmaPrefillElementwisePass(
+      pass,
+      resources.elementwisePipelines.add,
+      layer.attentionResidual,
+    );
+  } else {
+    throw new Error("Gemma prefill layer has no attention RMS epilogue");
+  }
+}
+
+function encodeLayerFeedforwardStage(
+  pass: GPUComputePassEncoder,
+  resources: GemmaFixedPrefillResources,
+  layer: GemmaPrefillLayerResources,
+): void {
+  encodeNorm(pass, layer.preFeedforwardNorm);
+  if (layer.gateUpActivation) {
+    encodeGemmaPrefillQatGateUpActivationPass(
+      pass,
+      layer.gateUpActivation.pipelines,
+      layer.gateUpActivation.resources,
+    );
+  } else if (layer.gateUp) {
+    encodeGemmaPrefillQatGateUpPass(
+      pass,
+      layer.gateUp.pipelines,
+      layer.gateUp.resources,
+    );
+  } else if (layer.gate && layer.up) {
+    encodeProjection(pass, layer.gate);
+    encodeProjection(pass, layer.up);
+  } else {
+    throw new Error("Gemma prefill layer has no gate/up implementation");
+  }
+  if (layer.gateActivation) {
+    encodeGemmaPrefillElementwisePass(
+      pass,
+      resources.elementwisePipelines.geluMultiply,
+      layer.gateActivation,
+    );
+  }
+  encodeProjection(pass, layer.down);
+  if (layer.feedforwardNormResidual) {
+    encodeGemmaPrefillRmsResidualPass(
+      pass,
+      layer.feedforwardNormResidual.pipeline,
+      layer.feedforwardNormResidual.resources,
+    );
+  } else if (layer.postFeedforwardNorm && layer.feedforwardResidual) {
+    encodeNorm(pass, layer.postFeedforwardNorm);
+    encodeGemmaPrefillElementwisePass(
+      pass,
+      resources.elementwisePipelines.add,
+      layer.feedforwardResidual,
+    );
+  } else {
+    throw new Error("Gemma prefill layer has no feedforward RMS epilogue");
+  }
+}
+
+function encodeLayerPleStage(
+  pass: GPUComputePassEncoder,
+  resources: GemmaFixedPrefillResources,
+  layer: GemmaPrefillLayerResources,
+): void {
+  if (layer.pleInputCopy) {
+    encodeGemmaPrefillStridedCopyPass(
+      pass,
+      resources.stridedCopyPipeline,
+      layer.pleInputCopy,
+      GEMMA_FIXED_PREFILL_ROWS,
+    );
+  }
+  encodePleProjection(pass, layer.pleGate);
+  encodeGemmaPrefillElementwisePass(
+    pass,
+    layer.pleInputCopy
+      ? resources.elementwisePipelines.geluMultiply
+      : resources.elementwisePipelines.geluMultiplyStrided,
+    layer.pleActivation,
+  );
+  encodePleProjection(pass, layer.pleProjection);
+  if (layer.pleNormResidualScale) {
+    encodeGemmaPrefillRmsResidualPass(
+      pass,
+      layer.pleNormResidualScale.pipeline,
+      layer.pleNormResidualScale.resources,
+    );
+  } else if (layer.postPleNorm && layer.pleResidual && layer.layerScale) {
+    encodeNorm(pass, layer.postPleNorm);
+    encodeGemmaPrefillElementwisePass(
+      pass,
+      resources.elementwisePipelines.add,
+      layer.pleResidual,
+    );
+    encodeGemmaPrefillElementwisePass(
+      pass,
+      resources.elementwisePipelines.multiply,
+      layer.layerScale,
+    );
+  } else {
+    throw new Error("Gemma prefill layer has no PLE RMS epilogue");
+  }
+}
+
+function encodeOutputStage(
+  pass: GPUComputePassEncoder,
+  resources: GemmaFixedPrefillResources,
+  outputMode: GemmaModelOutputMode,
+): void {
+  encodeNorm(pass, resources.finalNorm);
+  encodeGemmaPrefillStridedCopyPass(
+    pass,
+    resources.stridedCopyPipeline,
+    resources.lastRowCopy,
+    1,
+  );
+  encodeProjection(pass, resources.lmHead);
+  if (outputMode === "greedy") {
+    encodeGemmaGreedyPass(
+      pass,
+      resources.decode.greedyPipelines,
+      resources.decode.greedy,
+    );
+  }
+}
+
+function createProfileResources(
+  device: GPUDevice,
+  outputMode: GemmaModelOutputMode,
+): GemmaFixedPrefillProfileResources {
+  const recordCount = 1 + LAYER_COUNT * 3 + (outputMode === "none" ? 0 : 1);
+  const queryCount = recordCount * 2;
+  const size = queryCount * 8;
+  return {
+    querySet: device.createQuerySet({ type: "timestamp", count: queryCount }),
+    resolveBuffer: device.createBuffer({
+      label: "Gemma fixed prefill profile resolve",
+      size,
+      usage: GPUBufferUsage.QUERY_RESOLVE | GPUBufferUsage.COPY_SRC,
+    }),
+    readBuffer: device.createBuffer({
+      label: "Gemma fixed prefill profile readback",
+      size,
+      usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+    }),
+    records: [],
+  };
+}
+
+async function readProfile(
+  profile: GemmaFixedPrefillProfileResources,
+  position: number,
+  validRows: number,
+): Promise<GemmaFixedPrefillGpuProfile> {
+  const byteLength = profile.records.length * 16;
+  await profile.readBuffer.mapAsync(GPUMapMode.READ, 0, byteLength);
+  const timestamps = new BigUint64Array(
+    profile.readBuffer.getMappedRange(0, byteLength).slice(0),
+  );
+  profile.readBuffer.unmap();
+  const stageGpuMs: Record<GemmaFixedPrefillGpuStage, number> = {
+    input: 0,
+    attention: 0,
+    feedforward: 0,
+    ple: 0,
+    output: 0,
+  };
+  const samples = profile.records.map((record, index) => {
+    const gpuMs = Number(timestamps[index * 2 + 1] - timestamps[index * 2]) / 1e6;
+    stageGpuMs[record.stage] += gpuMs;
+    return { ...record, gpuMs };
+  });
+  return {
+    position,
+    validRows,
+    samples,
+    stageGpuMs,
+    totalGpuMs: samples.reduce((total, sample) => total + sample.gpuMs, 0),
+  };
+}
+
+function destroyProfileResources(profile: GemmaFixedPrefillProfileResources | null): void {
+  if (!profile) return;
+  profile.querySet.destroy();
+  profile.resolveBuffer.destroy();
+  profile.readBuffer.destroy();
 }
 
 function encodeProjection(

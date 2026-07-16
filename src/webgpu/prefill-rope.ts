@@ -1,4 +1,11 @@
 import type { GemmaRotaryRow } from "../model/gemma-rope";
+import {
+  createGemmaPrefillParameter,
+  gemmaPrefillParameterBinding,
+  writeGemmaPrefillParameter,
+  type GemmaPrefillParameterArena,
+  type GemmaPrefillParameterSlice,
+} from "./prefill-parameter-arena";
 
 export interface GemmaPrefillRopePipeline {
   headDimension: 256 | 512;
@@ -9,7 +16,7 @@ export interface GemmaPrefillRopeResources {
   bindGroup: GPUBindGroup;
   cosine: GPUBuffer;
   sine: GPUBuffer;
-  parameters: GPUBuffer;
+  parameters: GemmaPrefillParameterSlice;
   rowCapacity: number;
   heads: number;
   ownedBuffers: GPUBuffer[];
@@ -63,6 +70,7 @@ export function createGemmaPrefillRopeResources(
   rows: number,
   heads: number,
   rotary: GemmaRotaryRow,
+  parameterArena?: GemmaPrefillParameterArena,
 ): GemmaPrefillRopeResources {
   validateInputs(compiled, activations, rows, rows, heads, rotary);
   const halfDimension = compiled.headDimension / 2;
@@ -77,11 +85,12 @@ export function createGemmaPrefillRopeResources(
     size: rows * halfDimension * 4,
     usage: storageUpload,
   });
-  const parameters = device.createBuffer({
-    label: "Gemma prefill RoPE parameters",
-    size: 16,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
+  const parameters = createGemmaPrefillParameter(
+    device,
+    16,
+    "Gemma prefill RoPE parameters",
+    parameterArena,
+  );
   const resources = {
     bindGroup: device.createBindGroup({
       layout: compiled.pipeline.getBindGroupLayout(0),
@@ -89,15 +98,15 @@ export function createGemmaPrefillRopeResources(
         { binding: 0, resource: { buffer: activations } },
         { binding: 1, resource: { buffer: cosine } },
         { binding: 2, resource: { buffer: sine } },
-        { binding: 3, resource: { buffer: parameters } },
+        gemmaPrefillParameterBinding(3, parameters.slice),
       ],
     }),
     cosine,
     sine,
-    parameters,
+    parameters: parameters.slice,
     rowCapacity: rows,
     heads,
-    ownedBuffers: [cosine, sine, parameters],
+    ownedBuffers: [cosine, sine, ...parameters.ownedBuffers],
   };
   updateGemmaPrefillRope(device, compiled, resources, rows, rotary);
   return resources;
@@ -113,9 +122,9 @@ export function updateGemmaPrefillRope(
   validateRotary(compiled.headDimension, resources.rowCapacity, rows, rotary);
   device.queue.writeBuffer(resources.cosine, 0, rotary.cosine);
   device.queue.writeBuffer(resources.sine, 0, rotary.sine);
-  device.queue.writeBuffer(
+  writeGemmaPrefillParameter(
+    device,
     resources.parameters,
-    0,
     new Uint32Array([rows, resources.heads, 0, 0]),
   );
 }

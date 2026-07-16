@@ -1,3 +1,11 @@
+import {
+  createGemmaPrefillParameter,
+  gemmaPrefillParameterBinding,
+  writeGemmaPrefillParameter,
+  type GemmaPrefillParameterArena,
+  type GemmaPrefillParameterSlice,
+} from "./prefill-parameter-arena";
+
 export interface GemmaPrefillAttentionPipeline {
   headDimension: 64 | 256 | 512;
   queryTile: 16 | 32;
@@ -17,7 +25,7 @@ export interface GemmaPrefillAttentionParameters {
 export interface GemmaPrefillAttentionResources {
   bindGroup: GPUBindGroup;
   output: GPUBuffer;
-  parameters: GPUBuffer;
+  parameters: GemmaPrefillParameterSlice;
   sequenceCapacity: number;
   queryHeads: number;
   cacheCapacity: number;
@@ -78,6 +86,7 @@ export function createGemmaPrefillAttentionResources(
   cacheCapacity: number,
   parameters: GemmaPrefillAttentionParameters,
   output?: GPUBuffer,
+  parameterArena?: GemmaPrefillParameterArena,
 ): GemmaPrefillAttentionResources {
   validateParameters(parameters, sequenceCapacity, cacheCapacity);
   const queryBytes = sequenceCapacity * parameters.queryHeads * compiled.headDimension * 4;
@@ -93,12 +102,13 @@ export function createGemmaPrefillAttentionResources(
     usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
   });
   if (!output) ownedBuffers.push(outputBuffer);
-  const parameterBuffer = device.createBuffer({
-    label: "Gemma prefill attention parameters",
-    size: 32,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
-  ownedBuffers.push(parameterBuffer);
+  const parameterBuffer = createGemmaPrefillParameter(
+    device,
+    32,
+    "Gemma prefill attention parameters",
+    parameterArena,
+  );
+  ownedBuffers.push(...parameterBuffer.ownedBuffers);
   const resources = {
     bindGroup: device.createBindGroup({
       layout: compiled.pipeline.getBindGroupLayout(0),
@@ -107,11 +117,11 @@ export function createGemmaPrefillAttentionResources(
         { binding: 1, resource: { buffer: key } },
         { binding: 2, resource: { buffer: value } },
         { binding: 3, resource: { buffer: outputBuffer } },
-        { binding: 4, resource: { buffer: parameterBuffer } },
+        gemmaPrefillParameterBinding(4, parameterBuffer.slice),
       ],
     }),
     output: outputBuffer,
-    parameters: parameterBuffer,
+    parameters: parameterBuffer.slice,
     sequenceCapacity,
     queryHeads: parameters.queryHeads,
     cacheCapacity,
@@ -131,7 +141,7 @@ export function updateGemmaPrefillAttention(
   if (parameters.queryHeads !== resources.queryHeads) {
     throw new Error("Gemma prefill attention query head count cannot change after binding");
   }
-  device.queue.writeBuffer(resources.parameters, 0, new Uint32Array([
+  writeGemmaPrefillParameter(device, resources.parameters, new Uint32Array([
     parameters.sequence,
     parameters.keyLength,
     parameters.queryOffset,

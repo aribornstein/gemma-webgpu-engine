@@ -1,3 +1,11 @@
+import {
+  createGemmaPrefillParameter,
+  gemmaPrefillParameterBinding,
+  writeGemmaPrefillParameter,
+  type GemmaPrefillParameterArena,
+  type GemmaPrefillParameterSlice,
+} from "./prefill-parameter-arena";
+
 export interface GemmaPrefillStridedCopyParameters {
   rows: number;
   sourceStride: number;
@@ -9,7 +17,7 @@ export interface GemmaPrefillStridedCopyParameters {
 
 export interface GemmaPrefillStridedCopyResources {
   bindGroup: GPUBindGroup;
-  parameters: GPUBuffer;
+  parameters: GemmaPrefillParameterSlice;
   source: GPUBuffer;
   destination: GPUBuffer;
   ownedBuffers: GPUBuffer[];
@@ -43,26 +51,28 @@ export function createGemmaPrefillStridedCopyResources(
   source: GPUBuffer,
   destination: GPUBuffer,
   parameters: GemmaPrefillStridedCopyParameters,
+  parameterArena?: GemmaPrefillParameterArena,
 ): GemmaPrefillStridedCopyResources {
   validateParameters(source, destination, parameters);
-  const parameterBuffer = device.createBuffer({
-    label: "Gemma prefill strided copy parameters",
-    size: 32,
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-  });
+  const parameterBuffer = createGemmaPrefillParameter(
+    device,
+    32,
+    "Gemma prefill strided copy parameters",
+    parameterArena,
+  );
   const resources = {
     bindGroup: device.createBindGroup({
       layout: pipeline.getBindGroupLayout(0),
       entries: [
         { binding: 0, resource: { buffer: source } },
         { binding: 1, resource: { buffer: destination } },
-        { binding: 2, resource: { buffer: parameterBuffer } },
+        gemmaPrefillParameterBinding(2, parameterBuffer.slice),
       ],
     }),
-    parameters: parameterBuffer,
+    parameters: parameterBuffer.slice,
     source,
     destination,
-    ownedBuffers: [parameterBuffer],
+    ownedBuffers: parameterBuffer.ownedBuffers,
   };
   updateGemmaPrefillStridedCopy(device, resources, parameters);
   return resources;
@@ -74,7 +84,7 @@ export function updateGemmaPrefillStridedCopy(
   parameters: GemmaPrefillStridedCopyParameters,
 ): void {
   validateParameters(resources.source, resources.destination, parameters);
-  device.queue.writeBuffer(resources.parameters, 0, new Uint32Array([
+  writeGemmaPrefillParameter(device, resources.parameters, new Uint32Array([
     parameters.rows,
     parameters.sourceStride,
     parameters.sourceStart,

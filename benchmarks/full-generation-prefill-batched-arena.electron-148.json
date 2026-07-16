@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 2,
+  "capturedAt": "2026-07-16T13:16:30Z",
+  "status": "memory-gate-passed-exact-parity-passed-latency-tail-gate-failed",
+  "speedupClaim": null,
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c"
+  },
+  "environment": {
+    "origin": "http://localhost:8753/gemma-engine.html",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.128.0 Chrome/148.0.7778.271 Electron/42.5.0 Safari/537.36",
+    "adapterInfo": {
+      "vendor": "apple",
+      "architecture": "metal-3"
+    },
+    "powerPreference": "high-performance",
+    "bundle": "/assets/gemma-session-B5qrJLH_.js"
+  },
+  "changes": {
+    "maxInFlightNonFinalFixedBlocks": 4,
+    "intermediateNoneOutputQueueDrainRemoved": true,
+    "parameterArena": {
+      "alignmentSource": "device.limits.minUniformBufferOffsetAlignment",
+      "slotsPerBackingBuffer": 256,
+      "parameterBytesPerSlot": "16 or 32",
+      "standalonePrivateBufferFallback": true
+    }
+  },
+  "configuration": {
+    "reusePromptCache": false,
+    "warmupIterationsPerStrategy": 1,
+    "alternatingStrategyOrder": true,
+    "note": "Every measured sample reported promptTokensReused = 0 and preserved exact output IDs and text. Current timing distributions are substantially slower than the earlier retained sweep, so only same-sweep comparisons are used."
+  },
+  "retainedMemory": {
+    "cacheCapacity8192": {
+      "sequential": {
+        "retainedGpuBufferCount": 1469,
+        "retainedGpuBufferBytes": 926938436
+      },
+      "chunked32": {
+        "retainedGpuBufferCount": 1600,
+        "retainedGpuBufferBytes": 942476612
+      },
+      "additionalChunkedBuffers": 131,
+      "additionalChunkedBytes": 15538176,
+      "previousChunkedBufferCount": 2678,
+      "chunkedBufferCountReduction": 1078,
+      "result": "The arena removes 1,078 retained GPUBuffer objects from the fixed-prefill graph. The remaining 131-buffer delta is fixed-graph scratch and state; retained bytes increase by 308,736 versus the previous tiny-buffer graph because aligned arena slots trade a small amount of capacity for far fewer driver objects."
+    }
+  },
+  "fixed32Boundary": {
+    "prompt": "Reply with only OK. word word word word word word word word word word word word word word word word word word",
+    "promptTokens": 32,
+    "cacheCapacity": 512,
+    "expectedTokenIds": [7676],
+    "expectedText": "OK",
+    "measuredIterationsPerStrategy": 5,
+    "correctness": {
+      "fixed32AllIterationsMatchGolden": true,
+      "sequentialAllIterationsMatchGolden": true
+    },
+    "memory": {
+      "fixed32": { "retainedGpuBufferCount": 1600, "retainedGpuBufferBytes": 848104772 },
+      "sequential": { "retainedGpuBufferCount": 1469, "retainedGpuBufferBytes": 832566596 }
+    },
+    "fixed32Samples": [
+      { "prefillMs": 407.3, "timeToFirstTokenMs": 408.2, "totalMs": 427.0, "prefillMode": "fixed-32" },
+      { "prefillMs": 751.2, "timeToFirstTokenMs": 752.3, "totalMs": 782.2, "prefillMode": "fixed-32" },
+      { "prefillMs": 834.6, "timeToFirstTokenMs": 835.7, "totalMs": 858.9, "prefillMode": "fixed-32" },
+      { "prefillMs": 443.0, "timeToFirstTokenMs": 444.0, "totalMs": 463.6, "prefillMode": "fixed-32" },
+      { "prefillMs": 549.5, "timeToFirstTokenMs": 550.3, "totalMs": 572.9, "prefillMode": "fixed-32" }
+    ],
+    "sequentialSamples": [
+      { "prefillMs": 546.6, "timeToFirstTokenMs": 547.3, "totalMs": 567.7, "prefillMode": "sequential" },
+      { "prefillMs": 603.8, "timeToFirstTokenMs": 604.7, "totalMs": 627.3, "prefillMode": "sequential" },
+      { "prefillMs": 581.5, "timeToFirstTokenMs": 582.4, "totalMs": 600.0, "prefillMode": "sequential" },
+      { "prefillMs": 502.2, "timeToFirstTokenMs": 503.0, "totalMs": 519.7, "prefillMode": "sequential" },
+      { "prefillMs": 584.7, "timeToFirstTokenMs": 585.8, "totalMs": 605.4, "prefillMode": "sequential" }
+    ],
+    "comparison": {
+      "fixed32MedianTtftMs": 550.3,
+      "sequentialMedianTtftMs": 582.4,
+      "fixed32MedianTtftChangePercent": -5.511,
+      "fixed32P95TtftMs": 835.7,
+      "sequentialP95TtftMs": 604.7,
+      "fixed32P95TtftChangePercent": 38.201,
+      "fixed32MedianTotalMs": 572.9,
+      "sequentialMedianTotalMs": 600.0,
+      "fixed32P95TotalMs": 858.9,
+      "sequentialP95TotalMs": 627.3,
+      "result": "Fixed-32 preserves exact output and improves median TTFT, but this five-sample run regresses p95. The latency promotion gate does not pass on this capture."
+    }
+  },
+  "crossover153": {
+    "prompt": "Repeat the word blue once. (repeated 24 times)",
+    "promptTokens": 153,
+    "cacheCapacity": 8192,
+    "expectedTokenIds": [9503, 107, 9503, 107],
+    "expectedText": "blue\nblue\n",
+    "measuredIterationsPerStrategy": 8,
+    "correctness": {
+      "chunked32AllIterationsMatchGolden": true,
+      "sequentialAllIterationsMatchGolden": true
+    },
+    "chunked32Samples": [
+      { "prefillMs": 3405.0, "timeToFirstTokenMs": 3408.8, "totalMs": 3458.5 },
+      { "prefillMs": 3336.7, "timeToFirstTokenMs": 3339.2, "totalMs": 3391.8 },
+      { "prefillMs": 3089.9, "timeToFirstTokenMs": 3091.1, "totalMs": 3149.6 },
+      { "prefillMs": 2909.5, "timeToFirstTokenMs": 2915.0, "totalMs": 2972.3 },
+      { "prefillMs": 2710.1, "timeToFirstTokenMs": 2713.0, "totalMs": 2771.0 },
+      { "prefillMs": 2974.6, "timeToFirstTokenMs": 2978.2, "totalMs": 3039.7 },
+      { "prefillMs": 2807.8, "timeToFirstTokenMs": 2809.5, "totalMs": 2864.2 },
+      { "prefillMs": 2908.1, "timeToFirstTokenMs": 2911.1, "totalMs": 2971.9 }
+    ],
+    "sequentialSamples": [
+      { "prefillMs": 2469.2, "timeToFirstTokenMs": 2470.5, "totalMs": 2555.0 },
+      { "prefillMs": 3378.5, "timeToFirstTokenMs": 3381.2, "totalMs": 3435.5 },
+      { "prefillMs": 3035.0, "timeToFirstTokenMs": 3036.6, "totalMs": 3103.1 },
+      { "prefillMs": 2945.9, "timeToFirstTokenMs": 2954.7, "totalMs": 3024.0 },
+      { "prefillMs": 2923.6, "timeToFirstTokenMs": 2927.0, "totalMs": 3040.1 },
+      { "prefillMs": 3071.7, "timeToFirstTokenMs": 3074.8, "totalMs": 3146.1 },
+      { "prefillMs": 2950.0, "timeToFirstTokenMs": 2951.6, "totalMs": 3021.5 },
+      { "prefillMs": 3257.8, "timeToFirstTokenMs": 3261.5, "totalMs": 3327.7 }
+    ],
+    "comparison": {
+      "chunked32MedianTtftMs": 2978.2,
+      "sequentialMedianTtftMs": 3036.6,
+      "chunked32MedianTtftChangePercent": -1.923,
+      "chunked32P95TtftMs": 3408.8,
+      "sequentialP95TtftMs": 3381.2,
+      "chunked32P95TtftChangePercent": 0.816,
+      "chunked32MedianTotalMs": 3039.7,
+      "sequentialMedianTotalMs": 3103.1,
+      "chunked32P95TotalMs": 3458.5,
+      "sequentialP95TotalMs": 3435.5,
+      "previousChunkedP95TtftMs": 3840.3,
+      "result": "Bounded submissions remove the prior 3.84-second chunked outlier and improve median TTFT slightly, but p95 remains 0.8% slower than sequential. Automatic long-prompt promotion remains blocked."
+    }
+  },
+  "cancellationRecovery": {
+    "cancelPromptTokens": 585,
+    "cancelledAfterCompletedPromptTokens": 32,
+    "error": { "name": "AbortError", "message": "bounded prefill cancellation" },
+    "recoveryUsedSameSession": true,
+    "recoveryPromptTokens": 153,
+    "recoveryPromptTokensReused": 0,
+    "recoveryGeneratedTokenIds": [9503, 107, 9503, 107],
+    "recoveryText": "blue\nblue\n",
+    "recoveryExactGoldenMatch": true,
+    "browserOrWebGpuErrors": []
+  },
+  "conclusion": "Keep bounded fixed-prefill submissions and the shared parameter arena for correctness and retained-object reduction. Do not claim a latency win or broaden automatic fixed-prefill routing from this capture; rerun on a quieter process and require both median and p95 improvement."
+}

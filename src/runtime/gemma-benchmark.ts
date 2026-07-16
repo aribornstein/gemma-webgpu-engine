@@ -323,6 +323,7 @@ function roundTiming(timing: GemmaGenerationTiming): GemmaGenerationTiming {
     promptTokensReused: timing.promptTokensReused,
     prefillMs: round(timing.prefillMs),
     prefillMode: timing.prefillMode,
+    prefillGpuProfiles: timing.prefillGpuProfiles,
     timeToFirstTokenMs: round(timing.timeToFirstTokenMs),
     decodeTokenMs: Object.freeze(timing.decodeTokenMs.map(round)),
     interTokenLatencyMs: Object.freeze(timing.interTokenLatencyMs.map(round)),

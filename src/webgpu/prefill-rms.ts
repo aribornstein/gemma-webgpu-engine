@@ -1,3 +1,10 @@
+import {
+  createGemmaPrefillParameter,
+  gemmaPrefillParameterBinding,
+  writeGemmaPrefillParameter,
+  type GemmaPrefillParameterArena,
+} from "./prefill-parameter-arena";
+
 export interface GemmaPrefillRmsPipeline {
   dimension: number;
   weighted: boolean;
@@ -11,6 +18,12 @@ export interface GemmaPrefillRmsResources {
   ownedBuffers: GPUBuffer[];
 }
 
+export interface GemmaPrefillRmsResidualResources {
+  bindGroup: GPUBindGroup;
+  rows: number;
+  ownedBuffers: GPUBuffer[];
+}
+
 export type GemmaPrefillRmsBufferSlice = GPUBuffer | {
   buffer: GPUBuffer;
   offset: number;
@@ -18,6 +31,10 @@ export type GemmaPrefillRmsBufferSlice = GPUBuffer | {
 };
 
 const pipelineCache = new WeakMap<
+  GPUDevice,
+  Map<string, Promise<GemmaPrefillRmsPipeline>>
+>();
+const residualPipelineCache = new WeakMap<
   GPUDevice,
   Map<string, Promise<GemmaPrefillRmsPipeline>>
 >();
@@ -65,6 +82,55 @@ export async function compileGemmaPrefillRmsPipeline(
   return { dimension, weighted, pipeline };
 }
 
+export function getGemmaPrefillRmsResidualPipeline(
+  device: GPUDevice,
+  dimension: number,
+  scaled: boolean,
+): Promise<GemmaPrefillRmsPipeline> {
+  validateDimension(dimension);
+  let devicePipelines = residualPipelineCache.get(device);
+  if (!devicePipelines) {
+    devicePipelines = new Map();
+    residualPipelineCache.set(device, devicePipelines);
+  }
+  const key = `${dimension}:${scaled}`;
+  const cached = devicePipelines.get(key);
+  if (cached) return cached;
+  const compiled = compileGemmaPrefillRmsResidualPipeline(device, dimension, scaled).catch(
+    (error) => {
+      devicePipelines?.delete(key);
+      throw error;
+    },
+  );
+  devicePipelines.set(key, compiled);
+  return compiled;
+}
+
+export async function compileGemmaPrefillRmsResidualPipeline(
+  device: GPUDevice,
+  dimension: number,
+  scaled: boolean,
+): Promise<GemmaPrefillRmsPipeline> {
+  validateDimension(dimension);
+  const pipeline = await device.createComputePipelineAsync({
+    label: scaled
+      ? `Gemma prefill exact RMS residual scale ${dimension}`
+      : `Gemma prefill exact RMS residual ${dimension}`,
+    layout: "auto",
+    compute: {
+      module: device.createShaderModule({
+        code: createGemmaPrefillRmsShader(
+          dimension,
+          true,
+          scaled ? "residual-scale" : "residual",
+        ),
+      }),
+      entryPoint: "main",
+    },
+  });
+  return { dimension, weighted: true, pipeline };
+}
+
 export function createGemmaPrefillRmsResources(
   device: GPUDevice,
   compiled: GemmaPrefillRmsPipeline,
@@ -72,6 +138,7 @@ export function createGemmaPrefillRmsResources(
   input: GPUBuffer,
   weight: GemmaPrefillRmsBufferSlice | null,
   output?: GPUBuffer,
+  parameterArena?: GemmaPrefillParameterArena,
 ): GemmaPrefillRmsResources {
   if (!Number.isInteger(rows) || rows < 1 || rows > 65535) {
     throw new Error("Gemma prefill RMS row count must be a positive integer below 65536");
@@ -93,16 +160,25 @@ export function createGemmaPrefillRmsResources(
     dataBytes,
     GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
   );
-  const params = make(
-    "Gemma prefill exact RMS parameters",
+  const parameterAllocation = createGemmaPrefillParameter(
+    device,
     16,
-    GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+    "Gemma prefill exact RMS parameters",
+    parameterArena,
   );
-  device.queue.writeBuffer(params, 0, new Uint32Array([rows, rows, 0, 0]));
+  ownedBuffers.push(...parameterAllocation.ownedBuffers);
+  writeGemmaPrefillParameter(
+    device,
+    parameterAllocation.slice,
+    new Uint32Array([rows, rows, 0, 0]),
+  );
   const entries = [binding(0, input)];
   if (compiled.weighted) entries.push(sliceBinding(1, weight!));
   entries.push(binding(compiled.weighted ? 2 : 1, outputBuffer));
-  entries.push(binding(compiled.weighted ? 3 : 2, params));
+  entries.push(gemmaPrefillParameterBinding(
+    compiled.weighted ? 3 : 2,
+    parameterAllocation.slice,
+  ));
   return {
     bindGroup: device.createBindGroup({
       layout: compiled.pipeline.getBindGroupLayout(0),
@@ -140,30 +216,132 @@ export function destroyGemmaPrefillRmsResources(
   for (const buffer of resources.ownedBuffers) buffer.destroy();
 }
 
+export function createGemmaPrefillRmsResidualResources(
+  device: GPUDevice,
+  compiled: GemmaPrefillRmsPipeline,
+  rows: number,
+  input: GPUBuffer,
+  weight: GemmaPrefillRmsBufferSlice,
+  residual: GPUBuffer,
+  factors: GPUBuffer | null,
+  factorIndex: number,
+  parameterArena?: GemmaPrefillParameterArena,
+): GemmaPrefillRmsResidualResources {
+  if (!compiled.weighted || !Number.isInteger(rows) || rows < 1 || rows > 65535) {
+    throw new Error("Gemma prefill RMS residual geometry is invalid");
+  }
+  const dataBytes = rows * compiled.dimension * 4;
+  if (input.size < dataBytes || residual.size < dataBytes ||
+      sliceSize(weight) < compiled.dimension * 4 ||
+      (factors && (!Number.isInteger(factorIndex) || factorIndex < 0 ||
+        factors.size < (factorIndex + 1) * 4)) ||
+      (!factors && factorIndex !== 0)) {
+    throw new Error("Gemma prefill RMS residual buffers do not match pipeline geometry");
+  }
+  const parameterAllocation = createGemmaPrefillParameter(
+    device,
+    16,
+    "Gemma prefill exact RMS residual parameters",
+    parameterArena,
+  );
+  writeGemmaPrefillParameter(
+    device,
+    parameterAllocation.slice,
+    new Uint32Array([rows, rows, factorIndex, 0]),
+  );
+  const entries: GPUBindGroupEntry[] = [
+    binding(0, input),
+    sliceBinding(1, weight),
+    binding(2, residual),
+  ];
+  if (factors) entries.push(binding(3, factors));
+  entries.push(gemmaPrefillParameterBinding(factors ? 4 : 3, parameterAllocation.slice));
+  return {
+    bindGroup: device.createBindGroup({
+      layout: compiled.pipeline.getBindGroupLayout(0),
+      entries,
+    }),
+    rows,
+    ownedBuffers: parameterAllocation.ownedBuffers,
+  };
+}
+
+export function encodeGemmaPrefillRmsResidual(
+  encoder: GPUCommandEncoder,
+  compiled: GemmaPrefillRmsPipeline,
+  resources: GemmaPrefillRmsResidualResources,
+): void {
+  const pass = encoder.beginComputePass({ label: compiled.pipeline.label });
+  encodeGemmaPrefillRmsResidualPass(pass, compiled, resources);
+  pass.end();
+}
+
+export function encodeGemmaPrefillRmsResidualPass(
+  pass: GPUComputePassEncoder,
+  compiled: GemmaPrefillRmsPipeline,
+  resources: GemmaPrefillRmsResidualResources,
+): void {
+  pass.setPipeline(compiled.pipeline);
+  pass.setBindGroup(0, resources.bindGroup);
+  pass.dispatchWorkgroups(Math.ceil(resources.rows / 64));
+}
+
+export function destroyGemmaPrefillRmsResidualResources(
+  resources: GemmaPrefillRmsResidualResources,
+): void {
+  for (const buffer of resources.ownedBuffers) buffer.destroy();
+}
+
 export function createGemmaPrefillRmsShader(
   dimension: number,
   weighted: boolean,
+  epilogue: "output" | "residual" | "residual-scale" = "output",
 ): string {
   validateDimension(dimension);
+  if (!weighted && epilogue !== "output") {
+    throw new Error("Gemma prefill RMS residual epilogues require weights");
+  }
   const inverseDimension = Math.fround(1 / dimension);
   const weightBinding = weighted
     ? "@group(0) @binding(1) var<storage, read> weight: array<vec4<f32>>;"
     : "";
   const outputBinding = weighted ? 2 : 1;
   const paramsBinding = weighted ? 3 : 2;
-  const outputExpression = weighted
-    ? "    output[base + vector] = normalized * weight[vector];"
-    : "    output[base + vector] = normalized;";
+  const outputDeclaration = epilogue === "output"
+    ? `@group(0) @binding(${outputBinding}) var<storage, read_write> output: array<vec4<f32>>;`
+    : `@group(0) @binding(2) var<storage, read_write> residual: array<vec4<f32>>;${
+      epilogue === "residual-scale"
+        ? "\n@group(0) @binding(3) var<storage, read> factors: array<f32>;"
+        : ""
+    }`;
+  const parameterBinding = epilogue === "residual-scale"
+    ? 4
+    : epilogue === "residual" ? 3 : paramsBinding;
+  const outputExpression = epilogue === "residual-scale"
+    ? `    let weighted = fma(normalized, weight[vector], vec4<f32>(0.0));
+    let added = fma(residual[base + vector], vec4<f32>(1.0), weighted);
+    residual[base + vector] = added * vec4<f32>(factors[params.factorIndex]);`
+    : epilogue === "residual"
+      ? `    let weighted = fma(normalized, weight[vector], vec4<f32>(0.0));
+    residual[base + vector] = fma(
+      residual[base + vector],
+      vec4<f32>(1.0),
+      weighted,
+    );`
+      : weighted
+        ? "    output[base + vector] = normalized * weight[vector];"
+        : "    output[base + vector] = normalized;";
 
   return `struct Params {
   rows: u32,
   rowStride: u32,
+  factorIndex: u32,
 }
 
 @group(0) @binding(0) var<storage, read> input: array<vec4<f32>>;
 ${weightBinding}
-@group(0) @binding(${outputBinding}) var<storage, read_write> output: array<vec4<f32>>;
-@group(0) @binding(${paramsBinding}) var<uniform> params: Params;
+${outputDeclaration}
+@group(0) @binding(${parameterBinding}) var<uniform> params: Params;
 
 const DIMENSION: u32 = ${dimension}u;
 const DIMENSION_F: f32 = ${dimension}.0;
