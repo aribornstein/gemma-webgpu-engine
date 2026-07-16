@@ -125,7 +125,8 @@ test("wraps circular decode K/V cache storage at its physical capacity", async (
         length: cache.length,
         positions: [511, 512, 513].map((position) => cache.physicalPosition(position)),
         retainsCurrent: cache.canRetainPrefix(514),
-        retainsOldBranch: cache.canRetainPrefix(513),
+        retainsRollbackToken: cache.canRetainPrefix(513),
+        retainsOverwrittenPrefix: cache.canRetainPrefix(512),
       };
     } finally {
       readBuffer.destroy();
@@ -138,7 +139,8 @@ test("wraps circular decode K/V cache storage at its physical capacity", async (
     length: 514,
     positions: [511, 0, 1],
     retainsCurrent: true,
-    retainsOldBranch: false,
+    retainsRollbackToken: true,
+    retainsOverwrittenPrefix: false,
   });
 });
 
@@ -506,44 +508,62 @@ test("composes QKV through reusable K/V cache into decode attention", async ({ p
   expect(result.ffnInputBitMismatches).toBe(0);
   expect(result.ffnInputSumMaximumAbsoluteError).toBe(0);
   expect(result.ffnInputSumMaximumRelativeError).toBe(0);
-  expect(result.gpuBufferAllocations).toBe(28);
+  expect(result.gpuBufferAllocations).toBe(25);
   expect(result.allocationsPerDispatch).toBe(0);
   expect(result.cpuReadbacksBetweenKernels).toBe(0);
   expect(result.gpuCopiesBetweenKernels).toBe(0);
 });
 
-test("matches Hugging Face fused layer-0 DecodeOprojNorm", async ({ page }) => {
+test("matches Hugging Face fused layer-0 DecodeOprojNorm modes", async ({ page }) => {
   await page.goto("/");
   const webGpuAvailable = await page.evaluate(() => Boolean(navigator.gpu));
   test.skip(!webGpuAvailable, "Chrome does not expose WebGPU on this machine");
 
-  const result = await page.evaluate(async () => {
+  const { results, timestampQuerySupported } = await page.evaluate(async () => {
+    const adapter = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
     const modulePath = "/src/webgpu/decode-oproj-norm.ts";
     const { benchmarkDecodeOprojNorm } = await import(modulePath);
-    return benchmarkDecodeOprojNorm(2);
+    return {
+      results: await Promise.all([
+        benchmarkDecodeOprojNorm(2, "subgroup-rows"),
+        benchmarkDecodeOprojNorm(2, "cooperative-rows"),
+      ]),
+      timestampQuerySupported: adapter?.features.has("timestamp-query") ?? false,
+    };
   });
 
-  expect(result.sourceOperator).toBe("com.xenova.gemma4.DecodeOprojNorm");
-  expect(result.sourceVariant).toBe("fused-fixed-subgroup-32");
-  expect(result.artifactSha256).toBe(
-    "d8ec21da0edcccdfd478c76e90215b79d4bae5a4f58eebf8b1de355c474a223d",
-  );
-  expect(result.sourceMetadataSha256).toBe(
-    "1b81dd537bc0418ce74d93ee5dcf8c0b5d4b70c4c8621bb2ec3ae15c3d0dacdf",
-  );
-  expect(result.sourceTensorsSha256).toBe(
-    "b5eff21d1af5f8826cd00a2a01d0830462fad78505a803c50ef1ca12b8e2ac52",
-  );
-  expect(result.inFeatures).toBe(2048);
-  expect(result.outFeatures).toBe(1536);
-  expect(result.workgroupSize).toBe(256);
-  expect(result.workgroupCount).toBe(192);
-  expect(result.hiddenMaximumAbsoluteError).toBe(0);
-  expect(result.hiddenMaximumRelativeError).toBe(0);
-  expect(result.ffnInputBitMismatches).toBe(0);
-  expect(result.ffnInputSumMaximumAbsoluteError).toBe(0);
-  expect(result.ffnInputSumMaximumRelativeError).toBe(0);
-  expect(result.allocationsPerDispatch).toBe(0);
+  expect(results.map((result) => result.sourceVariant)).toEqual([
+    "fused-fixed-subgroup-32",
+    "fused-row-cooperative-32",
+  ]);
+  for (const result of results) {
+    expect(result.sourceOperator).toBe("com.xenova.gemma4.DecodeOprojNorm");
+    expect(result.artifactSha256).toBe(
+      "d8ec21da0edcccdfd478c76e90215b79d4bae5a4f58eebf8b1de355c474a223d",
+    );
+    expect(result.sourceMetadataSha256).toBe(
+      "1b81dd537bc0418ce74d93ee5dcf8c0b5d4b70c4c8621bb2ec3ae15c3d0dacdf",
+    );
+    expect(result.sourceTensorsSha256).toBe(
+      "b5eff21d1af5f8826cd00a2a01d0830462fad78505a803c50ef1ca12b8e2ac52",
+    );
+    expect(result.inFeatures).toBe(2048);
+    expect(result.outFeatures).toBe(1536);
+    expect(result.workgroupSize).toBe(256);
+    expect(result.workgroupCount).toBe(192);
+    expect(result.hiddenMaximumAbsoluteError).toBe(0);
+    expect(result.hiddenMaximumRelativeError).toBe(0);
+    expect(result.ffnInputBitMismatches).toBe(0);
+    expect(result.ffnInputSumMaximumAbsoluteError).toBe(0);
+    expect(result.ffnInputSumMaximumRelativeError).toBe(0);
+    expect(result.allocationsPerDispatch).toBe(0);
+    expect(result.gpuKernelDispatchesPerSample).toBe(timestampQuerySupported ? 20 : null);
+    if (timestampQuerySupported) {
+      expect(result.gpuKernelSamplesMs).toHaveLength(10);
+      expect(result.gpuKernelMedianMs).toBeGreaterThan(0);
+      expect(result.gpuKernelP95Ms).toBeGreaterThanOrEqual(result.gpuKernelMedianMs ?? 0);
+    }
+  }
 });
 
 test("matches Hugging Face layer-0 DecodeGateUpNormPresrq integer codes", async ({ page }) => {
@@ -856,10 +876,12 @@ test("compiles all four generic Gemma layer profiles", async ({ page }) => {
     const { getWebGpuDevice } = await import(deviceModulePath);
     const device = await getWebGpuDevice();
     const names = ["sliding-int4", "full-int4", "sliding-int2", "full-int2"] as const;
-    return Promise.all(names.map(async (profile) => {
-      const pipelines = await getGemmaDecodeLayerPipelines(device, profile);
+    const modes = ["subgroup-rows", "cooperative-rows"] as const;
+    return Promise.all(names.flatMap((profile) => modes.map(async (oprojMode) => {
+      const pipelines = await getGemmaDecodeLayerPipelines(device, profile, oprojMode);
       return {
         profile: pipelines.profile,
+        oprojMode,
         headDim: pipelines.attention.headDim,
         qOutFeatures: pipelines.attention.qOutFeatures,
         kvOutFeatures: pipelines.attention.kvOutFeatures,
@@ -867,12 +889,23 @@ test("compiles all four generic Gemma layer profiles", async ({ page }) => {
         mlpBits: pipelines.mlp.bitWidth,
         intermediateFeatures: pipelines.mlp.intermediateFeatures,
       };
-    }));
+    })));
   });
 
   expect(profiles).toEqual([
     {
       profile: "sliding-int4",
+      oprojMode: "subgroup-rows",
+      headDim: 256,
+      qOutFeatures: 2048,
+      kvOutFeatures: 256,
+      qkvWorkgroupCount: 1280,
+      mlpBits: 4,
+      intermediateFeatures: 6144,
+    },
+    {
+      profile: "sliding-int4",
+      oprojMode: "cooperative-rows",
       headDim: 256,
       qOutFeatures: 2048,
       kvOutFeatures: 256,
@@ -882,6 +915,17 @@ test("compiles all four generic Gemma layer profiles", async ({ page }) => {
     },
     {
       profile: "full-int4",
+      oprojMode: "subgroup-rows",
+      headDim: 512,
+      qOutFeatures: 4096,
+      kvOutFeatures: 512,
+      qkvWorkgroupCount: 2560,
+      mlpBits: 4,
+      intermediateFeatures: 6144,
+    },
+    {
+      profile: "full-int4",
+      oprojMode: "cooperative-rows",
       headDim: 512,
       qOutFeatures: 4096,
       kvOutFeatures: 512,
@@ -891,6 +935,17 @@ test("compiles all four generic Gemma layer profiles", async ({ page }) => {
     },
     {
       profile: "sliding-int2",
+      oprojMode: "subgroup-rows",
+      headDim: 256,
+      qOutFeatures: 2048,
+      kvOutFeatures: 256,
+      qkvWorkgroupCount: 1280,
+      mlpBits: 2,
+      intermediateFeatures: 12288,
+    },
+    {
+      profile: "sliding-int2",
+      oprojMode: "cooperative-rows",
       headDim: 256,
       qOutFeatures: 2048,
       kvOutFeatures: 256,
@@ -900,6 +955,17 @@ test("compiles all four generic Gemma layer profiles", async ({ page }) => {
     },
     {
       profile: "full-int2",
+      oprojMode: "subgroup-rows",
+      headDim: 512,
+      qOutFeatures: 4096,
+      kvOutFeatures: 512,
+      qkvWorkgroupCount: 2560,
+      mlpBits: 2,
+      intermediateFeatures: 12288,
+    },
+    {
+      profile: "full-int2",
+      oprojMode: "cooperative-rows",
       headDim: 512,
       qOutFeatures: 4096,
       kvOutFeatures: 512,
@@ -1254,7 +1320,6 @@ test("projects final activations through the int2 LM head", async ({ page }) => 
     } = await import(lmHeadModulePath);
     const { getWebGpuDevice } = await import(deviceModulePath);
     const device = await getWebGpuDevice();
-    const pipeline = await getGemmaLmHeadPipeline(device, 8);
     const activation = device.createBuffer({
       label: "Synthetic final activation",
       size: 1536 * Float32Array.BYTES_PER_ELEMENT,
@@ -1271,48 +1336,64 @@ test("projects final activations through the int2 LM head", async ({ page }) => 
     const rowScales = new Float32Array([1, 0.5, 0.25, 1, 1, 1, 1, 1]);
     device.queue.writeBuffer(activation, 0, new Float32Array(1536).fill(1));
     device.queue.writeBuffer(activationSum, 0, new Float32Array([1536]));
-    const resources = createGemmaLmHeadResources(
-      device,
-      pipeline,
-      { activation, activationSum },
-      { packedWeights, rowScales, outputScale: 0 },
-    );
-    const readback = device.createBuffer({
-      label: "Synthetic LM head readback",
-      size: 8 * Float32Array.BYTES_PER_ELEMENT,
-      usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-    });
-    device.pushErrorScope("validation");
-    device.pushErrorScope("internal");
     try {
-      const encoder = device.createCommandEncoder({ label: "Synthetic int2 LM head" });
-      encodeGemmaLmHead(encoder, pipeline, resources);
-      encoder.copyBufferToBuffer(resources.logits, 0, readback, 0, readback.size);
-      device.queue.submit([encoder.finish()]);
-      await readback.mapAsync(GPUMapMode.READ);
-      const logits = Array.from(new Float32Array(readback.getMappedRange().slice(0)));
-      readback.unmap();
-      const internalError = await device.popErrorScope();
-      const validationError = await device.popErrorScope();
-      return {
-        logits,
-        workgroupCount: pipeline.workgroupCount,
-        gpuError: internalError?.message ?? validationError?.message ?? null,
-      };
+      const results = [];
+      for (const mode of ["row-major-subgroups", "block-major-columns"] as const) {
+        const pipeline = await getGemmaLmHeadPipeline(device, 8, mode);
+        const resources = createGemmaLmHeadResources(
+          device,
+          pipeline,
+          { activation, activationSum },
+          { packedWeights, rowScales, outputScale: 0 },
+        );
+        const readback = device.createBuffer({
+          label: `Synthetic LM head ${mode} readback`,
+          size: 8 * Float32Array.BYTES_PER_ELEMENT,
+          usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+        });
+        device.pushErrorScope("validation");
+        device.pushErrorScope("internal");
+        try {
+          const encoder = device.createCommandEncoder({ label: `Synthetic LM head ${mode}` });
+          encodeGemmaLmHead(encoder, pipeline, resources);
+          encoder.copyBufferToBuffer(resources.logits, 0, readback, 0, readback.size);
+          device.queue.submit([encoder.finish()]);
+          await readback.mapAsync(GPUMapMode.READ);
+          const logits = Array.from(new Float32Array(readback.getMappedRange().slice(0)));
+          readback.unmap();
+          const internalError = await device.popErrorScope();
+          const validationError = await device.popErrorScope();
+          results.push({
+            mode: pipeline.mode,
+            logits,
+            workgroupCount: pipeline.workgroupCount,
+            gpuError: internalError?.message ?? validationError?.message ?? null,
+          });
+        } finally {
+          readback.destroy();
+          destroyGemmaLmHeadResources(resources);
+        }
+      }
+      return results;
     } finally {
-      readback.destroy();
-      destroyGemmaLmHeadResources(resources);
       activation.destroy();
       activationSum.destroy();
     }
   });
 
-  expect(result.workgroupCount).toBe(1);
-  expect(result.gpuError).toBeNull();
-  expect(result.logits[0]).toBeCloseTo(0, 3);
-  expect(result.logits[1]).toBeCloseTo(768, 3);
-  expect(result.logits[2]).toBe(-384);
-  for (const logit of result.logits.slice(3)) expect(logit).toBeCloseTo(0, 3);
+  const expected = [0, 768, -384, 0, 0, 0, 0, 0];
+  expect(result.map(({ mode }) => mode)).toEqual([
+    "row-major-subgroups",
+    "block-major-columns",
+  ]);
+  for (const modeResult of result) {
+    expect(modeResult.workgroupCount).toBe(1);
+    expect(modeResult.gpuError).toBeNull();
+    const precision = modeResult.mode === "row-major-subgroups" ? 3 : 1;
+    modeResult.logits.forEach((logit, index) => {
+      expect(logit).toBeCloseTo(expected[index], precision);
+    });
+  }
 });
 
 test("reduces logits to a deterministic greedy token on GPU", async ({ page }) => {
@@ -1463,7 +1544,7 @@ test("runs the complete ten-dispatch layer-0 decode plan", async ({ page }) => {
   expect(result.nextSumMaximumAbsoluteError).toBe(0);
   expect(result.nextSumMaximumRelativeError).toBe(0);
   expect(result.nextSumBitMismatches).toBe(0);
-  expect(result.gpuBufferAllocations).toBe(55);
+  expect(result.gpuBufferAllocations).toBe(52);
   expect(result.allocationsPerDispatch).toBe(0);
   expect(result.cpuReadbacksBetweenKernels).toBe(0);
   expect(result.gpuCopiesBetweenKernels).toBe(0);

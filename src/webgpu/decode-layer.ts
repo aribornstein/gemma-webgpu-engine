@@ -1,4 +1,5 @@
 import type { GemmaLayerProfile } from "../model/gemma-layer-plan";
+import type { DecodeOprojNormMode } from "./decode-oproj-norm";
 import {
   compileDecodeAttentionBlockPipelines,
   encodeDecodeAttentionBlockPass,
@@ -25,35 +26,38 @@ export interface GemmaDecodeLayerResources {
 
 const pipelineCache = new WeakMap<
   GPUDevice,
-  Map<GemmaLayerProfile, Promise<GemmaDecodeLayerPipelines>>
+  Map<string, Promise<GemmaDecodeLayerPipelines>>
 >();
 
 export function getGemmaDecodeLayerPipelines(
   device: GPUDevice,
   profile: GemmaLayerProfile,
+  oprojMode: DecodeOprojNormMode = "subgroup-rows",
 ): Promise<GemmaDecodeLayerPipelines> {
   let devicePipelines = pipelineCache.get(device);
   if (!devicePipelines) {
     devicePipelines = new Map();
     pipelineCache.set(device, devicePipelines);
   }
-  const cached = devicePipelines.get(profile);
+  const cacheKey = `${profile}:${oprojMode}`;
+  const cached = devicePipelines.get(cacheKey);
   if (cached) return cached;
 
-  const compiled = compileGemmaDecodeLayerPipelines(device, profile).catch((error) => {
-    devicePipelines?.delete(profile);
+  const compiled = compileGemmaDecodeLayerPipelines(device, profile, oprojMode).catch((error) => {
+    devicePipelines?.delete(cacheKey);
     throw error;
   });
-  devicePipelines.set(profile, compiled);
+  devicePipelines.set(cacheKey, compiled);
   return compiled;
 }
 
 export async function compileGemmaDecodeLayerPipelines(
   device: GPUDevice,
   profile: GemmaLayerProfile,
+  oprojMode: DecodeOprojNormMode = "subgroup-rows",
 ): Promise<GemmaDecodeLayerPipelines> {
   const [attention, mlp] = await Promise.all([
-    compileDecodeAttentionBlockPipelines(device, profile),
+    compileDecodeAttentionBlockPipelines(device, profile, oprojMode),
     compileDecodeMlpPleBlockPipelines(device, profile),
   ]);
   return { profile, attention, mlp };

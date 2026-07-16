@@ -29,6 +29,13 @@ export interface CachedTensorSliceRequest {
   byteLength: number;
 }
 
+interface SegmentedTensorValue {
+  kind: "segmented-array-buffer-v1";
+  byteLength: number;
+  partBytes: number;
+  partCount: number;
+}
+
 export const GEMMA_4_E2B_CACHE_SPEC: Readonly<SafetensorsCacheSpec> = {
   databaseName: "safetensors-cache-v1",
   sourceKey:
@@ -42,7 +49,7 @@ export class ReadonlySafetensorsCache {
   readonly spec: Readonly<SafetensorsCacheSpec>;
   readonly descriptors: ReadonlyMap<string, CachedTensorDescriptor>;
   private readonly database: IDBDatabase;
-  private readonly blobValues = new Map<string, Blob>();
+  private readonly blobValues = new Map<string, Blob | Blob[] | SegmentedTensorValue>();
 
   private constructor(
     database: IDBDatabase,
@@ -117,8 +124,17 @@ export class ReadonlySafetensorsCache {
       CHUNKS_STORE,
       [this.spec.sourceKey, descriptor.begin, descriptor.end],
     );
-    if (value instanceof Blob) this.blobValues.set(name, value);
-    const bytes = await copyBinarySlice(value, byteOffset, byteLength);
+    if (isCachedTensorValue(value)) this.blobValues.set(name, value);
+    const bytes = isSegmentedTensorValue(value)
+      ? await copySegmentedTensorSlice(
+          this.database,
+          this.spec.sourceKey,
+          descriptor,
+          value,
+          byteOffset,
+          byteLength,
+        )
+      : await copyBinarySlice(value, byteOffset, byteLength);
     if (!bytes) {
       throw new Error(`Tensor ${name} is not present in the readonly cache`);
     }
@@ -156,10 +172,21 @@ export class ReadonlySafetensorsCache {
     missingDescriptors.forEach((descriptor, index) => {
       const value = missingValues[index];
       valuesByName.set(descriptor.name, value);
-      if (value instanceof Blob) this.blobValues.set(descriptor.name, value);
+      if (isCachedTensorValue(value)) this.blobValues.set(descriptor.name, value);
     });
     return Promise.all(requests.map(async ({ name, byteOffset, byteLength }) => {
-      const bytes = await copyBinarySlice(valuesByName.get(name), byteOffset, byteLength);
+      const value = valuesByName.get(name);
+      const descriptor = this.descriptor(name);
+      const bytes = isSegmentedTensorValue(value)
+        ? await copySegmentedTensorSlice(
+            this.database,
+            this.spec.sourceKey,
+            descriptor,
+            value,
+            byteOffset,
+            byteLength,
+          )
+        : await copyBinarySlice(value, byteOffset, byteLength);
       if (!bytes) throw new Error(`Tensor ${name} is not present in the readonly cache`);
       return bytes;
     }));
@@ -176,7 +203,17 @@ export class ReadonlySafetensorsCache {
       descriptors.map(({ begin, end }) => [this.spec.sourceKey, begin, end]),
     );
     const payloads = await Promise.all(descriptors.map(async (descriptor, index) => {
-      const bytes = await copyBinary(values[index]);
+      const value = values[index];
+      const bytes = isSegmentedTensorValue(value)
+        ? await copySegmentedTensorSlice(
+            this.database,
+            this.spec.sourceKey,
+            descriptor,
+            value,
+            0,
+            descriptor.byteLength,
+          )
+        : await copyBinary(value);
       if (!bytes) {
         throw new Error(`Tensor ${descriptor.name} is not present in the readonly cache`);
       }
@@ -309,6 +346,16 @@ function parseMetadata(
 }
 
 async function copyBinary(value: unknown): Promise<Uint8Array | null> {
+  if (isBlobArray(value)) {
+    const output = new Uint8Array(value.reduce((total, part) => total + part.size, 0));
+    let offset = 0;
+    for (const part of value) {
+      const bytes = new Uint8Array(await part.arrayBuffer());
+      output.set(bytes, offset);
+      offset += bytes.byteLength;
+    }
+    return output;
+  }
   let source: Uint8Array;
   if (value instanceof Blob) {
     source = new Uint8Array(await value.arrayBuffer());
@@ -329,6 +376,28 @@ async function copyBinarySlice(
   byteOffset: number,
   byteLength: number,
 ): Promise<Uint8Array | null> {
+  if (isBlobArray(value)) {
+    const output = new Uint8Array(byteLength);
+    const requestedEnd = byteOffset + byteLength;
+    let partBegin = 0;
+    let outputOffset = 0;
+    for (const part of value) {
+      const partEnd = partBegin + part.size;
+      const overlapBegin = Math.max(byteOffset, partBegin);
+      const overlapEnd = Math.min(requestedEnd, partEnd);
+      if (overlapBegin < overlapEnd) {
+        const bytes = new Uint8Array(await part.slice(
+          overlapBegin - partBegin,
+          overlapEnd - partBegin,
+        ).arrayBuffer());
+        output.set(bytes, outputOffset);
+        outputOffset += bytes.byteLength;
+      }
+      if (partEnd >= requestedEnd) break;
+      partBegin = partEnd;
+    }
+    return outputOffset === byteLength ? output : null;
+  }
   if (value instanceof Blob) {
     return new Uint8Array(await value.slice(byteOffset, byteOffset + byteLength).arrayBuffer());
   }
@@ -343,6 +412,68 @@ async function copyBinarySlice(
   const output = new Uint8Array(byteLength);
   output.set(source.subarray(byteOffset, byteOffset + byteLength));
   return output;
+}
+
+function isBlobArray(value: unknown): value is Blob[] {
+  return Array.isArray(value) && value.every((part) => part instanceof Blob);
+}
+
+function isBlobValue(value: unknown): value is Blob | Blob[] {
+  return value instanceof Blob || isBlobArray(value);
+}
+
+function isSegmentedTensorValue(value: unknown): value is SegmentedTensorValue {
+  return isRecord(value) && value.kind === "segmented-array-buffer-v1" &&
+    typeof value.byteLength === "number" &&
+    Number.isSafeInteger(value.byteLength) && value.byteLength >= 0 &&
+    typeof value.partBytes === "number" &&
+    Number.isSafeInteger(value.partBytes) && value.partBytes > 0 &&
+    typeof value.partCount === "number" &&
+    Number.isSafeInteger(value.partCount) && value.partCount > 0;
+}
+
+function isCachedTensorValue(
+  value: unknown,
+): value is Blob | Blob[] | SegmentedTensorValue {
+  return isBlobValue(value) || isSegmentedTensorValue(value);
+}
+
+async function copySegmentedTensorSlice(
+  database: IDBDatabase,
+  sourceKey: string,
+  descriptor: CachedTensorDescriptor,
+  value: SegmentedTensorValue,
+  byteOffset: number,
+  byteLength: number,
+): Promise<Uint8Array | null> {
+  if (value.byteLength !== descriptor.byteLength ||
+      value.partCount !== Math.ceil(value.byteLength / value.partBytes)) {
+    return null;
+  }
+  const output = new Uint8Array(byteLength);
+  const requestedEnd = byteOffset + byteLength;
+  const firstPart = Math.floor(byteOffset / value.partBytes);
+  const lastPart = Math.floor((requestedEnd - 1) / value.partBytes);
+  let outputOffset = 0;
+  for (let partIndex = firstPart; partIndex <= lastPart; partIndex++) {
+    const part = await readStoreValue(
+      database,
+      CHUNKS_STORE,
+      [sourceKey, descriptor.begin, descriptor.end, partIndex],
+    );
+    const partBegin = partIndex * value.partBytes;
+    const expectedPartBytes = Math.min(value.partBytes, value.byteLength - partBegin);
+    const bytes = await copyBinary(part);
+    if (!bytes || bytes.byteLength !== expectedPartBytes) return null;
+    const overlapBegin = Math.max(byteOffset, partBegin);
+    const overlapEnd = Math.min(requestedEnd, partBegin + bytes.byteLength);
+    output.set(
+      bytes.subarray(overlapBegin - partBegin, overlapEnd - partBegin),
+      outputOffset,
+    );
+    outputOffset += overlapEnd - overlapBegin;
+  }
+  return outputOffset === byteLength ? output : null;
 }
 
 function numberPair(value: unknown): [number, number] | null {

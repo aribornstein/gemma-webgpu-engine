@@ -1,6 +1,8 @@
 # Gemma WebGPU Engine
 
-An inspectable WebGPU inference runtime for the Gemma 4 E2B QAT mobile backbone, built for low-latency browser generation and complete decoding control.
+An inspectable WebGPU inference runtime for the Gemma 4 E2B QAT mobile backbone, built for low-latency browser generation and complete decoding control. It executes the mobile/QAT checkpoint through owned browser-native WebGPU kernels rather than a TFLite wrapper.
+
+The engine optimizes the complete generation runtime, not a greedy-only benchmark path. Its full-logit execution supports seeded sampling, probability and penalty controls, tokenizer-aware constraints, streaming, cancellation, and profiling over the same owned transformer kernels. That is the key product distinction from the pinned Hugging Face comparison runtime, whose public generation API is greedy-only. Kernel candidates are promoted only when they preserve this contract, retain exact deterministic output, and improve both median and p95 latency.
 
 See [PROJECT.md](PROJECT.md) for architecture, correctness gates, model provenance, and the kernel roadmap.
 
@@ -219,11 +221,32 @@ parameter arenas, packed per-layer token-parameter updates, shared rotary buffer
 profiles, and profile-specialized decode-attention cache addressing. These
 changes preserve exact greedy/sampling/constraint parity while reducing avoidable host-side overhead.
 
+The same-device Hugging Face gap analysis deliberately excludes greedy-only queued execution and
+argmax-only LM-head handoff from the roadmap. The measured full-contract candidates are exact QKV
+projection geometry first, followed by evidence-gated gate/up, down, full-logit LM-head, and
+O-projection variants. Attention already occupies the same median timestamp bucket as the pinned
+reference. [benchmarks/huggingface-same-device-gap-analysis.electron-148.json](benchmarks/huggingface-same-device-gap-analysis.electron-148.json)
+records the measurements, exclusions, and promotion policy.
+
+That optimization pass promoted one full-contract change: the int2 LM head now repacks its matrix
+once into block-major storage and computes one complete vocabulary row per thread. It still writes
+all 262,144 F32 logits. Against the prior row-major kernel, alternating same-device samples improve
+median/p95 projection time from `1.2222`/`1.2714 ms` to `1.2009`/`1.2599 ms`; retained GPU memory is
+unchanged. The worst absolute delta over every real-model logit is `3.04e-6`, argmax is identical,
+and greedy, seeded sampling with probability filters and repetition penalty, and regex-constrained
+generation remain token-for-token exact. `lmHeadMode: "row-major-subgroups"` retains the previous
+kernel as a load-time fallback. Exact QKV source-layout remains a rejected diagnostic. Repeating the
+O-projection comparison at 200 dispatches per timestamp sample resolves the earlier timer ambiguity:
+the exact row-cooperative alternate improves aggregate median/p95 by `5.37%`/`8.33%`. It is exposed
+as `oprojMode: "cooperative-rows"` but remains non-default pending full-generation canonical and
+end-to-end A/B gates. Equivalent timing also showed the existing gate/up and down kernels already
+beat the pinned HF boundaries.
+
 The complete path uses four input-preparation dispatches, the 276-dispatch transformer stack, one
 LM-head dispatch, and two deterministic argmax dispatches: 283 compute dispatches per evaluated
 token.
 
-Model weights are intentionally not included. The immutable upstream revision, artifact hashes, architecture, tokenizer/generation identity, and QAT representation are recorded in [public/models/gemma-4-e2b/manifest.json](public/models/gemma-4-e2b/manifest.json).
+Model weights are intentionally not included. The immutable upstream revision, artifact hashes, architecture, tokenizer/generation identity, and QAT representation are recorded in [public/models/gemma-4-e2b/manifest.json](public/models/gemma-4-e2b/manifest.json). The console first looks for `public/models/gemma-4-e2b/model.safetensors`; when that file is absent, **Download model** range-fetches the pinned Hugging Face revision into the current origin's resumable IndexedDB cache. A partial cache is reported explicitly and can be resumed.
 
 The lab benchmarks owned packed-int4 layer-0 Q and fused QKV implementations at the real `1536 -> 2048/256/256` decode shape. Their weights come from verified readonly exports of the browser cache used by Buza. The operator implementation belongs to Hugging Face's [Gemma 4 WebGPU kernels](https://huggingface.co/spaces/webml-community/gemma-4-webgpu-kernels) runtime at commit `158f16ae0f672943ca304d59c47c8e3a264e399e`; Buza vendors and invokes a byte-identical bundle with SHA-256 `0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62`. Buza was used only as the cache-owning host and capture harness.
 

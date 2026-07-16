@@ -7,10 +7,13 @@ const SUBGROUPS_PER_WORKGROUP = 2;
 const ROWS_PER_WORKGROUP = ROWS_PER_SUBGROUP * SUBGROUPS_PER_WORKGROUP;
 const VOCAB_SIZE = 262144;
 
+export type GemmaLmHeadMode = "row-major-subgroups" | "block-major-columns";
+
 export interface GemmaLmHeadPipeline {
   pipeline: GPUComputePipeline;
   outputFeatures: number;
   workgroupCount: number;
+  mode: GemmaLmHeadMode;
 }
 
 export interface GemmaLmHeadInputs {
@@ -38,11 +41,12 @@ export interface GemmaLmHeadWeights {
   outputScale: number;
 }
 
-const pipelineCache = new WeakMap<GPUDevice, Map<number, Promise<GemmaLmHeadPipeline>>>();
+const pipelineCache = new WeakMap<GPUDevice, Map<string, Promise<GemmaLmHeadPipeline>>>();
 
 export function getGemmaLmHeadPipeline(
   device: GPUDevice,
   outputFeatures = VOCAB_SIZE,
+  mode: GemmaLmHeadMode = "block-major-columns",
 ): Promise<GemmaLmHeadPipeline> {
   validateOutputFeatures(outputFeatures);
   let devicePipelines = pipelineCache.get(device);
@@ -50,31 +54,40 @@ export function getGemmaLmHeadPipeline(
     devicePipelines = new Map();
     pipelineCache.set(device, devicePipelines);
   }
-  const cached = devicePipelines.get(outputFeatures);
+  const cacheKey = `${outputFeatures}:${mode}`;
+  const cached = devicePipelines.get(cacheKey);
   if (cached) return cached;
-  const compiled = compileGemmaLmHeadPipeline(device, outputFeatures).catch((error) => {
-    devicePipelines?.delete(outputFeatures);
+  const compiled = compileGemmaLmHeadPipeline(device, outputFeatures, mode).catch((error) => {
+    devicePipelines?.delete(cacheKey);
     throw error;
   });
-  devicePipelines.set(outputFeatures, compiled);
+  devicePipelines.set(cacheKey, compiled);
   return compiled;
 }
 
 export async function compileGemmaLmHeadPipeline(
   device: GPUDevice,
   outputFeatures = VOCAB_SIZE,
+  mode: GemmaLmHeadMode = "block-major-columns",
 ): Promise<GemmaLmHeadPipeline> {
   validateOutputFeatures(outputFeatures);
-  const module = device.createShaderModule({ code: createGemmaLmHeadShader(outputFeatures) });
+  const module = device.createShaderModule({
+    code: mode === "block-major-columns"
+      ? createGemmaLmHeadBlockMajorShader(outputFeatures)
+      : createGemmaLmHeadShader(outputFeatures),
+  });
   const pipeline = await device.createComputePipelineAsync({
-    label: `Gemma int2 LM head (${outputFeatures} rows)`,
+    label: `Gemma int2 LM head ${mode} (${outputFeatures} rows)`,
     layout: "auto",
     compute: { module, entryPoint: "main" },
   });
   return {
     pipeline,
     outputFeatures,
-    workgroupCount: Math.ceil(outputFeatures / ROWS_PER_WORKGROUP),
+    workgroupCount: Math.ceil(
+      outputFeatures / (mode === "block-major-columns" ? 128 : ROWS_PER_WORKGROUP),
+    ),
+    mode,
   };
 }
 
@@ -114,7 +127,13 @@ export function createGemmaLmHeadResources(
     GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
   );
   const buffers = [weightBuffer, scaleBuffer, logits, paramsBuffer];
-  device.queue.writeBuffer(weightBuffer, 0, weights.packedWeights);
+  device.queue.writeBuffer(
+    weightBuffer,
+    0,
+    pipeline.mode === "block-major-columns"
+      ? repackLmHeadWeightsBlockMajor(weights.packedWeights, pipeline.outputFeatures)
+      : weights.packedWeights,
+  );
   device.queue.writeBuffer(scaleBuffer, 0, weights.rowScales);
   device.queue.writeBuffer(paramsBuffer, 0, new Float32Array([weights.outputScale, 0, 0, 0]));
   return {
@@ -238,6 +257,106 @@ fn main(
     }
   }
 }`;
+}
+
+export function createGemmaLmHeadBlockMajorShader(outputFeatures = VOCAB_SIZE): string {
+  validateOutputFeatures(outputFeatures);
+  return `
+struct Params { outputScale: f32 }
+@group(0) @binding(0) var<storage, read> activation: array<vec4<f32>>;
+@group(0) @binding(1) var<storage, read> bits: array<vec4<u32>>;
+@group(0) @binding(2) var<storage, read> scales: array<f32>;
+@group(0) @binding(3) var<storage, read> sumA: array<f32>;
+@group(0) @binding(4) var<storage, read_write> logits: array<f32>;
+@group(0) @binding(5) var<uniform> params: Params;
+
+const OUT_FEATURES: u32 = ${outputFeatures}u;
+const BLOCKS_PER_ROW: u32 = ${WORDS_PER_ROW / 4}u;
+const ZERO_POINT: f32 = 2.0;
+
+fn srq(value: f32, scale: f32) -> f32 {
+  if (scale == 0.0) { return value; }
+  return clamp(round(value / scale), -128.0, 127.0) * scale;
+}
+
+fn blockDot(packed: vec4<u32>, activationBase: u32) -> f32 {
+  let code00 = unpack4x8unorm(packed[0] & 0x03030303u);
+  let code01 = unpack4x8unorm((packed[0] >> 2u) & 0x03030303u);
+  let code02 = unpack4x8unorm((packed[0] >> 4u) & 0x03030303u);
+  let code03 = unpack4x8unorm((packed[0] >> 6u) & 0x03030303u);
+  let code10 = unpack4x8unorm(packed[1] & 0x03030303u);
+  let code11 = unpack4x8unorm((packed[1] >> 2u) & 0x03030303u);
+  let code12 = unpack4x8unorm((packed[1] >> 4u) & 0x03030303u);
+  let code13 = unpack4x8unorm((packed[1] >> 6u) & 0x03030303u);
+  let code20 = unpack4x8unorm(packed[2] & 0x03030303u);
+  let code21 = unpack4x8unorm((packed[2] >> 2u) & 0x03030303u);
+  let code22 = unpack4x8unorm((packed[2] >> 4u) & 0x03030303u);
+  let code23 = unpack4x8unorm((packed[2] >> 6u) & 0x03030303u);
+  let code30 = unpack4x8unorm(packed[3] & 0x03030303u);
+  let code31 = unpack4x8unorm((packed[3] >> 2u) & 0x03030303u);
+  let code32 = unpack4x8unorm((packed[3] >> 4u) & 0x03030303u);
+  let code33 = unpack4x8unorm((packed[3] >> 6u) & 0x03030303u);
+  let sum0 =
+    (dot(vec4<f32>(code00.x, code01.x, code02.x, code03.x), activation[activationBase + 0u]) +
+    dot(vec4<f32>(code00.y, code01.y, code02.y, code03.y), activation[activationBase + 1u])) +
+    (dot(vec4<f32>(code00.z, code01.z, code02.z, code03.z), activation[activationBase + 2u]) +
+    dot(vec4<f32>(code00.w, code01.w, code02.w, code03.w), activation[activationBase + 3u]));
+  let sum1 =
+    (dot(vec4<f32>(code10.x, code11.x, code12.x, code13.x), activation[activationBase + 4u]) +
+    dot(vec4<f32>(code10.y, code11.y, code12.y, code13.y), activation[activationBase + 5u])) +
+    (dot(vec4<f32>(code10.z, code11.z, code12.z, code13.z), activation[activationBase + 6u]) +
+    dot(vec4<f32>(code10.w, code11.w, code12.w, code13.w), activation[activationBase + 7u]));
+  let sum2 =
+    (dot(vec4<f32>(code20.x, code21.x, code22.x, code23.x), activation[activationBase + 8u]) +
+    dot(vec4<f32>(code20.y, code21.y, code22.y, code23.y), activation[activationBase + 9u])) +
+    (dot(vec4<f32>(code20.z, code21.z, code22.z, code23.z), activation[activationBase + 10u]) +
+    dot(vec4<f32>(code20.w, code21.w, code22.w, code23.w), activation[activationBase + 11u]));
+  let sum3 =
+    (dot(vec4<f32>(code30.x, code31.x, code32.x, code33.x), activation[activationBase + 12u]) +
+    dot(vec4<f32>(code30.y, code31.y, code32.y, code33.y), activation[activationBase + 13u])) +
+    (dot(vec4<f32>(code30.z, code31.z, code32.z, code33.z), activation[activationBase + 14u]) +
+    dot(vec4<f32>(code30.w, code31.w, code32.w, code33.w), activation[activationBase + 15u]));
+  return (sum0 + sum1) + (sum2 + sum3);
+}
+
+@compute @workgroup_size(128, 1, 1)
+fn main(
+  @builtin(workgroup_id) workgroupId: vec3<u32>,
+  @builtin(local_invocation_id) localId: vec3<u32>,
+) {
+  let outputRow = workgroupId.x * 128u + localId.x;
+  if (outputRow >= OUT_FEATURES) { return; }
+  var accumulator = 0.0;
+  for (var block = 0u; block < BLOCKS_PER_ROW; block = block + 1u) {
+    accumulator = accumulator + blockDot(
+      bits[block * OUT_FEATURES + outputRow],
+      block * 16u,
+    );
+  }
+  logits[outputRow] = srq(
+    scales[outputRow] * fma(accumulator, 255.0, -(ZERO_POINT * sumA[0])),
+    params.outputScale,
+  );
+}`;
+}
+
+function repackLmHeadWeightsBlockMajor(
+  rowMajor: Uint32Array,
+  outputFeatures: number,
+): Uint32Array {
+  const blockMajor = new Uint32Array(rowMajor.length);
+  const blocksPerRow = WORDS_PER_ROW / 4;
+  for (let row = 0; row < outputFeatures; row += 1) {
+    for (let block = 0; block < blocksPerRow; block += 1) {
+      const source = row * WORDS_PER_ROW + block * 4;
+      const destination = (block * outputFeatures + row) * 4;
+      blockMajor[destination] = rowMajor[source];
+      blockMajor[destination + 1] = rowMajor[source + 1];
+      blockMajor[destination + 2] = rowMajor[source + 2];
+      blockMajor[destination + 3] = rowMajor[source + 3];
+    }
+  }
+  return blockMajor;
 }
 
 function validateOutputFeatures(outputFeatures: number): void {

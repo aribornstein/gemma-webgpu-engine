@@ -1,13 +1,16 @@
 import { loadDecodeOprojNormFixture } from "../model/decode-oproj-norm-fixture";
 import { getWebGpuDevice } from "./device";
+import { measureGpuDispatches } from "./gpu-timestamp";
 
 const WORKGROUP_SIZE = 256;
 const OUT_FEATURES = 1536;
 const WORKGROUP_COUNT = 192;
 
+export type DecodeOprojNormMode = "subgroup-rows" | "cooperative-rows";
+
 export interface DecodeOprojNormBenchmarkResult {
   sourceOperator: "com.xenova.gemma4.DecodeOprojNorm";
-  sourceVariant: "fused-fixed-subgroup-32";
+  sourceVariant: "fused-fixed-subgroup-32" | "fused-row-cooperative-32";
   artifactSha256: string;
   sourceMetadataSha256: string;
   sourceTensorsSha256: string;
@@ -26,6 +29,10 @@ export interface DecodeOprojNormBenchmarkResult {
   gpuBufferAllocations: number;
   bytesAllocated: number;
   allocationsPerDispatch: 0;
+  gpuKernelDispatchesPerSample: number | null;
+  gpuKernelSamplesMs: number[] | null;
+  gpuKernelMedianMs: number | null;
+  gpuKernelP95Ms: number | null;
 }
 
 interface CompiledPipeline {
@@ -42,13 +49,18 @@ interface Resources {
   bytesAllocated: number;
 }
 
-const pipelineCache = new WeakMap<GPUDevice, Promise<CompiledPipeline>>();
+const pipelineCache = new WeakMap<GPUDevice, Map<DecodeOprojNormMode, Promise<CompiledPipeline>>>();
 
 export async function benchmarkDecodeOprojNorm(
   iterations = 20,
+  mode: DecodeOprojNormMode = "subgroup-rows",
+  gpuDispatchesPerSample = 20,
 ): Promise<DecodeOprojNormBenchmarkResult> {
   if (!Number.isInteger(iterations) || iterations < 1) {
     throw new Error("Iterations must be a positive integer");
+  }
+  if (!Number.isInteger(gpuDispatchesPerSample) || gpuDispatchesPerSample < 1) {
+    throw new Error("GPU dispatches per sample must be a positive integer");
   }
   const [fixture, device] = await Promise.all([
     loadDecodeOprojNormFixture(),
@@ -57,13 +69,18 @@ export async function benchmarkDecodeOprojNorm(
   if (!device.features.has("subgroups") || !device.features.has("shader-f16")) {
     throw new Error("DecodeOprojNorm requires WebGPU subgroups and shader-f16");
   }
-  const compiledPromise = pipelineCache.get(device) ?? compilePipeline(device);
-  if (!pipelineCache.has(device)) pipelineCache.set(device, compiledPromise);
+  let devicePipelines = pipelineCache.get(device);
+  if (!devicePipelines) {
+    devicePipelines = new Map();
+    pipelineCache.set(device, devicePipelines);
+  }
+  const compiledPromise = devicePipelines.get(mode) ?? compilePipeline(device, mode);
+  if (!devicePipelines.has(mode)) devicePipelines.set(mode, compiledPromise);
   let compiled: CompiledPipeline;
   try {
     compiled = await compiledPromise;
   } catch (error) {
-    pipelineCache.delete(device);
+    devicePipelines.delete(mode);
     throw error;
   }
 
@@ -109,10 +126,24 @@ export async function benchmarkDecodeOprojNorm(
         ffnInputBitMismatches += 1;
       }
     }
+    const gpuSamples = await measureGpuDispatches(
+      device,
+      "DecodeOprojNorm",
+      gpuDispatchesPerSample,
+      (pass) => {
+        pass.setPipeline(compiled.pipeline);
+        pass.setBindGroup(0, resources.bindGroup);
+        pass.dispatchWorkgroups(WORKGROUP_COUNT);
+      },
+      10,
+      () => device.queue.writeBuffer(resources.hiddenBuffer, 0, fixture.hiddenBefore),
+    );
     const sortedSamples = samples.toSorted((left, right) => left - right);
     return {
       sourceOperator: "com.xenova.gemma4.DecodeOprojNorm",
-      sourceVariant: "fused-fixed-subgroup-32",
+      sourceVariant: mode === "cooperative-rows"
+        ? "fused-row-cooperative-32"
+        : "fused-fixed-subgroup-32",
       artifactSha256: fixture.artifactSha256,
       sourceMetadataSha256: fixture.sourceMetadataSha256,
       sourceTensorsSha256: fixture.sourceTensorsSha256,
@@ -131,16 +162,23 @@ export async function benchmarkDecodeOprojNorm(
       gpuBufferAllocations: resources.buffers.length,
       bytesAllocated: resources.bytesAllocated,
       allocationsPerDispatch: 0,
+      gpuKernelDispatchesPerSample: gpuSamples ? gpuDispatchesPerSample : null,
+      gpuKernelSamplesMs: gpuSamples?.map(round) ?? null,
+      gpuKernelMedianMs: gpuSamples ? round(percentile(gpuSamples, 0.5)) : null,
+      gpuKernelP95Ms: gpuSamples ? round(percentile(gpuSamples, 0.95)) : null,
     };
   } finally {
     for (const buffer of resources.buffers) buffer.destroy();
   }
 }
 
-async function compilePipeline(device: GPUDevice): Promise<CompiledPipeline> {
-  const module = device.createShaderModule({ code: createDecodeOprojNormShader() });
+async function compilePipeline(
+  device: GPUDevice,
+  mode: DecodeOprojNormMode,
+): Promise<CompiledPipeline> {
+  const module = device.createShaderModule({ code: createDecodeOprojNormShader(2048, mode) });
   const pipeline = await device.createComputePipelineAsync({
-    label: "DecodeOprojNorm fixed subgroup 32",
+    label: `DecodeOprojNorm ${mode}`,
     layout: "auto",
     compute: { module, entryPoint: "main" },
   });
@@ -149,8 +187,17 @@ async function compilePipeline(device: GPUDevice): Promise<CompiledPipeline> {
 
 export function createDecodeOprojNormShader(
   inFeatures: 2048 | 4096 = 2048,
+  mode: DecodeOprojNormMode = "subgroup-rows",
 ): string {
   const wordsPerRow = inFeatures / 8;
+  const projectionWorkgroupDeclarations = mode === "cooperative-rows"
+    ? `var<workgroup> projectionSums0: array<vec4<f32>, 8>;
+var<workgroup> projectionSums1: array<vec4<f32>, 8>;
+var<workgroup> projectionActivationSums: array<f32, 8>;`
+    : "";
+  const projectionBody = mode === "cooperative-rows"
+    ? createCooperativeProjectionBody()
+    : createSubgroupProjectionBody();
   return `enable f16;
 enable subgroups;
 
@@ -182,6 +229,7 @@ const ZP: f32 = 8.0;
 
 var<workgroup> lastFlag: u32;
 var<workgroup> sgp: array<f32, 8>;
+${projectionWorkgroupDeclarations}
 
 fn sg_sum(value: f32) -> f32 {
   return subgroupAdd(value);
@@ -212,37 +260,7 @@ fn main(
   let tid = local_id.x;
   let subgroup_id = tid / 32u;
   let lane = tid & 31u;
-  let row_base = workgroup_id.x * ROWS_PER_WG + subgroup_id * SG_ROWS;
-  var sum_qa: array<f32, 1>;
-  sum_qa[0] = 0.0;
-  var sum_a = 0.0;
-  var word = lane;
-  loop {
-    if (word >= WORDS_PER_ROW) { break; }
-    let activation0 = a[word * 2u];
-    let activation1 = a[word * 2u + 1u];
-    sum_a = sum_a + activation0.x + activation0.y + activation0.z + activation0.w;
-    sum_a = sum_a + activation1.x + activation1.y + activation1.z + activation1.w;
-    let output_row = row_base;
-    if (output_row < OUT_F) {
-      let packed = bits_buf[output_row * WORDS_PER_ROW + word];
-      let lo = vec4<f32>(unpack4xU8(packed & 0x0f0f0f0fu));
-      let hi = vec4<f32>(unpack4xU8((packed >> 4u) & 0x0f0f0f0fu));
-      sum_qa[0] = sum_qa[0] +
-        dot(vec4<f32>(lo.x, hi.x, lo.y, hi.y), activation0) +
-        dot(vec4<f32>(lo.z, hi.z, lo.w, hi.w), activation1);
-    }
-    word = word + 32u;
-  }
-  let reduced_a = sg_sum(sum_a);
-  let reduced_qa = sg_sum(sum_qa[0]);
-  let output_row = row_base;
-  if (lane == 0u && output_row < OUT_F) {
-    atomicStore(&pp[output_row], bitcast<u32>(srq(
-      scale[output_row] * (reduced_qa - ZP * reduced_a),
-      params.outScale,
-    )));
-  }
+${projectionBody}
   storageBarrier();
 
   if (tid == 0u) {
@@ -293,6 +311,119 @@ fn main(
   let total = reduce_sum(quantized_sum, tid);
   if (tid == 0u) { sum2[0] = total; }
 }`;
+}
+
+function createSubgroupProjectionBody(): string {
+  return `  let row_base = workgroup_id.x * ROWS_PER_WG + subgroup_id * SG_ROWS;
+  var sum_qa = 0.0;
+  var sum_a = 0.0;
+  var word = lane;
+  loop {
+    if (word >= WORDS_PER_ROW) { break; }
+    let activation0 = a[word * 2u];
+    let activation1 = a[word * 2u + 1u];
+    sum_a = sum_a + activation0.x + activation0.y + activation0.z + activation0.w;
+    sum_a = sum_a + activation1.x + activation1.y + activation1.z + activation1.w;
+    if (row_base < OUT_F) {
+      let packed = bits_buf[row_base * WORDS_PER_ROW + word];
+      let lo = vec4<f32>(unpack4xU8(packed & 0x0f0f0f0fu));
+      let hi = vec4<f32>(unpack4xU8((packed >> 4u) & 0x0f0f0f0fu));
+      sum_qa = sum_qa +
+        dot(vec4<f32>(lo.x, hi.x, lo.y, hi.y), activation0) +
+        dot(vec4<f32>(lo.z, hi.z, lo.w, hi.w), activation1);
+    }
+    word = word + 32u;
+  }
+  let reduced_a = sg_sum(sum_a);
+  let reduced_qa = sg_sum(sum_qa);
+  if (lane == 0u && row_base < OUT_F) {
+    atomicStore(&pp[row_base], bitcast<u32>(srq(
+      scale[row_base] * (reduced_qa - ZP * reduced_a),
+      params.outScale,
+    )));
+  }`;
+}
+
+function createCooperativeProjectionBody(): string {
+  return `  let row_base = workgroup_id.x * ROWS_PER_WG;
+  var projection0 = 0.0;
+  var projection1 = 0.0;
+  var projection2 = 0.0;
+  var projection3 = 0.0;
+  var projection4 = 0.0;
+  var projection5 = 0.0;
+  var projection6 = 0.0;
+  var projection7 = 0.0;
+  var sum_a = 0.0;
+  var word = tid;
+  loop {
+    if (word >= WORDS_PER_ROW) { break; }
+    let activation0 = a[word * 2u];
+    let activation1 = a[word * 2u + 1u];
+    sum_a = sum_a +
+      (activation0.x + activation0.y + activation0.z + activation0.w) +
+      (activation1.x + activation1.y + activation1.z + activation1.w);
+    let packed0 = bits_buf[(row_base + 0u) * WORDS_PER_ROW + word];
+    let packed1 = bits_buf[(row_base + 1u) * WORDS_PER_ROW + word];
+    let packed2 = bits_buf[(row_base + 2u) * WORDS_PER_ROW + word];
+    let packed3 = bits_buf[(row_base + 3u) * WORDS_PER_ROW + word];
+    let packed4 = bits_buf[(row_base + 4u) * WORDS_PER_ROW + word];
+    let packed5 = bits_buf[(row_base + 5u) * WORDS_PER_ROW + word];
+    let packed6 = bits_buf[(row_base + 6u) * WORDS_PER_ROW + word];
+    let packed7 = bits_buf[(row_base + 7u) * WORDS_PER_ROW + word];
+    let lo0 = vec4<f32>(unpack4xU8(packed0 & 0x0f0f0f0fu));
+    let hi0 = vec4<f32>(unpack4xU8((packed0 >> 4u) & 0x0f0f0f0fu));
+    let lo1 = vec4<f32>(unpack4xU8(packed1 & 0x0f0f0f0fu));
+    let hi1 = vec4<f32>(unpack4xU8((packed1 >> 4u) & 0x0f0f0f0fu));
+    let lo2 = vec4<f32>(unpack4xU8(packed2 & 0x0f0f0f0fu));
+    let hi2 = vec4<f32>(unpack4xU8((packed2 >> 4u) & 0x0f0f0f0fu));
+    let lo3 = vec4<f32>(unpack4xU8(packed3 & 0x0f0f0f0fu));
+    let hi3 = vec4<f32>(unpack4xU8((packed3 >> 4u) & 0x0f0f0f0fu));
+    let lo4 = vec4<f32>(unpack4xU8(packed4 & 0x0f0f0f0fu));
+    let hi4 = vec4<f32>(unpack4xU8((packed4 >> 4u) & 0x0f0f0f0fu));
+    let lo5 = vec4<f32>(unpack4xU8(packed5 & 0x0f0f0f0fu));
+    let hi5 = vec4<f32>(unpack4xU8((packed5 >> 4u) & 0x0f0f0f0fu));
+    let lo6 = vec4<f32>(unpack4xU8(packed6 & 0x0f0f0f0fu));
+    let hi6 = vec4<f32>(unpack4xU8((packed6 >> 4u) & 0x0f0f0f0fu));
+    let lo7 = vec4<f32>(unpack4xU8(packed7 & 0x0f0f0f0fu));
+    let hi7 = vec4<f32>(unpack4xU8((packed7 >> 4u) & 0x0f0f0f0fu));
+    projection0 = projection0 + dot(vec4<f32>(lo0.x, hi0.x, lo0.y, hi0.y), activation0) + dot(vec4<f32>(lo0.z, hi0.z, lo0.w, hi0.w), activation1);
+    projection1 = projection1 + dot(vec4<f32>(lo1.x, hi1.x, lo1.y, hi1.y), activation0) + dot(vec4<f32>(lo1.z, hi1.z, lo1.w, hi1.w), activation1);
+    projection2 = projection2 + dot(vec4<f32>(lo2.x, hi2.x, lo2.y, hi2.y), activation0) + dot(vec4<f32>(lo2.z, hi2.z, lo2.w, hi2.w), activation1);
+    projection3 = projection3 + dot(vec4<f32>(lo3.x, hi3.x, lo3.y, hi3.y), activation0) + dot(vec4<f32>(lo3.z, hi3.z, lo3.w, hi3.w), activation1);
+    projection4 = projection4 + dot(vec4<f32>(lo4.x, hi4.x, lo4.y, hi4.y), activation0) + dot(vec4<f32>(lo4.z, hi4.z, lo4.w, hi4.w), activation1);
+    projection5 = projection5 + dot(vec4<f32>(lo5.x, hi5.x, lo5.y, hi5.y), activation0) + dot(vec4<f32>(lo5.z, hi5.z, lo5.w, hi5.w), activation1);
+    projection6 = projection6 + dot(vec4<f32>(lo6.x, hi6.x, lo6.y, hi6.y), activation0) + dot(vec4<f32>(lo6.z, hi6.z, lo6.w, hi6.w), activation1);
+    projection7 = projection7 + dot(vec4<f32>(lo7.x, hi7.x, lo7.y, hi7.y), activation0) + dot(vec4<f32>(lo7.z, hi7.z, lo7.w, hi7.w), activation1);
+    word = word + WG;
+  }
+  let reduced0 = subgroupAdd(vec4<f32>(projection0, projection1, projection2, projection3));
+  let reduced1 = subgroupAdd(vec4<f32>(projection4, projection5, projection6, projection7));
+  let reduced_a = subgroupAdd(sum_a);
+  if (lane == 0u) {
+    projectionSums0[subgroup_id] = reduced0;
+    projectionSums1[subgroup_id] = reduced1;
+    projectionActivationSums[subgroup_id] = reduced_a;
+  }
+  workgroupBarrier();
+  if (tid == 0u) {
+    var total0 = vec4<f32>(0.0);
+    var total1 = vec4<f32>(0.0);
+    var total_a = 0.0;
+    for (var index = 0u; index < 8u; index = index + 1u) {
+      total0 = total0 + projectionSums0[index];
+      total1 = total1 + projectionSums1[index];
+      total_a = total_a + projectionActivationSums[index];
+    }
+    atomicStore(&pp[row_base + 0u], bitcast<u32>(srq(scale[row_base + 0u] * (total0[0] - ZP * total_a), params.outScale)));
+    atomicStore(&pp[row_base + 1u], bitcast<u32>(srq(scale[row_base + 1u] * (total0[1] - ZP * total_a), params.outScale)));
+    atomicStore(&pp[row_base + 2u], bitcast<u32>(srq(scale[row_base + 2u] * (total0[2] - ZP * total_a), params.outScale)));
+    atomicStore(&pp[row_base + 3u], bitcast<u32>(srq(scale[row_base + 3u] * (total0[3] - ZP * total_a), params.outScale)));
+    atomicStore(&pp[row_base + 4u], bitcast<u32>(srq(scale[row_base + 4u] * (total1[0] - ZP * total_a), params.outScale)));
+    atomicStore(&pp[row_base + 5u], bitcast<u32>(srq(scale[row_base + 5u] * (total1[1] - ZP * total_a), params.outScale)));
+    atomicStore(&pp[row_base + 6u], bitcast<u32>(srq(scale[row_base + 6u] * (total1[2] - ZP * total_a), params.outScale)));
+    atomicStore(&pp[row_base + 7u], bitcast<u32>(srq(scale[row_base + 7u] * (total1[3] - ZP * total_a), params.outScale)));
+  }`;
 }
 
 function createResources(

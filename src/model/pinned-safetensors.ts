@@ -1,6 +1,7 @@
 import type {
   CachedTensorDescriptor,
   CachedTensorPayload,
+  CachedTensorSliceRequest,
 } from "./cached-safetensors";
 
 const MODEL_REVISION = "9fcec64df66cb1e4d972fc5cdc142afb25b2362c";
@@ -12,6 +13,12 @@ const TENSOR_COUNT = 2_780;
 export const GEMMA_PINNED_SAFETENSORS_URL =
   `https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/` +
   `${MODEL_REVISION}/model.safetensors`;
+
+export const GEMMA_SAFETENSORS_DOWNLOAD_URL =
+  "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/" +
+  "model.safetensors";
+
+export const GEMMA_LOCAL_SAFETENSORS_URL = "/models/gemma-4-e2b/model.safetensors";
 
 interface RawTensorDescriptor {
   dtype?: unknown;
@@ -96,6 +103,27 @@ export class PinnedSafetensorsSource {
     const payloads = await Promise.all(names.map((name) => this.readTensor(name)));
     return new Map(payloads.map((payload) => [payload.name, payload]));
   }
+
+  async readTensorSlice(
+    name: string,
+    byteOffset: number,
+    byteLength: number,
+  ): Promise<Uint8Array> {
+    const descriptor = this.descriptor(name);
+    if (!Number.isInteger(byteOffset) || byteOffset < 0 ||
+        !Number.isInteger(byteLength) || byteLength < 1 ||
+        byteOffset + byteLength > descriptor.byteLength) {
+      throw new Error(`Tensor ${name} slice exceeds its ${descriptor.byteLength}-byte range`);
+    }
+    return fetchExactRange(this.sourceUrl, descriptor.begin + byteOffset, byteLength);
+  }
+
+  async readTensorSlices(requests: readonly CachedTensorSliceRequest[]): Promise<Uint8Array[]> {
+    return Promise.all(requests.map(({ name, byteOffset, byteLength }) =>
+      this.readTensorSlice(name, byteOffset, byteLength)));
+  }
+
+  close(): void {}
 }
 
 async function fetchExactRange(

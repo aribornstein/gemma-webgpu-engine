@@ -32,6 +32,7 @@ import {
   createDecodeMlpPleBlockResources,
   destroyDecodeMlpPleBlockResources,
 } from "./decode-mlp-ple-block";
+import type { DecodeOprojNormMode } from "./decode-oproj-norm";
 
 const LAYER_COUNT = 35;
 const Q_HEADS: 8 = 8;
@@ -123,6 +124,7 @@ export async function createGemmaDecodeStackResources(
   materializedLayers: readonly MaterializedGemmaLayer[],
   fixture: DecodeMlpPleFixture,
   runtime: GemmaDecodeStackRuntime,
+  oprojMode: DecodeOprojNormMode = "subgroup-rows",
 ): Promise<GemmaDecodeStackResources> {
   validateStackInputs(plans, materializedLayers, runtime);
   return buildGemmaDecodeStackResources(
@@ -131,6 +133,7 @@ export async function createGemmaDecodeStackResources(
     (layerIndex) => Promise.resolve(materializedLayers[layerIndex]),
     fixture,
     runtime,
+    oprojMode,
   );
 }
 
@@ -139,6 +142,7 @@ export async function loadGemmaDecodeStackResources(
   source: GemmaLayerTensorSource,
   fixture: DecodeMlpPleFixture,
   runtime: GemmaDecodeStackRuntime,
+  oprojMode: DecodeOprojNormMode = "subgroup-rows",
 ): Promise<GemmaDecodeStackResources> {
   const plans = createGemmaLayerPlans(source.descriptors);
   validateStackRuntime(runtime);
@@ -150,6 +154,7 @@ export async function loadGemmaDecodeStackResources(
     ),
     fixture,
     runtime,
+    oprojMode,
   );
 }
 
@@ -159,6 +164,7 @@ async function buildGemmaDecodeStackResources(
   loadLayer: (layerIndex: number) => Promise<MaterializedGemmaLayer>,
   fixture: DecodeMlpPleFixture,
   runtime: GemmaDecodeStackRuntime,
+  oprojMode: DecodeOprojNormMode,
 ): Promise<GemmaDecodeStackResources> {
   createGemmaDecodeStackSchedule(plans);
   const layers: GemmaDecodeLayerResources[] = [];
@@ -195,7 +201,11 @@ async function buildGemmaDecodeStackResources(
       validateMaterializedLayer(plan, layer);
       const nextLayer = nextLayerPromise ? await nextLayerPromise : undefined;
       if (nextLayer) validateMaterializedLayer(plans[layerIndex + 1], nextLayer);
-      const pipelines = await getGemmaDecodeLayerPipelines(device, plan.profile);
+      const pipelines = await getGemmaDecodeLayerPipelines(
+        device,
+        plan.profile,
+        oprojMode,
+      );
       const rotary = plan.attention.type === "full_attention"
         ? runtime.fullRotary
         : runtime.slidingRotary;

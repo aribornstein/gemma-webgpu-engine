@@ -6,6 +6,8 @@ Build an inspectable browser-native inference engine for `google/gemma-4-E2B-it-
 
 This project replaces the opaque minimized JavaScript runtime, not Gemma itself. Upstream model artifacts remain independently versioned and are never committed without their applicable license and provenance metadata.
 
+The product boundary is a complete generation engine over owned WebGPU kernels, not a greedy-only throughput demonstration. Optimizations must remain below the decoding-policy layer so the same transformer path continues to support full logits, seeded sampling, penalties, tokenizer-aware constraints, streaming, cancellation, and diagnostics. Greedy-only queueing and argmax-only LM-head shortcuts are out of scope even when they improve a narrow benchmark.
+
 ## Success criteria
 
 - Equivalent greedy token IDs and acceptably close logits on a golden prompt suite.
@@ -25,7 +27,7 @@ This project replaces the opaque minimized JavaScript runtime, not Gemma itself.
 - Local destination: `public/models/gemma-4-e2b/` or browser cache
 - Required manifest: repository revision, file list, SHA-256 hashes, license reference, tokenizer chat template, EOS IDs, and generation defaults
 
-The downloader will support authenticated Hugging Face access through local tooling. Tokens must never be committed or entered into the browser UI. The minimized Buza runtime will not be copied.
+The browser downloader checks `public/models/gemma-4-e2b/model.safetensors` first, then range-fetches the pinned Hugging Face revision into resumable IndexedDB storage when the local file is absent. Authenticated Hugging Face access remains a local-tooling concern; tokens must never be committed or entered into the browser UI. The minimized Buza runtime is not copied.
 
 ## Architecture
 
@@ -139,7 +141,7 @@ tools/             artifact download, hashing, and reference export
 2. **Multi-turn product integration:** expose role-preserving conversation history, test edits and cache invalidation, and define content-hash ownership before permitting multimodal prefix reuse.
 3. **Audio:** implement pinned audio preprocessing, tower/bridge materialization, owned WebGPU execution, soft-token insertion, parity tests, cancellation, and progress reporting without changing the historical language cache.
 4. **Video:** confirm the pinned processor contract, add deterministic frame sampling and timestamps, reuse the validated vision path where the checkpoint requires it, and enforce multi-frame context and memory bounds.
-5. **Performance:** fuse exact fixed-32 QKV and residual/norm boundaries; add larger prompt blocks only after measured crossover gates; move constrained candidate masking toward GPU execution; and require equivalent token, tensor, memory, and latency evidence for every routing change. Exact fixed-32 gate/up fusion is complete and passes token, tensor, memory, median, and p95 gates.
+5. **Performance:** continue evidence-gated kernel work below the decoding-policy layer. The measured pass rejected exact QKV source-layout, retained the existing gate/up and down kernels because they already beat equivalent pinned-HF timings, and promoted a block-major full-logit LM head after all-logit error, exact greedy/seeded/constraint sequences, retained memory, median, and p95 passed. A row-cooperative O-projection alternate is exact and improves 200-dispatch aggregate median/p95 by 5.37%/8.33%, but remains non-default until full-generation canonical and end-to-end A/B gates pass. Keep all logits available for sampling and constraints; do not add greedy-only queueing or argmax-only handoff. The prior kernels remain load-time fallbacks.
 6. **Reliability and release:** recover from WebGPU device loss, stress resource destruction and repeated requests, handle interrupted pinned-range reads, run the full target-browser matrix, and retain reproducible correctness and benchmark artifacts.
 
 Speculative decoding and device-specific autotuning remain later measured milestones. No optimization advances automatically unless it preserves the corresponding token, tensor, constraint, memory, and cancellation gates.

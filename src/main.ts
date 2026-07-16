@@ -4,6 +4,11 @@ import {
   ReadonlySafetensorsCache,
 } from "./model/cached-safetensors";
 import {
+  initializeGemmaSafetensorsCache,
+  type SafetensorsCacheInitializationProgress,
+} from "./model/safetensors-cache-initializer";
+import { GEMMA_LOCAL_SAFETENSORS_URL } from "./model/pinned-safetensors";
+import {
   compileGenerationConstraint,
   type GenerationConstraint,
   type JsonWhitespace,
@@ -26,15 +31,7 @@ import type {
 import type { GemmaGenerationInput } from "./runtime/gemma-tokenizer";
 import type { GemmaDurableBenchmarkArtifact } from "./runtime/durable-benchmark";
 
-interface GemmaCacheInitializationProgress {
-  status?: string;
-  kind?: string;
-  fraction?: number;
-  loaded?: number;
-  total?: number;
-  fromCache?: boolean;
-  message?: string;
-}
+type GemmaCacheInitializationProgress = SafetensorsCacheInitializationProgress;
 
 type GenerationExampleControl =
   | "temperature"
@@ -141,6 +138,12 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
     },
   },
 ];
+
+const MODEL_CACHE_SENTINELS = [
+  "lm_head.weight",
+  "model.language_model.layers.34.mlp.down_proj.weight",
+  "model.language_model.layers.34.self_attn.q_proj.weight",
+] as const;
 
 declare global {
   interface Window {
@@ -420,6 +423,7 @@ element<HTMLSpanElement>("origin-label").textContent = location.origin;
 let session: GemmaGenerationSession | null = null;
 let generationController: AbortController | null = null;
 let cacheAvailable = false;
+let localModelAvailable = false;
 let controlsValidationTimer: number | null = null;
 let progressPhaseKey = "";
 let progressPhaseFraction = 0;
@@ -483,23 +487,35 @@ window.addEventListener("beforeunload", () => {
 async function initializeCapabilities(): Promise<void> {
   const hasWebGpu = Boolean(navigator.gpu);
   setBadge(gpuStatus, hasWebGpu ? "WebGPU ready" : "WebGPU unavailable", hasWebGpu ? "ready" : "error");
+  let cacheExists = false;
   try {
-    cacheAvailable = await inventoryModelCache();
+    localModelAvailable = await localModelExists();
+    cacheExists = await modelCacheDatabaseExists();
+    cacheAvailable = localModelAvailable ? false : await inventoryModelCache();
     setBadge(
       cacheStatus,
-      cacheAvailable ? "Cache ready" : "Cache absent",
-      cacheAvailable ? "ready" : "error",
+      localModelAvailable
+        ? "Local weights"
+        : cacheAvailable ? "Cache ready" : cacheExists ? "Cache partial" : "Cache absent",
+      localModelAvailable || cacheAvailable ? "ready" : "error",
     );
   } catch {
     cacheAvailable = false;
+    localModelAvailable = false;
     setBadge(cacheStatus, "Cache unknown", "error");
   }
-  const canInitializeCache = typeof window.__gemmaEngineCacheInitializer === "function";
-  loadButton.disabled = !hasWebGpu || (!cacheAvailable && !canInitializeCache);
+  const canInitializeCache = typeof indexedDB !== "undefined";
+  loadButton.disabled = !hasWebGpu ||
+    (!localModelAvailable && !cacheAvailable && !canInitializeCache);
   benchmarkRunButton.disabled = !hasWebGpu || !cacheAvailable;
-  if (!cacheAvailable && canInitializeCache) {
-    loadButton.textContent = "Initialize cache";
-    requestStatus.textContent = "Model cache is not initialized in this browser";
+  if (localModelAvailable) {
+    loadButton.textContent = "Load model";
+    requestStatus.textContent = "Local model ready to load";
+  } else if (!cacheAvailable && canInitializeCache) {
+    loadButton.textContent = cacheExists ? "Resume download" : "Download model";
+    requestStatus.textContent = cacheExists
+      ? "Resume the model download and load it on this origin"
+      : "Download and load the model on this origin";
   } else if (!cacheAvailable) {
     requestStatus.textContent = `Open this console on the origin containing ${GEMMA_4_E2B_CACHE_SPEC.databaseName}`;
   } else if (hasWebGpu) {
@@ -606,7 +622,7 @@ function setBenchmarkRunning(running: boolean): void {
   benchmarkStopButton.disabled = !running;
   benchmarkCapacity.disabled = running;
   benchmarkDownloadButton.disabled = running || !benchmarkArtifact;
-  loadButton.disabled = running || !cacheAvailable || !navigator.gpu;
+  loadButton.disabled = running || (!localModelAvailable && !cacheAvailable) || !navigator.gpu;
   generateButton.disabled = running || !session;
   exampleSelect.disabled = running;
   promptInput.disabled = running;
@@ -622,13 +638,13 @@ function setBenchmarkRunning(running: boolean): void {
 
 async function loadModel(): Promise<void> {
   if (!navigator.gpu || generationController) return;
-  const cacheInitializer = window.__gemmaEngineCacheInitializer;
-  if (!cacheAvailable && !cacheInitializer) return;
+  const cacheInitializer = window.__gemmaEngineCacheInitializer ?? initializeGemmaSafetensorsCache;
+  if (!localModelAvailable && !cacheAvailable && !cacheInitializer) return;
   loadButton.disabled = true;
   const startedAt = performance.now();
   let cacheInitializationAttempted = false;
   try {
-    if (!cacheAvailable && cacheInitializer) {
+    if (!localModelAvailable && !cacheAvailable && cacheInitializer) {
       cacheInitializationAttempted = true;
       await initializeModelCache(cacheInitializer);
     }
@@ -638,13 +654,16 @@ async function loadModel(): Promise<void> {
     setModelProgress(
       "Loading WebGPU engine",
       null,
-      cacheAvailable ? "Reading cached weights and compiling pipelines" : "Preparing runtime",
+      localModelAvailable
+        ? "Reading local weights and compiling pipelines"
+        : cacheAvailable ? "Reading cached weights and compiling pipelines" : "Preparing runtime",
     );
     session?.destroy();
     const { loadGemmaGenerationSession } = await import("./runtime/gemma-session");
     const loadOwnedSession = () => loadGemmaGenerationSession({
       cacheCapacity: GEMMA_VALIDATED_CONTEXT_CAPACITY,
-        prefillStrategy: "auto",
+      sourceUrl: localModelAvailable ? GEMMA_LOCAL_SAFETENSORS_URL : undefined,
+      prefillStrategy: "auto",
       });
     try {
       session = await loadOwnedSession();
@@ -677,10 +696,12 @@ async function loadModel(): Promise<void> {
     setBadge(modelStatus, "Load failed", "error");
     requestStatus.textContent = errorMessage(error);
     setModelProgress("Model load failed", null, errorMessage(error), "error");
-    loadButton.textContent = cacheAvailable ? "Retry load" : "Retry initialization";
+    loadButton.textContent = localModelAvailable || cacheAvailable
+      ? "Retry load"
+      : "Retry initialization";
   } finally {
     loadButton.disabled = !navigator.gpu ||
-      (!cacheAvailable && typeof window.__gemmaEngineCacheInitializer !== "function");
+      (!localModelAvailable && !cacheAvailable && typeof indexedDB === "undefined");
   }
 }
 
@@ -695,10 +716,8 @@ async function initializeModelCache(
   requestStatus.textContent = "Preparing model cache";
   showModelProgress("Preparing download", "Contacting model host");
   await cacheInitializer(renderCacheProgress);
-  cacheAvailable = await inventoryModelCache();
-  if (!cacheAvailable) {
-    throw new Error(`Cache initialization did not create ${GEMMA_4_E2B_CACHE_SPEC.databaseName}`);
-  }
+  await verifyModelCache();
+  cacheAvailable = true;
   setBadge(cacheStatus, "Cache ready", "ready");
   setModelProgress("Finalizing cache", 1, "Model weights cached in this browser");
 }
@@ -995,7 +1014,7 @@ function clearTelemetry(): void {
 function setGenerating(generating: boolean): void {
   generateButton.disabled = generating || !session;
   cancelButton.disabled = !generating;
-  loadButton.disabled = generating || !cacheAvailable || !navigator.gpu;
+  loadButton.disabled = generating || (!localModelAvailable && !cacheAvailable) || !navigator.gpu;
   exampleSelect.disabled = generating;
   promptInput.disabled = generating;
   imageInput.disabled = generating;
@@ -1051,9 +1070,40 @@ function setBadge(target: HTMLElement, text: string, state: string): void {
 
 async function inventoryModelCache(): Promise<boolean> {
   try {
-    const cache = await ReadonlySafetensorsCache.open();
-    cache.close();
+    await verifyModelCache();
     return true;
+  } catch {
+    return false;
+  }
+}
+
+async function verifyModelCache(): Promise<void> {
+  let cache: ReadonlySafetensorsCache | null = null;
+  try {
+    cache = await ReadonlySafetensorsCache.open();
+    for (const name of MODEL_CACHE_SENTINELS) {
+      try {
+        await cache.readTensorSlice(name, 0, 1);
+      } catch (error) {
+        throw new Error(`Cache verification failed for ${name}: ${errorMessage(error)}`);
+      }
+    }
+  } finally {
+    cache?.close();
+  }
+}
+
+async function modelCacheDatabaseExists(): Promise<boolean> {
+  return (await indexedDB.databases()).some(
+    (candidate) => candidate.name === GEMMA_4_E2B_CACHE_SPEC.databaseName,
+  );
+}
+
+async function localModelExists(): Promise<boolean> {
+  try {
+    const response = await fetch(GEMMA_LOCAL_SAFETENSORS_URL, { method: "HEAD" });
+    return response.ok &&
+      response.headers.get("content-length") === String(GEMMA_4_E2B_CACHE_SPEC.fileSize);
   } catch {
     return false;
   }

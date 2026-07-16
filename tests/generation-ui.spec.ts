@@ -1,15 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-test("gates model loading to the cache-owning origin", async ({ page }) => {
+test("offers a direct model download when the cache is absent", async ({ page }) => {
   await page.goto("/");
 
   await expect(page).toHaveTitle("Gemma WebGPU Generation Console");
   await expect(page.getByRole("heading", { name: "Generation console" })).toBeVisible();
   await expect(page.getByText("WebGPU ready", { exact: true })).toBeVisible();
   await expect(page.getByText("Cache absent", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Load model" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Download model" })).toBeEnabled();
   await expect(page.getByRole("button", { name: "Generate" })).toBeDisabled();
-  await expect(page.getByText(/origin containing safetensors-cache-v1/)).toBeVisible();
+  await expect(page.getByText("Download and load the model on this origin")).toBeVisible();
   await expect(page.getByText("Decode tok/s", { exact: true })).toBeVisible();
   await expect(page.getByText("Overall tok/s", { exact: true })).toBeVisible();
   await expect(page.getByText("Vision", { exact: true })).toBeVisible();
@@ -19,6 +19,37 @@ test("gates model loading to the cache-owning origin", async ({ page }) => {
   await expect(page.getByRole("spinbutton", { name: "Max tokens" })).toHaveAttribute("max", "32768");
   await expect(page.getByText("32,768 validated / 131,072 model positions", { exact: true }))
     .toBeVisible();
+});
+
+test("offers to resume an incomplete model cache", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(async () => {
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.open("safetensors-cache-v1", 2);
+      request.onupgradeneeded = () => {
+        request.result.createObjectStore("chunks");
+        request.result.createObjectStore("meta");
+      };
+      request.onsuccess = () => {
+        request.result.close();
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  });
+  await page.reload();
+
+  await expect(page.getByText("Cache partial", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Resume download" })).toBeEnabled();
+  await expect(page.getByText("Resume the model download and load it on this origin"))
+    .toBeVisible();
+  await page.evaluate(async () => {
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.deleteDatabase("safetensors-cache-v1");
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  });
 });
 
 test("enables a host-provided client-side cache initializer", async ({ page }) => {
@@ -41,7 +72,7 @@ test("enables a host-provided client-side cache initializer", async ({ page }) =
   });
   await page.goto("/");
 
-  const initialize = page.getByRole("button", { name: "Initialize cache" });
+  const initialize = page.getByRole("button", { name: "Download model" });
   await expect(initialize).toBeEnabled();
   await initialize.click();
   await expect(page.getByRole("button", { name: "Downloading 50.9%" })).toBeVisible();

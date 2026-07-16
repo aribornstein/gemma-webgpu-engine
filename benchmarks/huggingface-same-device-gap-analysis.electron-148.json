@@ -1,0 +1,439 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-07-16T16:14:15Z",
+  "optimizationCompletedAt": "2026-07-16T17:10:00Z",
+  "status": "huggingface-same-device-gap-analysis-and-optimization-results",
+  "model": {
+    "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "sourceKey": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+    "fileSize": 2458111846,
+    "note": "The main source key was used to reuse the verified IndexedDB object. Model identity remains the pinned revision above."
+  },
+  "huggingFaceRuntime": {
+    "sourceCommit": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+    "bundlePath": "/vendor/gemma/gemma-4-e2b.js",
+    "bundleBytes": 551802,
+    "bundleSha256": "0234c0e866bfaa9623e938a7cfa7f5740cca22532cc1112dd4e8915b97f78d62",
+    "cacheCapacity": 8192,
+    "decodeSubmissionWindow": 4
+  },
+  "environment": {
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.128.0 Chrome/148.0.7778.271 Electron/42.5.0 Safari/537.36",
+    "adapterInfo": {
+      "vendor": "apple",
+      "architecture": "metal-3",
+      "subgroupMinSize": 32,
+      "subgroupMaxSize": 32,
+      "timestampQuery": true
+    },
+    "origin": "http://localhost:8753"
+  },
+  "methodology": {
+    "temperature": 0,
+    "reusePromptCache": false,
+    "warmup": "Runtime warmup followed by one unmeasured generation per canonical prompt shape.",
+    "canonicalIterations": 3,
+    "percentileMethod": "linear interpolation at (n - 1) * p",
+    "ownedReference": "full-generation-canonical-suite.optimized.electron-148.json",
+    "productionAndProfileRunsSeparated": true,
+    "residency": "The clean Hugging Face runs navigated away from the owned console before loading the upstream graph.",
+    "limitation": "The long generation bracket showed severe sustained-device thermal/order sensitivity. It is retained as raw context and is not a durable implementation speedup claim."
+  },
+  "load": {
+    "cleanCachedLoadMs": 4716.6,
+    "cleanWarmupMs": 2257.5
+  },
+  "canonical": {
+    "all15SamplesMatchGoldenTokenIdsAndText": true,
+    "cases": [
+      {
+        "id": "short-greeting",
+        "promptTokens": 16,
+        "generatedTokenIds": [10979, 236888],
+        "huggingFace": {
+          "ttftMedianMs": 202,
+          "ttftP95Ms": 202.45,
+          "itlMedianMs": 13.8,
+          "itlP95Ms": 16.86,
+          "steadyTokensPerSecond": 67.265,
+          "totalMedianMs": 269.8,
+          "totalP95Ms": 281.23
+        },
+        "owned": {
+          "ttftMedianMs": 214.9,
+          "ttftP95Ms": 219.9,
+          "itlMedianMs": 16.3,
+          "itlP95Ms": 16.4,
+          "warmDecodeTokensPerSecond": 63.358,
+          "totalMedianMs": 246.8,
+          "totalP95Ms": 254.2
+        }
+      },
+      {
+        "id": "arithmetic",
+        "promptTokens": 21,
+        "generatedTokenIds": [236770, 236778],
+        "huggingFace": {
+          "ttftMedianMs": 209.9,
+          "ttftP95Ms": 211.79,
+          "itlMedianMs": 13.5,
+          "itlP95Ms": 15.12,
+          "steadyTokensPerSecond": 72.464,
+          "totalMedianMs": 277,
+          "totalP95Ms": 279.79
+        },
+        "owned": {
+          "ttftMedianMs": 244.9,
+          "ttftP95Ms": 257.1,
+          "itlMedianMs": 13.3,
+          "itlP95Ms": 14.7,
+          "warmDecodeTokensPerSecond": 75,
+          "totalMedianMs": 270.6,
+          "totalP95Ms": 286
+        }
+      },
+      {
+        "id": "arabic",
+        "promptTokens": 18,
+        "generatedTokenIds": [237143, 236910, 70436, 60774, 236888],
+        "huggingFace": {
+          "ttftMedianMs": 214.9,
+          "ttftP95Ms": 218.05,
+          "itlMedianMs": 10.95,
+          "itlP95Ms": 14.09,
+          "steadyTokensPerSecond": 86.58,
+          "totalMedianMs": 313.3,
+          "totalP95Ms": 328.42
+        },
+        "owned": {
+          "ttftMedianMs": 205.7,
+          "ttftP95Ms": 215.3,
+          "itlMedianMs": 12.3,
+          "itlP95Ms": 13.8,
+          "warmDecodeTokensPerSecond": 78.329,
+          "totalMedianMs": 270.4,
+          "totalP95Ms": 279.1
+        }
+      },
+      {
+        "id": "longer-instruction",
+        "promptTokens": 19,
+        "generatedTokenIds": [818, 5905, 7913, 659, 2604, 236764, 7070, 236764, 532, 3730, 236761],
+        "huggingFace": {
+          "ttftMedianMs": 219.7,
+          "ttftP95Ms": 221.86,
+          "itlMedianMs": 10.55,
+          "itlP95Ms": 13.415,
+          "steadyTokensPerSecond": 89.074,
+          "totalMedianMs": 386.4,
+          "totalP95Ms": 392.7,
+          "postLastTokenDrainMedianMs": 51.6
+        },
+        "owned": {
+          "ttftMedianMs": 216.7,
+          "ttftP95Ms": 225,
+          "itlMedianMs": 12.5,
+          "itlP95Ms": 17.9,
+          "warmDecodeTokensPerSecond": 74.358,
+          "totalMedianMs": 361,
+          "totalP95Ms": 370.4
+        },
+        "comparison": {
+          "steadyTokensPerSecondChangePercent": 19.79,
+          "itlMedianChangePercent": -15.6,
+          "itlP95ChangePercent": -25.056,
+          "ttftMedianChangePercent": 1.384,
+          "totalMedianChangePercent": 7.036,
+          "note": "HF's four-token queue improves steady intervals but adds about 52 ms of drain cost after this short EOS response."
+        }
+      },
+      {
+        "id": "prefill-32-boundary",
+        "promptTokens": 32,
+        "generatedTokenIds": [7676],
+        "huggingFace": {
+          "ttftMedianMs": 226.9,
+          "ttftP95Ms": 238.33,
+          "totalMedianMs": 287.9,
+          "totalP95Ms": 303.02
+        },
+        "owned": {
+          "ttftMedianMs": 367.6,
+          "ttftP95Ms": 396.1,
+          "totalMedianMs": 381,
+          "totalP95Ms": 408.3
+        }
+      }
+    ]
+  },
+  "longGenerationBracket": {
+    "prompt": "Write a 1000 word essay about david hilbert",
+    "promptTokens": 22,
+    "maxNewTokens": 1024,
+    "huggingFaceBeforeOwned": {
+      "generatedTokens": 929,
+      "tokenIdsSha256": "3723e533fa16b277bab5361572e4faac48f0012d88a3873f7f614e8c99ed040c",
+      "textSha256": "6a768306aceeab5c1b30294619a5065313f50f964d84fc218a55a6c568787e34",
+      "ttftMs": 218.3,
+      "medianIntervalMs": 12.7,
+      "p95IntervalMs": 14.8,
+      "yieldedTokensPerSecond": 77.873,
+      "endToEndTokensPerSecond": 76.088,
+      "totalMs": 12209.5,
+      "hundredTokenWindowTokensPerSecond": [85.048, 83.647, 80.276, 78.579, 77.525, 76.394, 76.611, 75.409, 71.793, 69.307]
+    },
+    "owned": {
+      "generatedTokens": 971,
+      "textSha256": "640ed07741087a15fb668f706d100374801efacd34e5f6a49b38bfc31dfd9673",
+      "ttftMs": 337.7,
+      "medianIntervalMs": 19,
+      "p95IntervalMs": 24.2,
+      "decodeMedianMs": 18.6,
+      "decodeTokensPerSecond": 53,
+      "endToEndTokensPerSecond": 51.2,
+      "totalMs": 19000
+    },
+    "huggingFaceAfterOwned": {
+      "generatedTokens": 929,
+      "ttftMs": 256,
+      "medianIntervalMs": 19,
+      "p95IntervalMs": 23.8,
+      "yieldedTokensPerSecond": 52.112,
+      "endToEndTokensPerSecond": 51.128,
+      "totalMs": 18170.1,
+      "hundredTokenWindowTokensPerSecond": [57.202, 51.251, 60.968, 52.879, 52.966, 52.977, 52.576, 45.015, 48.631, 45.031]
+    },
+    "outputParity": {
+      "exact": false,
+      "sharedPrefixCharacters": 31,
+      "note": "The two runtimes diverged after the shared heading prefix, so the long bracket is not an exact-output A/B. Canonical cases remained exact."
+    },
+    "interpretation": "HF changed from 77.873 to 52.112 yielded tok/s across the run order. Sustained thermal/order state is larger than the implementation delta, so neither long-run ratio is promoted as a stable speedup claim."
+  },
+  "huggingFaceDecodeProfile": {
+    "promptTokens": 19,
+    "preparedSteps": 316,
+    "dispatchCount": 316,
+    "ownedDispatchCountReference": 283,
+    "unprofiledLongRunAdjacentProfile": {
+      "wallMs": 23.9,
+      "totalGpuMs": 13.369344,
+      "groups": [
+        {"name": "mlp", "dispatches": 70, "totalGpuMs": 5.046272, "percent": 37.745},
+        {"name": "rms_norm", "dispatches": 136, "totalGpuMs": 4.9152, "percent": 36.765},
+        {"name": "other", "dispatches": 56, "totalGpuMs": 2.162688, "percent": 16.176},
+        {"name": "attention", "dispatches": 35, "totalGpuMs": 0.720896, "percent": 5.392},
+        {"name": "qkv", "dispatches": 15, "totalGpuMs": 0.524288, "percent": 3.922}
+      ]
+    },
+    "earlierCompleteEventProfile": {
+      "totalGpuMs": 11.272192,
+      "wallMs": 21.8,
+      "dominantEvents": [
+        {"name": "DecodeGateUpNormPresrq", "count": 35, "totalGpuMs": 3.997696, "percent": 35.474},
+        {"name": "DecodeDownNormAddFused", "count": 35, "totalGpuMs": 2.29376, "percent": 20.349},
+        {"name": "DecodeOprojNorm", "count": 35, "totalGpuMs": 1.114112, "percent": 9.884},
+        {"name": "QatMatMulFastPresrq", "count": 1, "totalGpuMs": 1.048576, "percent": 9.302},
+        {"name": "QatMatMulPresrq", "count": 20, "totalGpuMs": 0.786432, "percent": 6.977},
+        {"name": "DecodeQkvProj", "count": 15, "totalGpuMs": 0.524288, "percent": 4.651},
+        {"name": "DecodePleProjNormCodes", "count": 35, "totalGpuMs": 0.393216, "percent": 3.488},
+        {"name": "Gemma4DecodeAttentionPartial", "count": 35, "totalGpuMs": 0.393216, "percent": 3.488}
+      ],
+      "note": "Timestamp samples are quantized in 0.065536 ms buckets; event-level medians below that resolution are not used for promotion decisions."
+    },
+    "interpretation": "HF uses 33 more dispatches than owned yet has better canonical steady intervals. Dispatch count alone is not the controlling metric. Projection throughput and keeping greedy token flow on GPU are the stronger hypotheses."
+  },
+  "retainedEquivalentOperators": [
+    {
+      "boundary": "QKV projection",
+      "ownedMedianMs": 0.030802,
+      "huggingFaceMedianMs": 0.01769472,
+      "ownedToHuggingFaceRatio": 1.741
+    },
+    {
+      "boundary": "RMS to QKV",
+      "ownedMedianMs": 0.034734,
+      "huggingFaceMedianMs": 0.02097152,
+      "ownedToHuggingFaceRatio": 1.656
+    },
+    {
+      "boundary": "QKV plus K norm and RoPE",
+      "ownedMedianMs": 0.020972,
+      "huggingFaceMedianMs": 0.02228224,
+      "ownedToHuggingFaceRatio": 0.941
+    },
+    {
+      "boundary": "decode attention",
+      "result": "same median timestamp bucket; retained owned run has lower p95"
+    },
+    {
+      "boundary": "layer-0 gate/up projection",
+      "ownedMedianMs": 0.108134,
+      "ownedP95Ms": 0.134349,
+      "huggingFaceMedianMs": 0.1343488,
+      "huggingFaceP95Ms": 0.29589504,
+      "result": "owned wins both median and p95; no alternate justified"
+    },
+    {
+      "boundary": "layer-0 down projection",
+      "ownedMedianMs": 0.155648,
+      "ownedP95Ms": 0.269025,
+      "huggingFaceMedianMs": 0.1835008,
+      "huggingFaceP95Ms": 0.33783808,
+      "result": "owned wins both median and p95; no alternate justified"
+    },
+    {
+      "boundary": "layer-0 O-projection and norm epilogue",
+      "ownedMedianMs": 0.091469,
+      "ownedP95Ms": 0.208608,
+      "huggingFaceMedianMs": 0.0196608,
+      "huggingFaceP95Ms": 0.02146304,
+      "result": "material equivalent gap confirmed; exact row-cooperative alternate did not consistently improve alternating median and p95"
+    },
+    {
+      "boundary": "full-logit LM-head projection",
+      "huggingFaceMedianMs": 1.2107776,
+      "huggingFaceP95Ms": 1.32169728,
+      "ownedRowMajorMedianOfMediansMs": 1.2222464,
+      "ownedRowMajorMedianOfP95sMs": 1.2713984,
+      "ownedBlockMajorMedianOfMediansMs": 1.2009472,
+      "ownedBlockMajorMedianOfP95sMs": 1.2599296,
+      "result": "block-major full-logit alternate promoted"
+    }
+  ],
+  "implementedOptimizations": {
+    "qkvSourceLayout": {
+      "status": "rejected-diagnostic-retained",
+      "quality": "Q, K, and V maximum absolute error 0",
+      "performance": "Five alternating rounds overlapped at 0.02818-0.03211 ms median and p95 did not consistently improve."
+    },
+    "gateUp": {
+      "status": "existing-kernel-retained",
+      "quality": "All nonzero integer codes exact; signed-zero differences tracked separately.",
+      "performance": "Owned improved both equivalent median and p95 versus pinned HF."
+    },
+    "downProjection": {
+      "status": "existing-kernel-retained",
+      "quality": "Hidden output bit-exact.",
+      "performance": "Owned improved both equivalent median and p95 versus pinned HF."
+    },
+    "oProjectionRowCooperative": {
+      "status": "candidate-pending-full-generation-gates",
+      "quality": {
+        "hiddenMaximumAbsoluteError": 0,
+        "ffnInputBitMismatches": 0,
+        "ffnInputSumMaximumAbsoluteError": 0
+      },
+      "initialPerformance": "At 20 dispatches per timestamp sample, eight alternating same-tab runs stayed within timestamp quantization with no consistent median or p95 improvement.",
+      "higherResolutionPerformance": {
+        "dispatchesPerSample": 200,
+        "alternatingRunsPerMode": 4,
+        "subgroupMedianOfMediansMs": 0.0244125,
+        "subgroupMedianOfP95sMs": 0.0294915,
+        "cooperativeMedianOfMediansMs": 0.0231015,
+        "cooperativeMedianOfP95sMs": 0.027034,
+        "medianImprovementPercent": 5.37,
+        "p95ImprovementPercent": 8.33,
+        "pairedRoundsWon": 4
+      },
+      "promotionBlocker": "Full-generation canonical parity and end-to-end alternating A/B require the cache-owning browser storage partition."
+    },
+    "lmHeadBlockMajor": {
+      "status": "promoted",
+      "contract": "Writes all 262144 F32 logits; no argmax fusion or greedy-only handoff.",
+      "geometry": {
+        "previousWorkgroups": 32768,
+        "promotedWorkgroups": 2048,
+        "workgroupSize": 128
+      },
+      "quality": {
+        "deterministicActivationBaselineSha256": "98a7bccfb6ef5bb68c18095180c5aae43a5936d7523e393146828f8e1f1f3b5f",
+        "deterministicActivationCandidateSha256": "5b417828c878b3a298c18be410f9a179280d748e6e1989a399b67f053eb8d21c",
+        "maximumAbsoluteLogitError": 0.000003039836883544922,
+        "baselineArgmaxTokenId": 22053,
+        "candidateArgmaxTokenId": 22053,
+        "exactGenerationCases": [
+          "greedy primary colors",
+          "seeded top-k/top-p/min-p/typical-p sampling with repetition penalty",
+          "regex-constrained sky color"
+        ]
+      },
+      "performance": {
+        "previousMedianOfMediansMs": 1.2222464,
+        "previousMedianOfP95sMs": 1.2713984,
+        "promotedMedianOfMediansMs": 1.2009472,
+        "promotedMedianOfP95sMs": 1.2599296,
+        "medianImprovementPercent": 1.743,
+        "p95ImprovementPercent": 0.902
+      },
+      "memory": {
+        "baselineRetainedGpuBuffers": 1469,
+        "candidateRetainedGpuBuffers": 1469,
+        "baselineRetainedGpuBytes": 832566596,
+        "candidateRetainedGpuBytes": 832566596,
+        "allocationsPerDispatch": 0
+      },
+      "fallback": "row-major-subgroups"
+    },
+    "lmHeadBlockMajorDirectIntegerUnpack": {
+      "status": "rejected",
+      "reason": "Synthetic arithmetic exactness improved, but alternating median/p95 regressed to 1.777664/1.8137088 ms versus 1.204224/1.294336 ms for row-major."
+    }
+  },
+  "originalOptimizationPriorities": [
+    {
+      "rank": 1,
+      "target": "QKV projection workgroup and memory-access strategy",
+      "reason": "Owned QKV is 1.74x slower in the retained equivalent operator benchmark, while the composed K-norm/RoPE and attention boundaries are already at parity. This kernel remains below the full-logit generation contract and does not specialize decoding behavior.",
+      "expectedGain": "About 0.20 ms per token across 15 QKV-owning layers if the measured layer-0 delta generalizes.",
+      "validation": "Port the pinned source geometry as an alternate exact kernel. Require bit-exact Q/K/V and cache writes, exact greedy and seeded-sampling sequences, and improved median and p95 before promotion."
+    },
+    {
+      "rank": 2,
+      "target": "Gate/up and down projection kernel throughput",
+      "reason": "The explicit HF event profile attributes 55.82% of GPU token time to DecodeGateUpNormPresrq plus DecodeDownNormAddFused.",
+      "expectedGain": "Potentially 0.4-1.2 ms per token, but no equivalent-boundary timing exists yet.",
+      "validation": "First add timestamp-query microbenchmarks for the owned and pinned-HF layer-0 boundaries. Only build alternate tiling or workgroup variants if a measured gap exists; preserve accumulation order and require exact tensors, generation sequences, median, and p95."
+    },
+    {
+      "rank": 3,
+      "target": "Full-logit LM-head projection kernel",
+      "reason": "HF's single QatMatMulFastPresrq LM-head projection accounts for 9.30% of profiled GPU time. Optimizing the projection while retaining the complete resident F32 logits benefits greedy, sampling, penalties, and constrained decoding equally.",
+      "expectedGain": "About 0.1-0.3 ms per token if a faster exact projection variant is found.",
+      "validation": "Benchmark the projection independently from token selection. Require exact full logits or the existing accepted numerical bound plus identical greedy and seeded-sampling sequences, and improved median and p95. Do not replace full logits with an argmax-only output."
+    },
+    {
+      "rank": 4,
+      "target": "O-projection and norm epilogue kernel throughput",
+      "reason": "The boundary is already fused and exact, but no equivalent owned-versus-HF timestamp comparison has established that it is slower. More fusion is not justified by dispatch count alone.",
+      "expectedGain": "Unknown until equivalent timing; likely 0.1-0.3 ms per token only if a material kernel gap is measured.",
+      "validation": "Add equivalent timestamp measurements before implementation. Any alternate must preserve hidden, normalized input, reduction sum, signed-zero behavior, median, and p95."
+    }
+  ],
+  "excludedOptimizations": [
+    {
+      "target": "Greedy-only queued execution or speculative cache advancement",
+      "reason": "It narrows the generation contract, complicates cancellation and stop semantics, and does not benefit sampling or tokenizer-aware constraints. The project differentiates itself by optimizing the full generation runtime rather than a greedy-only benchmark path."
+    },
+    {
+      "target": "Argmax-only LM-head fusion or direct argmax-to-embedding handoff",
+      "reason": "It removes full-logit visibility required by temperature sampling, top-k/top-p/min-p/typical-p, penalties, and constrained decoding."
+    },
+    {
+      "target": "Additional attention fusion",
+      "reason": "Owned attention is already at the same median timestamp bucket as the pinned reference and has a better retained p95."
+    }
+  ],
+  "promotionPolicy": {
+    "modelQuality": "No candidate is promoted unless primitive tensors and deterministic generation remain exact, including seeded sampling and constrained outputs where the boundary can affect token selection.",
+    "performance": "No candidate is promoted unless alternating same-device measurements improve both median and p95 without increasing retained memory or per-token allocations.",
+    "fallback": "Every experimental kernel remains a load-time alternate until it passes the complete gate; the current exact implementation remains the production fallback."
+  },
+  "conclusion": {
+    "hundredTokensPerSecondDemonstratedOnThisDevice": false,
+    "bestCleanHundredTokenWindowTokensPerSecond": 85.048,
+    "headroomRemains": true,
+    "note": "The evidence promoted a block-major full-logit LM head while rejecting QKV and O-projection alternates that missed median/p95 gates. All sampling and constraint paths remain available; no greedy-only execution mode or stable 100 tok/s M2 claim is justified."
+  }
+}

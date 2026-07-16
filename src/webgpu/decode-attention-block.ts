@@ -9,7 +9,10 @@ import { createDecodeAttentionShader } from "./decode-attention";
 import { gemmaDecodeAttentionChunkCount } from "./decode-attention-chunks";
 import { createDecodeKNormRopeShader } from "./decode-k-norm-rope";
 import { DecodeKvCache, resolveDecodeKvCacheAllocation } from "./decode-kv-cache";
-import { createDecodeOprojNormShader } from "./decode-oproj-norm";
+import {
+  createDecodeOprojNormShader,
+  type DecodeOprojNormMode,
+} from "./decode-oproj-norm";
 import { createDecodeRmsSrqShader } from "./decode-rms-srq";
 import { createDecodeVRmsShader } from "./decode-v-rms";
 import { getWebGpuDevice } from "./device";
@@ -378,6 +381,7 @@ export async function benchmarkDecodeAttentionBlock(
 export async function compileDecodeAttentionBlockPipelines(
   device: GPUDevice,
   profile: GemmaLayerProfile = "sliding-int4",
+  oprojMode: DecodeOprojNormMode = "subgroup-rows",
 ): Promise<DecodeAttentionBlockPipelines> {
   const fullAttention = profile.startsWith("full");
   const headDim = fullAttention ? 512 : 256;
@@ -398,7 +402,7 @@ export async function compileDecodeAttentionBlockPipelines(
     ),
   });
   const oprojNormModule = device.createShaderModule({
-    code: createDecodeOprojNormShader(qOutFeatures),
+    code: createDecodeOprojNormShader(qOutFeatures, oprojMode),
   });
   const [rms, qkv, kNormRope, vNorm, attention, oprojNorm] = await Promise.all([
     device.createComputePipelineAsync({

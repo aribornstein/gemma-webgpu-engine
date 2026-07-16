@@ -28,6 +28,7 @@ import {
   encodeGemmaLmHeadPass,
   getGemmaLmHeadPipeline,
   type GemmaLmHeadPipeline,
+  type GemmaLmHeadMode,
   type GemmaLmHeadResources,
 } from "./decode-lm-head";
 import {
@@ -38,6 +39,7 @@ import {
   type GemmaDecodeStackResources,
   type GemmaDecodeStackRuntime,
 } from "./decode-stack";
+import type { DecodeOprojNormMode } from "./decode-oproj-norm";
 
 const VOCAB_SIZE = 262144;
 
@@ -71,13 +73,15 @@ export async function loadGemmaDecodeModelResources(
   source: GemmaInputTensorSource,
   fixture: DecodeMlpPleFixture,
   runtime: GemmaDecodeModelRuntime,
+  lmHeadMode: GemmaLmHeadMode = "block-major-columns",
+  oprojMode: DecodeOprojNormMode = "subgroup-rows",
 ): Promise<GemmaDecodeModelResources> {
   const [inputWeights, outputWeights, inputPipeline, lmHeadPipeline, greedyPipelines] =
     await Promise.all([
     loadGemmaInputWeights(source),
     loadGemmaOutputWeights(source),
     getGemmaDecodeInputPipeline(device),
-    getGemmaLmHeadPipeline(device, VOCAB_SIZE),
+    getGemmaLmHeadPipeline(device, VOCAB_SIZE, lmHeadMode),
     getGemmaGreedyPipelines(device, VOCAB_SIZE),
   ]);
   const input = createGemmaDecodeInputResources(device, inputPipeline, inputWeights);
@@ -90,7 +94,7 @@ export async function loadGemmaDecodeModelResources(
       perLayerInputsBuffer: input.perLayerInputs,
       finalInputNorm: outputWeights.finalNorm,
       finalInputScale: outputWeights.inputScale,
-    });
+    }, oprojMode);
     lmHead = createGemmaLmHeadResources(
       device,
       lmHeadPipeline,

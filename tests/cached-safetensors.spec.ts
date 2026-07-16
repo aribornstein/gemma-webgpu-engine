@@ -1,5 +1,219 @@
 import { expect, test } from "@playwright/test";
 
+test("initializes and resumes a safetensors cache from byte ranges", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const databaseName = `initialized-safetensors-${crypto.randomUUID()}`;
+    const sourceKey = "https://example.invalid/model.safetensors";
+    const largeLength = 1024 * 1024 + 1;
+    const header = {
+      first: { dtype: "F32", shape: [1], data_offsets: [0, 4] },
+      second: { dtype: "U8", shape: [3], data_offsets: [4, 7] },
+      large: { dtype: "U8", shape: [largeLength], data_offsets: [7, 7 + largeLength] },
+    };
+    const encoder = new TextEncoder();
+    const encodedHeader = encoder.encode(JSON.stringify(header));
+    const headerLength = Math.ceil(encodedHeader.byteLength / 8) * 8;
+    const dataStart = 8 + headerLength;
+    const file = new Uint8Array(dataStart + 7 + largeLength);
+    new DataView(file.buffer).setBigUint64(0, BigInt(headerLength), true);
+    file.fill(0x20, 8, dataStart);
+    file.set(encodedHeader, 8);
+    file.set([0, 0, 128, 63, 5, 6, 7], dataStart);
+    file[dataStart + 7] = 11;
+    file[file.byteLength - 1] = 12;
+    const spec = {
+      databaseName,
+      sourceKey,
+      fileSize: file.byteLength,
+      dataStart,
+      tensorCount: 3,
+    };
+    let fetchCount = 0;
+    let localAvailable = true;
+    const localUrl = "/models/test/model.safetensors";
+    const signedUrl = "https://cdn.example.invalid/signed-model";
+    const requestedRanges: Array<{ url: string; begin: number; end: number }> = [];
+    const fetchRange = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      fetchCount++;
+      const url = String(input);
+      if (init?.method === "HEAD") {
+        return localAvailable
+          ? new Response(null, {
+              status: 200,
+              headers: {
+                "content-length": String(file.byteLength),
+                "content-type": "application/octet-stream",
+              },
+            })
+          : new Response("<!doctype html>", {
+              status: 200,
+              headers: { "content-type": "text/html" },
+            });
+      }
+      const range = new Headers(init?.headers).get("range")?.match(/^bytes=(\d+)-(\d+)$/);
+      if (!range) return new Response(null, { status: 400 });
+      const begin = Number(range[1]);
+      const end = Number(range[2]);
+      requestedRanges.push({ url, begin, end });
+      const response = new Response(file.slice(begin, end + 1), {
+        status: 206,
+        headers: { "content-range": `bytes ${begin}-${end}/${file.byteLength}` },
+      });
+      if (url === sourceKey) {
+        Object.defineProperty(response, "url", { value: signedUrl });
+      }
+      return response;
+    }) as typeof fetch;
+
+    const initializerPath = "/src/model/safetensors-cache-initializer.ts";
+    const cachePath = "/src/model/cached-safetensors.ts";
+    const { initializeGemmaSafetensorsCache } = await import(initializerPath);
+    const { ReadonlySafetensorsCache } = await import(cachePath);
+    const progress: Array<Record<string, unknown>> = [];
+    await initializeGemmaSafetensorsCache(
+      (event: Record<string, unknown>) => progress.push(event),
+      {
+        fetch: fetchRange,
+        spec,
+        concurrency: 2,
+        localUrl,
+        downloadUrl: sourceKey,
+        maximumStandaloneBlobBytes: 1024 * 1024,
+      },
+    );
+    const firstFetchCount = fetchCount;
+    const firstRangeRequestCount = requestedRanges.length;
+    const cache = await ReadonlySafetensorsCache.open(spec);
+    const first = await cache.readTensor("first");
+    const second = await cache.readTensor("second");
+    const largeEdges = [
+      ...(await cache.readTensorSlice("large", 0, 1)),
+      ...(await cache.readTensorSlice("large", largeLength - 1, 1)),
+    ];
+    cache.close();
+
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.open(databaseName);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const database = request.result;
+        const transaction = database.transaction("chunks", "readwrite");
+        transaction.objectStore("chunks").delete([sourceKey, dataStart + 4, dataStart + 7]);
+        transaction.oncomplete = () => {
+          database.close();
+          resolve();
+        };
+        transaction.onerror = () => reject(transaction.error);
+      };
+    });
+
+    localAvailable = false;
+    const resumedProgress: Array<Record<string, unknown>> = [];
+    await initializeGemmaSafetensorsCache(
+      (event: Record<string, unknown>) => resumedProgress.push(event),
+      {
+        fetch: fetchRange,
+        spec,
+        concurrency: 2,
+        localUrl,
+        downloadUrl: sourceKey,
+        maximumStandaloneBlobBytes: 1024 * 1024,
+      },
+    );
+    const resumedFetchCount = fetchCount - firstFetchCount;
+    const resumedCacheProgress = resumedProgress.find((event) => event.fromCache === true);
+    const request = indexedDB.open(databaseName);
+    const cacheState = await new Promise<{
+      counts: { chunks: number; meta: number };
+      cacheFormat: string;
+      complete: boolean;
+      valueTypes: string[];
+    }>((resolve, reject) => {
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const database = request.result;
+        const transaction = database.transaction(["chunks", "meta"], "readonly");
+        const chunks = transaction.objectStore("chunks").count();
+        const meta = transaction.objectStore("meta").count();
+        const metadata = transaction.objectStore("meta").get(sourceKey);
+        const values = transaction.objectStore("chunks").getAll();
+        transaction.oncomplete = () => {
+          database.close();
+          resolve({
+            counts: { chunks: chunks.result, meta: meta.result },
+            cacheFormat: metadata.result.cacheFormat,
+            complete: metadata.result.complete,
+            valueTypes: values.result.map((value) => value.constructor.name),
+          });
+        };
+        transaction.onerror = () => reject(transaction.error);
+      };
+    });
+    await new Promise<void>((resolve, reject) => {
+      const deleteRequest = indexedDB.deleteDatabase(databaseName);
+      deleteRequest.onsuccess = () => resolve();
+      deleteRequest.onerror = () => reject(deleteRequest.error);
+    });
+    return {
+      first: Array.from(first.bytes),
+      second: Array.from(second.bytes),
+      largeEdges,
+      firstFetchCount,
+      resumedFetchCount,
+      ...cacheState,
+      finalProgress: progress.at(-1),
+      resumedLoaded: resumedCacheProgress?.loaded,
+      resumedTotal: resumedCacheProgress?.total,
+      resumedFromCache: resumedCacheProgress?.fromCache,
+      initialRangeSources: requestedRanges
+        .slice(0, firstRangeRequestCount)
+        .map(({ url }) => url),
+      resumedRangeSources: requestedRanges
+        .slice(firstRangeRequestCount)
+        .map(({ url }) => url),
+      groupedDownloadSizes: [
+        requestedRanges[firstRangeRequestCount - 1]!,
+        requestedRanges.at(-1)!,
+      ].map(({ begin, end }) => end - begin + 1),
+    };
+  });
+
+  expect(result).toEqual({
+    first: [0, 0, 128, 63],
+    second: [5, 6, 7],
+    largeEdges: [11, 12],
+    firstFetchCount: 4,
+    resumedFetchCount: 4,
+    counts: { chunks: 4, meta: 1 },
+    cacheFormat: "gemma-webgpu-engine-v5-segmented-buffer",
+    complete: true,
+    valueTypes: ["Blob", "Blob", "Object", "ArrayBuffer"],
+    finalProgress: {
+      status: "ready",
+      kind: "tensors",
+      fraction: 1,
+      loaded: 3,
+      total: 3,
+    },
+    resumedLoaded: result.resumedLoaded,
+    resumedTotal: result.resumedTotal,
+    resumedFromCache: true,
+    initialRangeSources: [
+      "/models/test/model.safetensors",
+      "/models/test/model.safetensors",
+      "/models/test/model.safetensors",
+    ],
+    resumedRangeSources: [
+      "https://example.invalid/model.safetensors",
+      "https://example.invalid/model.safetensors",
+      "https://example.invalid/model.safetensors",
+    ],
+    groupedDownloadSizes: [1024 * 1024 + 8, 1024 * 1024 + 8],
+  });
+  expect(result.resumedLoaded).toBeLessThan(result.resumedTotal as number);
+});
+
 test("reads pinned safetensors tensors without mutating the existing cache", async ({ page }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {

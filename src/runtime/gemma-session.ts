@@ -4,10 +4,13 @@ import { loadDecodeMlpPleFixture } from "../model/decode-mlp-ple-fixture";
 import {
   loadGemmaTokenInputBatch,
   loadGemmaTokenInputs,
+  type GemmaInputTensorSource,
   type GemmaTokenInputs,
 } from "../model/gemma-input-weights";
 import { createGemmaRotaryBlock, createGemmaRotaryRows } from "../model/gemma-rope";
 import { getWebGpuDevice } from "../webgpu/device";
+import type { GemmaLmHeadMode } from "../webgpu/decode-lm-head";
+import type { DecodeOprojNormMode } from "../webgpu/decode-oproj-norm";
 import {
   uploadGemmaTokenInputBatch,
   uploadGemmaTokenInputs,
@@ -143,12 +146,19 @@ interface MutableGemmaGenerationTiming {
 
 export interface GemmaSessionLoadOptions {
   cacheCapacity?: number;
+  sourceUrl?: string;
+  lmHeadMode?: GemmaLmHeadMode;
+  oprojMode?: DecodeOprojNormMode;
   prefillStrategy?: GemmaPrefillStrategy;
   prefillGateUpMode?: GemmaPrefillGateUpMode;
   prefillRmsEpilogueMode?: GemmaPrefillRmsEpilogueMode;
   prefillQkvSrqMode?: GemmaPrefillQkvSrqMode;
   prefillPleInputMode?: GemmaPrefillPleInputMode;
   prefillMaxInFlightBlocks?: 1 | 2 | 4 | 8;
+}
+
+interface GemmaSessionTensorSource extends GemmaInputTensorSource {
+  close(): void;
 }
 
 export interface GemmaSessionMemoryEstimate {
@@ -180,7 +190,7 @@ export class GemmaGenerationSession {
   private destroyed = false;
   private generating = false;
   private readonly device: GPUDevice;
-  private readonly cache: ReadonlySafetensorsCache;
+  private readonly cache: GemmaSessionTensorSource;
   private readonly tokenizer: GemmaTokenizer;
   private readonly resources: GemmaDecodeModelResources;
   private readonly prefill: GemmaFixedPrefillResources | null;
@@ -195,7 +205,7 @@ export class GemmaGenerationSession {
 
   private constructor(
     device: GPUDevice,
-    cache: ReadonlySafetensorsCache,
+    cache: GemmaSessionTensorSource,
     tokenizer: GemmaTokenizer,
     resources: GemmaDecodeModelResources,
     prefill: GemmaFixedPrefillResources | null,
@@ -253,7 +263,9 @@ export class GemmaGenerationSession {
     }
     const [device, cache, tokenizer, fixture] = await Promise.all([
       getWebGpuDevice(),
-      ReadonlySafetensorsCache.open(),
+      options.sourceUrl
+        ? PinnedSafetensorsSource.open(options.sourceUrl)
+        : ReadonlySafetensorsCache.open(),
       loadGemmaTokenizer(),
       loadDecodeMlpPleFixture(),
     ]);
@@ -271,7 +283,7 @@ export class GemmaGenerationSession {
         cacheCapacity,
         slidingRotary: rotary.sliding,
         fullRotary: rotary.full,
-      });
+      }, options.lmHeadMode, options.oprojMode);
       let prefill: GemmaFixedPrefillResources | null = null;
       try {
         if (prefillStrategy !== "sequential" &&
@@ -900,7 +912,9 @@ export class GemmaGenerationSession {
   }
 
   private getVisionSource(): Promise<PinnedSafetensorsSource> {
-    this.visionSource ??= PinnedSafetensorsSource.open();
+    this.visionSource ??= this.cache instanceof PinnedSafetensorsSource
+      ? Promise.resolve(this.cache)
+      : PinnedSafetensorsSource.open();
     return this.visionSource;
   }
 

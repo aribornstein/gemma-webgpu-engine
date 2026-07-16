@@ -1,5 +1,6 @@
 import { loadDecodeMlpPleFixture } from "../model/decode-mlp-ple-fixture";
 import { getWebGpuDevice } from "./device";
+import { measureGpuDispatches } from "./gpu-timestamp";
 
 const WORKGROUP_SIZE = 256;
 const WORKGROUP_COUNT = 384;
@@ -15,6 +16,10 @@ export interface DecodeDownNormAddResult {
   hiddenBitMismatches: number;
   gpuBufferAllocations: number;
   allocationsPerDispatch: 0;
+  gpuKernelDispatchesPerSample: number | null;
+  gpuKernelSamplesMs: number[] | null;
+  gpuKernelMedianMs: number | null;
+  gpuKernelP95Ms: number | null;
 }
 
 const pipelineCache = new WeakMap<GPUDevice, Promise<GPUComputePipeline>>();
@@ -68,6 +73,18 @@ export async function runDecodeDownNormAdd(): Promise<DecodeDownNormAddResult> {
     const actual = new Float32Array(readback.getMappedRange().slice(0));
     readback.unmap();
     const errors = measureErrors(actual, fixture.expectedHiddenAfterDown);
+    const gpuSamples = await measureGpuDispatches(
+      device,
+      "DecodeDownNormAddFused",
+      20,
+      (pass) => {
+        pass.setPipeline(pipeline);
+        pass.setBindGroup(0, bindGroup);
+        pass.dispatchWorkgroups(WORKGROUP_COUNT);
+      },
+      10,
+      () => device.queue.writeBuffer(hidden, 0, fixture.hiddenBeforeDown),
+    );
     return {
       sourceOperator: "com.xenova.gemma4.DecodeDownNormAddFused",
       sourceVariant: "codes-fixed-subgroup-32",
@@ -76,6 +93,10 @@ export async function runDecodeDownNormAdd(): Promise<DecodeDownNormAddResult> {
       ...errors,
       gpuBufferAllocations: buffers.length,
       allocationsPerDispatch: 0,
+      gpuKernelDispatchesPerSample: gpuSamples ? 20 : null,
+      gpuKernelSamplesMs: gpuSamples?.map(round) ?? null,
+      gpuKernelMedianMs: gpuSamples ? round(percentile(gpuSamples, 0.5)) : null,
+      gpuKernelP95Ms: gpuSamples ? round(percentile(gpuSamples, 0.95)) : null,
     };
   } finally {
     for (const buffer of buffers) buffer.destroy();
@@ -253,4 +274,16 @@ function measureErrors(actual: Float32Array, expected: Float32Array) {
     if (actualBits[index] !== expectedBits[index]) hiddenBitMismatches += 1;
   }
   return { hiddenMaximumAbsoluteError, hiddenMaximumRelativeError, hiddenBitMismatches };
+}
+
+function percentile(sortedValues: number[], quantile: number): number {
+  const index = (sortedValues.length - 1) * quantile;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  return sortedValues[lower] +
+    (sortedValues[upper] - sortedValues[lower]) * (index - lower);
+}
+
+function round(value: number): number {
+  return Math.round(value * 1_000_000) / 1_000_000;
 }

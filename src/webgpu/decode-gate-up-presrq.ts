@@ -1,5 +1,6 @@
 import { loadDecodeMlpPleFixture } from "../model/decode-mlp-ple-fixture";
 import { getWebGpuDevice } from "./device";
+import { measureGpuDispatches } from "./gpu-timestamp";
 
 const WORKGROUP_SIZE = 64;
 const WORKGROUP_COUNT = 768;
@@ -27,6 +28,10 @@ export interface DecodeGateUpPresrqResult {
   gpuBufferAllocations: number;
   bytesAllocated: number;
   allocationsPerDispatch: 0;
+  gpuKernelDispatchesPerSample: number | null;
+  gpuKernelSamplesMs: number[] | null;
+  gpuKernelMedianMs: number | null;
+  gpuKernelP95Ms: number | null;
 }
 
 interface Resources {
@@ -107,6 +112,16 @@ export async function runDecodeGateUpPresrq(): Promise<DecodeGateUpPresrqResult>
         }
       }
     }
+    const gpuSamples = await measureGpuDispatches(
+      device,
+      "DecodeGateUpNormPresrq",
+      20,
+      (pass) => {
+        pass.setPipeline(pipeline);
+        pass.setBindGroup(0, resources.bindGroup);
+        pass.dispatchWorkgroups(WORKGROUP_COUNT);
+      },
+    );
     return {
       sourceOperator: "com.xenova.gemma4.DecodeGateUpNormPresrq",
       sourceVariant: "presrq-codes-fixed-subgroup-32",
@@ -129,6 +144,10 @@ export async function runDecodeGateUpPresrq(): Promise<DecodeGateUpPresrqResult>
       gpuBufferAllocations: resources.buffers.length,
       bytesAllocated: resources.bytesAllocated,
       allocationsPerDispatch: 0,
+      gpuKernelDispatchesPerSample: gpuSamples ? 20 : null,
+      gpuKernelSamplesMs: gpuSamples?.map(round) ?? null,
+      gpuKernelMedianMs: gpuSamples ? round(percentile(gpuSamples, 0.5)) : null,
+      gpuKernelP95Ms: gpuSamples ? round(percentile(gpuSamples, 0.95)) : null,
     };
   } finally {
     for (const buffer of resources.buffers) buffer.destroy();
@@ -340,4 +359,16 @@ function createBuffer(
   usage: GPUBufferUsageFlags,
 ): GPUBuffer {
   return device.createBuffer({ label, size, usage });
+}
+
+function percentile(sortedValues: number[], quantile: number): number {
+  const index = (sortedValues.length - 1) * quantile;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  return sortedValues[lower] +
+    (sortedValues[upper] - sortedValues[lower]) * (index - lower);
+}
+
+function round(value: number): number {
+  return Math.round(value * 1_000_000) / 1_000_000;
 }
