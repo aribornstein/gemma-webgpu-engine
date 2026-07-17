@@ -1,8 +1,9 @@
 import {
+  GemmaVisionWeightCache,
   loadGemmaVisionPatchWeights,
   loadGemmaVisionProjectorWeights,
+  type GemmaVisionTensorSource,
 } from "../model/gemma-vision-weights";
-import { PinnedSafetensorsSource } from "../model/pinned-safetensors";
 import type { GemmaVisionInput } from "../runtime/gemma-vision-input";
 import { runGemmaVisionEncoder, type GemmaVisionEncoderProgress } from "./vision-encoder";
 import {
@@ -27,14 +28,25 @@ export interface GemmaVisionImageResources {
   patchCount: number;
   sourceBytes: number;
   elapsedMilliseconds: number;
+  timing: GemmaVisionImageTiming;
   postprocess: GemmaVisionPostprocessResources;
+}
+
+export interface GemmaVisionImageTiming {
+  weightLoadMilliseconds: number;
+  patchEmbedMilliseconds: number;
+  layerSetupMilliseconds: number;
+  layerExecutionMilliseconds: number;
+  postprocessMilliseconds: number;
 }
 
 export async function encodeGemmaVisionImage(
   device: GPUDevice,
-  source: PinnedSafetensorsSource,
+  source: GemmaVisionTensorSource,
   input: GemmaVisionInput,
   onProgress?: (progress: GemmaVisionEncoderProgress) => void,
+  signal?: AbortSignal,
+  weightCache?: GemmaVisionWeightCache,
 ): Promise<GemmaVisionImageResources> {
   if (input.patchCount !== input.patchRows * input.patchColumns ||
       input.softTokenCount !== input.patchCount / 9 ||
@@ -43,7 +55,13 @@ export async function encodeGemmaVisionImage(
     throw new Error("Gemma vision image input geometry is invalid");
   }
   const started = performance.now();
-  const patchWeights = await loadGemmaVisionPatchWeights(source);
+  throwIfAborted(signal);
+  const patchWeightLoadStarted = performance.now();
+  const patchWeights = await (weightCache
+    ? weightCache.loadPatch(source)
+    : loadGemmaVisionPatchWeights(source));
+  let weightLoadMilliseconds = performance.now() - patchWeightLoadStarted;
+  throwIfAborted(signal);
   const storageUpload = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
   const make = (label: string, size: number, usage = storageUpload) =>
     device.createBuffer({ label, size, usage });
@@ -64,6 +82,7 @@ export async function encodeGemmaVisionImage(
   );
   const uploadBuffers = [patches, positions, projection, positionEmbeddings];
   let postprocess: GemmaVisionPostprocessResources | null = null;
+  let patchEmbedMilliseconds = 0;
   try {
     device.queue.writeBuffer(
       patches,
@@ -77,6 +96,7 @@ export async function encodeGemmaVisionImage(
     );
     device.queue.writeBuffer(projection, 0, patchWeights.projection);
     device.queue.writeBuffer(positionEmbeddings, 0, patchWeights.positions);
+    const patchEmbedStarted = performance.now();
     const patchPipeline = await getGemmaVisionPatchEmbedPipeline(device);
     const patchResources = createGemmaVisionPatchEmbedResources(
       device,
@@ -94,9 +114,11 @@ export async function encodeGemmaVisionImage(
       encodeGemmaVisionPatchEmbed(command, patchPipeline, patchResources, input.patchCount);
       device.queue.submit([command.finish()]);
       await device.queue.onSubmittedWorkDone();
+      throwIfAborted(signal);
     } finally {
       for (const buffer of patchResources.ownedBuffers.toReversed()) buffer.destroy();
     }
+    patchEmbedMilliseconds = performance.now() - patchEmbedStarted;
     for (const buffer of uploadBuffers) buffer.destroy();
     uploadBuffers.length = 0;
     const encoderResult = await runGemmaVisionEncoder(
@@ -106,8 +128,16 @@ export async function encodeGemmaVisionImage(
       input.patchCount,
       input.positions,
       onProgress,
+      signal,
+      weightCache,
     );
-    const projectorWeights = await loadGemmaVisionProjectorWeights(source);
+    const projectorWeightLoadStarted = performance.now();
+    const projectorWeights = await (weightCache
+      ? weightCache.loadProjector(source)
+      : loadGemmaVisionProjectorWeights(source));
+    weightLoadMilliseconds += performance.now() - projectorWeightLoadStarted;
+    throwIfAborted(signal);
+    const postprocessStarted = performance.now();
     postprocess = await createGemmaVisionPostprocessResources(
       device,
       hidden,
@@ -119,6 +149,8 @@ export async function encodeGemmaVisionImage(
     encodeGemmaVisionPostprocess(command, postprocess);
     device.queue.submit([command.finish()]);
     await device.queue.onSubmittedWorkDone();
+    throwIfAborted(signal);
+    const postprocessMilliseconds = performance.now() - postprocessStarted;
     hidden.destroy();
     return {
       output: postprocess.output,
@@ -127,6 +159,14 @@ export async function encodeGemmaVisionImage(
       sourceBytes: patchWeights.sourceBytes + encoderResult.sourceBytes +
         projectorWeights.sourceBytes,
       elapsedMilliseconds: performance.now() - started,
+      timing: {
+        weightLoadMilliseconds: weightLoadMilliseconds +
+          encoderResult.timing.weightLoadMilliseconds,
+        patchEmbedMilliseconds,
+        layerSetupMilliseconds: encoderResult.timing.resourceSetupMilliseconds,
+        layerExecutionMilliseconds: encoderResult.timing.executionMilliseconds,
+        postprocessMilliseconds,
+      },
       postprocess,
     };
   } catch (error) {
@@ -136,6 +176,11 @@ export async function encodeGemmaVisionImage(
   } finally {
     for (const buffer of uploadBuffers) buffer.destroy();
   }
+}
+
+function throwIfAborted(signal?: AbortSignal): void {
+  if (!signal?.aborted) return;
+  throw signal.reason ?? new DOMException("Gemma vision encoding was cancelled", "AbortError");
 }
 
 export function destroyGemmaVisionImageResources(

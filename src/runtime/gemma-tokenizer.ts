@@ -1,5 +1,8 @@
 import { AutoTokenizer, env, type PreTrainedTokenizer } from "@huggingface/transformers";
-import type { GemmaVisionImageSource } from "./gemma-vision-input";
+import type {
+  GemmaVisionImageSource,
+  GemmaVisionTokenBudget,
+} from "./gemma-vision-input";
 
 const TOKENIZER_PATH = "gemma-4-e2b-tokenizer";
 const MODEL_ROOT = `${new URL(import.meta.url).origin}/models/`;
@@ -41,6 +44,7 @@ export interface GemmaFunctionTool {
 export interface GemmaStructuredGenerationInput {
   messages: readonly GemmaChatMessage[];
   images?: readonly GemmaVisionImageSource[];
+  visionTokenBudget?: GemmaVisionTokenBudget;
   tools?: readonly GemmaFunctionTool[];
 }
 

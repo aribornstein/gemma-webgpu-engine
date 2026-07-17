@@ -1,4 +1,8 @@
-import type { GemmaVisionImageSource } from "./gemma-vision-input";
+import {
+  GEMMA_VISION_MAX_SOFT_TOKENS,
+  type GemmaVisionImageSource,
+  type GemmaVisionTokenBudget,
+} from "./gemma-vision-input";
 import type {
   GemmaChatMessage,
   GemmaFunctionTool,
@@ -33,6 +37,7 @@ export function prepareGemmaConversationTurn(
   conversation: GemmaConversation,
   prompt: string,
   image?: GemmaVisionImageSource,
+  visionTokenBudget: GemmaVisionTokenBudget = GEMMA_VISION_MAX_SOFT_TOKENS,
 ): PreparedGemmaConversationTurn {
   const content = prompt.trim();
   if (!content) throw new Error("Gemma conversation prompt must not be empty");
@@ -52,7 +57,7 @@ export function prepareGemmaConversationTurn(
     input: images.length > 0 || tools.length > 0
       ? {
           messages,
-          ...(images.length > 0 ? { images } : {}),
+          ...(images.length > 0 ? { images, visionTokenBudget } : {}),
           ...(tools.length > 0 ? { tools } : {}),
         }
       : messages,

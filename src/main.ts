@@ -39,6 +39,11 @@ import type {
   GemmaChatMessage,
   GemmaFunctionTool,
 } from "./runtime/gemma-tokenizer";
+import {
+  validateGemmaVisionTokenBudget,
+  type GemmaVisionImageSource,
+  type GemmaVisionTokenBudget,
+} from "./runtime/gemma-vision-input";
 import type { GemmaDurableBenchmarkArtifact } from "./runtime/durable-benchmark";
 
 type GemmaCacheInitializationProgress = SafetensorsCacheInitializationProgress;
@@ -67,6 +72,7 @@ interface GenerationExample {
     url: string;
     filename: string;
   };
+  visionTokenBudget?: GemmaVisionTokenBudget;
   constraint?: GenerationConstraint;
   expandProbabilityControls?: boolean;
 }
@@ -125,6 +131,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
       url: "/examples/dolphin_capt_image.png",
       filename: "dolphin_capt_image.png",
     },
+    visionTokenBudget: 280,
   },
   {
     id: "vision-gottingen",
@@ -135,6 +142,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
       url: "/examples/the-mathematics-club-of-gottingen-1902.jpg",
       filename: "the-mathematics-club-of-gottingen-1902.jpg",
     },
+    visionTokenBudget: 280,
   },
   {
     id: "greedy-colors",
@@ -272,6 +280,13 @@ app.innerHTML = `
             <span id="image-name"></span>
             <button id="remove-image" class="quiet-command" type="button">Remove</button>
           </div>
+          <label class="field image-budget">Visual tokens
+            <select id="vision-token-budget" name="visionTokenBudget">
+              <option value="70">Fast · 70</option>
+              <option value="140" selected>Balanced · 140</option>
+              <option value="280">Quality · 280</option>
+            </select>
+          </label>
         </div>
         <p id="prompt-budget" class="prompt-budget" data-valid="true" aria-live="polite">Load the model to calculate context usage</p>
 
@@ -457,6 +472,7 @@ const controlsForm = element<HTMLFormElement>("controls-form");
 const exampleSelect = element<HTMLSelectElement>("generation-example");
 const promptInput = element<HTMLTextAreaElement>("prompt");
 const imageInput = element<HTMLInputElement>("image-input");
+const visionTokenBudgetInput = element<HTMLSelectElement>("vision-token-budget");
 const imagePreview = element<HTMLDivElement>("image-preview");
 const imageThumbnail = element<HTMLImageElement>("image-thumbnail");
 const imageName = element<HTMLSpanElement>("image-name");
@@ -487,7 +503,7 @@ let localModelAvailable = false;
 let controlsValidationTimer: number | null = null;
 let progressPhaseKey = "";
 let progressPhaseFraction = 0;
-let selectedImage: File | null = null;
+let selectedImage: GemmaVisionImageSource | null = null;
 let imagePreviewUrl: string | null = null;
 let benchmarkController: AbortController | null = null;
 let benchmarkArtifact: GemmaDurableBenchmarkArtifact | null = null;
@@ -513,6 +529,7 @@ cancelButton.addEventListener("click", () => {
 });
 resetButton.addEventListener("click", () => {
   controlsForm.reset();
+  visionTokenBudgetInput.value = "140";
   exampleSelect.value = "";
   renderConstraintFields();
   validateControls();
@@ -534,6 +551,10 @@ imageInput.addEventListener("change", () => {
     return;
   }
   selectImage(file, true);
+});
+visionTokenBudgetInput.addEventListener("change", () => {
+  exampleSelect.value = "";
+  validateControls();
 });
 removeImageButton.addEventListener("click", clearSelectedImage);
 benchmarkRunButton.addEventListener("click", () => void runBoundaryBenchmark());
@@ -798,7 +819,12 @@ async function generate(): Promise<void> {
   let turn: PreparedGemmaConversationTurn;
   try {
     options = readGenerationOptions();
-    turn = prepareGemmaConversationTurn(conversation, prompt, selectedImage ?? undefined);
+    turn = prepareGemmaConversationTurn(
+      conversation,
+      prompt,
+      selectedImage ?? undefined,
+      readVisionTokenBudget(),
+    );
     renderPromptBudget(options.maxNewTokens ?? DEFAULT_GENERATION_CONFIG.maxNewTokens);
     renderValidConfiguration(options);
   } catch (error) {
@@ -915,6 +941,7 @@ function applyGenerationExample(example: GenerationExample): void {
   renderConversation();
   newChatButton.disabled = !hasConversationState();
   promptInput.value = example.prompt;
+  visionTokenBudgetInput.value = String(example.visionTokenBudget ?? 140);
   for (const [name, value] of Object.entries(example.controls)) {
     setControlValue(name, value);
   }
@@ -945,17 +972,9 @@ async function selectGenerationExample(example: GenerationExample): Promise<void
   applyGenerationExample(example);
   if (!example.image) return;
   try {
-    const response = await fetch(example.image.url);
-    if (!response.ok) {
-      throw new Error(`Image request failed with HTTP ${response.status}`);
-    }
-    const contentType = response.headers.get("content-type") ?? "";
-    if (!contentType.startsWith("image/")) {
-      throw new Error(`Image request returned ${contentType || "an unknown content type"}`);
-    }
-    const blob = await response.blob();
+    const image = await loadExampleImage(example.image.url);
     if (exampleSelect.value !== example.id) return;
-    selectImage(new File([blob], example.image.filename, { type: blob.type }), false);
+    selectImage(image, false, example.image.url, example.image.filename);
   } catch (error) {
     if (exampleSelect.value !== example.id) return;
     exampleSelect.value = "";
@@ -964,6 +983,19 @@ async function selectGenerationExample(example: GenerationExample): Promise<void
     configStatus.dataset.valid = "false";
     generateButton.disabled = true;
   }
+}
+
+async function loadExampleImage(url: string): Promise<ImageData> {
+  const image = new Image();
+  image.src = url;
+  await image.decode();
+  const canvas = document.createElement("canvas");
+  canvas.width = image.naturalWidth;
+  canvas.height = image.naturalHeight;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("Could not decode example image");
+  context.drawImage(image, 0, 0);
+  return context.getImageData(0, 0, canvas.width, canvas.height);
 }
 
 function setControlValue(name: string, value: string | number): void {
@@ -1021,7 +1053,12 @@ function renderPromptBudget(maxNewTokens: number): void {
     promptBudget.dataset.valid = "true";
     return;
   }
-  const turn = prepareGemmaConversationTurn(conversation, prompt, selectedImage ?? undefined);
+  const turn = prepareGemmaConversationTurn(
+    conversation,
+    prompt,
+    selectedImage ?? undefined,
+    readVisionTokenBudget(),
+  );
   const promptTokens = session.promptTokenCount(turn.input);
   const availableOutput = availableGemmaOutputTokens(promptTokens, session.cacheCapacity);
   const requestedPositions = promptTokens + maxNewTokens - 1;
@@ -1032,6 +1069,12 @@ function renderPromptBudget(maxNewTokens: number): void {
       `Output exceeds context capacity; this prompt allows at most ${availableOutput.toLocaleString()} ${availableOutput === 1 ? "token" : "tokens"}`,
     );
   }
+}
+
+function readVisionTokenBudget(): GemmaVisionTokenBudget {
+  const tokenBudget = Number(visionTokenBudgetInput.value);
+  validateGemmaVisionTokenBudget(tokenBudget);
+  return tokenBudget;
 }
 
 function renderValidConfiguration(options: GemmaGenerationOptions): void {
@@ -1083,7 +1126,14 @@ function renderTelemetry(
     : "-";
   element<HTMLElement>("metric-vision").title = timing.visionEncodeMs > 0 ||
       timing.visionPreprocessMs > 0
-    ? `Preprocess ${formatMilliseconds(timing.visionPreprocessMs)} · encode ${formatMilliseconds(timing.visionEncodeMs)}`
+    ? [
+        `Preprocess ${formatMilliseconds(timing.visionPreprocessMs)}`,
+        `weights ${formatMilliseconds(timing.visionWeightLoadMs)}`,
+        `patch ${formatMilliseconds(timing.visionPatchEmbedMs)}`,
+        `layer setup ${formatMilliseconds(timing.visionLayerSetupMs)}`,
+        `layer execute ${formatMilliseconds(timing.visionLayerExecutionMs)}`,
+        `postprocess ${formatMilliseconds(timing.visionPostprocessMs)}`,
+      ].join(" · ")
     : "";
   element<HTMLElement>("metric-prefill").textContent = timing.prefillMode;
   element<HTMLElement>("metric-stop").textContent = stopReason;
@@ -1197,12 +1247,17 @@ function hasConversationState(): boolean {
     conversation.tools.length > 0;
 }
 
-function selectImage(file: File, clearExample: boolean): void {
-  selectedImage = file;
+function selectImage(
+  image: GemmaVisionImageSource,
+  clearExample: boolean,
+  previewUrl?: string,
+  filename?: string,
+): void {
+  selectedImage = image;
   if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
-  imagePreviewUrl = URL.createObjectURL(file);
-  imageThumbnail.src = imagePreviewUrl;
-  imageName.textContent = file.name;
+  imagePreviewUrl = previewUrl || !(image instanceof Blob) ? null : URL.createObjectURL(image);
+  imageThumbnail.src = previewUrl ?? imagePreviewUrl!;
+  imageName.textContent = filename ?? (image instanceof File ? image.name : "Image");
   imagePreview.hidden = false;
   if (clearExample) exampleSelect.value = "";
   validateControls();

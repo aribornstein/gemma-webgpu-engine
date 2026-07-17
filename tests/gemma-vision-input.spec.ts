@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import {
   GEMMA_VISION_MAX_PATCHES,
   GEMMA_VISION_PATCH_DIMENSION,
+  GEMMA_VISION_PATCH_SIZE,
   gemmaVisionTargetSize,
   patchifyGemmaVisionRgb,
 } from "../src/runtime/gemma-vision-input";
@@ -11,6 +12,26 @@ test("matches Gemma 4 aspect-ratio preserving image geometry", () => {
   expect(gemmaVisionTargetSize(600, 1200)).toEqual([528, 1104]);
   expect(gemmaVisionTargetSize(1200, 600)).toEqual([1104, 528]);
   expect(gemmaVisionTargetSize(1, 1000)).toEqual([48, 13_440]);
+});
+
+test("scales image geometry to supported visual-token budgets", () => {
+  for (const budget of [70, 140, 280] as const) {
+    const [height, width] = gemmaVisionTargetSize(369, 700, budget);
+    const patchRows = height / GEMMA_VISION_PATCH_SIZE;
+    const patchColumns = width / GEMMA_VISION_PATCH_SIZE;
+    expect(patchRows % 3).toBe(0);
+    expect(patchColumns % 3).toBe(0);
+    expect(patchRows * patchColumns).toBeLessThanOrEqual(budget * 9);
+  }
+  expect(gemmaVisionTargetSize(369, 700, 70)).toEqual([288, 528]);
+  expect(gemmaVisionTargetSize(369, 700, 140)).toEqual([384, 768]);
+  expect(gemmaVisionTargetSize(369, 700, 280)).toEqual([576, 1104]);
+});
+
+test("rejects unsupported visual-token budgets", () => {
+  expect(() => gemmaVisionTargetSize(369, 700, 1120 as 280)).toThrow(
+    "Gemma vision token budget must be one of 70, 140, 280",
+  );
 });
 
 test("patchifies HWC RGB pixels and pads positions exactly", () => {

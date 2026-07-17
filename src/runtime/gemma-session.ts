@@ -1,5 +1,6 @@
 import { ReadonlySafetensorsCache } from "../model/cached-safetensors";
 import { PinnedSafetensorsSource } from "../model/pinned-safetensors";
+import { GemmaVisionWeightCache } from "../model/gemma-vision-weights";
 import { loadDecodeMlpPleFixture } from "../model/decode-mlp-ple-fixture";
 import {
   loadGemmaTokenInputBatch,
@@ -65,7 +66,9 @@ import {
   type GemmaTokenizer,
 } from "./gemma-tokenizer";
 import {
+  GEMMA_VISION_MAX_SOFT_TOKENS,
   prepareGemmaVisionImage,
+  validateGemmaVisionTokenBudget,
   type GemmaVisionInput,
 } from "./gemma-vision-input";
 import { sampleToken, SeededRandom } from "./sampling";
@@ -108,6 +111,11 @@ export interface GemmaGenerationTiming {
   requestSetupMs: number;
   visionPreprocessMs: number;
   visionEncodeMs: number;
+  visionWeightLoadMs: number;
+  visionPatchEmbedMs: number;
+  visionLayerSetupMs: number;
+  visionLayerExecutionMs: number;
+  visionPostprocessMs: number;
   cacheResetMs: number;
   promptTokensReused: number;
   prefillMs: number;
@@ -136,6 +144,11 @@ interface MutableGemmaGenerationTiming {
   requestSetupMs: number;
   visionPreprocessMs: number;
   visionEncodeMs: number;
+  visionWeightLoadMs: number;
+  visionPatchEmbedMs: number;
+  visionLayerSetupMs: number;
+  visionLayerExecutionMs: number;
+  visionPostprocessMs: number;
   cacheResetMs: number;
   promptTokensReused: number;
   prefillMs: number;
@@ -204,8 +217,8 @@ export class GemmaGenerationSession {
   private readonly prefillMaxInFlightBlocks: 1 | 2 | 4 | 8;
   private readonly logitsReadback: GPUBuffer;
   private readonly tokenInputCache = new Map<number, GemmaTokenInputs>();
+  private readonly visionWeightCache = new GemmaVisionWeightCache();
   private tokenByteTrie: TokenByteTrie | null = null;
-  private visionSource: Promise<PinnedSafetensorsSource> | null = null;
   private activeTiming: MutableGemmaGenerationTiming | null = null;
   readonly cacheCapacity: number;
 
@@ -395,7 +408,7 @@ export class GemmaGenerationSession {
         const visionEncodeStartedAt = performance.now();
         const encoded = await encodeGemmaVisionImage(
           this.device,
-          await this.getVisionSource(),
+          this.cache,
           preparedPrompt.visionInputs[imageIndex],
           (progress) => {
             throwIfGemmaGenerationAborted(signal);
@@ -407,9 +420,16 @@ export class GemmaGenerationSession {
               totalLayers: GEMMA_VISION_LAYER_COUNT,
             });
           },
+          signal,
+          this.visionWeightCache,
         );
         if (this.activeTiming) {
           this.activeTiming.visionEncodeMs += performance.now() - visionEncodeStartedAt;
+          this.activeTiming.visionWeightLoadMs += encoded.timing.weightLoadMilliseconds;
+          this.activeTiming.visionPatchEmbedMs += encoded.timing.patchEmbedMilliseconds;
+          this.activeTiming.visionLayerSetupMs += encoded.timing.layerSetupMilliseconds;
+          this.activeTiming.visionLayerExecutionMs += encoded.timing.layerExecutionMilliseconds;
+          this.activeTiming.visionPostprocessMs += encoded.timing.postprocessMilliseconds;
         }
         throwIfGemmaGenerationAborted(signal);
         visionResources.push(encoded);
@@ -625,7 +645,9 @@ export class GemmaGenerationSession {
     if (markerCount !== input.images.length) {
       throw new Error("Gemma image parts and image sources must have equal counts");
     }
-    return tokenIds.length - markerCount + markerCount * 280;
+    const visionTokenBudget = input.visionTokenBudget ?? GEMMA_VISION_MAX_SOFT_TOKENS;
+    validateGemmaVisionTokenBudget(visionTokenBudget);
+    return tokenIds.length - markerCount + markerCount * visionTokenBudget;
   }
 
   async generateMeasured(
@@ -638,6 +660,11 @@ export class GemmaGenerationSession {
       requestSetupMs: 0,
       visionPreprocessMs: 0,
       visionEncodeMs: 0,
+      visionWeightLoadMs: 0,
+      visionPatchEmbedMs: 0,
+      visionLayerSetupMs: 0,
+      visionLayerExecutionMs: 0,
+      visionPostprocessMs: 0,
       cacheResetMs: 0,
       promptTokensReused: 0,
       prefillMs: 0,
@@ -662,6 +689,11 @@ export class GemmaGenerationSession {
           requestSetupMs: timing.requestSetupMs,
           visionPreprocessMs: timing.visionPreprocessMs,
           visionEncodeMs: timing.visionEncodeMs,
+          visionWeightLoadMs: timing.visionWeightLoadMs,
+          visionPatchEmbedMs: timing.visionPatchEmbedMs,
+          visionLayerSetupMs: timing.visionLayerSetupMs,
+          visionLayerExecutionMs: timing.visionLayerExecutionMs,
+          visionPostprocessMs: timing.visionPostprocessMs,
           cacheResetMs: timing.cacheResetMs,
           promptTokensReused: timing.promptTokensReused,
           prefillMs: timing.prefillMs,
@@ -718,6 +750,7 @@ export class GemmaGenerationSession {
     this.logitsReadback.destroy();
     destroyGemmaDecodeModelResources(this.resources);
     this.tokenInputCache.clear();
+    this.visionWeightCache.clear();
     this.cache.close();
   }
 
@@ -885,6 +918,8 @@ export class GemmaGenerationSession {
       };
     }
     const visionInputs: GemmaVisionInput[] = [];
+    const visionTokenBudget = input.visionTokenBudget ?? GEMMA_VISION_MAX_SOFT_TOKENS;
+    validateGemmaVisionTokenBudget(visionTokenBudget);
     let visionPreprocessMs = 0;
     for (let imageIndex = 0; imageIndex < input.images.length; imageIndex += 1) {
       throwIfGemmaGenerationAborted(signal);
@@ -896,7 +931,11 @@ export class GemmaGenerationSession {
         totalLayers: GEMMA_VISION_LAYER_COUNT,
       });
       const visionPreprocessStartedAt = performance.now();
-      visionInputs.push(await prepareGemmaVisionImage(input.images[imageIndex], signal));
+      visionInputs.push(await prepareGemmaVisionImage(
+        input.images[imageIndex],
+        signal,
+        visionTokenBudget,
+      ));
       visionPreprocessMs += performance.now() - visionPreprocessStartedAt;
       throwIfGemmaGenerationAborted(signal);
     }
@@ -919,13 +958,6 @@ export class GemmaGenerationSession {
       tokenIds.push(...new Array<number>(visionInput.softTokenCount).fill(tokenId));
     }
     return { tokenIds, visionInputs, visionStarts, visionPreprocessMs };
-  }
-
-  private getVisionSource(): Promise<PinnedSafetensorsSource> {
-    this.visionSource ??= this.cache instanceof PinnedSafetensorsSource
-      ? Promise.resolve(this.cache)
-      : PinnedSafetensorsSource.open();
-    return this.visionSource;
   }
 
   private getTokenByteTrie(): TokenByteTrie {

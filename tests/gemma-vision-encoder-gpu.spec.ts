@@ -78,3 +78,57 @@ test("executes all 16 real Gemma vision encoder layers", async ({ page }) => {
   expect(result.changed).toBeGreaterThan(700);
   expect(result.elapsedMilliseconds).toBeGreaterThan(0);
 });
+
+test("rejects cancelled vision encoding before loading a layer", async ({ page }) => {
+  await page.goto("/");
+  const webGpuAvailable = await page.evaluate(() => Boolean(navigator.gpu));
+  test.skip(!webGpuAvailable, "Chrome does not expose WebGPU on this machine");
+
+  const result = await page.evaluate(async () => {
+    const devicePath = "/src/webgpu/device.ts";
+    const encoderPath = "/src/webgpu/vision-encoder.ts";
+    const [{ getWebGpuDevice }, vision] = await Promise.all([
+      import(devicePath),
+      import(encoderPath),
+    ]);
+    const device = await getWebGpuDevice();
+    const hidden = device.createBuffer({
+      size: 768 * 4,
+      usage: GPUBufferUsage.STORAGE,
+    });
+    let tensorReads = 0;
+    const source = {
+      descriptors: new Map(),
+      async readTensors() {
+        tensorReads += 1;
+        return new Map();
+      },
+    };
+    const controller = new AbortController();
+    controller.abort(new DOMException("vision cancelled", "AbortError"));
+    try {
+      await vision.runGemmaVisionEncoder(
+        device,
+        source,
+        hidden,
+        1,
+        new Int32Array([0, 0]),
+        undefined,
+        controller.signal,
+      );
+      return { error: null, tensorReads };
+    } catch (error) {
+      return {
+        error: { name: (error as Error).name, message: (error as Error).message },
+        tensorReads,
+      };
+    } finally {
+      hidden.destroy();
+    }
+  });
+
+  expect(result).toEqual({
+    error: { name: "AbortError", message: "vision cancelled" },
+    tensorReads: 0,
+  });
+});

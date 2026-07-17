@@ -397,6 +397,10 @@ textarea {
   display: none;
 }
 
+.image-budget {
+  flex: 0 0 146px;
+}
+
 .image-preview img {
   width: 42px;
   height: 42px;
@@ -795,6 +799,10 @@ textarea {
   .image-input-row {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .image-budget {
+    flex-basis: auto;
   }
 
   .request-status {

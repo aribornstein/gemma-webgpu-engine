@@ -2,7 +2,7 @@
 
 An inspectable WebGPU inference runtime for the Gemma 4 E2B QAT mobile backbone, built for low-latency browser generation and complete decoding control. It executes the mobile/QAT checkpoint through owned browser-native WebGPU kernels rather than a TFLite wrapper.
 
-The engine optimizes the complete generation runtime, not a greedy-only benchmark path. Its full-logit execution supports seeded sampling, probability and penalty controls, tokenizer-aware constraints, streaming, cancellation, and profiling over the same owned transformer kernels. That is the key product distinction from the pinned Hugging Face comparison runtime, whose public generation API is greedy-only. Kernel candidates are promoted only when they preserve this contract, retain exact deterministic output, and improve both median and p95 latency.
+The engine optimizes the complete generation runtime, not a greedy-only benchmark path. Its full-logit execution supports seeded sampling, probability and penalty controls, tokenizer-aware constraints, streaming, cancellation, and profiling over the same owned transformer kernels. That is the key product distinction from the pinned [Hugging Face comparison runtime](https://huggingface.co/spaces/webml-community/gemma-4-webgpu-kernels) from Xenova, whose kernel throughput is slightly higher but public generation API is greedy-only. Kernel candidates are promoted only when they preserve this contract, retain exact deterministic output, and improve both median and p95 latency.
 
 See [PROJECT.md](PROJECT.md) for architecture, correctness gates, model provenance, and the kernel roadmap.
 
@@ -158,14 +158,41 @@ tower on WebGPU, pools and projects its output to 1,536-wide language soft token
 GPU-resident rows into language prefill. Vision transformer layers are loaded and released one at a
 time to bound memory. No ONNX session or CPU transformer fallback is used.
 
+Set `visionTokenBudget` on structured input to control preprocessing cost. Supported E2B tiers are
+`70`, `140`, and `280`; the API defaults to `280` for compatibility. Aspect-ratio rounding may
+produce fewer tokens than the selected ceiling, and every output geometry remains aligned to the
+vision tower's 16-pixel patches and 3x3 pooling grid.
+
+```ts
+const result = await session.generate({
+	messages: [{
+		role: "user",
+		content: [{ type: "image" }, { type: "text", text: "Describe this image." }],
+	}],
+	images: [image],
+	visionTokenBudget: 140,
+}, { maxNewTokens: 64 });
+```
+
+The console labels these tiers Fast, Balanced, and Quality. On the 700x369 dolphin example with
+warm materialized weights, measured TTFT/vision/total latency was `2.1/1.1/4.0 s` at 70,
+`4.0/2.3/5.7 s` at 140, and `8.4/5.5/10.7 s` at 280. Use 70 for classification and coarse
+description, 140 for general image understanding, and 280 for small text or faithful OCR. In this
+sample, 140 retained the credit line with minor transcription errors; only 280 reproduced the full
+caption accurately.
+
 The operator, complete-layer, 16-layer tower, postprocess, tokenizer, browser preprocessing,
 abort-boundary, and maximum-2,520-patch tests pass. The answer-free dolphin example completed
 same-origin image encoding, chunked language prefill, and decode, accurately transcribing its
-visible caption and credit line without prompt leakage. The request spent 103.6 seconds in vision
-out of 110.9 seconds total. The console reports vision progress and preprocessing/encoding timing;
-live mid-tower cancellation, repeated-request resource stability, maximum-geometry full generation,
-and finer stage timing remain open. Multimodal requests reset prefix caches, while text-only
-requests may reuse a retained common prefix.
+visible caption and credit line without prompt leakage. Vision now reads through the session's
+readonly IndexedDB source instead of issuing hundreds of separate HTTP ranges, and verified
+materialized vision weights are reused for the session lifetime. The same 2,484-patch request fell
+from 103.6 to 11.7 seconds of vision work on the first optimized run; a warm request completed in
+5.6 seconds with 0.1 ms of weight loading. Exact 2,520-patch full generation completed in 5.8
+seconds of vision work and 8.4 seconds total. Live mid-tower cancellation and same-session recovery
+pass. Console telemetry separates preprocessing, weights, patch embedding, layer setup/execution,
+and postprocessing. GPU layer execution and longer repeated-request resource stress remain open.
+Multimodal requests reset prefix caches, while text-only requests may reuse a retained common prefix.
 
 ## Context capacity
 
@@ -188,11 +215,12 @@ recovery passed at 1,024 rows. The normal console remains at the practical certi
 
 ## Roadmap
 
-Work proceeds in this order: harden repeated/cancelled/maximum-geometry vision and optimize its
-measured 103.6-second path;
-expose role-preserving multi-turn chat and define multimodal reuse; implement the pinned audio
-path; implement deterministic video frame ingestion; optimize prefill and constrained decoding;
-then harden device-loss recovery and the release browser matrix. See
+Work proceeds in this order: optimize the remaining measured vision-layer execution and complete
+long-run resource stress;
+expose role-preserving multi-turn chat and define multimodal reuse; add canonical reasoning-mode
+configuration, response parsing, and history ownership; implement the pinned audio path; implement
+deterministic video frame ingestion; optimize prefill and constrained decoding; then harden
+device-loss recovery and the release browser matrix. See
 [PROJECT.md](PROJECT.md#execution-plan) for gates and details.
 
 The owned and pinned runtimes now match prompt IDs, every generated ID, EOS behavior, and final
@@ -277,7 +305,7 @@ parameter arenas, packed per-layer token-parameter updates, shared rotary buffer
 profiles, and profile-specialized decode-attention cache addressing. These
 changes preserve exact greedy/sampling/constraint parity while reducing avoidable host-side overhead.
 
-The same-device Hugging Face gap analysis deliberately excludes greedy-only queued execution and
+The same-device Hugging Face Xenova gap analysis deliberately excludes greedy-only queued execution and
 argmax-only LM-head handoff from the roadmap. The measured full-contract candidates are exact QKV
 projection geometry first, followed by evidence-gated gate/up, down, full-logit LM-head, and
 O-projection variants. Attention already occupies the same median timestamp bucket as the pinned
@@ -356,7 +384,7 @@ type GenerationConstraint =
 		};
 ```
 
-JSON Schema is the preferred contract for Buza decision payloads. Regex constraints target regular output formats and deliberately reject assertions and backreferences. Nested JSON uses a bounded grammar rather than pretending an unbounded JSON language is regular. The supported schema subset includes `type`, `const`, `enum`, `oneOf`, `anyOf`, closed objects whose declared properties are all required, and bounded homogeneous arrays. Unknown keywords, references, optional/open object properties, and other unsupported constructs fail configuration explicitly.
+JSON Schema is the preferred contract for decision payloads. Regex constraints target regular output formats and deliberately reject assertions and backreferences. Nested JSON uses a bounded grammar rather than pretending an unbounded JSON language is regular. The supported schema subset includes `type`, `const`, `enum`, `oneOf`, `anyOf`, closed objects whose declared properties are all required, and bounded homogeneous arrays. Unknown keywords, references, optional/open object properties, and other unsupported constructs fail configuration explicitly.
 
 Constraints operate on the exact tokenizer's UTF-8 token bytes, including partial multi-byte characters across token boundaries. A token trie and minimized DFA determine legal token IDs for each state. The current correctness-first path masks the resident CPU logits before top-k/min-p/typical-p/top-p filtering and sampling; GPU candidate masking remains a performance milestone. EOS and configured stop tokens are legal only in an accepting state, dead ends are explicit errors, and regex, JSON, and AJV schema checks validate final output independently.
 

@@ -21,6 +21,7 @@ test("offers a direct model download when the cache is absent", async ({ page })
   await expect(page.getByRole("button", { name: "Run exact-fit" })).toBeDisabled();
   await expect(page.getByLabel("Capacity")).toHaveValue("32768");
   await expect(page.getByRole("spinbutton", { name: "Max tokens" })).toHaveAttribute("max", "32768");
+  await expect(page.getByLabel("Visual tokens")).toHaveValue("140");
   await expect(page.getByText("32,768 validated / 131,072 model positions", { exact: true }))
     .toBeVisible();
 });
@@ -175,6 +176,7 @@ test("keeps the vision example grounded in the selected image", async ({ page })
   expect(captionPrompt).not.toMatch(/spinner|stenella|kona|hawaii|brian skerry/i);
   await expect(page.getByRole("img", { name: "Selected image preview" })).toBeVisible();
   await expect(page.getByText("dolphin_capt_image.png", { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Visual tokens")).toHaveValue("280");
 
   await page.getByLabel("Example").selectOption("vision-gottingen");
   const prompt = await page.getByRole("textbox", { name: "Message" }).inputValue();

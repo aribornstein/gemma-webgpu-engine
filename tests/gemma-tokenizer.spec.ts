@@ -126,6 +126,26 @@ test("commits completed turns without mutating in-flight conversation history", 
   ]);
 });
 
+test("retains the selected visual-token budget in multimodal turns", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-conversation.ts";
+    const { createGemmaConversation, prepareGemmaConversationTurn } = await import(modulePath);
+    const image = new ImageData(48, 48);
+    return prepareGemmaConversationTurn(
+      createGemmaConversation(),
+      "Describe this image.",
+      image,
+      70,
+    ).input;
+  });
+
+  expect(result).toMatchObject({
+    visionTokenBudget: 70,
+    images: [{}],
+  });
+});
+
 test("renders function declarations through the canonical tool system block", async ({ page }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {

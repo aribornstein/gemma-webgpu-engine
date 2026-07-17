@@ -4,7 +4,7 @@ import {
   float32LittleEndian,
   packedUint32,
 } from "./gemma-layer-materializer";
-import { PinnedSafetensorsSource } from "./pinned-safetensors";
+import type { GemmaLayerTensorSource } from "./gemma-layer-weights";
 
 export const GEMMA_VISION_PATCH_WEIGHT =
   "model.vision_tower.patch_embedder.input_proj.weight";
@@ -55,8 +55,53 @@ export interface GemmaVisionProjectorWeights {
   sourceBytes: number;
 }
 
+export type GemmaVisionTensorSource = GemmaLayerTensorSource;
+
+export class GemmaVisionWeightCache {
+  private patch: Promise<GemmaVisionPatchWeights> | null = null;
+  private readonly layers = new Map<number, Promise<GemmaVisionLayerWeights>>();
+  private projector: Promise<GemmaVisionProjectorWeights> | null = null;
+
+  loadPatch(source: GemmaVisionTensorSource): Promise<GemmaVisionPatchWeights> {
+    this.patch ??= loadGemmaVisionPatchWeights(source).catch((error) => {
+      this.patch = null;
+      throw error;
+    });
+    return this.patch;
+  }
+
+  loadLayer(
+    source: GemmaVisionTensorSource,
+    layerIndex: number,
+  ): Promise<GemmaVisionLayerWeights> {
+    let pending = this.layers.get(layerIndex);
+    if (!pending) {
+      pending = loadGemmaVisionLayerWeights(source, layerIndex).catch((error) => {
+        this.layers.delete(layerIndex);
+        throw error;
+      });
+      this.layers.set(layerIndex, pending);
+    }
+    return pending;
+  }
+
+  loadProjector(source: GemmaVisionTensorSource): Promise<GemmaVisionProjectorWeights> {
+    this.projector ??= loadGemmaVisionProjectorWeights(source).catch((error) => {
+      this.projector = null;
+      throw error;
+    });
+    return this.projector;
+  }
+
+  clear(): void {
+    this.patch = null;
+    this.layers.clear();
+    this.projector = null;
+  }
+}
+
 export async function loadGemmaVisionPatchWeights(
-  source: PinnedSafetensorsSource,
+  source: GemmaVisionTensorSource,
 ): Promise<GemmaVisionPatchWeights> {
   validateDescriptor(source, GEMMA_VISION_PATCH_WEIGHT, "BF16", [768, 768]);
   validateDescriptor(source, GEMMA_VISION_POSITION_WEIGHT, "BF16", [2, 10_240, 768]);
@@ -74,7 +119,7 @@ export async function loadGemmaVisionPatchWeights(
 }
 
 export async function loadGemmaVisionProjectionWeights(
-  source: PinnedSafetensorsSource,
+  source: GemmaVisionTensorSource,
   prefix: string,
   outFeatures: number,
   inFeatures: number,
@@ -111,7 +156,7 @@ export async function loadGemmaVisionProjectionWeights(
 }
 
 export async function loadGemmaVisionLayerNormWeights(
-  source: PinnedSafetensorsSource,
+  source: GemmaVisionTensorSource,
   layerIndex: number,
 ): Promise<GemmaVisionLayerNormWeights> {
   if (!Number.isInteger(layerIndex) || layerIndex < 0 || layerIndex >= 16) {
@@ -153,7 +198,7 @@ export async function loadGemmaVisionLayerNormWeights(
 }
 
 export async function loadGemmaVisionLayerWeights(
-  source: PinnedSafetensorsSource,
+  source: GemmaVisionTensorSource,
   layerIndex: number,
 ): Promise<GemmaVisionLayerWeights> {
   const prefix = `model.vision_tower.encoder.layers.${layerIndex}`;
@@ -187,7 +232,7 @@ export async function loadGemmaVisionLayerWeights(
 }
 
 export async function loadGemmaVisionProjectorWeights(
-  source: PinnedSafetensorsSource,
+  source: GemmaVisionTensorSource,
 ): Promise<GemmaVisionProjectorWeights> {
   validateDescriptor(source, GEMMA_VISION_PROJECTOR_WEIGHT, "F32", [1536, 768]);
   const tensors = await source.readTensors([GEMMA_VISION_PROJECTOR_WEIGHT]);
@@ -199,12 +244,13 @@ export async function loadGemmaVisionProjectorWeights(
 }
 
 function validateDescriptor(
-  source: PinnedSafetensorsSource,
+  source: GemmaVisionTensorSource,
   name: string,
   dtype: string,
   shape: readonly number[],
 ): void {
-  const descriptor = source.descriptor(name);
+  const descriptor = source.descriptors.get(name);
+  if (!descriptor) throw new Error(`Gemma vision tensor ${name} is absent`);
   if (descriptor.dtype !== dtype || descriptor.shape.join(",") !== shape.join(",")) {
     throw new Error(`Gemma vision tensor ${name} does not match its pinned contract`);
   }

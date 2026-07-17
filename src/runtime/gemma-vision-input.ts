@@ -1,6 +1,8 @@
 export const GEMMA_VISION_PATCH_SIZE = 16;
 export const GEMMA_VISION_POOLING_KERNEL = 3;
 export const GEMMA_VISION_MAX_SOFT_TOKENS = 280;
+export const GEMMA_VISION_TOKEN_BUDGETS = [70, 140, 280] as const;
+export type GemmaVisionTokenBudget = typeof GEMMA_VISION_TOKEN_BUDGETS[number];
 export const GEMMA_VISION_MAX_PATCHES =
   GEMMA_VISION_MAX_SOFT_TOKENS * GEMMA_VISION_POOLING_KERNEL ** 2;
 export const GEMMA_VISION_PATCH_DIMENSION = 3 * GEMMA_VISION_PATCH_SIZE ** 2;
@@ -19,12 +21,13 @@ export type GemmaVisionImageSource = Blob | ImageBitmap | ImageData;
 export async function prepareGemmaVisionImage(
   source: GemmaVisionImageSource,
   signal?: AbortSignal,
+  tokenBudget: GemmaVisionTokenBudget = GEMMA_VISION_MAX_SOFT_TOKENS,
 ): Promise<GemmaVisionInput> {
   signal?.throwIfAborted();
   const bitmap = await createImageBitmap(source);
   try {
     signal?.throwIfAborted();
-    const [height, width] = gemmaVisionTargetSize(bitmap.height, bitmap.width);
+    const [height, width] = gemmaVisionTargetSize(bitmap.height, bitmap.width, tokenBudget);
     const canvas = new OffscreenCanvas(width, height);
     const context = canvas.getContext("2d", { willReadFrequently: true });
     if (!context) throw new Error("Gemma vision image canvas is unavailable");
@@ -47,11 +50,17 @@ export async function prepareGemmaVisionImage(
   }
 }
 
-export function gemmaVisionTargetSize(height: number, width: number): [number, number] {
+export function gemmaVisionTargetSize(
+  height: number,
+  width: number,
+  tokenBudget: GemmaVisionTokenBudget = GEMMA_VISION_MAX_SOFT_TOKENS,
+): [number, number] {
   if (!Number.isInteger(height) || height < 1 || !Number.isInteger(width) || width < 1) {
     throw new Error("Gemma vision image dimensions must be positive integers");
   }
-  const targetPixels = GEMMA_VISION_MAX_PATCHES * GEMMA_VISION_PATCH_SIZE ** 2;
+  validateGemmaVisionTokenBudget(tokenBudget);
+  const patchBudget = tokenBudget * GEMMA_VISION_POOLING_KERNEL ** 2;
+  const targetPixels = patchBudget * GEMMA_VISION_PATCH_SIZE ** 2;
   const factor = Math.sqrt(targetPixels / (height * width));
   const sideMultiple = GEMMA_VISION_POOLING_KERNEL * GEMMA_VISION_PATCH_SIZE;
   let targetHeight = Math.floor(factor * height / sideMultiple) * sideMultiple;
@@ -60,7 +69,7 @@ export function gemmaVisionTargetSize(height: number, width: number): [number, n
     throw new Error("Gemma vision image aspect ratio cannot produce a nonzero target size");
   }
   const maximumSide = Math.floor(
-    GEMMA_VISION_MAX_PATCHES / GEMMA_VISION_POOLING_KERNEL ** 2,
+    patchBudget / GEMMA_VISION_POOLING_KERNEL ** 2,
   ) * sideMultiple;
   if (targetHeight === 0) {
     targetHeight = sideMultiple;
@@ -70,6 +79,16 @@ export function gemmaVisionTargetSize(height: number, width: number): [number, n
     targetHeight = Math.min(Math.floor(height / width) * sideMultiple, maximumSide);
   }
   return [targetHeight, targetWidth];
+}
+
+export function validateGemmaVisionTokenBudget(
+  tokenBudget: number,
+): asserts tokenBudget is GemmaVisionTokenBudget {
+  if (!(GEMMA_VISION_TOKEN_BUDGETS as readonly number[]).includes(tokenBudget)) {
+    throw new Error(
+      `Gemma vision token budget must be one of ${GEMMA_VISION_TOKEN_BUDGETS.join(", ")}`,
+    );
+  }
 }
 
 export function patchifyGemmaVisionRgb(
