@@ -260,10 +260,13 @@ recovery passed at 1,024 rows. The normal console remains at the practical certi
 
 ## Roadmap
 
-Work proceeds in this order: optimize the remaining measured vision-layer execution and complete
-long-run resource stress; implement the pinned audio path; implement
-deterministic video frame ingestion; optimize prefill and constrained decoding; then harden
-device-loss recovery and the release browser matrix. See
+Work proceeds in this order: establish a same-device performance proof against the pinned Hugging
+Face WebGPU runtime, an equivalent Transformers.js export, and Google's official LiteRT-LM WebGPU
+package; audit and parameterize E4B compatibility; optimize the remaining measured vision-layer
+execution and complete long-run resource stress; implement the pinned audio path; implement
+deterministic video frame ingestion; use the comparative evidence to prioritize further prefill,
+decode, and constrained-decoding work; then harden device-loss recovery and the release browser
+matrix. See
 [PROJECT.md](PROJECT.md#execution-plan) for gates and details.
 
 The contextual Custom/Chat console, safe history editing, content-identified multimodal prefix
