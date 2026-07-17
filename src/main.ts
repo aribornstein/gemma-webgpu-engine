@@ -27,6 +27,7 @@ import {
 import {
   commitGemmaConversationTurn,
   createGemmaConversation,
+  prepareGemmaConversationEdit,
   prepareGemmaConversationTurn,
   type GemmaConversation,
   type PreparedGemmaConversationTurn,
@@ -61,6 +62,15 @@ type GenerationExampleControl =
   | "presencePenalty"
   | "seed";
 
+type ConsoleWorkspace = "custom" | "chat" | "example";
+type ConstraintEditor = "all" | "none" | "regex" | "json" | "json-schema";
+
+interface ExampleUiProfile {
+  vision: boolean;
+  sampling: boolean;
+  constraint: Exclude<ConstraintEditor, "all">;
+}
+
 interface GenerationExample {
   id: string;
   label: string;
@@ -75,6 +85,7 @@ interface GenerationExample {
   visionTokenBudget?: GemmaVisionTokenBudget;
   constraint?: GenerationConstraint;
   expandProbabilityControls?: boolean;
+  ui: ExampleUiProfile;
 }
 
 const GENERATION_EXAMPLES: readonly GenerationExample[] = [
@@ -87,6 +98,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
       { role: "user", content: "2 + 2?" },
       { role: "assistant", content: "4" },
     ],
+    ui: { vision: false, sampling: false, constraint: "none" },
   },
   {
     id: "tool-weather",
@@ -121,6 +133,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
         },
       },
     }],
+    ui: { vision: false, sampling: true, constraint: "none" },
   },
   {
     id: "vision-dolphin-caption",
@@ -132,6 +145,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
       filename: "dolphin_capt_image.png",
     },
     visionTokenBudget: 280,
+    ui: { vision: true, sampling: false, constraint: "none" },
   },
   {
     id: "vision-gottingen",
@@ -143,12 +157,14 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
       filename: "the-mathematics-club-of-gottingen-1902.jpg",
     },
     visionTokenBudget: 280,
+    ui: { vision: true, sampling: false, constraint: "none" },
   },
   {
     id: "greedy-colors",
     label: "Primary colors · Greedy",
     prompt: "Name the three primary colors in one short sentence.",
     controls: { temperature: 0, maxNewTokens: 32 },
+    ui: { vision: false, sampling: false, constraint: "none" },
   },
   {
     id: "sampling-tagline",
@@ -165,6 +181,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
       seed: 7,
     },
     expandProbabilityControls: true,
+    ui: { vision: false, sampling: true, constraint: "none" },
   },
   {
     id: "regex-sky",
@@ -172,6 +189,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
     prompt: "Return exactly one lowercase word for the color of a clear daytime sky.",
     controls: { temperature: 0, maxNewTokens: 4 },
     constraint: { type: "regex", pattern: "(?:blue|gray)" },
+    ui: { vision: false, sampling: false, constraint: "regex" },
   },
   {
     id: "json-city",
@@ -179,6 +197,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
     prompt: "Return one compact JSON object about Paris with keys city, country, and landmarks, where landmarks is an array of exactly two strings. Return JSON only.",
     controls: { temperature: 0, maxNewTokens: 64 },
     constraint: { type: "json", maxDepth: 3, whitespace: "compact" },
+    ui: { vision: false, sampling: false, constraint: "json" },
   },
   {
     id: "schema-triage",
@@ -200,6 +219,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
         additionalProperties: false,
       },
     },
+    ui: { vision: false, sampling: false, constraint: "json-schema" },
   },
 ];
 
@@ -237,7 +257,7 @@ app.innerHTML = `
   </header>
 
   <main class="console-grid">
-    <section class="generation-panel" aria-labelledby="generation-heading">
+    <section id="generation-panel" class="generation-panel" data-workspace="custom" aria-labelledby="generation-heading">
       <div class="section-heading">
         <div>
           <p class="eyebrow">SESSION</p>
@@ -258,19 +278,24 @@ app.innerHTML = `
         <span id="progress-detail" class="progress-detail">Waiting for download information</span>
       </div>
 
-      <form id="generation-form">
-        <label class="field example-picker">Example
-          <select id="generation-example" name="generationExample">
-            <option value="">Custom</option>
+      <label class="field example-picker" id="workspace-picker">Workspace
+        <select id="generation-example" name="generationExample">
+          <optgroup label="Workspaces">
+            <option value="custom">Custom</option>
+            <option value="chat">Chat</option>
+          </optgroup>
+          <optgroup label="Examples">
             ${GENERATION_EXAMPLES.map(({ id, label }) => `<option value="${id}">${label}</option>`).join("")}
-          </select>
-        </label>
+          </optgroup>
+        </select>
+      </label>
 
+      <form id="generation-form">
         <label class="field prompt-field" for="prompt">
           <span>Message</span>
           <textarea id="prompt" name="prompt" rows="6" spellcheck="true">Name the three primary colors in one short sentence.</textarea>
         </label>
-        <div class="image-input-row">
+        <div id="image-controls" class="image-input-row">
           <label class="image-picker" for="image-input">
             <span>Add image</span>
             <input id="image-input" name="image" type="file" accept="image/*">
@@ -280,7 +305,7 @@ app.innerHTML = `
             <span id="image-name"></span>
             <button id="remove-image" class="quiet-command" type="button">Remove</button>
           </div>
-          <label class="field image-budget">Visual tokens
+          <label id="image-budget" class="field image-budget">Visual tokens
             <select id="vision-token-budget" name="visionTokenBudget">
               <option value="70">Fast · 70</option>
               <option value="140" selected>Balanced · 140</option>
@@ -316,6 +341,7 @@ app.innerHTML = `
         <div title="Browser preprocessing plus vision tower and projection"><span>Vision</span><strong id="metric-vision">-</strong></div>
         <div><span>Prefill</span><strong id="metric-prefill">-</strong></div>
         <div><span>GPU buffers</span><strong id="metric-memory">-</strong></div>
+        <div title="Session-retained materialized vision weights on the CPU"><span>Vision CPU</span><strong id="metric-vision-memory">-</strong></div>
         <div><span>Stop</span><strong id="metric-stop">-</strong></div>
       </div>
     </section>
@@ -331,27 +357,27 @@ app.innerHTML = `
 
       <form id="controls-form">
         <div class="control-grid core-controls">
-          <label class="field">Temperature
+          <label class="field" data-control="sampling">Temperature
             <input name="temperature" type="number" min="0" step="0.05" value="${DEFAULT_GENERATION_CONFIG.temperature}">
           </label>
           <label class="field">Max tokens
             <input name="maxNewTokens" type="number" min="1" max="${GEMMA_VALIDATED_CONTEXT_CAPACITY}" step="1" value="${DEFAULT_GENERATION_CONFIG.maxNewTokens}">
           </label>
-          <label class="field">Top K
+          <label class="field" data-control="sampling">Top K
             <input name="topK" type="number" min="0" step="1" value="${DEFAULT_GENERATION_CONFIG.topK}">
           </label>
-          <label class="field">Top P
+          <label class="field" data-control="sampling">Top P
             <input name="topP" type="number" min="0" max="1" step="0.01" value="${DEFAULT_GENERATION_CONFIG.topP}">
           </label>
-          <label class="field">Seed
+          <label class="field" data-control="sampling">Seed
             <input name="seed" type="number" step="1" value="${DEFAULT_GENERATION_CONFIG.seed}">
           </label>
-          <label class="field">Stop token IDs
+          <label class="field" data-control="stop-tokens">Stop token IDs
             <input name="stopTokenIds" type="text" inputmode="numeric" placeholder="1, 50, 106">
           </label>
         </div>
 
-        <details class="control-section">
+        <details id="probability-controls" class="control-section">
           <summary>Probability and penalties</summary>
           <div class="control-grid detail-controls">
             <label class="field">Min P
@@ -375,9 +401,9 @@ app.innerHTML = `
           </div>
         </details>
 
-        <fieldset class="constraint-section">
+        <fieldset id="constraint-section" class="constraint-section">
           <legend>Constraint</legend>
-          <div class="segmented-control" role="radiogroup" aria-label="Output constraint">
+          <div id="constraint-mode-selector" class="segmented-control" role="radiogroup" aria-label="Output constraint">
             <label><input type="radio" name="constraintMode" value="none" checked><span>None</span></label>
             <label><input type="radio" name="constraintMode" value="regex"><span>Regex</span></label>
             <label><input type="radio" name="constraintMode" value="json"><span>JSON</span></label>
@@ -464,6 +490,7 @@ const cacheStatus = element<HTMLSpanElement>("cache-status");
 const modelStatus = element<HTMLSpanElement>("model-status");
 const loadButton = element<HTMLButtonElement>("load-model");
 const newChatButton = element<HTMLButtonElement>("new-chat");
+const generationPanel = element<HTMLElement>("generation-panel");
 const generateButton = element<HTMLButtonElement>("generate");
 const cancelButton = element<HTMLButtonElement>("cancel");
 const resetButton = element<HTMLButtonElement>("reset-controls");
@@ -473,10 +500,14 @@ const exampleSelect = element<HTMLSelectElement>("generation-example");
 const promptInput = element<HTMLTextAreaElement>("prompt");
 const imageInput = element<HTMLInputElement>("image-input");
 const visionTokenBudgetInput = element<HTMLSelectElement>("vision-token-budget");
+const imageControls = element<HTMLDivElement>("image-controls");
+const imageBudget = element<HTMLLabelElement>("image-budget");
 const imagePreview = element<HTMLDivElement>("image-preview");
 const imageThumbnail = element<HTMLImageElement>("image-thumbnail");
 const imageName = element<HTMLSpanElement>("image-name");
 const removeImageButton = element<HTMLButtonElement>("remove-image");
+const outputTool = element<HTMLDivElement>("output-heading").closest<HTMLDivElement>(".output-tool");
+if (!outputTool) throw new Error("Missing output tool");
 const output = element<HTMLDivElement>("generation-output");
 const outputTokenCount = element<HTMLSpanElement>("output-token-count");
 const requestStatus = element<HTMLSpanElement>("request-status");
@@ -493,6 +524,16 @@ const benchmarkStopButton = element<HTMLButtonElement>("benchmark-stop");
 const benchmarkDownloadButton = element<HTMLButtonElement>("benchmark-download");
 const benchmarkStatus = element<HTMLParagraphElement>("benchmark-status");
 const benchmarkDetails = element<HTMLDListElement>("benchmark-details");
+const telemetry = generationPanel.querySelector<HTMLDivElement>(".telemetry");
+if (!telemetry) throw new Error("Missing generation telemetry");
+const probabilityControls = element<HTMLDetailsElement>("probability-controls");
+const constraintSection = element<HTMLFieldSetElement>("constraint-section");
+const constraintModeSelector = element<HTMLDivElement>("constraint-mode-selector");
+const samplingControls = Array.from(
+  controlsForm.querySelectorAll<HTMLElement>("[data-control='sampling']"),
+);
+const stopTokenControl = controlsForm.querySelector<HTMLElement>("[data-control='stop-tokens']");
+if (!stopTokenControl) throw new Error("Missing stop-token control");
 
 element<HTMLSpanElement>("origin-label").textContent = location.origin;
 
@@ -505,6 +546,10 @@ let progressPhaseKey = "";
 let progressPhaseFraction = 0;
 let selectedImage: GemmaVisionImageSource | null = null;
 let imagePreviewUrl: string | null = null;
+let activeWorkspace: ConsoleWorkspace = "custom";
+let activeExample: GenerationExample | null = null;
+let editBaseConversation: GemmaConversation | null = null;
+let editingMessageIndex: number | null = null;
 let benchmarkController: AbortController | null = null;
 let benchmarkArtifact: GemmaDurableBenchmarkArtifact | null = null;
 let conversation: GemmaConversation = createGemmaConversation();
@@ -512,11 +557,20 @@ let conversation: GemmaConversation = createGemmaConversation();
 void initializeCapabilities();
 void restoreBenchmarkArtifact();
 renderConstraintFields();
+renderConsoleProfile();
 validateControls();
 
 loadButton.addEventListener("click", () => void loadModel());
 newChatButton.addEventListener("click", clearConversation);
 exampleSelect.addEventListener("change", () => {
+  if (exampleSelect.value === "custom") {
+    activateWorkspace("custom");
+    return;
+  }
+  if (exampleSelect.value === "chat") {
+    activateWorkspace("chat");
+    return;
+  }
   const example = GENERATION_EXAMPLES.find(({ id }) => id === exampleSelect.value);
   if (example) void selectGenerationExample(example);
 });
@@ -530,18 +584,18 @@ cancelButton.addEventListener("click", () => {
 resetButton.addEventListener("click", () => {
   controlsForm.reset();
   visionTokenBudgetInput.value = "140";
-  exampleSelect.value = "";
+  activateWorkspace("custom");
   renderConstraintFields();
   validateControls();
 });
 controlsForm.addEventListener("input", () => {
-  exampleSelect.value = "";
+  markExampleCustomized();
   renderConstraintFields();
   if (controlsValidationTimer !== null) window.clearTimeout(controlsValidationTimer);
   controlsValidationTimer = window.setTimeout(validateControls, 120);
 });
 promptInput.addEventListener("input", () => {
-  exampleSelect.value = "";
+  markExampleCustomized();
   validateControls();
 });
 imageInput.addEventListener("change", () => {
@@ -553,10 +607,13 @@ imageInput.addEventListener("change", () => {
   selectImage(file, true);
 });
 visionTokenBudgetInput.addEventListener("change", () => {
-  exampleSelect.value = "";
+  markExampleCustomized();
   validateControls();
 });
-removeImageButton.addEventListener("click", clearSelectedImage);
+removeImageButton.addEventListener("click", () => {
+  markExampleCustomized();
+  clearSelectedImage();
+});
 benchmarkRunButton.addEventListener("click", () => void runBoundaryBenchmark());
 benchmarkStopButton.addEventListener("click", () => {
   benchmarkController?.abort(new DOMException("Benchmark cancelled", "AbortError"));
@@ -772,7 +829,7 @@ async function loadModel(): Promise<void> {
     setBadge(modelStatus, "Model ready", "ready");
     requestStatus.textContent = `Loaded in ${formatSeconds(loadSeconds)}`;
     setModelProgress("Model ready", 1, `Loaded in ${formatSeconds(loadSeconds)}`, "ready");
-    element<HTMLElement>("metric-memory").textContent = formatBytes(memory.gpuBufferBytes);
+    renderMemory(memory);
     generateButton.disabled = !validateControls();
     loadButton.textContent = "Reload model";
   } catch (error) {
@@ -817,10 +874,12 @@ async function generate(): Promise<void> {
 
   let options: GemmaGenerationOptions;
   let turn: PreparedGemmaConversationTurn;
+  const requestConversation = editBaseConversation ?? conversation;
+  const editingRequest = editBaseConversation !== null;
   try {
     options = readGenerationOptions();
     turn = prepareGemmaConversationTurn(
-      conversation,
+      requestConversation,
       prompt,
       selectedImage ?? undefined,
       readVisionTokenBudget(),
@@ -864,15 +923,17 @@ async function generate(): Promise<void> {
       ? measured.result.toolCalls.map((call) =>
           `${call.function.name}\n${JSON.stringify(call.function.arguments, null, 2)}`)
         .join("\n\n")
-      : conversation.tools.length > 0 ? measured.result.rawText : measured.result.text;
-    if (conversation.tools.length > 0) {
+      : requestConversation.tools.length > 0 ? measured.result.rawText : measured.result.text;
+    if (requestConversation.tools.length > 0) {
       renderConversation(
         turn.userMessage,
         draftText || "No tool call output.",
         hasToolCalls ? "tool-call" : "stopped",
       );
     } else if (draftText.trim()) {
-      conversation = commitGemmaConversationTurn(conversation, turn, draftText);
+      conversation = commitGemmaConversationTurn(requestConversation, turn, draftText);
+      editBaseConversation = null;
+      editingMessageIndex = null;
       promptInput.value = "";
       clearSelectedImage();
       renderConversation();
@@ -888,6 +949,7 @@ async function generate(): Promise<void> {
       measured.result.stopReason,
       measured.result.generatedTokenIds.length,
     );
+    renderMemory(session.estimateRetainedGpuMemory());
   } catch (error) {
     if (generationController.signal.aborted) {
       requestStatus.textContent = "Generation stopped";
@@ -903,6 +965,8 @@ async function generate(): Promise<void> {
         setBadge(modelStatus, "Reload required", "error");
       }
     }
+    cancelConversationEdit();
+    if (editingRequest) renderConversation();
   } finally {
     generationController = null;
     setGenerating(false);
@@ -968,6 +1032,10 @@ function applyGenerationExample(example: GenerationExample): void {
 }
 
 async function selectGenerationExample(example: GenerationExample): Promise<void> {
+  activeWorkspace = "example";
+  activeExample = example;
+  exampleSelect.value = example.id;
+  renderConsoleProfile();
   clearSelectedImage();
   applyGenerationExample(example);
   if (!example.image) return;
@@ -977,7 +1045,7 @@ async function selectGenerationExample(example: GenerationExample): Promise<void
     selectImage(image, false, example.image.url, example.image.filename);
   } catch (error) {
     if (exampleSelect.value !== example.id) return;
-    exampleSelect.value = "";
+    activateWorkspace("custom");
     clearSelectedImage();
     configStatus.textContent = `Could not load example image: ${errorMessage(error)}`;
     configStatus.dataset.valid = "false";
@@ -1054,7 +1122,7 @@ function renderPromptBudget(maxNewTokens: number): void {
     return;
   }
   const turn = prepareGemmaConversationTurn(
-    conversation,
+    editBaseConversation ?? conversation,
     prompt,
     selectedImage ?? undefined,
     readVisionTokenBudget(),
@@ -1090,10 +1158,69 @@ function renderValidConfiguration(options: GemmaGenerationOptions): void {
 
 function renderConstraintFields(): void {
   const data = new FormData(controlsForm);
-  const mode = String(data.get("constraintMode"));
+  const editor = activeConsoleProfile().constraint;
+  constraintSection.hidden = editor === "none";
+  constraintModeSelector.hidden = editor !== "all";
+  const mode = editor === "all" ? String(data.get("constraintMode")) : editor;
   element<HTMLElement>("constraint-regex").hidden = mode !== "regex";
   element<HTMLElement>("constraint-json").hidden = mode !== "json" && mode !== "json-schema";
   element<HTMLElement>("constraint-json-schema").hidden = mode !== "json-schema";
+}
+
+function activeConsoleProfile(): ExampleUiProfile & {
+  workspace: ConsoleWorkspace;
+  constraint: ConstraintEditor;
+} {
+  if (activeWorkspace === "custom") {
+    return { workspace: "custom", vision: true, sampling: true, constraint: "all" };
+  }
+  if (activeWorkspace === "chat") {
+    return { workspace: "chat", vision: true, sampling: true, constraint: "none" };
+  }
+  if (!activeExample) throw new Error("Example workspace is missing its UI profile");
+  return { workspace: "example", ...activeExample.ui };
+}
+
+function renderConsoleProfile(): void {
+  const profile = activeConsoleProfile();
+  generationPanel.dataset.workspace = profile.workspace;
+  if (profile.workspace === "chat") generationPanel.insertBefore(outputTool, generationForm);
+  else generationPanel.insertBefore(outputTool, telemetry);
+  element<HTMLElement>("generation-heading").textContent = profile.workspace === "chat"
+    ? "Chat"
+    : "Conversation";
+  element<HTMLElement>("output-heading").textContent = profile.workspace === "chat"
+    ? "Messages"
+    : "Transcript";
+  generateButton.textContent = profile.workspace === "chat" ? "Send" : "Generate";
+  promptInput.rows = profile.workspace === "chat" ? 3 : 6;
+  imageControls.hidden = !profile.vision;
+  imageBudget.hidden = !profile.vision || (profile.workspace === "chat" && !selectedImage);
+  for (const control of samplingControls) control.hidden = !profile.sampling;
+  probabilityControls.hidden = !profile.sampling;
+  stopTokenControl.hidden = profile.workspace === "example";
+  renderConstraintFields();
+}
+
+function activateWorkspace(workspace: Exclude<ConsoleWorkspace, "example">): void {
+  const enteringChat = workspace === "chat" && activeWorkspace !== "chat";
+  activeWorkspace = workspace;
+  activeExample = null;
+  exampleSelect.value = workspace;
+  if (enteringChat) {
+    conversation = createGemmaConversation();
+    editBaseConversation = null;
+    editingMessageIndex = null;
+    promptInput.value = "";
+    clearSelectedImage();
+    renderConversation();
+  }
+  renderConsoleProfile();
+}
+
+function markExampleCustomized(): void {
+  if (activeWorkspace !== "example") return;
+  activateWorkspace("custom");
 }
 
 function renderTelemetry(
@@ -1139,6 +1266,15 @@ function renderTelemetry(
   element<HTMLElement>("metric-stop").textContent = stopReason;
 }
 
+function renderMemory(memory: ReturnType<GemmaGenerationSession["estimateRetainedGpuMemory"]>): void {
+  element<HTMLElement>("metric-memory").textContent = formatBytes(memory.gpuBufferBytes);
+  const visionMemory = element<HTMLElement>("metric-vision-memory");
+  visionMemory.textContent = formatBytes(memory.visionWeightMaterializedBytes);
+  visionMemory.title = memory.visionWeightEntryCount > 0
+    ? `${memory.visionWeightEntryCount} cached entries · ${formatBytes(memory.visionWeightSourceBytes)} source weights`
+    : "No materialized vision weights cached";
+}
+
 function clearTelemetry(): void {
   for (const id of [
     "metric-ttft",
@@ -1175,6 +1311,10 @@ function setGenerating(generating: boolean): void {
 
 function clearConversation(): void {
   conversation = createGemmaConversation();
+  editBaseConversation = null;
+  editingMessageIndex = null;
+  promptInput.value = "";
+  clearSelectedImage();
   renderConversation();
   outputTokenCount.textContent = "0 tokens";
   newChatButton.disabled = true;
@@ -1188,19 +1328,26 @@ function renderConversation(
   draftState: "streaming" | "stopped" | "failed" | "tool-call" = "streaming",
 ): void {
   output.replaceChildren();
-  for (const tool of conversation.tools) output.append(renderTool(tool));
+  const displayedConversation = editBaseConversation ?? conversation;
+  for (const tool of displayedConversation.tools) output.append(renderTool(tool));
   const messages = pendingUser
-    ? [...conversation.messages, pendingUser]
-    : [...conversation.messages];
-  for (const message of messages) output.append(renderMessage(message));
+    ? [...displayedConversation.messages, pendingUser]
+    : [...displayedConversation.messages];
+  let imageIndex = 0;
+  for (const [messageIndex, message] of messages.entries()) {
+    const imageCount = messageImageCount(message);
+    const images = displayedConversation.images.slice(imageIndex, imageIndex + imageCount);
+    imageIndex += imageCount;
+    output.append(renderMessage(message, undefined, messageIndex, images));
+  }
   if (pendingUser) {
     output.append(renderMessage({
       role: "assistant",
       content: assistantDraft || "Generating...",
     }, draftState));
   }
-  if (messages.length === 0 && conversation.tools.length === 0) {
-    output.textContent = "No conversation yet.";
+  if (messages.length === 0 && displayedConversation.tools.length === 0) {
+    output.textContent = activeWorkspace === "chat" ? "Start a new conversation." : "No conversation yet.";
   }
   output.scrollTop = output.scrollHeight;
 }
@@ -1222,6 +1369,8 @@ function renderTool(tool: GemmaFunctionTool): HTMLElement {
 function renderMessage(
   message: GemmaChatMessage,
   state?: "streaming" | "stopped" | "failed" | "tool-call",
+  messageIndex?: number,
+  images: readonly GemmaVisionImageSource[] = [],
 ): HTMLElement {
   const article = document.createElement("article");
   article.className = "conversation-message";
@@ -1233,8 +1382,87 @@ function renderMessage(
   const content = document.createElement("div");
   content.className = "conversation-content";
   content.textContent = messageContentText(message);
-  article.append(role, content);
+  const body = document.createElement("div");
+  body.className = "conversation-body";
+  body.append(content);
+  if (images.length > 0) {
+    const attachments = document.createElement("div");
+    attachments.className = "conversation-attachments";
+    for (const image of images) attachments.append(renderConversationImage(image));
+    body.prepend(attachments);
+  }
+  if (activeWorkspace === "chat" && message.role === "user" && state === undefined &&
+      messageIndex !== undefined) {
+    const editButton = document.createElement("button");
+    editButton.type = "button";
+    editButton.className = "message-edit quiet-command";
+    editButton.textContent = "Edit";
+    editButton.addEventListener("click", () => beginConversationEdit(messageIndex));
+    body.append(editButton);
+  }
+  article.append(role, body);
   return article;
+}
+
+function renderConversationImage(image: GemmaVisionImageSource): HTMLElement {
+  const frame = document.createElement("div");
+  frame.className = "conversation-image";
+  if (image instanceof Blob) {
+    const thumbnail = document.createElement("img");
+    const url = URL.createObjectURL(image);
+    thumbnail.alt = image instanceof File ? image.name : "Attached image";
+    thumbnail.src = url;
+    thumbnail.addEventListener("load", () => URL.revokeObjectURL(url), { once: true });
+    frame.append(thumbnail);
+    return frame;
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = image.width;
+  canvas.height = image.height;
+  const context = canvas.getContext("2d");
+  if (context) {
+    if (image instanceof ImageData) context.putImageData(image, 0, 0);
+    else context.drawImage(image, 0, 0);
+  }
+  frame.append(canvas);
+  return frame;
+}
+
+function beginConversationEdit(messageIndex: number): void {
+  const message = conversation.messages[messageIndex];
+  if (!message || message.role !== "user") return;
+  const edit = prepareGemmaConversationEdit(
+    conversation,
+    messageIndex,
+    messageText(message),
+    undefined,
+    readVisionTokenBudget(),
+  );
+  editBaseConversation = edit.conversation;
+  editingMessageIndex = messageIndex;
+  promptInput.value = messageText(message);
+  if (edit.turn.image) selectImage(edit.turn.image, false);
+  else clearSelectedImage();
+  requestStatus.textContent = "Editing message";
+  renderConversation();
+  promptInput.focus();
+}
+
+function cancelConversationEdit(): void {
+  editBaseConversation = null;
+  editingMessageIndex = null;
+}
+
+function messageImageCount(message: GemmaChatMessage): number {
+  return typeof message.content === "string"
+    ? 0
+    : message.content.filter((part) => part.type === "image").length;
+}
+
+function messageText(message: GemmaChatMessage): string {
+  return typeof message.content === "string"
+    ? message.content
+    : message.content.filter((part) => part.type === "text").map((part) => part.text).join("\n");
 }
 
 function messageContentText(message: GemmaChatMessage): string {
@@ -1259,7 +1487,8 @@ function selectImage(
   imageThumbnail.src = previewUrl ?? imagePreviewUrl!;
   imageName.textContent = filename ?? (image instanceof File ? image.name : "Image");
   imagePreview.hidden = false;
-  if (clearExample) exampleSelect.value = "";
+  if (clearExample) markExampleCustomized();
+  renderConsoleProfile();
   validateControls();
 }
 
@@ -1271,6 +1500,7 @@ function clearSelectedImage(): void {
   imageName.textContent = "";
   if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
   imagePreviewUrl = null;
+  renderConsoleProfile();
   validateControls();
 }
 

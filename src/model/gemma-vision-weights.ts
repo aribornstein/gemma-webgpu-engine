@@ -55,18 +55,33 @@ export interface GemmaVisionProjectorWeights {
   sourceBytes: number;
 }
 
+export interface GemmaVisionWeightCacheEstimate {
+  loadedEntryCount: number;
+  sourceBytes: number;
+  materializedBytes: number;
+}
+
 export type GemmaVisionTensorSource = GemmaLayerTensorSource;
 
 export class GemmaVisionWeightCache {
   private patch: Promise<GemmaVisionPatchWeights> | null = null;
+  private loadedPatch: GemmaVisionPatchWeights | null = null;
   private readonly layers = new Map<number, Promise<GemmaVisionLayerWeights>>();
+  private readonly loadedLayers = new Map<number, GemmaVisionLayerWeights>();
   private projector: Promise<GemmaVisionProjectorWeights> | null = null;
+  private loadedProjector: GemmaVisionProjectorWeights | null = null;
 
   loadPatch(source: GemmaVisionTensorSource): Promise<GemmaVisionPatchWeights> {
-    this.patch ??= loadGemmaVisionPatchWeights(source).catch((error) => {
-      this.patch = null;
-      throw error;
-    });
+    if (!this.patch) {
+      const pending = loadGemmaVisionPatchWeights(source).then((weights) => {
+        if (this.patch === pending) this.loadedPatch = weights;
+        return weights;
+      }).catch((error) => {
+        if (this.patch === pending) this.patch = null;
+        throw error;
+      });
+      this.patch = pending;
+    }
     return this.patch;
   }
 
@@ -76,8 +91,11 @@ export class GemmaVisionWeightCache {
   ): Promise<GemmaVisionLayerWeights> {
     let pending = this.layers.get(layerIndex);
     if (!pending) {
-      pending = loadGemmaVisionLayerWeights(source, layerIndex).catch((error) => {
-        this.layers.delete(layerIndex);
+      pending = loadGemmaVisionLayerWeights(source, layerIndex).then((weights) => {
+        if (this.layers.get(layerIndex) === pending) this.loadedLayers.set(layerIndex, weights);
+        return weights;
+      }).catch((error) => {
+        if (this.layers.get(layerIndex) === pending) this.layers.delete(layerIndex);
         throw error;
       });
       this.layers.set(layerIndex, pending);
@@ -86,17 +104,52 @@ export class GemmaVisionWeightCache {
   }
 
   loadProjector(source: GemmaVisionTensorSource): Promise<GemmaVisionProjectorWeights> {
-    this.projector ??= loadGemmaVisionProjectorWeights(source).catch((error) => {
-      this.projector = null;
-      throw error;
-    });
+    if (!this.projector) {
+      const pending = loadGemmaVisionProjectorWeights(source).then((weights) => {
+        if (this.projector === pending) this.loadedProjector = weights;
+        return weights;
+      }).catch((error) => {
+        if (this.projector === pending) this.projector = null;
+        throw error;
+      });
+      this.projector = pending;
+    }
     return this.projector;
+  }
+
+  estimateRetainedMemory(): GemmaVisionWeightCacheEstimate {
+    const entries = [
+      ...(this.loadedPatch ? [this.loadedPatch] : []),
+      ...this.loadedLayers.values(),
+      ...(this.loadedProjector ? [this.loadedProjector] : []),
+    ];
+    const buffers = new Set<ArrayBufferLike>();
+    const seen = new Set<object>();
+    const visit = (value: unknown): void => {
+      if (typeof value !== "object" || value === null || seen.has(value)) return;
+      seen.add(value);
+      if (ArrayBuffer.isView(value)) {
+        buffers.add(value.buffer);
+        return;
+      }
+      for (const child of Object.values(value)) visit(child);
+    };
+    for (const entry of entries) visit(entry);
+    return {
+      loadedEntryCount: entries.length,
+      sourceBytes: entries.reduce((total, entry) => total + entry.sourceBytes, 0),
+      materializedBytes: Array.from(buffers, (buffer) => buffer.byteLength)
+        .reduce((total, byteLength) => total + byteLength, 0),
+    };
   }
 
   clear(): void {
     this.patch = null;
+    this.loadedPatch = null;
     this.layers.clear();
+    this.loadedLayers.clear();
     this.projector = null;
+    this.loadedProjector = null;
   }
 }
 

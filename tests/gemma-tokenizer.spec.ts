@@ -126,6 +126,69 @@ test("commits completed turns without mutating in-flight conversation history", 
   ]);
 });
 
+test("prepares edited user turns without retaining dependent history", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-conversation.ts";
+    const {
+      commitGemmaConversationTurn,
+      createGemmaConversation,
+      prepareGemmaConversationEdit,
+    } = await import(modulePath);
+    const initial = createGemmaConversation([
+      { role: "user", content: "What is two plus two?" },
+      { role: "assistant", content: "Four." },
+      { role: "user", content: "Spell it." },
+      { role: "assistant", content: "F-O-U-R." },
+    ]);
+    const edit = prepareGemmaConversationEdit(initial, 0, "What is three plus three?");
+    const committed = commitGemmaConversationTurn(edit.conversation, edit.turn, "Six.");
+    return {
+      initial: initial.messages,
+      pending: edit.turn.input,
+      committed: committed.messages,
+    };
+  });
+
+  expect(result.initial).toHaveLength(4);
+  expect(result.pending).toEqual([{ role: "user", content: "What is three plus three?" }]);
+  expect(result.committed).toEqual([
+    { role: "user", content: "What is three plus three?" },
+    { role: "assistant", content: "Six." },
+  ]);
+});
+
+test("preserves image ownership when preparing an edited multimodal turn", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-conversation.ts";
+    const { createGemmaConversation, prepareGemmaConversationEdit } = await import(modulePath);
+    const firstImage = new ImageData(48, 48);
+    const editedImage = new ImageData(96, 48);
+    const conversation = createGemmaConversation([
+      { role: "user", content: [{ type: "image" }, { type: "text", text: "First image" }] },
+      { role: "assistant", content: "First answer" },
+      { role: "user", content: [{ type: "image" }, { type: "text", text: "Second image" }] },
+      { role: "assistant", content: "Second answer" },
+    ], [firstImage, editedImage]);
+    const edit = prepareGemmaConversationEdit(conversation, 2, "Describe it differently.");
+    const input = edit.turn.input;
+    if (Array.isArray(input) || typeof input === "string") throw new Error("Expected image input");
+    return {
+      retainedMessages: edit.conversation.messages,
+      retainedImages: edit.conversation.images.length,
+      pendingMessages: input.messages,
+      pendingImages: input.images?.map((image: unknown) =>
+        image === firstImage ? "first" : "edited"),
+    };
+  });
+
+  expect(result.retainedMessages).toHaveLength(2);
+  expect(result.retainedImages).toBe(1);
+  expect(result.pendingMessages).toHaveLength(3);
+  expect(result.pendingImages).toEqual(["first", "edited"]);
+});
+
 test("retains the selected visual-token budget in multimodal turns", async ({ page }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {

@@ -17,6 +17,7 @@ test("offers a direct model download when the cache is absent", async ({ page })
   await expect(page.getByText("Decode tok/s", { exact: true })).toBeVisible();
   await expect(page.getByText("Overall tok/s", { exact: true })).toBeVisible();
   await expect(page.getByText("Vision", { exact: true })).toBeVisible();
+  await expect(page.getByText("Vision CPU", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Long-context boundary" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Run exact-fit" })).toBeDisabled();
   await expect(page.getByLabel("Capacity")).toHaveValue("32768");
@@ -123,7 +124,7 @@ test("validates controls and switches constraint editors", async ({ page }) => {
 test("applies editable generation examples", async ({ page }) => {
   await page.goto("/");
 
-  const examples = page.getByLabel("Example");
+  const examples = page.getByLabel("Workspace");
   await examples.selectOption("chat-arithmetic");
   await expect(page.getByRole("log")).toContainText("2 + 2?");
   await expect(page.getByRole("log")).toContainText("4");
@@ -149,28 +150,25 @@ test("applies editable generation examples", async ({ page }) => {
   await expect(page.getByText("Sampling configuration valid", { exact: true })).toBeVisible();
 
   await examples.selectOption("regex-sky");
-  await expect(page.getByRole("radio", { name: "Regex" })).toBeChecked();
   await expect(page.getByRole("textbox", { name: "Pattern" })).toHaveValue("(?:blue|gray)");
   await expect(page.getByText("regex constraint valid", { exact: true })).toBeVisible();
 
   await examples.selectOption("json-city");
-  await expect(page.getByRole("radio", { name: "JSON", exact: true })).toBeChecked();
   await expect(page.getByRole("spinbutton", { name: "Maximum depth" })).toHaveValue("3");
   await expect(page.getByText("json constraint valid", { exact: true })).toBeVisible();
 
   await examples.selectOption("schema-triage");
-  await expect(page.getByRole("radio", { name: "Schema" })).toBeChecked();
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toHaveValue(/"urgent"/);
   await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
 
   await page.getByRole("spinbutton", { name: "Max tokens" }).fill("32");
-  await expect(examples).toHaveValue("");
+  await expect(examples).toHaveValue("custom");
 });
 
 test("keeps the vision example grounded in the selected image", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByLabel("Example").selectOption("vision-dolphin-caption");
+  await page.getByLabel("Workspace").selectOption("vision-dolphin-caption");
   const captionPrompt = await page.getByRole("textbox", { name: "Message" }).inputValue();
   expect(captionPrompt).toContain("Transcribe the printed caption in this image");
   expect(captionPrompt).not.toMatch(/spinner|stenella|kona|hawaii|brian skerry/i);
@@ -178,7 +176,7 @@ test("keeps the vision example grounded in the selected image", async ({ page })
   await expect(page.getByText("dolphin_capt_image.png", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Visual tokens")).toHaveValue("280");
 
-  await page.getByLabel("Example").selectOption("vision-gottingen");
+  await page.getByLabel("Workspace").selectOption("vision-gottingen");
   const prompt = await page.getByRole("textbox", { name: "Message" }).inputValue();
   expect(prompt).toContain("Read the printed caption in the image");
   expect(prompt).not.toMatch(
@@ -187,6 +185,78 @@ test("keeps the vision example grounded in the selected image", async ({ page })
   await expect(page.getByRole("img", { name: "Selected image preview" })).toBeVisible();
   await expect(page.getByText("the-mathematics-club-of-gottingen-1902.jpg", { exact: true }))
     .toBeVisible();
+});
+
+test("shows only controls relevant to each example while Custom exposes all", async ({ page }) => {
+  await page.goto("/");
+  const workspace = page.getByLabel("Workspace");
+  const addImage = page.getByRole("button", { name: "Add image" });
+  const visualTokens = page.getByLabel("Visual tokens");
+  const temperature = page.getByRole("spinbutton", { name: "Temperature" });
+  const probability = page.getByText("Probability and penalties", { exact: true });
+  const constraintModes = page.getByRole("radiogroup", { name: "Output constraint" });
+
+  await expect(workspace.locator("optgroup").first()).toHaveAttribute("label", "Workspaces");
+  await expect(workspace.locator("optgroup").last()).toHaveAttribute("label", "Examples");
+  await expect(addImage).toBeVisible();
+  await expect(visualTokens).toBeVisible();
+  await expect(temperature).toBeVisible();
+  await expect(probability).toBeVisible();
+  await expect(constraintModes).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Stop token IDs" })).toBeVisible();
+
+  await workspace.selectOption("greedy-colors");
+  await expect(addImage).toBeHidden();
+  await expect(visualTokens).toBeHidden();
+  await expect(temperature).toBeHidden();
+  await expect(probability).toBeHidden();
+  await expect(constraintModes).toBeHidden();
+
+  await workspace.selectOption("sampling-tagline");
+  await expect(temperature).toBeVisible();
+  await expect(probability).toBeVisible();
+  await expect(constraintModes).toBeHidden();
+
+  await workspace.selectOption("regex-sky");
+  await expect(constraintModes).toBeHidden();
+  await expect(page.getByRole("textbox", { name: "Pattern" })).toBeVisible();
+  await expect(page.getByRole("spinbutton", { name: "Maximum depth" })).toBeHidden();
+
+  await workspace.selectOption("json-city");
+  await expect(page.getByRole("textbox", { name: "Pattern" })).toBeHidden();
+  await expect(page.getByRole("spinbutton", { name: "Maximum depth" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeHidden();
+
+  await workspace.selectOption("schema-triage");
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeVisible();
+});
+
+test("keeps Chat selected through composing and image attachment", async ({ page }) => {
+  await page.goto("/");
+  const workspace = page.getByLabel("Workspace");
+  await workspace.selectOption("chat");
+
+  await expect(page.getByRole("heading", { name: "Chat" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Messages" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Send" })).toBeVisible();
+  await expect(page.getByLabel("Visual tokens")).toBeHidden();
+  await page.getByRole("textbox", { name: "Message" }).fill("What is in this image?");
+  await expect(workspace).toHaveValue("chat");
+
+  await page.getByRole("button", { name: "Add image" }).setInputFiles(
+    "public/examples/dolphin_capt_image.png",
+  );
+  await expect(page.getByRole("img", { name: "Selected image preview" })).toBeVisible();
+  await expect(page.getByLabel("Visual tokens")).toBeVisible();
+  await expect(workspace).toHaveValue("chat");
+
+  const transcriptBeforeComposer = await page.evaluate(() => {
+    const transcript = document.querySelector(".output-tool");
+    const composer = document.querySelector("#generation-form");
+    return Boolean(transcript && composer &&
+      (transcript.compareDocumentPosition(composer) & Node.DOCUMENT_POSITION_FOLLOWING));
+  });
+  expect(transcriptBeforeComposer).toBe(true);
 });
 
 async function hideLocalCheckpoint(page: import("@playwright/test").Page): Promise<void> {

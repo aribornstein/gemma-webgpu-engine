@@ -21,6 +21,11 @@ export interface PreparedGemmaConversationTurn {
   readonly image?: GemmaVisionImageSource;
 }
 
+export interface PreparedGemmaConversationEdit {
+  readonly conversation: GemmaConversation;
+  readonly turn: PreparedGemmaConversationTurn;
+}
+
 export function createGemmaConversation(
   messages: readonly GemmaChatMessage[] = [],
   images: readonly GemmaVisionImageSource[] = [],
@@ -78,4 +83,46 @@ export function commitGemmaConversationTurn(
     turn.image ? [...conversation.images, turn.image] : conversation.images,
     conversation.tools,
   );
+}
+
+export function prepareGemmaConversationEdit(
+  conversation: GemmaConversation,
+  messageIndex: number,
+  prompt: string,
+  replacementImage?: GemmaVisionImageSource,
+  visionTokenBudget: GemmaVisionTokenBudget = GEMMA_VISION_MAX_SOFT_TOKENS,
+): PreparedGemmaConversationEdit {
+  if (!Number.isInteger(messageIndex) || messageIndex < 0 ||
+      messageIndex >= conversation.messages.length) {
+    throw new Error("Gemma conversation edit index is invalid");
+  }
+  const message = conversation.messages[messageIndex];
+  if (message.role !== "user") throw new Error("Only Gemma user turns can be edited");
+  const priorMessages = conversation.messages.slice(0, messageIndex);
+  const priorImageCount = countImageParts(priorMessages);
+  const messageImageCount = countImageParts([message]);
+  if (messageImageCount > 1) {
+    throw new Error("Gemma conversation edits support at most one image per user turn");
+  }
+  const image = replacementImage ?? (messageImageCount === 1
+    ? conversation.images[priorImageCount]
+    : undefined);
+  if (messageImageCount === 1 && !image) {
+    throw new Error("Gemma conversation edit is missing its owned image");
+  }
+  const truncated = createGemmaConversation(
+    priorMessages,
+    conversation.images.slice(0, priorImageCount),
+    conversation.tools,
+  );
+  return {
+    conversation: truncated,
+    turn: prepareGemmaConversationTurn(truncated, prompt, image, visionTokenBudget),
+  };
+}
+
+function countImageParts(messages: readonly GemmaChatMessage[]): number {
+  return messages.reduce((total, message) => total + (typeof message.content === "string"
+    ? 0
+    : message.content.filter((part) => part.type === "image").length), 0);
 }

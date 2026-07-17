@@ -73,6 +73,14 @@ async function chat(content: string): Promise<string> {
 }
 ```
 
+Editing an earlier user turn must discard assistant output and later turns that depended on the old
+content. `prepareGemmaConversationEdit()` performs that truncation without mutating the retained
+conversation. For multimodal history it keeps images owned by earlier turns and carries the edited
+turn's image into the replacement request. After successful generation, commit the returned turn
+against the returned truncated conversation. The session compares the newly serialized token IDs
+with its evaluated IDs and retains only the exact common prefix; changed tokens therefore cannot
+reuse stale K/V rows.
+
 `encodeMessages()` applies the pinned July 9 canonical Gemma 4 template with
 `add_generation_prompt: true`, mapping `assistant` to the template's `model` role and closing every
 completed turn. Text requests reuse the longest matching K/V prefix by default, so resubmitting the
@@ -191,7 +199,12 @@ from 103.6 to 11.7 seconds of vision work on the first optimized run; a warm req
 5.6 seconds with 0.1 ms of weight loading. Exact 2,520-patch full generation completed in 5.8
 seconds of vision work and 8.4 seconds total. Live mid-tower cancellation and same-session recovery
 pass. Console telemetry separates preprocessing, weights, patch embedding, layer setup/execution,
-and postprocessing. GPU layer execution and longer repeated-request resource stress remain open.
+postprocessing, and retained CPU vision-weight memory. A cold quality-tier request populated 18
+cached entries from 180.3 MiB of source weights and retained 211.6 MiB of materialized CPU arrays.
+Thirteen additional same-session requests held that value and 1186.8 MiB of GPU buffers constant;
+the ten-run extension completed without browser or request errors and measured 5.4-5.8 seconds of
+warm vision work. GPU layer optimization and longer mixed-image, cancellation, and destruction
+soak testing remain open.
 Multimodal requests reset prefix caches, while text-only requests may reuse a retained common prefix.
 
 ## Context capacity
@@ -217,7 +230,7 @@ recovery passed at 1,024 rows. The normal console remains at the practical certi
 
 Work proceeds in this order: optimize the remaining measured vision-layer execution and complete
 long-run resource stress;
-expose role-preserving multi-turn chat and define multimodal reuse; add canonical reasoning-mode
+finish console integration for safe history editing and define content-hashed multimodal reuse; add canonical reasoning-mode
 configuration, response parsing, and history ownership; implement the pinned audio path; implement
 deterministic video frame ingestion; optimize prefill and constrained decoding; then harden
 device-loss recovery and the release browser matrix. See

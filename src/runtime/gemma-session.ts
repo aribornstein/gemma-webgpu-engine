@@ -88,6 +88,7 @@ import {
   type GemmaPrefillMode,
   type GemmaPrefillStrategy,
 } from "./gemma-prefill-plan";
+import { reusableGemmaPromptPrefixLength } from "./gemma-prompt-cache";
 
 export type { GemmaGenerationOptions } from "./generation-config";
 export type { GemmaGenerationUpdate } from "./generation-control";
@@ -183,6 +184,9 @@ interface GemmaSessionTensorSource extends GemmaInputTensorSource {
 export interface GemmaSessionMemoryEstimate {
   gpuBufferCount: number;
   gpuBufferBytes: number;
+  visionWeightEntryCount: number;
+  visionWeightSourceBytes: number;
+  visionWeightMaterializedBytes: number;
   scope: "retained-resource-graph";
 }
 
@@ -735,10 +739,14 @@ export class GemmaGenerationSession {
     visit(this.resources);
     visit(this.prefill);
     visit(this.logitsReadback);
+    const visionWeights = this.visionWeightCache.estimateRetainedMemory();
     return {
       gpuBufferCount: buffers.size,
       gpuBufferBytes: Array.from(buffers, (buffer) => buffer.size)
         .reduce((sum, size) => sum + size, 0),
+      visionWeightEntryCount: visionWeights.loadedEntryCount,
+      visionWeightSourceBytes: visionWeights.sourceBytes,
+      visionWeightMaterializedBytes: visionWeights.materializedBytes,
       scope: "retained-resource-graph",
     };
   }
@@ -770,13 +778,10 @@ export class GemmaGenerationSession {
       this.reset();
       return 0;
     }
-    const maximumReusable = Math.max(0, promptTokenIds.length - 1);
-    let prefixLength = 0;
-    while (prefixLength < maximumReusable &&
-        prefixLength < this.evaluatedTokenIds.length &&
-        promptTokenIds[prefixLength] === this.evaluatedTokenIds[prefixLength]) {
-      prefixLength += 1;
-    }
+    const prefixLength = reusableGemmaPromptPrefixLength(
+      promptTokenIds,
+      this.evaluatedTokenIds,
+    );
     const caches = Array.from(this.resources.stack.ownerCaches.values());
     if (prefixLength > 0 && caches.every((cache) => cache.canRetainPrefix(prefixLength))) {
       for (const cache of caches) cache.truncate(prefixLength);

@@ -33,11 +33,24 @@ test("reuses immutable materialized vision weights until cleared", async () => {
   const cache = new GemmaVisionWeightCache();
 
   const first = await cache.loadProjector(source);
-  const second = await cache.loadProjector(source);
-  expect(second).toBe(first);
+  const firstEstimate = cache.estimateRetainedMemory();
+  for (let iteration = 0; iteration < 20; iteration += 1) {
+    expect(await cache.loadProjector(source)).toBe(first);
+    expect(cache.estimateRetainedMemory()).toEqual(firstEstimate);
+  }
   expect(reads).toBe(1);
+  expect(firstEstimate).toEqual({
+    loadedEntryCount: 1,
+    sourceBytes: byteLength,
+    materializedBytes: byteLength,
+  });
 
   cache.clear();
+  expect(cache.estimateRetainedMemory()).toEqual({
+    loadedEntryCount: 0,
+    sourceBytes: 0,
+    materializedBytes: 0,
+  });
   const afterClear = await cache.loadProjector(source);
   expect(afterClear).not.toBe(first);
   expect(reads).toBe(2);
