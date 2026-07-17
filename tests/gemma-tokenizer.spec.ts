@@ -74,12 +74,95 @@ test("tokenizes structured single and multi-turn conversations", async ({ page }
       prompt: tokenizer.encodePrompt(prompt),
       conversation: tokenizer.encodeMessages(conversation),
       repeated: tokenizer.encodeMessages(conversation),
+      decoded: tokenizer.decodeTokens(tokenizer.encodeMessages(conversation)),
     };
   });
 
   expect(result.single).toEqual(result.prompt);
   expect(result.conversation).toEqual(result.repeated);
-  expect(result.conversation.length).toBeGreaterThan(result.single.length);
+  expect(result.conversation).toEqual([
+    2, 105, 9731, 107, 7925, 21485, 236761, 106, 107, 105, 2364, 107, 3689,
+    563, 1156, 2915, 1156, 236881, 106, 107, 105, 4368, 107, 26391, 236761,
+    106, 107, 105, 2364, 107, 6974, 625, 618, 496, 15958, 236761, 106, 107,
+    105, 4368, 107,
+  ]);
+  expect(result.decoded).toBe(
+    "system\nAnswer briefly.\nuser\nWhat is two plus two?\n" +
+    "model\nFour.\nuser\nWrite it as a digit.\nmodel\n",
+  );
+});
+
+test("commits completed turns without mutating in-flight conversation history", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-conversation.ts";
+    const {
+      commitGemmaConversationTurn,
+      createGemmaConversation,
+      prepareGemmaConversationTurn,
+    } = await import(modulePath);
+    const initial = createGemmaConversation([
+      { role: "system", content: "Answer briefly." },
+      { role: "user", content: "What is two plus two?" },
+      { role: "assistant", content: "Four." },
+    ]);
+    const pending = prepareGemmaConversationTurn(initial, "Write it as a digit.");
+    const committed = commitGemmaConversationTurn(initial, pending, "4");
+    return {
+      initialMessages: initial.messages,
+      pendingInput: pending.input,
+      committedMessages: committed.messages,
+    };
+  });
+
+  expect(result.initialMessages).toHaveLength(3);
+  expect(result.pendingInput).toEqual([
+    ...result.initialMessages,
+    { role: "user", content: "Write it as a digit." },
+  ]);
+  expect(result.committedMessages).toEqual([
+    ...result.pendingInput,
+    { role: "assistant", content: "4" },
+  ]);
+});
+
+test("renders function declarations through the canonical tool system block", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-tokenizer.ts";
+    const { loadGemmaTokenizer } = await import(modulePath);
+    const tokenizer = await loadGemmaTokenizer();
+    const tokenIds = tokenizer.encodeInput({
+      messages: [{ role: "user", content: "What is the weather in Boston?" }],
+      tools: [{
+        type: "function",
+        function: {
+          name: "get_current_weather",
+          description: "Get the current weather for a city.",
+          parameters: {
+            type: "object",
+            properties: {
+              location: { type: "string", description: "City and region." },
+            },
+            required: ["location"],
+          },
+        },
+      }],
+    });
+    return {
+      tokenIds,
+      decoded: tokenizer.decodeTokens(tokenIds),
+    };
+  });
+
+  expect(result.tokenIds[0]).toBe(2);
+  expect(result.tokenIds).toContain(46);
+  expect(result.tokenIds).toContain(47);
+  expect(result.decoded).toBe(
+    "system\ndeclaration:get_current_weather{description:Get the current weather for a city.," +
+    "parameters:{properties:{location:{description:City and region.,type:STRING}}," +
+    "required:[location],type:OBJECT}}\nuser\nWhat is the weather in Boston?\nmodel\n",
+  );
 });
 
 test("emits one pinned image marker for each structured image part", async ({ page }) => {

@@ -24,11 +24,21 @@ import {
   GEMMA_MODEL_CONTEXT_CAPACITY,
   GEMMA_VALIDATED_CONTEXT_CAPACITY,
 } from "./runtime/gemma-context";
+import {
+  commitGemmaConversationTurn,
+  createGemmaConversation,
+  prepareGemmaConversationTurn,
+  type GemmaConversation,
+  type PreparedGemmaConversationTurn,
+} from "./runtime/gemma-conversation";
 import type {
   GemmaGenerationSession,
   GemmaGenerationTiming,
 } from "./runtime/gemma-session";
-import type { GemmaGenerationInput } from "./runtime/gemma-tokenizer";
+import type {
+  GemmaChatMessage,
+  GemmaFunctionTool,
+} from "./runtime/gemma-tokenizer";
 import type { GemmaDurableBenchmarkArtifact } from "./runtime/durable-benchmark";
 
 type GemmaCacheInitializationProgress = SafetensorsCacheInitializationProgress;
@@ -51,6 +61,8 @@ interface GenerationExample {
   label: string;
   prompt: string;
   controls: Partial<Record<GenerationExampleControl, number>>;
+  history?: readonly GemmaChatMessage[];
+  tools?: readonly GemmaFunctionTool[];
   image?: {
     url: string;
     filename: string;
@@ -60,6 +72,50 @@ interface GenerationExample {
 }
 
 const GENERATION_EXAMPLES: readonly GenerationExample[] = [
+  {
+    id: "chat-arithmetic",
+    label: "Arithmetic follow-up · Multi-turn",
+    prompt: "As a digit?",
+    controls: { temperature: 0, maxNewTokens: 16 },
+    history: [
+      { role: "user", content: "2 + 2?" },
+      { role: "assistant", content: "4" },
+    ],
+  },
+  {
+    id: "tool-weather",
+    label: "Boston weather · Tool call",
+    prompt: "Use get_current_weather to look up the current weather in Boston.",
+    controls: {
+      temperature: 1,
+      maxNewTokens: 48,
+      topK: 64,
+      topP: 0.95,
+      seed: 42,
+    },
+    expandProbabilityControls: true,
+    history: [{
+      role: "system",
+      content: "When a listed tool can answer the request, call that tool instead of answering in prose.",
+    }],
+    tools: [{
+      type: "function",
+      function: {
+        name: "get_current_weather",
+        description: "Get the current weather for a city.",
+        parameters: {
+          type: "object",
+          properties: {
+            location: {
+              type: "string",
+              description: "City and region, for example Boston, MA.",
+            },
+          },
+          required: ["location"],
+        },
+      },
+    }],
+  },
   {
     id: "vision-dolphin-caption",
     label: "Dolphin caption · Vision",
@@ -177,9 +233,12 @@ app.innerHTML = `
       <div class="section-heading">
         <div>
           <p class="eyebrow">SESSION</p>
-          <h2 id="generation-heading">Prompt and response</h2>
+          <h2 id="generation-heading">Conversation</h2>
         </div>
-        <button id="load-model" class="secondary-command" type="button" disabled>Load model</button>
+        <div class="heading-commands">
+          <button id="new-chat" class="quiet-command" type="button" disabled>New chat</button>
+          <button id="load-model" class="secondary-command" type="button" disabled>Load model</button>
+        </div>
       </div>
 
       <div id="model-progress" class="model-progress" data-state="pending" hidden>
@@ -200,7 +259,7 @@ app.innerHTML = `
         </label>
 
         <label class="field prompt-field" for="prompt">
-          <span>Prompt</span>
+          <span>Message</span>
           <textarea id="prompt" name="prompt" rows="6" spellcheck="true">Name the three primary colors in one short sentence.</textarea>
         </label>
         <div class="image-input-row">
@@ -225,10 +284,10 @@ app.innerHTML = `
 
       <div class="output-tool" aria-labelledby="output-heading">
         <div class="tool-heading">
-          <h3 id="output-heading">Output</h3>
+          <h3 id="output-heading">Transcript</h3>
           <span id="output-token-count">0 tokens</span>
         </div>
-        <div id="generation-output" class="generation-output" role="log" aria-live="polite">No output yet.</div>
+        <div id="generation-output" class="generation-output" role="log" aria-live="polite">No conversation yet.</div>
       </div>
 
       <div class="telemetry" aria-label="Generation telemetry">
@@ -389,6 +448,7 @@ const gpuStatus = element<HTMLSpanElement>("gpu-status");
 const cacheStatus = element<HTMLSpanElement>("cache-status");
 const modelStatus = element<HTMLSpanElement>("model-status");
 const loadButton = element<HTMLButtonElement>("load-model");
+const newChatButton = element<HTMLButtonElement>("new-chat");
 const generateButton = element<HTMLButtonElement>("generate");
 const cancelButton = element<HTMLButtonElement>("cancel");
 const resetButton = element<HTMLButtonElement>("reset-controls");
@@ -431,6 +491,7 @@ let selectedImage: File | null = null;
 let imagePreviewUrl: string | null = null;
 let benchmarkController: AbortController | null = null;
 let benchmarkArtifact: GemmaDurableBenchmarkArtifact | null = null;
+let conversation: GemmaConversation = createGemmaConversation();
 
 void initializeCapabilities();
 void restoreBenchmarkArtifact();
@@ -438,6 +499,7 @@ renderConstraintFields();
 validateControls();
 
 loadButton.addEventListener("click", () => void loadModel());
+newChatButton.addEventListener("click", clearConversation);
 exampleSelect.addEventListener("change", () => {
   const example = GENERATION_EXAMPLES.find(({ id }) => id === exampleSelect.value);
   if (example) void selectGenerationExample(example);
@@ -623,6 +685,7 @@ function setBenchmarkRunning(running: boolean): void {
   benchmarkCapacity.disabled = running;
   benchmarkDownloadButton.disabled = running || !benchmarkArtifact;
   loadButton.disabled = running || (!localModelAvailable && !cacheAvailable) || !navigator.gpu;
+  newChatButton.disabled = running || !hasConversationState();
   generateButton.disabled = running || !session;
   exampleSelect.disabled = running;
   promptInput.disabled = running;
@@ -732,8 +795,10 @@ async function generate(): Promise<void> {
   }
 
   let options: GemmaGenerationOptions;
+  let turn: PreparedGemmaConversationTurn;
   try {
     options = readGenerationOptions();
+    turn = prepareGemmaConversationTurn(conversation, prompt, selectedImage ?? undefined);
     renderPromptBudget(options.maxNewTokens ?? DEFAULT_GENERATION_CONFIG.maxNewTokens);
     renderValidConfiguration(options);
   } catch (error) {
@@ -754,23 +819,44 @@ async function generate(): Promise<void> {
       ? `Preparing ${image}`
       : `Encoding ${image} · layer ${progress.completedLayers}/${progress.totalLayers}`;
   };
+  let draftText = "";
   options.onToken = (update) => {
-    output.textContent = update.text;
+    draftText = update.text;
+    renderConversation(turn.userMessage, draftText);
     outputTokenCount.textContent = `${update.generatedTokenIds.length} ${pluralize(update.generatedTokenIds.length, "token")}`;
   };
   setGenerating(true);
-  output.textContent = "";
+  renderConversation(turn.userMessage, "");
   outputTokenCount.textContent = "0 tokens";
   clearTelemetry();
   requestStatus.textContent = "Generating";
 
   try {
-    const measured = await session.generateMeasured(generationInput(prompt), options);
-    output.textContent = measured.result.text || "No text output.";
+    const measured = await session.generateMeasured(turn.input, options);
+    const hasToolCalls = measured.result.toolCalls.length > 0;
+    draftText = hasToolCalls
+      ? measured.result.toolCalls.map((call) =>
+          `${call.function.name}\n${JSON.stringify(call.function.arguments, null, 2)}`)
+        .join("\n\n")
+      : conversation.tools.length > 0 ? measured.result.rawText : measured.result.text;
+    if (conversation.tools.length > 0) {
+      renderConversation(
+        turn.userMessage,
+        draftText || "No tool call output.",
+        hasToolCalls ? "tool-call" : "stopped",
+      );
+    } else if (draftText.trim()) {
+      conversation = commitGemmaConversationTurn(conversation, turn, draftText);
+      promptInput.value = "";
+      clearSelectedImage();
+      renderConversation();
+    } else {
+      renderConversation(turn.userMessage, "No text output.", "failed");
+    }
     outputTokenCount.textContent = `${measured.result.generatedTokenIds.length} ${pluralize(measured.result.generatedTokenIds.length, "token")}`;
-    requestStatus.textContent = measured.result.stopReason === "length"
-      ? "Token limit reached"
-      : "Generation complete";
+    requestStatus.textContent = hasToolCalls
+      ? "Tool call ready"
+      : measured.result.stopReason === "length" ? "Token limit reached" : "Generation complete";
     renderTelemetry(
       measured.timing,
       measured.result.stopReason,
@@ -780,9 +866,11 @@ async function generate(): Promise<void> {
     if (generationController.signal.aborted) {
       requestStatus.textContent = "Generation stopped";
       element<HTMLElement>("metric-stop").textContent = "cancelled";
+      renderConversation(turn.userMessage, draftText, "stopped");
     } else {
       requestStatus.textContent = errorMessage(error);
       element<HTMLElement>("metric-stop").textContent = "error";
+      renderConversation(turn.userMessage, draftText || errorMessage(error), "failed");
       if (isDeviceFailure(error)) {
         session.destroy();
         session = null;
@@ -792,6 +880,7 @@ async function generate(): Promise<void> {
   } finally {
     generationController = null;
     setGenerating(false);
+    validateControls();
   }
 }
 
@@ -822,6 +911,9 @@ function readGenerationOptions(): GemmaGenerationOptions {
 
 function applyGenerationExample(example: GenerationExample): void {
   controlsForm.reset();
+  conversation = createGemmaConversation(example.history, [], example.tools);
+  renderConversation();
+  newChatButton.disabled = !hasConversationState();
   promptInput.value = example.prompt;
   for (const [name, value] of Object.entries(example.controls)) {
     setControlValue(name, value);
@@ -908,7 +1000,9 @@ function validateControls(): boolean {
     const options = readGenerationOptions();
     renderPromptBudget(options.maxNewTokens ?? DEFAULT_GENERATION_CONFIG.maxNewTokens);
     renderValidConfiguration(options);
-    if (session && !generationController) generateButton.disabled = false;
+    if (session && !generationController) {
+      generateButton.disabled = promptInput.value.trim().length === 0;
+    }
     return true;
   } catch (error) {
     configStatus.textContent = errorMessage(error);
@@ -922,12 +1016,13 @@ function renderPromptBudget(maxNewTokens: number): void {
   const prompt = promptInput.value.trim();
   if (!session || !prompt) {
     promptBudget.textContent = session
-      ? "Enter a prompt to calculate context usage"
+      ? "Enter a message to calculate context usage"
       : "Load the model to calculate context usage";
     promptBudget.dataset.valid = "true";
     return;
   }
-  const promptTokens = session.promptTokenCount(generationInput(prompt));
+  const turn = prepareGemmaConversationTurn(conversation, prompt, selectedImage ?? undefined);
+  const promptTokens = session.promptTokenCount(turn.input);
   const availableOutput = availableGemmaOutputTokens(promptTokens, session.cacheCapacity);
   const requestedPositions = promptTokens + maxNewTokens - 1;
   promptBudget.textContent = `${promptTokens.toLocaleString()} prompt + ${maxNewTokens.toLocaleString()} output / ${requestedPositions.toLocaleString()} of ${session.cacheCapacity.toLocaleString()} positions`;
@@ -1015,6 +1110,7 @@ function setGenerating(generating: boolean): void {
   generateButton.disabled = generating || !session;
   cancelButton.disabled = !generating;
   loadButton.disabled = generating || (!localModelAvailable && !cacheAvailable) || !navigator.gpu;
+  newChatButton.disabled = generating || !hasConversationState();
   exampleSelect.disabled = generating;
   promptInput.disabled = generating;
   imageInput.disabled = generating;
@@ -1027,18 +1123,78 @@ function setGenerating(generating: boolean): void {
   }
 }
 
-function generationInput(prompt: string): GemmaGenerationInput {
-  if (!selectedImage) return prompt;
-  return {
-    messages: [{
-      role: "user",
-      content: [
-        { type: "image" },
-        { type: "text", text: prompt },
-      ],
-    }],
-    images: [selectedImage],
-  };
+function clearConversation(): void {
+  conversation = createGemmaConversation();
+  renderConversation();
+  outputTokenCount.textContent = "0 tokens";
+  newChatButton.disabled = true;
+  requestStatus.textContent = session ? "New conversation" : "Waiting for model";
+  validateControls();
+}
+
+function renderConversation(
+  pendingUser?: GemmaChatMessage,
+  assistantDraft?: string,
+  draftState: "streaming" | "stopped" | "failed" | "tool-call" = "streaming",
+): void {
+  output.replaceChildren();
+  for (const tool of conversation.tools) output.append(renderTool(tool));
+  const messages = pendingUser
+    ? [...conversation.messages, pendingUser]
+    : [...conversation.messages];
+  for (const message of messages) output.append(renderMessage(message));
+  if (pendingUser) {
+    output.append(renderMessage({
+      role: "assistant",
+      content: assistantDraft || "Generating...",
+    }, draftState));
+  }
+  if (messages.length === 0 && conversation.tools.length === 0) {
+    output.textContent = "No conversation yet.";
+  }
+  output.scrollTop = output.scrollHeight;
+}
+
+function renderTool(tool: GemmaFunctionTool): HTMLElement {
+  const article = document.createElement("article");
+  article.className = "conversation-message";
+  article.dataset.role = "tool";
+  const role = document.createElement("span");
+  role.className = "conversation-role";
+  role.textContent = "Tool";
+  const content = document.createElement("div");
+  content.className = "conversation-content";
+  content.textContent = `${tool.function.name} - ${tool.function.description}`;
+  article.append(role, content);
+  return article;
+}
+
+function renderMessage(
+  message: GemmaChatMessage,
+  state?: "streaming" | "stopped" | "failed" | "tool-call",
+): HTMLElement {
+  const article = document.createElement("article");
+  article.className = "conversation-message";
+  article.dataset.role = message.role;
+  if (state) article.dataset.state = state;
+  const role = document.createElement("span");
+  role.className = "conversation-role";
+  role.textContent = message.role === "assistant" ? "Model" : message.role;
+  const content = document.createElement("div");
+  content.className = "conversation-content";
+  content.textContent = messageContentText(message);
+  article.append(role, content);
+  return article;
+}
+
+function messageContentText(message: GemmaChatMessage): string {
+  if (typeof message.content === "string") return message.content;
+  return message.content.map((part) => part.type === "image" ? "[Image]" : part.text).join("\n");
+}
+
+function hasConversationState(): boolean {
+  return conversation.messages.length > 0 || conversation.images.length > 0 ||
+    conversation.tools.length > 0;
 }
 
 function selectImage(file: File, clearExample: boolean): void {

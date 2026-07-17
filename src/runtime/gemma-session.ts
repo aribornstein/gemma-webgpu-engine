@@ -69,6 +69,10 @@ import {
   type GemmaVisionInput,
 } from "./gemma-vision-input";
 import { sampleToken, SeededRandom } from "./sampling";
+import {
+  parseGemmaToolCalls,
+  type GemmaParsedToolCall,
+} from "./gemma-response";
 import { TokenByteTrie } from "./token-byte-trie";
 import {
   assertGemmaContextSupported,
@@ -90,6 +94,8 @@ export type GemmaGenerationStopReason = "end-token" | "stop-token" | "length";
 
 export interface GemmaGenerationResult {
   text: string;
+  rawText: string;
+  toolCalls: readonly GemmaParsedToolCall[];
   promptTokenIds: number[];
   generatedTokenIds: number[];
   decodingConfig: DecodingConfig;
@@ -587,9 +593,13 @@ export class GemmaGenerationSession {
         }
       }
       const text = this.tokenizer.decodeTokens(generatedTokenIds);
+      const rawText = this.tokenizer.decodeRawTokens(generatedTokenIds);
+      const toolCalls = parseGemmaToolCalls(rawText);
       compiledConstraint?.validateFinal(text);
       return {
         text,
+        rawText,
+        toolCalls,
         promptTokenIds,
         generatedTokenIds,
         decodingConfig: config,
@@ -980,5 +990,5 @@ function isMultimodalGenerationInput(
   input: GemmaGenerationInput,
 ): input is GemmaMultimodalGenerationInput {
   return typeof input === "object" && !Array.isArray(input) &&
-    "messages" in input && "images" in input;
+    "messages" in input && "images" in input && Array.isArray(input.images);
 }

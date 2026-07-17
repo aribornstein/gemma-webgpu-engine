@@ -1,10 +1,14 @@
 import { expect, test } from "@playwright/test";
 
 test("offers a direct model download when the cache is absent", async ({ page }) => {
+  await hideLocalCheckpoint(page);
   await page.goto("/");
 
   await expect(page).toHaveTitle("Gemma WebGPU Generation Console");
   await expect(page.getByRole("heading", { name: "Generation console" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Conversation" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "New chat" })).toBeDisabled();
+  await expect(page.getByRole("heading", { name: "Transcript" })).toBeVisible();
   await expect(page.getByText("WebGPU ready", { exact: true })).toBeVisible();
   await expect(page.getByText("Cache absent", { exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Download model" })).toBeEnabled();
@@ -22,6 +26,7 @@ test("offers a direct model download when the cache is absent", async ({ page })
 });
 
 test("offers to resume an incomplete model cache", async ({ page }) => {
+  await hideLocalCheckpoint(page);
   await page.goto("/");
   await page.evaluate(async () => {
     await new Promise<void>((resolve, reject) => {
@@ -53,6 +58,7 @@ test("offers to resume an incomplete model cache", async ({ page }) => {
 });
 
 test("enables a host-provided client-side cache initializer", async ({ page }) => {
+  await hideLocalCheckpoint(page);
   await page.addInitScript(() => {
     const host = window as typeof window & {
       __gemmaEngineCacheInitializer?: (
@@ -117,13 +123,25 @@ test("applies editable generation examples", async ({ page }) => {
   await page.goto("/");
 
   const examples = page.getByLabel("Example");
+  await examples.selectOption("chat-arithmetic");
+  await expect(page.getByRole("log")).toContainText("2 + 2?");
+  await expect(page.getByRole("log")).toContainText("4");
+  await expect(page.getByRole("textbox", { name: "Message" }))
+    .toHaveValue("As a digit?");
+  await expect(page.getByRole("button", { name: "New chat" })).toBeEnabled();
+
+  await examples.selectOption("tool-weather");
+  await expect(page.getByRole("log")).toContainText("get_current_weather");
+  await expect(page.getByRole("textbox", { name: "Message" }))
+    .toHaveValue(/current weather in Boston/);
+
   await examples.selectOption("greedy-colors");
-  await expect(page.getByRole("textbox", { name: "Prompt" }))
+  await expect(page.getByRole("textbox", { name: "Message" }))
     .toHaveValue("Name the three primary colors in one short sentence.");
   await expect(page.getByText("Exact greedy configuration", { exact: true })).toBeVisible();
 
   await examples.selectOption("sampling-tagline");
-  await expect(page.getByRole("textbox", { name: "Prompt" }))
+  await expect(page.getByRole("textbox", { name: "Message" }))
     .toHaveValue("Write one vivid, playful sentence describing a pocket-sized observatory.");
   await expect(page.getByRole("spinbutton", { name: "Temperature" })).toHaveValue("0.8");
   await expect(page.getByRole("spinbutton", { name: "Top K" })).toHaveValue("40");
@@ -152,14 +170,14 @@ test("keeps the vision example grounded in the selected image", async ({ page })
   await page.goto("/");
 
   await page.getByLabel("Example").selectOption("vision-dolphin-caption");
-  const captionPrompt = await page.getByRole("textbox", { name: "Prompt" }).inputValue();
+  const captionPrompt = await page.getByRole("textbox", { name: "Message" }).inputValue();
   expect(captionPrompt).toContain("Transcribe the printed caption in this image");
   expect(captionPrompt).not.toMatch(/spinner|stenella|kona|hawaii|brian skerry/i);
   await expect(page.getByRole("img", { name: "Selected image preview" })).toBeVisible();
   await expect(page.getByText("dolphin_capt_image.png", { exact: true })).toBeVisible();
 
   await page.getByLabel("Example").selectOption("vision-gottingen");
-  const prompt = await page.getByRole("textbox", { name: "Prompt" }).inputValue();
+  const prompt = await page.getByRole("textbox", { name: "Message" }).inputValue();
   expect(prompt).toContain("Read the printed caption in the image");
   expect(prompt).not.toMatch(
     /Abraham|Schilling|Hilbert|Klein|Schwarzschild|Young|Diestel|Zermelo|Fanla|Hansen|Müller|Dawncy|Schmidt|Yoshiye|Epsteen|Fleisher|Bernstein|Blumenthal|Hamel/,
@@ -168,3 +186,13 @@ test("keeps the vision example grounded in the selected image", async ({ page })
   await expect(page.getByText("the-mathematics-club-of-gottingen-1902.jpg", { exact: true }))
     .toBeVisible();
 });
+
+async function hideLocalCheckpoint(page: import("@playwright/test").Page): Promise<void> {
+  await page.route("**/models/gemma-4-e2b/model.safetensors", async (route) => {
+    if (route.request().method() === "HEAD") {
+      await route.fulfill({ status: 404 });
+      return;
+    }
+    await route.continue();
+  });
+}

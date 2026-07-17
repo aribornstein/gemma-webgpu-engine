@@ -24,15 +24,34 @@ export interface GemmaChatMessage {
   content: string | readonly GemmaChatContentPart[];
 }
 
-export interface GemmaMultimodalGenerationInput {
+export interface GemmaFunctionTool {
+  type: "function";
+  function: {
+    name: string;
+    description: string;
+    parameters: {
+      type: "object";
+      properties: Readonly<Record<string, Readonly<Record<string, unknown>>>>;
+      required: readonly string[];
+    };
+    response?: Readonly<Record<string, unknown>>;
+  };
+}
+
+export interface GemmaStructuredGenerationInput {
   messages: readonly GemmaChatMessage[];
+  images?: readonly GemmaVisionImageSource[];
+  tools?: readonly GemmaFunctionTool[];
+}
+
+export interface GemmaMultimodalGenerationInput extends GemmaStructuredGenerationInput {
   images: readonly GemmaVisionImageSource[];
 }
 
 export type GemmaGenerationInput =
   | string
   | readonly GemmaChatMessage[]
-  | GemmaMultimodalGenerationInput;
+  | GemmaStructuredGenerationInput;
 
 env.allowLocalModels = true;
 env.allowRemoteModels = false;
@@ -51,9 +70,13 @@ export interface GemmaTokenizer {
   readonly endTokenIds: readonly number[];
   readonly imageTokenId: number;
   encodePrompt(prompt: string): number[];
-  encodeMessages(messages: readonly GemmaChatMessage[]): number[];
+  encodeMessages(
+    messages: readonly GemmaChatMessage[],
+    tools?: readonly GemmaFunctionTool[],
+  ): number[];
   encodeInput(input: GemmaGenerationInput): number[];
   decodeTokens(tokenIds: readonly number[]): string;
+  decodeRawTokens(tokenIds: readonly number[]): string;
   tokenBytes(tokenId: number): Uint8Array | null;
   isEndToken(tokenId: number): boolean;
 }
@@ -72,8 +95,12 @@ function createGemmaTokenizer(
   chatTemplate: string,
 ): GemmaTokenizer {
   const tokenBytes = createTokenByteTable(tokenizer);
-  const encodeMessages = (messages: readonly GemmaChatMessage[]): number[] => {
+  const encodeMessages = (
+    messages: readonly GemmaChatMessage[],
+    tools: readonly GemmaFunctionTool[] = [],
+  ): number[] => {
     validateMessages(messages);
+    validateTools(tools);
     const tokenIds = tokenizer.apply_chat_template(
       messages.map(({ role, content }) => ({
         role,
@@ -83,6 +110,17 @@ function createGemmaTokenizer(
       })),
       {
         chat_template: chatTemplate,
+        tools: tools.map((tool) => ({
+          type: tool.type,
+          function: {
+            ...tool.function,
+            parameters: {
+              ...tool.function.parameters,
+              properties: { ...tool.function.parameters.properties },
+              required: [...tool.function.parameters.required],
+            },
+          },
+        })),
         add_generation_prompt: true,
         tokenize: true,
         return_tensor: false,
@@ -104,12 +142,21 @@ function createGemmaTokenizer(
     encodeMessages,
     encodeInput(input) {
       if (typeof input === "string") return this.encodePrompt(input);
-      return encodeMessages("messages" in input ? input.messages : input);
+      return "messages" in input
+        ? encodeMessages(input.messages, input.tools)
+        : encodeMessages(input);
     },
     decodeTokens(tokenIds) {
       if (tokenIds.length === 0) return "";
       return tokenizer.decode(Array.from(tokenIds), {
         skip_special_tokens: true,
+        clean_up_tokenization_spaces: false,
+      });
+    },
+    decodeRawTokens(tokenIds) {
+      if (tokenIds.length === 0) return "";
+      return tokenizer.decode(Array.from(tokenIds), {
+        skip_special_tokens: false,
         clean_up_tokenization_spaces: false,
       });
     },
@@ -146,6 +193,26 @@ function validContent(content: GemmaChatMessage["content"]): boolean {
   if (content.length === 0) return false;
   return content.every((part) => part.type === "image" ||
     (part.type === "text" && part.text.trim().length > 0));
+}
+
+function validateTools(tools: readonly GemmaFunctionTool[]): void {
+  const names = new Set<string>();
+  for (const [index, tool] of tools.entries()) {
+    const declaration = tool.function;
+    if (tool.type !== "function" || !/^[A-Za-z_][A-Za-z0-9_]*$/.test(declaration.name) ||
+        !declaration.description.trim() || declaration.parameters.type !== "object") {
+      throw new Error(`Gemma tool ${index} has an invalid function declaration`);
+    }
+    if (names.has(declaration.name)) {
+      throw new Error(`Gemma tool name ${declaration.name} is duplicated`);
+    }
+    names.add(declaration.name);
+    for (const required of declaration.parameters.required) {
+      if (!(required in declaration.parameters.properties)) {
+        throw new Error(`Gemma tool ${declaration.name} requires unknown property ${required}`);
+      }
+    }
+  }
 }
 
 function createTokenByteTable(tokenizer: PreTrainedTokenizer): (Uint8Array | null)[] {

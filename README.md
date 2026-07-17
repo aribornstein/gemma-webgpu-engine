@@ -30,7 +30,7 @@ npm run build
 
 ## Generate
 
-The owned runtime now exposes a persistent prompt-to-text session:
+The owned runtime exposes a persistent generation session:
 
 ```ts
 import { loadGemmaGenerationSession } from "./src/runtime/gemma-session";
@@ -56,6 +56,62 @@ try {
 }
 ```
 
+For multi-turn chat, retain typed messages in the application and pass the complete history on
+every request. Commit the pending user and assistant messages only after generation succeeds:
+
+```ts
+import type { GemmaChatMessage } from "./src/runtime/gemma-tokenizer";
+
+let messages: GemmaChatMessage[] = [];
+
+async function chat(content: string): Promise<string> {
+	const pending: GemmaChatMessage[] = [...messages, { role: "user", content }];
+	const result = await session.generate(pending, { maxNewTokens: 128 });
+	if (!result.text.trim()) throw new Error("Gemma returned an empty response");
+	messages = [...pending, { role: "assistant", content: result.text }];
+	return result.text;
+}
+```
+
+`encodeMessages()` applies the pinned July 9 canonical Gemma 4 template with
+`add_generation_prompt: true`, mapping `assistant` to the template's `model` role and closing every
+completed turn. Text requests reuse the longest matching K/V prefix by default, so resubmitting the
+full history preserves correctness without forcing full prefill. Cancellation and failures must not
+be appended to history. Start a new chat by replacing the message array; the next request detects
+the changed prefix and resets the owned caches. A first `system` or `developer` message is supported.
+The E2B and E4B model repositories currently publish the same canonical template, but this runtime
+pins the E2B copy that belongs to its checkpoint.
+
+The example picker includes `Arithmetic follow-up · Multi-turn`, which seeds a completed user/model
+turn before generating the follow-up, and `Boston weather · Tool call`, which supplies a typed
+function declaration through the template's `tools` argument. Tool inputs use the structured form:
+
+```ts
+const result = await session.generate({
+	messages: [{ role: "user", content: "Use get_current_weather for Boston." }],
+	tools: [{
+		type: "function",
+		function: {
+			name: "get_current_weather",
+			description: "Get the current weather for a city.",
+			parameters: {
+				type: "object",
+				properties: { location: { type: "string" } },
+				required: ["location"],
+			},
+		},
+	}],
+}, { temperature: 1, topK: 64, topP: 0.95, seed: 42 });
+
+console.log(result.toolCalls[0]?.function);
+// { name: "get_current_weather", arguments: { location: "Boston, MA" } }
+```
+
+`result.text` remains clean display text. `result.rawText` retains canonical special-token blocks
+for diagnostics, and `result.toolCalls` parses complete `<|tool_call>...<tool_call|>` blocks into
+dispatchable function names and arguments. The console intentionally leaves a tool call
+uncommitted until an application executes it and supplies a tool response.
+
 The console owns one persistent session and exposes exact greedy or seeded sampling, every penalty
 and probability control, custom stop IDs, regex/JSON/closed-schema constraints, streamed output,
 and cancellation. Editable examples populate the prompt and matching controls for greedy, sampling,
@@ -69,7 +125,7 @@ one streamed token while preserving partial output, reused the interrupted sessi
 generated and parsed `{"ok":true}` through the closed JSON Schema editor.
 
 The session loads the checkpoint once, reuses all GPU resources, resets or truncates its owned K/V
-caches between requests, applies the pinned chat template, and decodes until an EOS token,
+caches between requests, applies the pinned canonical chat template, and decodes until an EOS token,
 configured stop token, or the requested limit. Automatic prefill uses sequential evaluation for at
 most 32 pending prompt tokens and repeats the exact fixed-32 graph as `chunked-32` for longer
 prompts. Explicit `fixed-32`, `chunked-32`, and `sequential` strategies remain available for
