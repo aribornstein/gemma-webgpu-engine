@@ -65,7 +65,7 @@ test("validates every decoding control", () => {
 
 test("generation defaults preserve exact GPU greedy decoding", () => {
   const config = resolveGemmaGenerationConfig({});
-  expect(config.maxNewTokens).toBe(32);
+  expect(config.maxNewTokens).toBe(256);
   expect(config.temperature).toBe(0);
   expect(config.repetitionPenalty).toBe(1);
   expect(usesGemmaGpuGreedy(config)).toBe(true);

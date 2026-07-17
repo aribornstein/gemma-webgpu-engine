@@ -3,6 +3,7 @@ export interface GemmaGenerationUpdate {
   tokenIndex: number;
   generatedTokenIds: readonly number[];
   text: string;
+  rawText?: string;
 }
 
 export type GemmaGenerationTokenHandler = (
@@ -19,6 +20,7 @@ export async function emitGemmaGenerationUpdate(
   generatedTokenIds: readonly number[],
   decodeTokens: (tokenIds: readonly number[]) => string,
   onToken?: GemmaGenerationTokenHandler,
+  decodeRawTokens?: (tokenIds: readonly number[]) => string,
 ): Promise<void> {
   if (!onToken) return;
   const tokenIds = Object.freeze([...generatedTokenIds]);
@@ -27,5 +29,6 @@ export async function emitGemmaGenerationUpdate(
     tokenIndex: tokenIds.length - 1,
     generatedTokenIds: tokenIds,
     text: decodeTokens(tokenIds),
+    ...(decodeRawTokens ? { rawText: decodeRawTokens(tokenIds) } : {}),
   });
 }

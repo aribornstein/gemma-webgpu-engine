@@ -18,6 +18,9 @@ test("offers a direct model download when the cache is absent", async ({ page })
   await expect(page.getByText("Overall tok/s", { exact: true })).toBeVisible();
   await expect(page.getByText("Vision", { exact: true })).toBeVisible();
   await expect(page.getByText("Vision CPU", { exact: true })).toBeVisible();
+  await expect(page.getByText("Diagnostics", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Long-context boundary" })).toBeHidden();
+  await page.getByText("Diagnostics", { exact: true }).click();
   await expect(page.getByRole("heading", { name: "Long-context boundary" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Run exact-fit" })).toBeDisabled();
   await expect(page.getByLabel("Capacity")).toHaveValue("32768");
@@ -125,13 +128,6 @@ test("applies editable generation examples", async ({ page }) => {
   await page.goto("/");
 
   const examples = page.getByLabel("Workspace");
-  await examples.selectOption("chat-arithmetic");
-  await expect(page.getByRole("log")).toContainText("2 + 2?");
-  await expect(page.getByRole("log")).toContainText("4");
-  await expect(page.getByRole("textbox", { name: "Message" }))
-    .toHaveValue("As a digit?");
-  await expect(page.getByRole("button", { name: "New chat" })).toBeEnabled();
-
   await examples.selectOption("tool-weather");
   await expect(page.getByRole("log")).toContainText("get_current_weather");
   await expect(page.getByRole("textbox", { name: "Message" }))
@@ -195,6 +191,7 @@ test("shows only controls relevant to each example while Custom exposes all", as
   const temperature = page.getByRole("spinbutton", { name: "Temperature" });
   const probability = page.getByText("Probability and penalties", { exact: true });
   const constraintModes = page.getByRole("radiogroup", { name: "Output constraint" });
+  const thinking = page.getByRole("checkbox", { name: "Thinking" });
 
   await expect(workspace.locator("optgroup").first()).toHaveAttribute("label", "Workspaces");
   await expect(workspace.locator("optgroup").last()).toHaveAttribute("label", "Examples");
@@ -203,6 +200,8 @@ test("shows only controls relevant to each example while Custom exposes all", as
   await expect(temperature).toBeVisible();
   await expect(probability).toBeVisible();
   await expect(constraintModes).toBeVisible();
+  await expect(thinking).toBeVisible();
+  await expect(thinking).not.toBeChecked();
   await expect(page.getByRole("textbox", { name: "Stop token IDs" })).toBeVisible();
 
   await workspace.selectOption("greedy-colors");
@@ -211,6 +210,7 @@ test("shows only controls relevant to each example while Custom exposes all", as
   await expect(temperature).toBeHidden();
   await expect(probability).toBeHidden();
   await expect(constraintModes).toBeHidden();
+  await expect(thinking).toBeHidden();
 
   await workspace.selectOption("sampling-tagline");
   await expect(temperature).toBeVisible();
@@ -239,6 +239,7 @@ test("keeps Chat selected through composing and image attachment", async ({ page
   await expect(page.getByRole("heading", { name: "Chat" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Messages" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Send" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeVisible();
   await expect(page.getByLabel("Visual tokens")).toBeHidden();
   await page.getByRole("textbox", { name: "Message" }).fill("What is in this image?");
   await expect(workspace).toHaveValue("chat");
@@ -258,6 +259,38 @@ test("keeps Chat selected through composing and image attachment", async ({ page
   });
   expect(transcriptBeforeComposer).toBe(true);
 });
+
+for (const viewport of [
+  { name: "desktop", width: 1440, height: 900 },
+  { name: "mobile", width: 390, height: 844 },
+] as const) {
+  test(`keeps Chat controls coherent on ${viewport.name}`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+    await page.getByLabel("Workspace").selectOption("chat");
+    await page.getByRole("textbox", { name: "Message" }).fill("Responsive layout check");
+
+    const layout = await page.evaluate(() => {
+      const documentWidth = document.documentElement.scrollWidth;
+      const viewportWidth = document.documentElement.clientWidth;
+      const transcript = document.querySelector<HTMLElement>(".output-tool")?.getBoundingClientRect();
+      const composer = document.querySelector<HTMLElement>("#generation-form")?.getBoundingClientRect();
+      const send = document.querySelector<HTMLElement>("#generate")?.getBoundingClientRect();
+      if (!transcript || !composer || !send) throw new Error("Missing responsive UI surface");
+      return {
+        horizontalOverflow: documentWidth > viewportWidth,
+        transcriptBeforeComposer: transcript.bottom <= composer.top,
+        sendInsideViewport: send.left >= 0 && send.right <= viewportWidth,
+      };
+    });
+
+    expect(layout).toEqual({
+      horizontalOverflow: false,
+      transcriptBeforeComposer: true,
+      sendInsideViewport: true,
+    });
+  });
+}
 
 async function hideLocalCheckpoint(page: import("@playwright/test").Page): Promise<void> {
   await page.route("**/models/gemma-4-e2b/model.safetensors", async (route) => {

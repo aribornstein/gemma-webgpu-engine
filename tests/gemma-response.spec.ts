@@ -40,3 +40,58 @@ test("rejects malformed Gemma tool call boundaries", async ({ page }) => {
 
   expect(message).toBe("Gemma emitted a malformed tool call");
 });
+
+test("separates canonical thought channels from the final answer", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-response.ts";
+    const { countGemmaReasoningTokens, parseGemmaResponse } = await import(modulePath);
+    return {
+      parsed: parseGemmaResponse(
+        "<|channel>thought\nCheck the premise.\n<channel|>The answer is <four>.<turn|>",
+        "Check the premise. The answer is 4.",
+      ),
+      tokenCount: countGemmaReasoningTokens([
+        "<|channel>thought", "\n", "Check", " premise", ".", "<channel|>", "Answer",
+      ]),
+    };
+  });
+
+  expect(result).toEqual({
+    parsed: { reasoning: "Check the premise.", text: "The answer is <four>." },
+    tokenCount: 4,
+  });
+});
+
+test("rejects an unterminated canonical thought channel", async ({ page }) => {
+  await page.goto("/");
+  const message = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-response.ts";
+    const { parseGemmaResponse } = await import(modulePath);
+    try {
+      parseGemmaResponse("<|channel>thought\nunfinished", "unfinished");
+      return "no error";
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error);
+    }
+  });
+  expect(message).toBe("Gemma emitted an unterminated thought channel");
+});
+
+test("rejects a malformed later thought channel", async ({ page }) => {
+  await page.goto("/");
+  const message = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-response.ts";
+    const { parseGemmaResponse } = await import(modulePath);
+    try {
+      parseGemmaResponse(
+        "<|channel>thought\nfirst<channel|>answer<|channel>thought\nunfinished",
+        "first answer unfinished",
+      );
+      return "no error";
+    } catch (error) {
+      return error instanceof Error ? error.message : String(error);
+    }
+  });
+  expect(message).toBe("Gemma emitted an unterminated thought channel");
+});

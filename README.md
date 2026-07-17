@@ -90,9 +90,8 @@ the changed prefix and resets the owned caches. A first `system` or `developer` 
 The E2B and E4B model repositories currently publish the same canonical template, but this runtime
 pins the E2B copy that belongs to its checkpoint.
 
-The example picker includes `Arithmetic follow-up · Multi-turn`, which seeds a completed user/model
-turn before generating the follow-up, and `Boston weather · Tool call`, which supplies a typed
-function declaration through the template's `tools` argument. Tool inputs use the structured form:
+The example picker includes `Boston weather · Tool call`, which supplies a typed function
+declaration through the template's `tools` argument. Tool inputs use the structured form:
 
 ```ts
 const result = await session.generate({
@@ -120,10 +119,37 @@ for diagnostics, and `result.toolCalls` parses complete `<|tool_call>...<tool_ca
 dispatchable function names and arguments. The console intentionally leaves a tool call
 uncommitted until an application executes it and supplies a tool response.
 
+Canonical Gemma 4 reasoning is a boolean structured-input capability and remains disabled by
+default:
+
+```ts
+const result = await session.generate({
+	messages: [{ role: "user", content: "Solve this carefully." }],
+	enableThinking: true,
+}, { maxNewTokens: 256 });
+
+console.log(result.reasoning);
+console.log(result.text);
+console.log(result.reasoningTokenCount);
+```
+
+`enableThinking` passes the pinned template's `enable_thinking` switch and injects its canonical
+`<|think|>` system marker. Results separate complete `<|channel>thought ... <channel|>` content
+from final display text while preserving the exact generated stream in `rawText`. The output limit
+is one shared budget for reasoning and final-answer tokens. Assistant history stores the final
+answer in `content`; optional reasoning metadata is omitted from ordinary later-turn serialization.
+Set `preserveThinking: true` only when canonical assistant `toolCalls` and following `tool` messages
+must retain reasoning across a tool loop. Thinking cannot be combined with grammar-constrained
+decoding because channel markers are outside the requested output grammar.
+
 The console owns one persistent session and exposes exact greedy or seeded sampling, every penalty
 and probability control, custom stop IDs, regex/JSON/closed-schema constraints, streamed output,
 and cancellation. Editable examples populate the prompt and matching controls for greedy, sampling,
-regex, bounded JSON, and closed JSON Schema generation. Its telemetry reports session load, retained GPU-buffer memory, TTFT, median
+regex, bounded JSON, and closed JSON Schema generation. Custom retains every control, while Chat
+provides persistent multimodal history, user-turn editing/regeneration, a canonical Thinking toggle,
+collapsed reasoning disclosures, and reasoning-token telemetry. Examples expose only controls that
+affect their fixed scenario, and long-context diagnostics remain collapsed until requested. Its
+telemetry reports session load, retained GPU-buffer memory, TTFT, median
 decode latency, TPOT, ITL (median/p95), total latency, prefill route, and stop reason from the same measured runtime path.
 `Decode` remains model-evaluation latency only; `TPOT` and `ITL` are wall-clock token-emission latency metrics.
 `Decode tok/s` divides post-first-token decode evaluations by their measured decode time, while
@@ -205,7 +231,13 @@ Thirteen additional same-session requests held that value and 1186.8 MiB of GPU 
 the ten-run extension completed without browser or request errors and measured 5.4-5.8 seconds of
 warm vision work. GPU layer optimization and longer mixed-image, cancellation, and destruction
 soak testing remain open.
-Multimodal requests reset prefix caches, while text-only requests may reuse a retained common prefix.
+
+Each preprocessed image receives a SHA-256 identity over its exact resized RGB bytes, dimensions,
+and visual-token budget. Multimodal K/V reuse requires the same ordered identity list and the same
+serialized token prefix; changed pixels, image order, or budget reset reuse. A live image-chat
+follow-up reused 79 prompt rows and skipped vision tower execution, while a changed image forced a
+fresh encode. Text-only follow-ups to an unchanged image turn can therefore reuse its retained soft
+token rows safely.
 
 ## Context capacity
 
@@ -229,12 +261,16 @@ recovery passed at 1,024 rows. The normal console remains at the practical certi
 ## Roadmap
 
 Work proceeds in this order: optimize the remaining measured vision-layer execution and complete
-long-run resource stress;
-finish console integration for safe history editing and define content-hashed multimodal reuse; add canonical reasoning-mode
-configuration, response parsing, and history ownership; implement the pinned audio path; implement
+long-run resource stress; implement the pinned audio path; implement
 deterministic video frame ingestion; optimize prefill and constrained decoding; then harden
 device-loss recovery and the release browser matrix. See
 [PROJECT.md](PROJECT.md#execution-plan) for gates and details.
+
+The contextual Custom/Chat console, safe history editing, content-identified multimodal prefix
+reuse, and canonical reasoning input/result contracts are complete. Reasoning serialization,
+response parsing, token accounting, malformed-channel rejection, and tool-response continuation
+have focused browser coverage; live thinking-enabled requests also complete, although the tested
+checkpoint chose direct answers and emitted no thought channel in those short prompts.
 
 The owned and pinned runtimes now match prompt IDs, every generated ID, EOS behavior, and final
 text across five greedy golden cases: a short English greeting (`Hi!`), arithmetic (`12`), Arabic

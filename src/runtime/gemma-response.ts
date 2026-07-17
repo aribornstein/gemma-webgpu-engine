@@ -6,7 +6,50 @@ export interface GemmaParsedToolCall {
   };
 }
 
+export interface GemmaParsedResponse {
+  readonly reasoning: string;
+  readonly text: string;
+}
+
 const TOOL_CALL_PATTERN = /<\|tool_call>call:([A-Za-z_][A-Za-z0-9_]*)\{([\s\S]*?)\}<tool_call\|>/g;
+const THOUGHT_CHANNEL_PATTERN = /<\|channel>thought\n?([\s\S]*?)<channel\|>/g;
+const RESPONSE_CONTROL_PATTERN = /<\|turn>(?:model)?\n?|<turn\|>|<\|channel>final\n?/g;
+
+export function parseGemmaResponse(rawText: string, decodedText: string): GemmaParsedResponse {
+  const reasoning = Array.from(rawText.matchAll(THOUGHT_CHANNEL_PATTERN), (match) => match[1].trim())
+    .filter(Boolean)
+    .join("\n\n");
+  if (!rawText.includes("<|channel>thought")) {
+    return Object.freeze({ reasoning: "", text: decodedText.trim() });
+  }
+  const withoutThought = rawText.replace(THOUGHT_CHANNEL_PATTERN, "");
+  if (withoutThought.includes("<|channel>thought")) {
+    throw new Error("Gemma emitted an unterminated thought channel");
+  }
+  if (withoutThought.includes("<channel|>")) {
+    throw new Error("Gemma emitted a malformed thought channel");
+  }
+  const text = withoutThought.replace(RESPONSE_CONTROL_PATTERN, "")
+    .trim();
+  return Object.freeze({ reasoning, text });
+}
+
+export function countGemmaReasoningTokens(rawTokenFragments: readonly string[]): number {
+  let inThought = false;
+  let count = 0;
+  for (const fragment of rawTokenFragments) {
+    if (fragment === "<|channel>thought") {
+      inThought = true;
+      continue;
+    }
+    if (fragment === "<channel|>") {
+      inThought = false;
+      continue;
+    }
+    if (inThought) count += 1;
+  }
+  return count;
+}
 
 export function parseGemmaToolCalls(rawText: string): readonly GemmaParsedToolCall[] {
   const calls: GemmaParsedToolCall[] = [];

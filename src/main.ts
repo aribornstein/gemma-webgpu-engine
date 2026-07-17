@@ -32,6 +32,7 @@ import {
   type GemmaConversation,
   type PreparedGemmaConversationTurn,
 } from "./runtime/gemma-conversation";
+import { parseGemmaResponse } from "./runtime/gemma-response";
 import type {
   GemmaGenerationSession,
   GemmaGenerationTiming,
@@ -71,6 +72,13 @@ interface ExampleUiProfile {
   constraint: Exclude<ConstraintEditor, "all">;
 }
 
+interface ConsoleUiProfile {
+  workspace: ConsoleWorkspace;
+  vision: boolean;
+  sampling: boolean;
+  constraint: ConstraintEditor;
+}
+
 interface GenerationExample {
   id: string;
   label: string;
@@ -89,17 +97,6 @@ interface GenerationExample {
 }
 
 const GENERATION_EXAMPLES: readonly GenerationExample[] = [
-  {
-    id: "chat-arithmetic",
-    label: "Arithmetic follow-up · Multi-turn",
-    prompt: "As a digit?",
-    controls: { temperature: 0, maxNewTokens: 16 },
-    history: [
-      { role: "user", content: "2 + 2?" },
-      { role: "assistant", content: "4" },
-    ],
-    ui: { vision: false, sampling: false, constraint: "none" },
-  },
   {
     id: "tool-weather",
     label: "Boston weather · Tool call",
@@ -377,6 +374,15 @@ app.innerHTML = `
           </label>
         </div>
 
+        <label id="thinking-control" class="toggle-control">
+          <span>
+            <strong>Thinking</strong>
+            <small>Separate reasoning from the final answer</small>
+          </span>
+          <input id="enable-thinking" name="enableThinking" type="checkbox">
+          <span class="toggle-track" aria-hidden="true"></span>
+        </label>
+
         <details id="probability-controls" class="control-section">
           <summary>Probability and penalties</summary>
           <div class="control-grid detail-controls">
@@ -448,33 +454,36 @@ app.innerHTML = `
         <p id="config-status" class="config-status" data-valid="true" role="status">Exact greedy configuration</p>
       </form>
 
-      <section class="benchmark-tool" aria-labelledby="benchmark-heading">
-        <div class="benchmark-heading">
-          <div>
-            <p class="eyebrow">CERTIFICATION</p>
-            <h3 id="benchmark-heading">Long-context boundary</h3>
+      <details class="diagnostics-section">
+        <summary>Diagnostics</summary>
+        <section class="benchmark-tool" aria-labelledby="benchmark-heading">
+          <div class="benchmark-heading">
+            <div>
+              <p class="eyebrow">CERTIFICATION</p>
+              <h3 id="benchmark-heading">Long-context boundary</h3>
+            </div>
+            <button id="benchmark-download" class="quiet-command" type="button" disabled>Download JSON</button>
           </div>
-          <button id="benchmark-download" class="quiet-command" type="button" disabled>Download JSON</button>
-        </div>
-        <label class="field">Capacity
-          <select id="benchmark-capacity">
-            <option value="8192">8,192 positions</option>
-            <option value="32768" selected>32,768 positions</option>
-            <option value="131072">131,072 positions</option>
-          </select>
-        </label>
-        <div class="benchmark-command-row">
-          <button id="benchmark-run" class="primary-command" type="button" disabled>Run exact-fit</button>
-          <button id="benchmark-stop" class="danger-command" type="button" disabled>Stop</button>
-        </div>
-        <p id="benchmark-status" class="benchmark-status" role="status">No retained benchmark</p>
-        <dl id="benchmark-details" class="benchmark-details" hidden>
-          <div><dt>Phase</dt><dd id="benchmark-phase">-</dd></div>
-          <div><dt>Progress</dt><dd id="benchmark-progress">-</dd></div>
-          <div><dt>Memory</dt><dd id="benchmark-memory">-</dd></div>
-          <div><dt>Total</dt><dd id="benchmark-total">-</dd></div>
-        </dl>
-      </section>
+          <label class="field">Capacity
+            <select id="benchmark-capacity">
+              <option value="8192">8,192 positions</option>
+              <option value="32768" selected>32,768 positions</option>
+              <option value="131072">131,072 positions</option>
+            </select>
+          </label>
+          <div class="benchmark-command-row">
+            <button id="benchmark-run" class="primary-command" type="button" disabled>Run exact-fit</button>
+            <button id="benchmark-stop" class="danger-command" type="button" disabled>Stop</button>
+          </div>
+          <p id="benchmark-status" class="benchmark-status" role="status">No retained benchmark</p>
+          <dl id="benchmark-details" class="benchmark-details" hidden>
+            <div><dt>Phase</dt><dd id="benchmark-phase">-</dd></div>
+            <div><dt>Progress</dt><dd id="benchmark-progress">-</dd></div>
+            <div><dt>Memory</dt><dd id="benchmark-memory">-</dd></div>
+            <div><dt>Total</dt><dd id="benchmark-total">-</dd></div>
+          </dl>
+        </section>
+      </details>
     </aside>
   </main>
 
@@ -500,6 +509,8 @@ const exampleSelect = element<HTMLSelectElement>("generation-example");
 const promptInput = element<HTMLTextAreaElement>("prompt");
 const imageInput = element<HTMLInputElement>("image-input");
 const visionTokenBudgetInput = element<HTMLSelectElement>("vision-token-budget");
+const thinkingControl = element<HTMLElement>("thinking-control");
+const enableThinkingInput = element<HTMLInputElement>("enable-thinking");
 const imageControls = element<HTMLDivElement>("image-controls");
 const imageBudget = element<HTMLLabelElement>("image-budget");
 const imagePreview = element<HTMLDivElement>("image-preview");
@@ -508,6 +519,7 @@ const imageName = element<HTMLSpanElement>("image-name");
 const removeImageButton = element<HTMLButtonElement>("remove-image");
 const outputTool = element<HTMLDivElement>("output-heading").closest<HTMLDivElement>(".output-tool");
 if (!outputTool) throw new Error("Missing output tool");
+const ownedOutputTool = outputTool;
 const output = element<HTMLDivElement>("generation-output");
 const outputTokenCount = element<HTMLSpanElement>("output-token-count");
 const requestStatus = element<HTMLSpanElement>("request-status");
@@ -526,6 +538,7 @@ const benchmarkStatus = element<HTMLParagraphElement>("benchmark-status");
 const benchmarkDetails = element<HTMLDListElement>("benchmark-details");
 const telemetry = generationPanel.querySelector<HTMLDivElement>(".telemetry");
 if (!telemetry) throw new Error("Missing generation telemetry");
+const ownedTelemetry = telemetry;
 const probabilityControls = element<HTMLDetailsElement>("probability-controls");
 const constraintSection = element<HTMLFieldSetElement>("constraint-section");
 const constraintModeSelector = element<HTMLDivElement>("constraint-mode-selector");
@@ -534,6 +547,7 @@ const samplingControls = Array.from(
 );
 const stopTokenControl = controlsForm.querySelector<HTMLElement>("[data-control='stop-tokens']");
 if (!stopTokenControl) throw new Error("Missing stop-token control");
+const ownedStopTokenControl = stopTokenControl;
 
 element<HTMLSpanElement>("origin-label").textContent = location.origin;
 
@@ -549,7 +563,6 @@ let imagePreviewUrl: string | null = null;
 let activeWorkspace: ConsoleWorkspace = "custom";
 let activeExample: GenerationExample | null = null;
 let editBaseConversation: GemmaConversation | null = null;
-let editingMessageIndex: number | null = null;
 let benchmarkController: AbortController | null = null;
 let benchmarkArtifact: GemmaDurableBenchmarkArtifact | null = null;
 let conversation: GemmaConversation = createGemmaConversation();
@@ -883,6 +896,7 @@ async function generate(): Promise<void> {
       prompt,
       selectedImage ?? undefined,
       readVisionTokenBudget(),
+      enableThinkingInput.checked,
     );
     renderPromptBudget(options.maxNewTokens ?? DEFAULT_GENERATION_CONFIG.maxNewTokens);
     renderValidConfiguration(options);
@@ -906,7 +920,7 @@ async function generate(): Promise<void> {
   };
   let draftText = "";
   options.onToken = (update) => {
-    draftText = update.text;
+    draftText = visibleGemmaDraft(update.rawText, update.text, enableThinkingInput.checked);
     renderConversation(turn.userMessage, draftText);
     outputTokenCount.textContent = `${update.generatedTokenIds.length} ${pluralize(update.generatedTokenIds.length, "token")}`;
   };
@@ -923,24 +937,31 @@ async function generate(): Promise<void> {
       ? measured.result.toolCalls.map((call) =>
           `${call.function.name}\n${JSON.stringify(call.function.arguments, null, 2)}`)
         .join("\n\n")
-      : requestConversation.tools.length > 0 ? measured.result.rawText : measured.result.text;
+      : measured.result.text;
     if (requestConversation.tools.length > 0) {
       renderConversation(
         turn.userMessage,
         draftText || "No tool call output.",
         hasToolCalls ? "tool-call" : "stopped",
+        measured.result.reasoning,
       );
     } else if (draftText.trim()) {
-      conversation = commitGemmaConversationTurn(requestConversation, turn, draftText);
+      conversation = commitGemmaConversationTurn(
+        requestConversation,
+        turn,
+        measured.result.text,
+        measured.result.reasoning,
+      );
       editBaseConversation = null;
-      editingMessageIndex = null;
       promptInput.value = "";
       clearSelectedImage();
       renderConversation();
     } else {
       renderConversation(turn.userMessage, "No text output.", "failed");
     }
-    outputTokenCount.textContent = `${measured.result.generatedTokenIds.length} ${pluralize(measured.result.generatedTokenIds.length, "token")}`;
+    outputTokenCount.textContent = measured.result.reasoningTokenCount > 0
+      ? `${measured.result.generatedTokenIds.length} tokens · ${measured.result.reasoningTokenCount} reasoning`
+      : `${measured.result.generatedTokenIds.length} ${pluralize(measured.result.generatedTokenIds.length, "token")}`;
     requestStatus.textContent = hasToolCalls
       ? "Tool call ready"
       : measured.result.stopReason === "length" ? "Token limit reached" : "Generation complete";
@@ -996,7 +1017,16 @@ function readGenerationOptions(): GemmaGenerationOptions {
   });
   const constraint = readConstraint(data);
   if (constraint) compileGenerationConstraint(constraint);
+  if (constraint && enableThinkingInput.checked) {
+    throw new Error("Thinking cannot be combined with an output constraint");
+  }
   return { ...config, constraint };
+}
+
+function visibleGemmaDraft(rawText: string | undefined, decodedText: string, thinking: boolean): string {
+  if (!thinking || !rawText?.includes("<|channel>thought")) return decodedText;
+  if (!rawText.includes("<channel|>")) return "";
+  return parseGemmaResponse(rawText, decodedText).text;
 }
 
 function applyGenerationExample(example: GenerationExample): void {
@@ -1167,10 +1197,7 @@ function renderConstraintFields(): void {
   element<HTMLElement>("constraint-json-schema").hidden = mode !== "json-schema";
 }
 
-function activeConsoleProfile(): ExampleUiProfile & {
-  workspace: ConsoleWorkspace;
-  constraint: ConstraintEditor;
-} {
+function activeConsoleProfile(): ConsoleUiProfile {
   if (activeWorkspace === "custom") {
     return { workspace: "custom", vision: true, sampling: true, constraint: "all" };
   }
@@ -1184,8 +1211,8 @@ function activeConsoleProfile(): ExampleUiProfile & {
 function renderConsoleProfile(): void {
   const profile = activeConsoleProfile();
   generationPanel.dataset.workspace = profile.workspace;
-  if (profile.workspace === "chat") generationPanel.insertBefore(outputTool, generationForm);
-  else generationPanel.insertBefore(outputTool, telemetry);
+  if (profile.workspace === "chat") generationPanel.insertBefore(ownedOutputTool, generationForm);
+  else generationPanel.insertBefore(ownedOutputTool, ownedTelemetry);
   element<HTMLElement>("generation-heading").textContent = profile.workspace === "chat"
     ? "Chat"
     : "Conversation";
@@ -1196,9 +1223,10 @@ function renderConsoleProfile(): void {
   promptInput.rows = profile.workspace === "chat" ? 3 : 6;
   imageControls.hidden = !profile.vision;
   imageBudget.hidden = !profile.vision || (profile.workspace === "chat" && !selectedImage);
+  thinkingControl.hidden = profile.workspace === "example";
   for (const control of samplingControls) control.hidden = !profile.sampling;
   probabilityControls.hidden = !profile.sampling;
-  stopTokenControl.hidden = profile.workspace === "example";
+  ownedStopTokenControl.hidden = profile.workspace === "example";
   renderConstraintFields();
 }
 
@@ -1210,7 +1238,6 @@ function activateWorkspace(workspace: Exclude<ConsoleWorkspace, "example">): voi
   if (enteringChat) {
     conversation = createGemmaConversation();
     editBaseConversation = null;
-    editingMessageIndex = null;
     promptInput.value = "";
     clearSelectedImage();
     renderConversation();
@@ -1263,6 +1290,9 @@ function renderTelemetry(
       ].join(" · ")
     : "";
   element<HTMLElement>("metric-prefill").textContent = timing.prefillMode;
+  element<HTMLElement>("metric-prefill").title = timing.promptTokensReused > 0
+    ? `${timing.promptTokensReused.toLocaleString()} prompt tokens reused`
+    : "No prompt tokens reused";
   element<HTMLElement>("metric-stop").textContent = stopReason;
 }
 
@@ -1312,7 +1342,6 @@ function setGenerating(generating: boolean): void {
 function clearConversation(): void {
   conversation = createGemmaConversation();
   editBaseConversation = null;
-  editingMessageIndex = null;
   promptInput.value = "";
   clearSelectedImage();
   renderConversation();
@@ -1326,6 +1355,7 @@ function renderConversation(
   pendingUser?: GemmaChatMessage,
   assistantDraft?: string,
   draftState: "streaming" | "stopped" | "failed" | "tool-call" = "streaming",
+  assistantReasoning?: string,
 ): void {
   output.replaceChildren();
   const displayedConversation = editBaseConversation ?? conversation;
@@ -1344,6 +1374,7 @@ function renderConversation(
     output.append(renderMessage({
       role: "assistant",
       content: assistantDraft || "Generating...",
+      ...(assistantReasoning ? { reasoning: assistantReasoning } : {}),
     }, draftState));
   }
   if (messages.length === 0 && displayedConversation.tools.length === 0) {
@@ -1385,6 +1416,17 @@ function renderMessage(
   const body = document.createElement("div");
   body.className = "conversation-body";
   body.append(content);
+  if (message.role === "assistant" && message.reasoning) {
+    const reasoning = document.createElement("details");
+    reasoning.className = "message-reasoning";
+    const summary = document.createElement("summary");
+    summary.textContent = "Reasoning";
+    const reasoningContent = document.createElement("div");
+    reasoningContent.className = "message-reasoning-content";
+    reasoningContent.textContent = message.reasoning;
+    reasoning.append(summary, reasoningContent);
+    body.append(reasoning);
+  }
   if (images.length > 0) {
     const attachments = document.createElement("div");
     attachments.className = "conversation-attachments";
@@ -1439,7 +1481,6 @@ function beginConversationEdit(messageIndex: number): void {
     readVisionTokenBudget(),
   );
   editBaseConversation = edit.conversation;
-  editingMessageIndex = messageIndex;
   promptInput.value = messageText(message);
   if (edit.turn.image) selectImage(edit.turn.image, false);
   else clearSelectedImage();
@@ -1450,7 +1491,6 @@ function beginConversationEdit(messageIndex: number): void {
 
 function cancelConversationEdit(): void {
   editBaseConversation = null;
-  editingMessageIndex = null;
 }
 
 function messageImageCount(message: GemmaChatMessage): number {

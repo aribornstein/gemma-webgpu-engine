@@ -92,6 +92,66 @@ test("tokenizes structured single and multi-turn conversations", async ({ page }
   );
 });
 
+test("applies the canonical boolean thinking template switch", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-tokenizer.ts";
+    const { loadGemmaTokenizer } = await import(modulePath);
+    const tokenizer = await loadGemmaTokenizer();
+    const messages = [{ role: "user", content: "What is two plus two?" }] as const;
+    const disabled = tokenizer.encodeInput({ messages });
+    const enabled = tokenizer.encodeInput({ messages, enableThinking: true });
+    return {
+      disabled: tokenizer.decodeRawTokens(disabled),
+      enabled: tokenizer.decodeRawTokens(enabled),
+      enabledTokenIds: enabled,
+      repeatedEnabled: tokenizer.encodeInput({ messages, enableThinking: true }),
+    };
+  });
+
+  expect(result.disabled).not.toContain("<|think|>");
+  expect(result.enabled).toContain("<|turn>system\n<|think|>\n<turn|>");
+  expect(result.enabled).toContain("<|turn>user\nWhat is two plus two?<turn|>");
+  expect(result.repeatedEnabled).toEqual(result.enabledTokenIds);
+});
+
+test("preserves canonical reasoning through a tool-response continuation", async ({ page }) => {
+  await page.goto("/");
+  const rawPrompt = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-tokenizer.ts";
+    const { loadGemmaTokenizer } = await import(modulePath);
+    const tokenizer = await loadGemmaTokenizer();
+    const tokenIds = tokenizer.encodeInput({
+      enableThinking: true,
+      preserveThinking: true,
+      messages: [
+        { role: "user", content: "What is the weather in Boston?" },
+        {
+          role: "assistant",
+          content: "",
+          reasoning: "I need the weather tool.",
+          toolCalls: [{
+            id: "weather-1",
+            type: "function",
+            function: { name: "get_weather", arguments: { city: "Boston" } },
+          }],
+        },
+        {
+          role: "tool",
+          content: "72 F and clear",
+          toolCallId: "weather-1",
+        },
+      ],
+    });
+    return tokenizer.decodeRawTokens(tokenIds);
+  });
+
+  expect(rawPrompt).toContain("<|channel>thought\nI need the weather tool.\n<channel|>");
+  expect(rawPrompt).toContain("<|tool_call>call:get_weather{city:<|\"|>Boston<|\"|>}<tool_call|>");
+  expect(rawPrompt).toContain("<|tool_response>response:get_weather{value:<|\"|>72 F and clear<|\"|>}<tool_response|>");
+  expect(rawPrompt.endsWith("<|channel>thought\n")).toBe(true);
+});
+
 test("commits completed turns without mutating in-flight conversation history", async ({ page }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {

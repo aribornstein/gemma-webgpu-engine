@@ -8,6 +8,7 @@ export const GEMMA_VISION_MAX_PATCHES =
 export const GEMMA_VISION_PATCH_DIMENSION = 3 * GEMMA_VISION_PATCH_SIZE ** 2;
 
 export interface GemmaVisionInput {
+  identity?: string;
   patches: Float32Array;
   positions: Int32Array;
   patchRows: number;
@@ -35,19 +36,43 @@ export async function prepareGemmaVisionImage(
     context.imageSmoothingQuality = "high";
     context.drawImage(bitmap, 0, 0, width, height);
     const bytes = context.getImageData(0, 0, width, height).data;
+    const rgb = new Uint8Array(height * width * 3);
     const pixels = new Float32Array(height * width * 3);
     for (let sourceIndex = 0, destination = 0;
         sourceIndex < bytes.length;
         sourceIndex += 4) {
+      rgb[destination] = bytes[sourceIndex];
       pixels[destination++] = bytes[sourceIndex] / 255;
+      rgb[destination] = bytes[sourceIndex + 1];
       pixels[destination++] = bytes[sourceIndex + 1] / 255;
+      rgb[destination] = bytes[sourceIndex + 2];
       pixels[destination++] = bytes[sourceIndex + 2] / 255;
     }
     signal?.throwIfAborted();
-    return patchifyGemmaVisionRgb(pixels, height, width);
+    const identity = await gemmaVisionContentIdentity(rgb, height, width, tokenBudget);
+    signal?.throwIfAborted();
+    return { ...patchifyGemmaVisionRgb(pixels, height, width), identity };
   } finally {
     bitmap.close();
   }
+}
+
+export async function gemmaVisionContentIdentity(
+  rgb: Uint8Array,
+  height: number,
+  width: number,
+  tokenBudget: GemmaVisionTokenBudget,
+): Promise<string> {
+  if (rgb.length !== height * width * 3) {
+    throw new Error("Gemma vision identity requires exact HWC RGB bytes");
+  }
+  validateGemmaVisionTokenBudget(tokenBudget);
+  const header = new Uint32Array([height, width, tokenBudget]);
+  const payload = new Uint8Array(header.byteLength + rgb.byteLength);
+  payload.set(new Uint8Array(header.buffer));
+  payload.set(rgb, header.byteLength);
+  const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", payload));
+  return Array.from(digest, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 export function gemmaVisionTargetSize(

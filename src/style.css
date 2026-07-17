@@ -604,6 +604,25 @@ textarea {
   color: var(--yellow);
 }
 
+.message-reasoning {
+  width: 100%;
+  border-left: 2px solid #66736d;
+  color: #bdc8c1;
+  font: 13px/1.55 var(--mono);
+}
+
+.message-reasoning summary {
+  padding: 4px 10px;
+  cursor: pointer;
+  color: #91aa9d;
+  font-weight: 700;
+}
+
+.message-reasoning-content {
+  padding: 5px 10px 8px;
+  white-space: pre-wrap;
+}
+
 .telemetry {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -647,10 +666,93 @@ textarea {
   padding-top: 20px;
 }
 
+.diagnostics-section {
+  margin-top: 22px;
+  border-top: 1px solid var(--line-strong);
+}
+
+.diagnostics-section > summary {
+  padding: 16px 0;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.diagnostics-section .benchmark-tool {
+  margin-top: 0;
+}
+
 .control-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 13px;
+}
+
+.toggle-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 15px;
+  cursor: pointer;
+}
+
+.toggle-control > span:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.toggle-control strong {
+  font-size: 12px;
+}
+
+.toggle-control small {
+  color: var(--ink-muted);
+  font: 10px/1.35 var(--mono);
+}
+
+.toggle-control input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.toggle-track {
+  position: relative;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 22px;
+  border: 1px solid var(--line-strong);
+  border-radius: 11px;
+  background: #d8ddd7;
+}
+
+.toggle-track::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 2px rgba(28, 35, 31, 0.25);
+  content: "";
+  transition: transform 140ms ease;
+}
+
+.toggle-control input:checked + .toggle-track {
+  border-color: var(--green);
+  background: var(--green);
+}
+
+.toggle-control input:checked + .toggle-track::after {
+  transform: translateX(16px);
+}
+
+.toggle-control input:focus-visible + .toggle-track {
+  outline: 3px solid rgba(230, 83, 50, 0.35);
+  outline-offset: 2px;
 }
 
 .control-section,

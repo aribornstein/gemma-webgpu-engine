@@ -6,7 +6,7 @@ import {
 import type { GemmaGenerationTokenHandler } from "./generation-control";
 import type { GenerationConstraint } from "./constraints";
 
-const DEFAULT_MAX_NEW_TOKENS = 32;
+const DEFAULT_MAX_NEW_TOKENS = 256;
 const VOCAB_SIZE = 262144;
 
 export interface GemmaVisionGenerationProgress {

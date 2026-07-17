@@ -11,3 +11,11 @@ export function reusableGemmaPromptPrefixLength(
   }
   return prefixLength;
 }
+
+export function sameGemmaMultimodalIdentity(
+  current: readonly string[],
+  retained: readonly string[],
+): boolean {
+  return current.length === retained.length &&
+    current.every((identity, index) => identity === retained[index]);
+}

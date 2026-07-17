@@ -43,6 +43,7 @@ export function prepareGemmaConversationTurn(
   prompt: string,
   image?: GemmaVisionImageSource,
   visionTokenBudget: GemmaVisionTokenBudget = GEMMA_VISION_MAX_SOFT_TOKENS,
+  enableThinking = false,
 ): PreparedGemmaConversationTurn {
   const content = prompt.trim();
   if (!content) throw new Error("Gemma conversation prompt must not be empty");
@@ -59,11 +60,12 @@ export function prepareGemmaConversationTurn(
   const images = image ? [...conversation.images, image] : [...conversation.images];
   const tools = [...conversation.tools];
   return {
-    input: images.length > 0 || tools.length > 0
+    input: images.length > 0 || tools.length > 0 || enableThinking
       ? {
           messages,
           ...(images.length > 0 ? { images, visionTokenBudget } : {}),
           ...(tools.length > 0 ? { tools } : {}),
+          ...(enableThinking ? { enableThinking: true } : {}),
         }
       : messages,
     userMessage,
@@ -75,11 +77,17 @@ export function commitGemmaConversationTurn(
   conversation: GemmaConversation,
   turn: PreparedGemmaConversationTurn,
   assistantText: string,
+  assistantReasoning?: string,
 ): GemmaConversation {
   const content = assistantText.trim();
   if (!content) throw new Error("Gemma assistant response must not be empty");
+  const reasoning = assistantReasoning?.trim();
   return createGemmaConversation(
-    [...conversation.messages, turn.userMessage, { role: "assistant", content }],
+    [
+      ...conversation.messages,
+      turn.userMessage,
+      { role: "assistant", content, ...(reasoning ? { reasoning } : {}) },
+    ],
     turn.image ? [...conversation.images, turn.image] : conversation.images,
     conversation.tools,
   );

@@ -9,7 +9,7 @@ const MODEL_ROOT = `${new URL(import.meta.url).origin}/models/`;
 const EOS_TOKEN_IDS = new Set([1, 50, 106]);
 export const GEMMA_IMAGE_TOKEN_ID = 258880;
 
-export type GemmaChatRole = "system" | "developer" | "user" | "assistant";
+export type GemmaChatRole = "system" | "developer" | "user" | "assistant" | "tool";
 
 export interface GemmaChatTextPart {
   type: "text";
@@ -22,9 +22,22 @@ export interface GemmaChatImagePart {
 
 export type GemmaChatContentPart = GemmaChatTextPart | GemmaChatImagePart;
 
+export interface GemmaChatToolCall {
+  id?: string;
+  type: "function";
+  function: {
+    name: string;
+    arguments: Readonly<Record<string, unknown>>;
+  };
+}
+
 export interface GemmaChatMessage {
   role: GemmaChatRole;
   content: string | readonly GemmaChatContentPart[];
+  reasoning?: string;
+  toolCalls?: readonly GemmaChatToolCall[];
+  toolCallId?: string;
+  name?: string;
 }
 
 export interface GemmaFunctionTool {
@@ -46,6 +59,8 @@ export interface GemmaStructuredGenerationInput {
   images?: readonly GemmaVisionImageSource[];
   visionTokenBudget?: GemmaVisionTokenBudget;
   tools?: readonly GemmaFunctionTool[];
+  enableThinking?: boolean;
+  preserveThinking?: boolean;
 }
 
 export interface GemmaMultimodalGenerationInput extends GemmaStructuredGenerationInput {
@@ -77,6 +92,8 @@ export interface GemmaTokenizer {
   encodeMessages(
     messages: readonly GemmaChatMessage[],
     tools?: readonly GemmaFunctionTool[],
+    enableThinking?: boolean,
+    preserveThinking?: boolean,
   ): number[];
   encodeInput(input: GemmaGenerationInput): number[];
   decodeTokens(tokenIds: readonly number[]): string;
@@ -102,34 +119,51 @@ function createGemmaTokenizer(
   const encodeMessages = (
     messages: readonly GemmaChatMessage[],
     tools: readonly GemmaFunctionTool[] = [],
+    enableThinking = false,
+    preserveThinking = false,
   ): number[] => {
     validateMessages(messages);
     validateTools(tools);
+    const templateOptions = {
+      chat_template: chatTemplate,
+      tools: tools.map((tool) => ({
+        type: tool.type,
+        function: {
+          ...tool.function,
+          parameters: {
+            ...tool.function.parameters,
+            properties: { ...tool.function.parameters.properties },
+            required: [...tool.function.parameters.required],
+          },
+        },
+      })),
+      add_generation_prompt: true,
+      enable_thinking: enableThinking,
+      preserve_thinking: preserveThinking,
+      tokenize: true as const,
+      return_tensor: false,
+      return_dict: false,
+    } as Parameters<PreTrainedTokenizer["apply_chat_template"]>[1] & {
+      enable_thinking: boolean;
+      preserve_thinking: boolean;
+    };
     const tokenIds = tokenizer.apply_chat_template(
-      messages.map(({ role, content }) => ({
+      messages.map(({ role, content, reasoning, toolCalls, toolCallId, name }) => ({
         role,
         content: typeof content === "string"
           ? content
           : content.map((part) => ({ ...part })),
+        ...(reasoning ? { reasoning } : {}),
+        ...(toolCalls ? {
+          tool_calls: toolCalls.map((call) => ({
+            ...call,
+            function: { ...call.function, arguments: { ...call.function.arguments } },
+          })),
+        } : {}),
+        ...(toolCallId ? { tool_call_id: toolCallId } : {}),
+        ...(name ? { name } : {}),
       })),
-      {
-        chat_template: chatTemplate,
-        tools: tools.map((tool) => ({
-          type: tool.type,
-          function: {
-            ...tool.function,
-            parameters: {
-              ...tool.function.parameters,
-              properties: { ...tool.function.parameters.properties },
-              required: [...tool.function.parameters.required],
-            },
-          },
-        })),
-        add_generation_prompt: true,
-        tokenize: true,
-        return_tensor: false,
-        return_dict: false,
-      },
+      templateOptions,
     );
     if (!Array.isArray(tokenIds) || tokenIds.some((value) => !Number.isInteger(value))) {
       throw new Error("Gemma tokenizer returned invalid prompt IDs");
@@ -147,7 +181,12 @@ function createGemmaTokenizer(
     encodeInput(input) {
       if (typeof input === "string") return this.encodePrompt(input);
       return "messages" in input
-        ? encodeMessages(input.messages, input.tools)
+        ? encodeMessages(
+            input.messages,
+            input.tools,
+            input.enableThinking,
+            input.preserveThinking,
+          )
         : encodeMessages(input);
     },
     decodeTokens(tokenIds) {
@@ -178,17 +217,38 @@ function createGemmaTokenizer(
 
 function validateMessages(messages: readonly GemmaChatMessage[]): void {
   if (messages.length === 0) throw new Error("Gemma messages must not be empty");
-  const validRoles = new Set<GemmaChatRole>(["system", "developer", "user", "assistant"]);
+  const validRoles = new Set<GemmaChatRole>(["system", "developer", "user", "assistant", "tool"]);
   for (const [index, message] of messages.entries()) {
-    if (!validRoles.has(message.role) || !validContent(message.content)) {
+    const hasToolCalls = message.toolCalls !== undefined && message.toolCalls.length > 0;
+    if (!validRoles.has(message.role) ||
+        (!validContent(message.content) && !(message.role === "assistant" && hasToolCalls))) {
       throw new Error(`Gemma message ${index} has an invalid role or empty content`);
+    }
+    if (message.reasoning !== undefined &&
+        (message.role !== "assistant" || !message.reasoning.trim())) {
+      throw new Error(`Gemma message ${index} has invalid reasoning content`);
     }
     if ((message.role === "system" || message.role === "developer") && index !== 0) {
       throw new Error("Gemma system or developer message must be first");
     }
+    if (message.toolCalls !== undefined) {
+      if (message.role !== "assistant" || !hasToolCalls ||
+          message.toolCalls.some((call) => call.type !== "function" ||
+            !/^[A-Za-z_][A-Za-z0-9_]*$/.test(call.function.name) ||
+            !isRecord(call.function.arguments))) {
+        throw new Error(`Gemma message ${index} has invalid tool calls`);
+      }
+    }
+    if (message.role === "tool") {
+      if (!message.toolCallId?.trim() && !message.name?.trim()) {
+        throw new Error(`Gemma tool message ${index} must identify its tool call`);
+      }
+    } else if (message.toolCallId !== undefined || message.name !== undefined) {
+      throw new Error(`Gemma message ${index} has tool response fields on a non-tool role`);
+    }
   }
-  if (messages.at(-1)?.role !== "user") {
-    throw new Error("Gemma generation messages must end with a user turn");
+  if (!new Set<GemmaChatRole>(["user", "tool"]).has(messages.at(-1)?.role as GemmaChatRole)) {
+    throw new Error("Gemma generation messages must end with a user or tool turn");
   }
 }
 
@@ -197,6 +257,10 @@ function validContent(content: GemmaChatMessage["content"]): boolean {
   if (content.length === 0) return false;
   return content.every((part) => part.type === "image" ||
     (part.type === "text" && part.text.trim().length > 0));
+}
+
+function isRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function validateTools(tools: readonly GemmaFunctionTool[]): void {

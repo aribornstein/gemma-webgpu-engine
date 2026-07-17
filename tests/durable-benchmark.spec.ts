@@ -29,6 +29,7 @@ test("persists and restores a benchmark checkpoint across reload", async ({ page
 
   expect(saved.phase).toBe("running");
   await page.reload();
+  await page.getByText("Diagnostics", { exact: true }).click();
   await expect(page.getByRole("status").filter({
     hasText: "The benchmark page or browser process reloaded before completion",
   })).toBeVisible();

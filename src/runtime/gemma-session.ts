@@ -73,6 +73,8 @@ import {
 } from "./gemma-vision-input";
 import { sampleToken, SeededRandom } from "./sampling";
 import {
+  countGemmaReasoningTokens,
+  parseGemmaResponse,
   parseGemmaToolCalls,
   type GemmaParsedToolCall,
 } from "./gemma-response";
@@ -88,7 +90,10 @@ import {
   type GemmaPrefillMode,
   type GemmaPrefillStrategy,
 } from "./gemma-prefill-plan";
-import { reusableGemmaPromptPrefixLength } from "./gemma-prompt-cache";
+import {
+  reusableGemmaPromptPrefixLength,
+  sameGemmaMultimodalIdentity,
+} from "./gemma-prompt-cache";
 
 export type { GemmaGenerationOptions } from "./generation-config";
 export type { GemmaGenerationUpdate } from "./generation-control";
@@ -98,6 +103,8 @@ export type GemmaGenerationStopReason = "end-token" | "stop-token" | "length";
 
 export interface GemmaGenerationResult {
   text: string;
+  reasoning: string;
+  reasoningTokenCount: number;
   rawText: string;
   toolCalls: readonly GemmaParsedToolCall[];
   promptTokenIds: number[];
@@ -194,6 +201,7 @@ interface PreparedGemmaPrompt {
   tokenIds: number[];
   visionInputs: GemmaVisionInput[];
   visionStarts: number[];
+  visionIdentities: string[];
   visionPreprocessMs: number;
 }
 
@@ -222,6 +230,7 @@ export class GemmaGenerationSession {
   private readonly logitsReadback: GPUBuffer;
   private readonly tokenInputCache = new Map<number, GemmaTokenInputs>();
   private readonly visionWeightCache = new GemmaVisionWeightCache();
+  private readonly evaluatedVisionIdentities: string[] = [];
   private tokenByteTrie: TokenByteTrie | null = null;
   private activeTiming: MutableGemmaGenerationTiming | null = null;
   readonly cacheCapacity: number;
@@ -399,8 +408,23 @@ export class GemmaGenerationSession {
         );
       }
 
+      const resetStartedAt = performance.now();
+      const promptTokensReused = this.preparePromptCache(
+        promptTokenIds,
+        reusePromptCache,
+        preparedPrompt.visionIdentities,
+      );
+      if (this.activeTiming) {
+        this.activeTiming.cacheResetMs = performance.now() - resetStartedAt;
+        this.activeTiming.promptTokensReused = promptTokensReused;
+      }
+      throwIfGemmaGenerationAborted(signal);
+
       const softTokens = new Map<number, GemmaSoftTokenSource>();
       for (let imageIndex = 0; imageIndex < preparedPrompt.visionInputs.length; imageIndex += 1) {
+        const promptStart = preparedPrompt.visionStarts[imageIndex];
+        const visionInput = preparedPrompt.visionInputs[imageIndex];
+        if (promptStart + visionInput.softTokenCount <= promptTokensReused) continue;
         throwIfGemmaGenerationAborted(signal);
         onVisionProgress?.({
           imageIndex,
@@ -413,7 +437,7 @@ export class GemmaGenerationSession {
         const encoded = await encodeGemmaVisionImage(
           this.device,
           this.cache,
-          preparedPrompt.visionInputs[imageIndex],
+          visionInput,
           (progress) => {
             throwIfGemmaGenerationAborted(signal);
             onVisionProgress?.({
@@ -437,7 +461,6 @@ export class GemmaGenerationSession {
         }
         throwIfGemmaGenerationAborted(signal);
         visionResources.push(encoded);
-        const promptStart = preparedPrompt.visionStarts[imageIndex];
         for (let tokenIndex = 0; tokenIndex < encoded.softTokenCount; tokenIndex += 1) {
           softTokens.set(promptStart + tokenIndex, {
             buffer: encoded.output,
@@ -445,16 +468,6 @@ export class GemmaGenerationSession {
           });
         }
       }
-      const resetStartedAt = performance.now();
-      const promptTokensReused = this.preparePromptCache(
-        promptTokenIds,
-        visionResources.length === 0 && reusePromptCache,
-      );
-      if (this.activeTiming) {
-        this.activeTiming.cacheResetMs = performance.now() - resetStartedAt;
-        this.activeTiming.promptTokensReused = promptTokensReused;
-      }
-      throwIfGemmaGenerationAborted(signal);
       let modelOutput: GemmaModelOutput | null = null;
       const prefillStartedAt = performance.now();
       const pendingPromptTokenIds = promptTokenIds.slice(promptTokensReused);
@@ -602,6 +615,7 @@ export class GemmaGenerationSession {
           generatedTokenIds,
           (tokenIds) => this.tokenizer.decodeTokens(tokenIds),
           onToken,
+          (tokenIds) => this.tokenizer.decodeRawTokens(tokenIds),
         );
         if (this.activeTiming) {
           this.activeTiming.callbackMs += performance.now() - callbackStartedAt;
@@ -616,12 +630,18 @@ export class GemmaGenerationSession {
           throwIfGemmaGenerationAborted(signal);
         }
       }
-      const text = this.tokenizer.decodeTokens(generatedTokenIds);
+      const decodedText = this.tokenizer.decodeTokens(generatedTokenIds);
       const rawText = this.tokenizer.decodeRawTokens(generatedTokenIds);
+      const parsedResponse = parseGemmaResponse(rawText, decodedText);
+      const reasoningTokenCount = countGemmaReasoningTokens(
+        generatedTokenIds.map((tokenId) => this.tokenizer.decodeRawTokens([tokenId])),
+      );
       const toolCalls = parseGemmaToolCalls(rawText);
-      compiledConstraint?.validateFinal(text);
+      compiledConstraint?.validateFinal(parsedResponse.text);
       return {
-        text,
+        text: parsedResponse.text,
+        reasoning: parsedResponse.reasoning,
+        reasoningTokenCount,
         rawText,
         toolCalls,
         promptTokenIds,
@@ -768,14 +788,20 @@ export class GemmaGenerationSession {
     this.device.queue.submit([encoder.finish()]);
     this.position = 0;
     this.evaluatedTokenIds.length = 0;
+    this.evaluatedVisionIdentities.length = 0;
   }
 
   private preparePromptCache(
     promptTokenIds: readonly number[],
     allowReuse = true,
+    visionIdentities: readonly string[] = [],
   ): number {
-    if (!allowReuse) {
+    if (!allowReuse || !sameGemmaMultimodalIdentity(
+      visionIdentities,
+      this.evaluatedVisionIdentities,
+    )) {
       this.reset();
+      this.evaluatedVisionIdentities.push(...visionIdentities);
       return 0;
     }
     const prefixLength = reusableGemmaPromptPrefixLength(
@@ -790,6 +816,7 @@ export class GemmaGenerationSession {
       return prefixLength;
     }
     this.reset();
+    this.evaluatedVisionIdentities.push(...visionIdentities);
     return 0;
   }
 
@@ -919,6 +946,7 @@ export class GemmaGenerationSession {
         tokenIds: rawTokenIds,
         visionInputs: [],
         visionStarts: [],
+        visionIdentities: [],
         visionPreprocessMs: 0,
       };
     }
@@ -962,7 +990,11 @@ export class GemmaGenerationSession {
       visionStarts.push(tokenIds.length);
       tokenIds.push(...new Array<number>(visionInput.softTokenCount).fill(tokenId));
     }
-    return { tokenIds, visionInputs, visionStarts, visionPreprocessMs };
+    const visionIdentities = visionInputs.map(({ identity }, index) => {
+      if (!identity) throw new Error(`Gemma vision image ${index} has no content identity`);
+      return identity;
+    });
+    return { tokenIds, visionInputs, visionStarts, visionIdentities, visionPreprocessMs };
   }
 
   private getTokenByteTrie(): TokenByteTrie {
