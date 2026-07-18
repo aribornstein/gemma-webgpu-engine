@@ -231,6 +231,7 @@ declare global {
     __gemmaEngineCacheInitializer?: (
       onProgress: (progress: GemmaCacheInitializationProgress) => void,
     ) => Promise<void>;
+    __gemmaEngineForceDeviceLoss?: () => boolean;
   }
 }
 
@@ -262,7 +263,7 @@ app.innerHTML = `
         </div>
         <div class="heading-commands">
           <button id="new-chat" class="quiet-command" type="button" disabled>New chat</button>
-          <button id="load-model" class="secondary-command" type="button" disabled>Load model</button>
+          <button id="load-model" class="secondary-command" type="button" title="Rebuild the WebGPU engine from existing local or cached weights" disabled>Load model</button>
         </div>
       </div>
 
@@ -553,6 +554,9 @@ element<HTMLSpanElement>("origin-label").textContent = location.origin;
 
 let session: GemmaGenerationSession | null = null;
 let generationController: AbortController | null = null;
+let modelLifecycleBusy = false;
+let deviceRecoveryPending = false;
+let lostSession: GemmaGenerationSession | null = null;
 let cacheAvailable = false;
 let localModelAvailable = false;
 let controlsValidationTimer: number | null = null;
@@ -567,13 +571,23 @@ let benchmarkController: AbortController | null = null;
 let benchmarkArtifact: GemmaDurableBenchmarkArtifact | null = null;
 let conversation: GemmaConversation = createGemmaConversation();
 
+if (import.meta.env.DEV) {
+  window.__gemmaEngineForceDeviceLoss = () => {
+    if (!session) return false;
+    session.simulateDeviceLoss();
+    return true;
+  };
+}
+
 void initializeCapabilities();
 void restoreBenchmarkArtifact();
 renderConstraintFields();
 renderConsoleProfile();
 validateControls();
 
-loadButton.addEventListener("click", () => void loadModel());
+loadButton.addEventListener("click", () => {
+  void loadModel(session ? "manual-reload" : "initial");
+});
 newChatButton.addEventListener("click", clearConversation);
 exampleSelect.addEventListener("change", () => {
   if (exampleSelect.value === "custom") {
@@ -790,29 +804,47 @@ function setBenchmarkRunning(running: boolean): void {
   }
 }
 
-async function loadModel(): Promise<void> {
-  if (!navigator.gpu || generationController) return;
-  const cacheInitializer = window.__gemmaEngineCacheInitializer ?? initializeGemmaSafetensorsCache;
+type ModelLoadReason = "initial" | "manual-reload" | "device-recovery";
+
+async function loadModel(reason: ModelLoadReason = "initial"): Promise<void> {
+  if (!navigator.gpu || generationController || benchmarkController || modelLifecycleBusy) return;
+  const cachedOnly = reason !== "initial";
+  const cacheInitializer = cachedOnly
+    ? undefined
+    : window.__gemmaEngineCacheInitializer ?? initializeGemmaSafetensorsCache;
   if (!localModelAvailable && !cacheAvailable && !cacheInitializer) return;
+  modelLifecycleBusy = true;
   loadButton.disabled = true;
+  generateButton.disabled = true;
   const startedAt = performance.now();
   let cacheInitializationAttempted = false;
   try {
+    const previousSession = session;
+    session = null;
+    previousSession?.destroy();
+    if (reason === "manual-reload") {
+      loadButton.textContent = "Reloading...";
+      requestStatus.textContent = "Recreating WebGPU device and engine from cached weights";
+      setBadge(modelStatus, "Engine reloading", "pending");
+      const { resetWebGpuDevice } = await import("./webgpu/device");
+      await resetWebGpuDevice();
+    }
     if (!localModelAvailable && !cacheAvailable && cacheInitializer) {
       cacheInitializationAttempted = true;
       await initializeModelCache(cacheInitializer);
     }
     loadButton.textContent = "Loading...";
-    requestStatus.textContent = "Loading checkpoint and compiling pipelines";
-    setBadge(modelStatus, "Model loading", "pending");
+    requestStatus.textContent = reason === "device-recovery"
+      ? "Recovering WebGPU engine from cached weights"
+      : "Loading checkpoint and compiling pipelines";
+    setBadge(modelStatus, reason === "device-recovery" ? "Engine recovering" : "Model loading", "pending");
     setModelProgress(
-      "Loading WebGPU engine",
+      reason === "device-recovery" ? "Recovering WebGPU engine" : "Loading WebGPU engine",
       null,
       localModelAvailable
         ? "Reading local weights and compiling pipelines"
         : cacheAvailable ? "Reading cached weights and compiling pipelines" : "Preparing runtime",
     );
-    session?.destroy();
     const { loadGemmaGenerationSession } = await import("./runtime/gemma-session");
     const loadOwnedSession = () => loadGemmaGenerationSession({
       cacheCapacity: GEMMA_VALIDATED_CONTEXT_CAPACITY,
@@ -837,26 +869,73 @@ async function loadModel(): Promise<void> {
       );
       session = await loadOwnedSession();
     }
+    watchSessionDeviceLoss(session);
     const loadSeconds = (performance.now() - startedAt) / 1000;
     const memory = session.estimateRetainedGpuMemory();
     setBadge(modelStatus, "Model ready", "ready");
-    requestStatus.textContent = `Loaded in ${formatSeconds(loadSeconds)}`;
-    setModelProgress("Model ready", 1, `Loaded in ${formatSeconds(loadSeconds)}`, "ready");
+    requestStatus.textContent = reason === "device-recovery"
+      ? `Recovered in ${formatSeconds(loadSeconds)}`
+      : `Loaded in ${formatSeconds(loadSeconds)}`;
+    setModelProgress(
+      "Model ready",
+      1,
+      reason === "device-recovery"
+        ? `Recovered in ${formatSeconds(loadSeconds)}`
+        : `Loaded in ${formatSeconds(loadSeconds)}`,
+      "ready",
+    );
     renderMemory(memory);
     generateButton.disabled = !validateControls();
-    loadButton.textContent = "Reload model";
+    loadButton.textContent = "Reload engine";
   } catch (error) {
     session = null;
-    setBadge(modelStatus, "Load failed", "error");
+    setBadge(modelStatus, reason === "device-recovery" ? "Recovery failed" : "Load failed", "error");
     requestStatus.textContent = errorMessage(error);
-    setModelProgress("Model load failed", null, errorMessage(error), "error");
+    setModelProgress(
+      reason === "device-recovery" ? "Engine recovery failed" : "Model load failed",
+      null,
+      errorMessage(error),
+      "error",
+    );
     loadButton.textContent = localModelAvailable || cacheAvailable
-      ? "Retry load"
+      ? reason === "device-recovery" ? "Retry recovery" : "Retry load"
       : "Retry initialization";
   } finally {
+    modelLifecycleBusy = false;
     loadButton.disabled = !navigator.gpu ||
       (!localModelAvailable && !cacheAvailable && typeof indexedDB === "undefined");
+    generateButton.disabled = !session || !validateControls();
   }
+}
+
+function watchSessionDeviceLoss(target: GemmaGenerationSession): void {
+  void target.deviceLost.then((info) => {
+    if (session !== target) return;
+    queueDeviceRecovery(target, info.message || "WebGPU device lost");
+  });
+}
+
+function queueDeviceRecovery(target: GemmaGenerationSession, detail: string): void {
+  if (session !== target && lostSession !== target) return;
+  session = null;
+  lostSession = target;
+  deviceRecoveryPending = true;
+  setBadge(gpuStatus, "WebGPU recovering", "pending");
+  setBadge(modelStatus, "Engine recovery queued", "pending");
+  requestStatus.textContent = detail;
+  generateButton.disabled = true;
+  loadButton.disabled = true;
+  generationController?.abort(new DOMException("WebGPU device lost", "AbortError"));
+  void recoverDeviceSessionWhenIdle();
+}
+
+async function recoverDeviceSessionWhenIdle(): Promise<void> {
+  if (!deviceRecoveryPending || generationController || benchmarkController || modelLifecycleBusy) return;
+  deviceRecoveryPending = false;
+  lostSession?.destroy();
+  lostSession = null;
+  await loadModel("device-recovery");
+  if (session) setBadge(gpuStatus, "WebGPU ready", "ready");
 }
 
 async function initializeModelCache(
@@ -878,6 +957,7 @@ async function initializeModelCache(
 
 async function generate(): Promise<void> {
   if (!session || generationController) return;
+  const activeSession = session;
   const prompt = promptInput.value.trim();
   if (!prompt) {
     requestStatus.textContent = "Prompt is required";
@@ -931,7 +1011,7 @@ async function generate(): Promise<void> {
   requestStatus.textContent = "Generating";
 
   try {
-    const measured = await session.generateMeasured(turn.input, options);
+    const measured = await activeSession.generateMeasured(turn.input, options);
     const hasToolCalls = measured.result.toolCalls.length > 0;
     draftText = hasToolCalls
       ? measured.result.toolCalls.map((call) =>
@@ -970,20 +1050,26 @@ async function generate(): Promise<void> {
       measured.result.stopReason,
       measured.result.generatedTokenIds.length,
     );
-    renderMemory(session.estimateRetainedGpuMemory());
+    if (session === activeSession) renderMemory(activeSession.estimateRetainedGpuMemory());
   } catch (error) {
     if (generationController.signal.aborted) {
-      requestStatus.textContent = "Generation stopped";
-      element<HTMLElement>("metric-stop").textContent = "cancelled";
-      renderConversation(turn.userMessage, draftText, "stopped");
+      requestStatus.textContent = deviceRecoveryPending
+        ? "WebGPU device lost · recovery queued"
+        : "Generation stopped";
+      element<HTMLElement>("metric-stop").textContent = deviceRecoveryPending
+        ? "device-lost"
+        : "cancelled";
+      renderConversation(
+        turn.userMessage,
+        draftText || (deviceRecoveryPending ? "WebGPU device lost" : ""),
+        deviceRecoveryPending ? "failed" : "stopped",
+      );
     } else {
       requestStatus.textContent = errorMessage(error);
       element<HTMLElement>("metric-stop").textContent = "error";
       renderConversation(turn.userMessage, draftText || errorMessage(error), "failed");
       if (isDeviceFailure(error)) {
-        session.destroy();
-        session = null;
-        setBadge(modelStatus, "Reload required", "error");
+        queueDeviceRecovery(activeSession, errorMessage(error));
       }
     }
     cancelConversationEdit();
@@ -992,6 +1078,7 @@ async function generate(): Promise<void> {
     generationController = null;
     setGenerating(false);
     validateControls();
+    void recoverDeviceSessionWhenIdle();
   }
 }
 
@@ -1325,7 +1412,8 @@ function clearTelemetry(): void {
 function setGenerating(generating: boolean): void {
   generateButton.disabled = generating || !session;
   cancelButton.disabled = !generating;
-  loadButton.disabled = generating || (!localModelAvailable && !cacheAvailable) || !navigator.gpu;
+  loadButton.disabled = generating || modelLifecycleBusy || deviceRecoveryPending ||
+    (!localModelAvailable && !cacheAvailable) || !navigator.gpu;
   newChatButton.disabled = generating || !hasConversationState();
   exampleSelect.disabled = generating;
   promptInput.disabled = generating;

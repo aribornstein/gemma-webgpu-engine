@@ -21,6 +21,12 @@ same-origin route `http://localhost:8753/gemma-engine.html`. When this browser h
 that route enables **Initialize cache** and uses Buza's existing client-side downloader before
 loading the owned engine; no inference backend is involved.
 
+After loading, **Reload engine** performs a full user-forced WebGPU teardown and reconstruction from
+the existing local file or IndexedDB cache; it never invokes the model downloader. Unexpected
+device loss is handled automatically: the stale session is discarded, an in-flight request fails
+without being committed, and a replacement session is built while committed conversation state is
+retained. The status badges report queued recovery, reconstruction, success, or failure.
+
 ```bash
 npm run typecheck
 npm run test:unit
@@ -304,13 +310,11 @@ The current-browser owned-versus-LiteRT-LM run is recorded in
 The same artifact now includes Transformers.js 4.2.0 using the pinned ONNX Community Gemma 4 E2B
 `q4f16` text-only export. It is a model-family comparison rather than file-identical execution:
 Transformers.js has much lower short-prompt TTFT, while the owned runtime decodes faster on the
-multi-token cases. The evidence does not support a blanket owned-runtime speedup claim. Work
-proceeds by restoring the current-browser pinned Hugging Face leg; adding longer decode, prefill,
-and prefix-reuse cases; auditing and parameterizing E4B compatibility; optimizing the measured vision-layer
-execution and complete long-run resource stress; implement the pinned audio path; implement
-deterministic video frame ingestion; use the comparative evidence to prioritize further prefill,
-decode, and constrained-decoding work; then harden device-loss recovery and the release browser
-matrix. See
+multi-token cases. The evidence does not support a blanket owned-runtime speedup claim. Automatic
+device-loss recovery, the first priority, is complete. Remaining work proceeds in this order:
+vision optimization; pinned audio; deterministic video frame ingestion; completion of the
+performance evidence; release reliability; promotion or rejection of remaining kernel candidates;
+the E4B compatibility audit; speculative decoding; and device-specific autotuning. See
 [PROJECT.md](PROJECT.md#execution-plan) for gates and details.
 
 The contextual Custom/Chat console, safe history editing, content-identified multimodal prefix

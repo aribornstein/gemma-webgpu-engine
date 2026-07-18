@@ -11,7 +11,12 @@ test("offers a direct model download when the cache is absent", async ({ page })
   await expect(page.getByRole("heading", { name: "Transcript" })).toBeVisible();
   await expect(page.getByText("WebGPU ready", { exact: true })).toBeVisible();
   await expect(page.getByText("Cache absent", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Download model" })).toBeEnabled();
+  const modelButton = page.getByRole("button", { name: "Download model" });
+  await expect(modelButton).toBeEnabled();
+  await expect(modelButton).toHaveAttribute(
+    "title",
+    "Rebuild the WebGPU engine from existing local or cached weights",
+  );
   await expect(page.getByRole("button", { name: "Generate" })).toBeDisabled();
   await expect(page.getByText("Download and load the model on this origin")).toBeVisible();
   await expect(page.getByText("Decode tok/s", { exact: true })).toBeVisible();

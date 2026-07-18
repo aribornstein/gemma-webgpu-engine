@@ -234,6 +234,7 @@ export class GemmaGenerationSession {
   private tokenByteTrie: TokenByteTrie | null = null;
   private activeTiming: MutableGemmaGenerationTiming | null = null;
   readonly cacheCapacity: number;
+  readonly deviceLost: Promise<GPUDeviceLostInfo>;
 
   private constructor(
     device: GPUDevice,
@@ -255,6 +256,7 @@ export class GemmaGenerationSession {
     this.prefillMaxInFlightBlocks = prefillMaxInFlightBlocks;
     this.logitsReadback = logitsReadback;
     this.cacheCapacity = cacheCapacity;
+    this.deviceLost = device.lost;
   }
 
   static async load(options: GemmaSessionLoadOptions = {}): Promise<GemmaGenerationSession> {
@@ -780,6 +782,11 @@ export class GemmaGenerationSession {
     this.tokenInputCache.clear();
     this.visionWeightCache.clear();
     this.cache.close();
+  }
+
+  simulateDeviceLoss(): void {
+    this.assertAlive();
+    this.device.destroy();
   }
 
   private reset(): void {
