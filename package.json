@@ -12,12 +12,20 @@
     "test": "playwright test",
     "test:unit": "playwright test tests/sampling.spec.ts tests/qat-linear.spec.ts tests/cached-safetensors.spec.ts tests/gemma-layer-plan.spec.ts tests/gemma-layer-weights.spec.ts tests/gemma-layer-materializer.spec.ts",
     "test:gpu": "playwright test tests/qat-linear-gpu.spec.ts",
+    "benchmark:e2b": "E2B_PERFORMANCE_PROOF=1 playwright test tests/e2b-performance-proof.live.spec.ts --workers=1",
+    "benchmark:e2b:report": "node --experimental-strip-types tools/render_e2b_performance_report.mjs",
+    "benchmark:suite:smoke": "BENCHMARK_SUITE_SYNTHETIC_SMOKE=1 playwright test tests/benchmark-suite.smoke.spec.ts --workers=1",
+    "benchmark:suite:live-smoke": "BENCHMARK_SUITE_LIVE=1 BENCHMARK_SUITE_PROFILE=smoke playwright test tests/benchmark-suite.live.spec.ts --workers=1",
+    "benchmark:suite:full": "BENCHMARK_SUITE_LIVE=1 BENCHMARK_SUITE_PROFILE=full BENCHMARK_BROWSER_MODE=headless playwright test tests/benchmark-suite.live.spec.ts --workers=1",
+    "benchmark:suite:resume": "BENCHMARK_SUITE_LIVE=1 BENCHMARK_SUITE_PROFILE=full BENCHMARK_BROWSER_MODE=headless playwright test tests/benchmark-suite.live.spec.ts --workers=1",
+    "benchmark:suite:full:headed": "BENCHMARK_SUITE_LIVE=1 BENCHMARK_SUITE_PROFILE=full BENCHMARK_BROWSER_MODE=headed playwright test tests/benchmark-suite.live.spec.ts --headed --workers=1",
     "verify:materializer": "node --experimental-strip-types tools/verify_layer0_materializer.mjs"
   },
   "engines": {
     "node": ">=20.19.0"
   },
   "devDependencies": {
+    "@litert-lm/core": "^0.14.0",
     "@playwright/test": "^1.61.1",
     "@webgpu/types": "^0.1.71",
     "typescript": "~6.0.2",

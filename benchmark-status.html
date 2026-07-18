@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Benchmark Live Status</title>
+    <style>
+      :root {
+        color: #191c1a;
+        background: #eef1ed;
+        font-family: "Avenir Next", "Helvetica Neue", sans-serif;
+        font-synthesis: none;
+      }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; min-width: 320px; }
+      main { width: min(1040px, calc(100% - 32px)); margin: 28px auto; }
+      header { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 28px; }
+      h1 { margin: 0; font-size: clamp(28px, 5vw, 52px); font-weight: 650; letter-spacing: 0; }
+      .connection { display: flex; align-items: center; gap: 9px; font: 600 13px ui-monospace, monospace; }
+      .pulse { width: 10px; height: 10px; border-radius: 50%; background: #18864b; box-shadow: 0 0 0 5px #18864b20; }
+      .progress-track { height: 12px; overflow: hidden; background: #d1d7d1; border: 1px solid #bec6be; }
+      .progress-fill { width: 0; height: 100%; background: #176b45; transition: width 250ms ease; }
+      .progress-caption { display: flex; justify-content: space-between; margin-top: 9px; font: 600 13px ui-monospace, monospace; }
+      .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid #adb6ae; border-left: 1px solid #adb6ae; margin: 30px 0; }
+      .metric { min-height: 108px; padding: 18px; border-right: 1px solid #adb6ae; border-bottom: 1px solid #adb6ae; background: #f8faf7; }
+      .metric-label { color: #59625b; font-size: 12px; font-weight: 700; text-transform: uppercase; }
+      .metric-value { display: block; margin-top: 12px; font: 650 28px ui-monospace, monospace; overflow-wrap: anywhere; }
+      .work { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #adb6ae; border: 1px solid #adb6ae; }
+      .work section { min-width: 0; padding: 22px; background: #f8faf7; }
+      h2 { margin: 0 0 16px; font-size: 13px; text-transform: uppercase; }
+      dl { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 12px 18px; margin: 0; }
+      dt { color: #606861; }
+      dd { margin: 0; font: 600 14px ui-monospace, monospace; overflow-wrap: anywhere; }
+      .warning { margin-top: 18px; padding: 14px 16px; border-left: 4px solid #a85e00; background: #fff4df; font-size: 14px; }
+      .error { border-color: #a52d2d; background: #fff0f0; }
+      footer { margin-top: 20px; color: #5b645d; font: 12px ui-monospace, monospace; overflow-wrap: anywhere; }
+
+      @media (max-width: 760px) {
+        header { align-items: start; flex-direction: column; }
+        .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .work { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Benchmark Live Status</h1>
+        <div class="connection"><span class="pulse" id="pulse"></span><span id="connection">Connecting</span></div>
+      </header>
+
+      <div class="progress-track" aria-label="Schedule disposition">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <div class="progress-caption"><span id="progress-label">0%</span><span id="status">loading</span></div>
+
+      <div class="metrics">
+        <div class="metric"><span class="metric-label">Measured</span><strong class="metric-value" id="completed">-</strong></div>
+        <div class="metric"><span class="metric-label">Remaining</span><strong class="metric-value" id="remaining">-</strong></div>
+        <div class="metric"><span class="metric-label">Skipped</span><strong class="metric-value" id="skipped">-</strong></div>
+        <div class="metric"><span class="metric-label">Errors</span><strong class="metric-value" id="errors">-</strong></div>
+      </div>
+
+      <div class="work">
+        <section>
+          <h2>Current Work</h2>
+          <dl>
+            <dt>Phase</dt><dd id="phase">-</dd>
+            <dt>Runtime</dt><dd id="runtime">-</dd>
+            <dt>Workload</dt><dd id="workload">-</dd>
+            <dt>Phase progress</dt><dd id="phase-progress">-</dd>
+          </dl>
+        </section>
+        <section>
+          <h2>Timing</h2>
+          <dl>
+            <dt>Live elapsed</dt><dd id="elapsed">-</dd>
+            <dt>Estimated left</dt><dd id="eta">-</dd>
+            <dt>Benchmark event</dt><dd id="event-time">-</dd>
+            <dt>Last fetched</dt><dd id="fetch-time">-</dd>
+          </dl>
+        </section>
+      </div>
+
+      <div id="warnings"></div>
+      <footer id="source"></footer>
+    </main>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const run = params.get("run") ?? "benchmarks/suite/headless/2026-07-17T16-22-56-126Z-full";
+      const source = `/${run.replace(/^\/+|\/+$/g, "")}/progress.json`;
+      let progress = null;
+
+      const element = (id) => document.getElementById(id);
+      const duration = (milliseconds) => {
+        if (milliseconds == null) return "pending";
+        const seconds = Math.max(0, Math.round(milliseconds / 1000));
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const remainder = seconds % 60;
+        return hours ? `${hours}h ${minutes}m` : minutes ? `${minutes}m ${remainder}s` : `${remainder}s`;
+      };
+
+      function render() {
+        if (!progress) return;
+        const now = Date.now();
+        const percentage = Number(progress.percentComplete) || 0;
+        element("progress-fill").style.width = `${percentage}%`;
+        element("progress-label").textContent = `${percentage.toFixed(2)}% schedule disposition`;
+        element("status").textContent = progress.status;
+        element("completed").textContent = `${progress.completed} / ${progress.total}`;
+        element("remaining").textContent = progress.remaining;
+        element("skipped").textContent = progress.skipped;
+        element("errors").textContent = progress.errors;
+        element("phase").textContent = progress.phase;
+        element("runtime").textContent = progress.currentRuntime ?? "-";
+        element("workload").textContent = progress.currentWorkload ?? "-";
+        element("phase-progress").textContent = progress.phaseProgress
+          ? `${progress.phaseProgress.completed}/${progress.phaseProgress.total} ${progress.phaseProgress.unit}; workload ${progress.phaseProgress.workloadIndex}/${progress.phaseProgress.workloadTotal}; attempt ${progress.phaseProgress.attempt}`
+          : "-";
+        element("elapsed").textContent = duration(now - Date.parse(progress.startedAt));
+        element("eta").textContent = duration(progress.estimatedRemainingMs);
+        element("event-time").textContent = `${new Date(progress.updatedAt).toLocaleTimeString()} (${duration(now - Date.parse(progress.updatedAt))} ago)`;
+        element("warnings").innerHTML = (progress.unavailableRuntimes ?? []).map((item) =>
+          `<div class="warning"><strong>${item.runtimeId}</strong>: ${item.reason}</div>`
+        ).join("");
+      }
+
+      async function refresh() {
+        try {
+          const response = await fetch(`${source}?t=${Date.now()}`, { cache: "no-store" });
+          if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+          progress = await response.json();
+          element("connection").textContent = "LIVE";
+          element("pulse").classList.remove("error");
+          element("fetch-time").textContent = new Date().toLocaleTimeString();
+          render();
+        } catch (error) {
+          element("connection").textContent = `READ ERROR: ${error}`;
+          element("pulse").classList.add("error");
+        }
+      }
+
+      element("source").textContent = `Polling ${source} every second with cache disabled`;
+      refresh();
+      setInterval(refresh, 1000);
+      setInterval(render, 1000);
+    </script>
+  </body>
+</html>

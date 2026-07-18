@@ -17,6 +17,20 @@ reference-output
 /public/models/gemma-4-e2b/model.safetensors
 /public/models/gemma-4-e2b/model.safetensors.part
 
+# Generated browser test state and reports
+/test-results/
+/playwright-report/
+/blob-report/
+
+# Generated benchmark runs; retain compact full-run report.md files
+/benchmarks/suite/**/*-smoke/
+/benchmarks/suite/**/progress.json
+/benchmarks/suite/**/raw-results.jsonl
+/benchmarks/suite/**/report.csv
+/benchmarks/suite/**/report.html
+/benchmarks/suite/**/summary.json
+/benchmarks/suite-smoke/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

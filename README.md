@@ -258,11 +258,55 @@ same token with `chunked-32`, and completed in 4,424.216 seconds. The follow-up 
 131,071 prompt tokens in 1,070.9 ms; 131,073 positions were rejected, and cancellation plus clean
 recovery passed at 1,024 rows. The normal console remains at the practical certified 32K tier.
 
+## Reproducible Benchmark Suite
+
+The publication-oriented benchmark suite is documented in
+[benchmarks/BENCHMARK_SUITE.md](benchmarks/BENCHMARK_SUITE.md). It separates network-cold,
+cached-cold, warm steady-state, and conversation/KV-cache modes; uses a seeded randomized block
+schedule; keeps external and runtime-native measurements separate; and emits JSONL, summary JSON,
+Markdown, CSV, and HTML reports. `npm run benchmark:suite:smoke` validates the complete artifact
+pipeline with labeled synthetic data. Real runs use `benchmark:suite:live-smoke`,
+`benchmark:suite:full`, or `benchmark:suite:full:headed`; headed and headless aggregates are never
+combined.
+
+### Full-run comparison
+
+![Six-metric comparison of Owned WebGPU and LiteRT-LM Web on the warm 32-input/512-output workload](benchmarks/full-suite-warm-comparison.svg)
+
+The clearest matched long-decode comparison uses the full suite's warm steady-state
+`input-32-output-512` workload. Values are medians of 30 valid headless Chrome 150 runs per
+available runtime on Apple M4. Lower latency is better; higher throughput is better.
+
+| Metric | Owned WebGPU | LiteRT-LM Web | Transformers.js |
+| --- | ---: | ---: | ---: |
+| **TTFT** | **479.70 ms** | **155.65 ms** | unavailable |
+| **TPOT** | **19.47 ms/token** | **27.54 ms/token** | unavailable |
+| **ITL** | **19.20 ms** | not comparable | unavailable |
+| **Decode** | **9.93 s** | **14.07 s** | unavailable |
+| **Decode tok/s** | **51.37 tok/s** | **36.31 tok/s** | unavailable |
+| **Overall tok/s** | **49.44 tok/s** | **36.07 tok/s** | unavailable |
+
+TTFT and completion use common external wall-clock boundaries. `Decode` here is wall time after
+the first visible output, not a runtime-native model-evaluation counter. TPOT is the decode wall
+time per post-first-output token. Owned WebGPU emits one callback per token, so its stream intervals
+support ITL; LiteRT-LM exposes chunk callbacks with no one-token guarantee, so its chunk interval is
+not mislabeled as ITL. Overall throughput includes prefill and every emitted output token.
+Transformers.js is unavailable in this warm comparison because sustained ONNX WebGPU generation
+failed qualification; its six successful cold-start records remain in the full report. See the
+[complete 1,008-record report](benchmarks/suite/headless/2026-07-17T16-22-56-126Z-full/report.md)
+for every workload, mode, exclusion, and limitation.
+
 ## Roadmap
 
-Work proceeds in this order: establish a same-device performance proof against the pinned Hugging
-Face WebGPU runtime, an equivalent Transformers.js export, and Google's official LiteRT-LM WebGPU
-package; audit and parameterize E4B compatibility; optimize the remaining measured vision-layer
+The current-browser owned-versus-LiteRT-LM run is recorded in
+[benchmarks/BENCHMARK_RESULTS.md](benchmarks/BENCHMARK_RESULTS.md), with raw samples in
+[benchmarks/e2b-performance-proof.chrome.json](benchmarks/e2b-performance-proof.chrome.json).
+The same artifact now includes Transformers.js 4.2.0 using the pinned ONNX Community Gemma 4 E2B
+`q4f16` text-only export. It is a model-family comparison rather than file-identical execution:
+Transformers.js has much lower short-prompt TTFT, while the owned runtime decodes faster on the
+multi-token cases. The evidence does not support a blanket owned-runtime speedup claim. Work
+proceeds by restoring the current-browser pinned Hugging Face leg; adding longer decode, prefill,
+and prefix-reuse cases; auditing and parameterizing E4B compatibility; optimizing the measured vision-layer
 execution and complete long-run resource stress; implement the pinned audio path; implement
 deterministic video frame ingestion; use the comparative evidence to prioritize further prefill,
 decode, and constrained-decoding work; then harden device-loss recovery and the release browser

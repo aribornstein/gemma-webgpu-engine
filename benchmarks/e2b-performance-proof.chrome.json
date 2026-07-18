@@ -1,0 +1,2520 @@
+{
+  "artifact": {
+    "schemaVersion": 1,
+    "capturedAt": "2026-07-17T11:46:54.890Z",
+    "status": "partial",
+    "model": {
+      "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+      "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c"
+    },
+    "environment": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+      "adapter": "apple / metal-3",
+      "device": "MacBook Air (local benchmark host)"
+    },
+    "methodology": [
+      "Owned WebGPU, Transformers.js, and LiteRT-LM ran sequentially in fresh browser contexts; every runtime-owned session, conversation, engine, and context was destroyed before the next runtime.",
+      "Each live case used one warmup followed by three measured greedy generations with a fresh prompt cache or conversation.",
+      "Externally observed TTFT and total wall time are primary. Runtime-native counters are supplemental unless their timing boundaries are demonstrably equivalent.",
+      "The pinned Hugging Face row is prior same-device evidence from Chrome 148/Electron 42 and is not treated as a current-browser measurement.",
+      "Transformers.js uses the pinned ONNX Community q4f16 text-only export. It is a model-family comparison, not file-identical model execution.",
+      "LiteRT-LM uses Google's specially optimized text-only Web .litertlm artifact. It is a model-family comparison, not file-identical model execution.",
+      "No browser runtime exposes a portable retained GPU-memory measurement with equivalent boundaries; memory is therefore omitted from same-device speedup gates."
+    ],
+    "runtimes": [
+      {
+        "id": "owned-webgpu",
+        "label": "Owned WebGPU",
+        "version": "workspace",
+        "modelArtifact": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors (2458111846 bytes)",
+        "artifactEquivalence": "pinned-source-equivalent",
+        "status": "same-device-measured",
+        "notes": [
+          "Loads the pinned mobile-QAT safetensors artifact through repository-owned kernels.",
+          "Fresh session load from the local pinned file: 7068.9 ms.",
+          "Retained GPU buffers for the first case: 848039236 bytes across 1599 buffers; driver and pipeline allocations are excluded."
+        ]
+      },
+      {
+        "id": "pinned-hugging-face-webgpu",
+        "label": "Pinned Hugging Face WebGPU",
+        "version": "158f16ae0f672943ca304d59c47c8e3a264e399e",
+        "modelArtifact": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+        "artifactEquivalence": "pinned-source-equivalent",
+        "status": "prior-same-device-measured",
+        "notes": [
+          "Reuses the existing exact-output same-device artifact; it was not rerun because its vendored upstream bundle is not present in this workspace.",
+          "Previous clean cached load: 4716.6 ms."
+        ]
+      },
+      {
+        "id": "transformers-js",
+        "label": "Transformers.js",
+        "version": "4.2.0",
+        "modelArtifact": "onnx-community/gemma-4-E2B-it-ONNX@9f4bef82ea6e296bc69f8a2f5939f73af81b07a6 (q4f16)",
+        "artifactEquivalence": "model-family-only",
+        "status": "same-device-measured",
+        "notes": [
+          "Fresh processor and model load: 309681.9 ms.",
+          "The ONNX Community q4f16 export is derived from the Gemma 4 E2B instruction model, but it is not the file-identical mixed 2/4/8-bit mobile-QAT safetensors artifact used by the owned runtime.",
+          "Gemma4ForCausalLM intentionally selects only embed_tokens and decoder_model_merged; vision and audio encoder sessions are excluded from load time and generation.",
+          "Token timestamps are captured by TextStreamer after each generated token reaches JavaScript. They include runtime dispatch, readback, sampling, and callback overhead."
+        ]
+      },
+      {
+        "id": "litert-lm-web",
+        "label": "LiteRT-LM Web",
+        "version": "0.14.0",
+        "modelArtifact": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-web.litertlm",
+        "artifactEquivalence": "model-family-only",
+        "status": "same-device-measured",
+        "notes": [
+          "Fresh engine load: 199088.5 ms.",
+          "The official Web .litertlm file is a specially optimized text-only export, not the pinned mobile-QAT safetensors file.",
+          "Externally observed callback intervals are chunk intervals. They are not promoted to per-token ITL because the preview API does not guarantee one token per callback.",
+          "Native LiteRT-LM TTFT and decode throughput are retained as supplemental runtime counters; cross-runtime claims use externally equivalent boundaries where available."
+        ]
+      }
+    ],
+    "cases": [
+      {
+        "id": "short-greeting",
+        "promptTokens": 16,
+        "expectedOutputTokens": 2,
+        "results": [
+          {
+            "runtimeId": "owned-webgpu",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 2,
+            "metrics": {
+              "ttftMs": {
+                "median": 211.2,
+                "p95": 248.9
+              },
+              "itlMs": {
+                "median": 14.4,
+                "p95": 16.7
+              },
+              "tpotMs": {
+                "median": 14.4,
+                "p95": 16.7
+              },
+              "decodeTokensPerSecond": 66.89,
+              "totalMs": {
+                "median": 239.7,
+                "p95": 282.1
+              }
+            }
+          },
+          {
+            "runtimeId": "pinned-hugging-face-webgpu",
+            "evidenceStatus": "prior-same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 2,
+            "metrics": {
+              "ttftMs": {
+                "median": 202,
+                "p95": 202.45
+              },
+              "itlMs": {
+                "median": 13.8,
+                "p95": 16.86
+              },
+              "tpotMs": {
+                "median": 14.867,
+                "p95": 14.867
+              },
+              "decodeTokensPerSecond": 67.265,
+              "totalMs": {
+                "median": 269.8,
+                "p95": 281.23
+              }
+            },
+            "note": "Prior same-device/browser-version evidence; TPOT is derived from aggregate steady throughput and is not a measured p95 distribution."
+          },
+          {
+            "runtimeId": "transformers-js",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 2,
+            "metrics": {
+              "ttftMs": {
+                "median": 82.3,
+                "p95": 82.8
+              },
+              "itlMs": {
+                "median": 33.4,
+                "p95": 37.1
+              },
+              "tpotMs": {
+                "median": 33.4,
+                "p95": 37.1
+              },
+              "decodeTokensPerSecond": 30.769,
+              "totalMs": {
+                "median": 146.7,
+                "p95": 153.5
+              }
+            },
+            "note": "Token timing uses TextStreamer callbacks. Output equality is checked against the owned mobile-QAT golden text, but differences do not invalidate the separately labeled model-family performance row."
+          },
+          {
+            "runtimeId": "litert-lm-web",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 3,
+            "metrics": {
+              "ttftMs": {
+                "median": 53.1,
+                "p95": 53.9
+              },
+              "itlMs": {
+                "median": 19.3,
+                "p95": 19.6
+              },
+              "tpotMs": {
+                "median": 13.333,
+                "p95": 13.667
+              },
+              "decodeTokensPerSecond": 75,
+              "totalMs": {
+                "median": 91.8,
+                "p95": 93.1
+              }
+            },
+            "note": "ITL is an externally observed callback-interval proxy because LiteRT-LM does not guarantee one token per callback. TPOT and decode tok/s use native benchmark counters; native TTFT median is 64.333 ms."
+          }
+        ]
+      },
+      {
+        "id": "arithmetic",
+        "promptTokens": 21,
+        "expectedOutputTokens": 2,
+        "results": [
+          {
+            "runtimeId": "owned-webgpu",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 2,
+            "metrics": {
+              "ttftMs": {
+                "median": 379,
+                "p95": 397.5
+              },
+              "itlMs": {
+                "median": 22.7,
+                "p95": 24.1
+              },
+              "tpotMs": {
+                "median": 22.7,
+                "p95": 24.1
+              },
+              "decodeTokensPerSecond": 45.524,
+              "totalMs": {
+                "median": 421.2,
+                "p95": 442.1
+              }
+            }
+          },
+          {
+            "runtimeId": "pinned-hugging-face-webgpu",
+            "evidenceStatus": "prior-same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 2,
+            "metrics": {
+              "ttftMs": {
+                "median": 209.9,
+                "p95": 211.79
+              },
+              "itlMs": {
+                "median": 13.5,
+                "p95": 15.12
+              },
+              "tpotMs": {
+                "median": 13.8,
+                "p95": 13.8
+              },
+              "decodeTokensPerSecond": 72.464,
+              "totalMs": {
+                "median": 277,
+                "p95": 279.79
+              }
+            },
+            "note": "Prior same-device/browser-version evidence; TPOT is derived from aggregate steady throughput and is not a measured p95 distribution."
+          },
+          {
+            "runtimeId": "transformers-js",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 2,
+            "metrics": {
+              "ttftMs": {
+                "median": 114.6,
+                "p95": 115.4
+              },
+              "itlMs": {
+                "median": 32.2,
+                "p95": 33
+              },
+              "tpotMs": {
+                "median": 32.2,
+                "p95": 33
+              },
+              "decodeTokensPerSecond": 31.447,
+              "totalMs": {
+                "median": 177.9,
+                "p95": 179
+              }
+            },
+            "note": "Token timing uses TextStreamer callbacks. Output equality is checked against the owned mobile-QAT golden text, but differences do not invalidate the separately labeled model-family performance row."
+          },
+          {
+            "runtimeId": "litert-lm-web",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 3,
+            "metrics": {
+              "ttftMs": {
+                "median": 63.2,
+                "p95": 63.6
+              },
+              "itlMs": {
+                "median": 20.5,
+                "p95": 20.8
+              },
+              "tpotMs": {
+                "median": 14.333,
+                "p95": 14.667
+              },
+              "decodeTokensPerSecond": 69.767,
+              "totalMs": {
+                "median": 103.8,
+                "p95": 105.7
+              }
+            },
+            "note": "ITL is an externally observed callback-interval proxy because LiteRT-LM does not guarantee one token per callback. TPOT and decode tok/s use native benchmark counters; native TTFT median is 74.333 ms."
+          }
+        ]
+      },
+      {
+        "id": "arabic",
+        "promptTokens": 18,
+        "expectedOutputTokens": 5,
+        "results": [
+          {
+            "runtimeId": "owned-webgpu",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 5,
+            "metrics": {
+              "ttftMs": {
+                "median": 324.8,
+                "p95": 327.3
+              },
+              "itlMs": {
+                "median": 18.8,
+                "p95": 22.2
+              },
+              "tpotMs": {
+                "median": 19.475,
+                "p95": 22.025
+              },
+              "decodeTokensPerSecond": 50.59,
+              "totalMs": {
+                "median": 421.6,
+                "p95": 437.8
+              }
+            }
+          },
+          {
+            "runtimeId": "pinned-hugging-face-webgpu",
+            "evidenceStatus": "prior-same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 5,
+            "metrics": {
+              "ttftMs": {
+                "median": 214.9,
+                "p95": 218.05
+              },
+              "itlMs": {
+                "median": 10.95,
+                "p95": 14.09
+              },
+              "tpotMs": {
+                "median": 11.55,
+                "p95": 11.55
+              },
+              "decodeTokensPerSecond": 86.58,
+              "totalMs": {
+                "median": 313.3,
+                "p95": 328.42
+              }
+            },
+            "note": "Prior same-device/browser-version evidence; TPOT is derived from aggregate steady throughput and is not a measured p95 distribution."
+          },
+          {
+            "runtimeId": "transformers-js",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 5,
+            "metrics": {
+              "ttftMs": {
+                "median": 110.1,
+                "p95": 112.8
+              },
+              "itlMs": {
+                "median": 31.2,
+                "p95": 32.1
+              },
+              "tpotMs": {
+                "median": 31.35,
+                "p95": 31.55
+              },
+              "decodeTokensPerSecond": 31.928,
+              "totalMs": {
+                "median": 265.6,
+                "p95": 270.2
+              }
+            },
+            "note": "Token timing uses TextStreamer callbacks. Output equality is checked against the owned mobile-QAT golden text, but differences do not invalidate the separately labeled model-family performance row."
+          },
+          {
+            "runtimeId": "litert-lm-web",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 6,
+            "metrics": {
+              "ttftMs": {
+                "median": 60.6,
+                "p95": 60.6
+              },
+              "itlMs": {
+                "median": 19.8,
+                "p95": 20.6
+              },
+              "tpotMs": {
+                "median": 16.667,
+                "p95": 17.333
+              },
+              "decodeTokensPerSecond": 60,
+              "totalMs": {
+                "median": 158.2,
+                "p95": 162.3
+              }
+            },
+            "note": "ITL is an externally observed callback-interval proxy because LiteRT-LM does not guarantee one token per callback. TPOT and decode tok/s use native benchmark counters; native TTFT median is 74.667 ms."
+          }
+        ]
+      },
+      {
+        "id": "longer-instruction",
+        "promptTokens": 19,
+        "expectedOutputTokens": 11,
+        "results": [
+          {
+            "runtimeId": "owned-webgpu",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 11,
+            "metrics": {
+              "ttftMs": {
+                "median": 316.6,
+                "p95": 348.6
+              },
+              "itlMs": {
+                "median": 17.8,
+                "p95": 19.3
+              },
+              "tpotMs": {
+                "median": 17.65,
+                "p95": 18.63
+              },
+              "decodeTokensPerSecond": 55.885,
+              "totalMs": {
+                "median": 509.4,
+                "p95": 542.8
+              }
+            }
+          },
+          {
+            "runtimeId": "pinned-hugging-face-webgpu",
+            "evidenceStatus": "prior-same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 11,
+            "metrics": {
+              "ttftMs": {
+                "median": 219.7,
+                "p95": 221.86
+              },
+              "itlMs": {
+                "median": 10.55,
+                "p95": 13.415
+              },
+              "tpotMs": {
+                "median": 11.227,
+                "p95": 11.227
+              },
+              "decodeTokensPerSecond": 89.074,
+              "totalMs": {
+                "median": 386.4,
+                "p95": 392.7
+              }
+            },
+            "note": "Prior same-device/browser-version evidence; TPOT is derived from aggregate steady throughput and is not a measured p95 distribution."
+          },
+          {
+            "runtimeId": "transformers-js",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": false,
+            "generatedTokens": 12,
+            "metrics": {
+              "ttftMs": {
+                "median": 109.2,
+                "p95": 110.6
+              },
+              "itlMs": {
+                "median": 31.2,
+                "p95": 31.7
+              },
+              "tpotMs": {
+                "median": 31.191,
+                "p95": 31.318
+              },
+              "decodeTokensPerSecond": 32.051,
+              "totalMs": {
+                "median": 484.7,
+                "p95": 485.2
+              }
+            },
+            "note": "Token timing uses TextStreamer callbacks. Output equality is checked against the owned mobile-QAT golden text, but differences do not invalidate the separately labeled model-family performance row."
+          },
+          {
+            "runtimeId": "litert-lm-web",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": false,
+            "generatedTokens": 12,
+            "metrics": {
+              "ttftMs": {
+                "median": 63.4,
+                "p95": 64.5
+              },
+              "itlMs": {
+                "median": 20,
+                "p95": 22
+              },
+              "tpotMs": {
+                "median": 18.583,
+                "p95": 19.25
+              },
+              "decodeTokensPerSecond": 53.812,
+              "totalMs": {
+                "median": 284.5,
+                "p95": 292.9
+              }
+            },
+            "note": "ITL is an externally observed callback-interval proxy because LiteRT-LM does not guarantee one token per callback. TPOT and decode tok/s use native benchmark counters; native TTFT median is 78.583 ms."
+          }
+        ]
+      },
+      {
+        "id": "prefill-32-boundary",
+        "promptTokens": 32,
+        "expectedOutputTokens": 1,
+        "results": [
+          {
+            "runtimeId": "owned-webgpu",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 1,
+            "metrics": {
+              "ttftMs": {
+                "median": 518.1,
+                "p95": 574
+              },
+              "itlMs": null,
+              "tpotMs": null,
+              "decodeTokensPerSecond": 50.083,
+              "totalMs": {
+                "median": 539.7,
+                "p95": 596.3
+              }
+            }
+          },
+          {
+            "runtimeId": "pinned-hugging-face-webgpu",
+            "evidenceStatus": "prior-same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 1,
+            "metrics": {
+              "ttftMs": {
+                "median": 226.9,
+                "p95": 238.33
+              },
+              "itlMs": null,
+              "tpotMs": null,
+              "decodeTokensPerSecond": null,
+              "totalMs": {
+                "median": 287.9,
+                "p95": 303.02
+              }
+            },
+            "note": "Prior same-device/browser-version evidence; TPOT is derived from aggregate steady throughput and is not a measured p95 distribution."
+          },
+          {
+            "runtimeId": "transformers-js",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 1,
+            "metrics": {
+              "ttftMs": {
+                "median": 113.6,
+                "p95": 113.8
+              },
+              "itlMs": null,
+              "tpotMs": null,
+              "decodeTokensPerSecond": 31.447,
+              "totalMs": {
+                "median": 145.5,
+                "p95": 145.6
+              }
+            },
+            "note": "Token timing uses TextStreamer callbacks. Output equality is checked against the owned mobile-QAT golden text, but differences do not invalidate the separately labeled model-family performance row."
+          },
+          {
+            "runtimeId": "litert-lm-web",
+            "evidenceStatus": "same-device-measured",
+            "exactOutputMatch": true,
+            "generatedTokens": 2,
+            "metrics": {
+              "ttftMs": {
+                "median": 73.3,
+                "p95": 74.5
+              },
+              "itlMs": null,
+              "tpotMs": {
+                "median": 11.5,
+                "p95": 12.5
+              },
+              "decodeTokensPerSecond": 86.956,
+              "totalMs": {
+                "median": 94.5,
+                "p95": 96.8
+              }
+            },
+            "note": "ITL is an externally observed callback-interval proxy because LiteRT-LM does not guarantee one token per callback. TPOT and decode tok/s use native benchmark counters; native TTFT median is 81.5 ms."
+          }
+        ]
+      }
+    ],
+    "publishedReferences": [
+      {
+        "runtimeId": "litert-lm-web",
+        "device": "MacBook Pro M4 Max / WebGPU",
+        "promptTokens": 1024,
+        "outputTokens": 256,
+        "prefillTokensPerSecond": 4853,
+        "decodeTokensPerSecond": 73,
+        "timeToFirstTokenSeconds": 1.09,
+        "modelSizeMb": 2008,
+        "memoryMb": 1800,
+        "source": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm"
+      }
+    ]
+  },
+  "raw": {
+    "owned": [
+      {
+        "schemaVersion": 1,
+        "capturedAt": "2026-07-17T11:37:42.096Z",
+        "status": "owned-full-generation-baseline",
+        "speedupClaim": null,
+        "model": {
+          "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+          "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+          "sourceKey": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+          "fileSize": 2458111846
+        },
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+          "adapterInfo": {
+            "vendor": "apple",
+            "architecture": "metal-3"
+          },
+          "powerPreference": "high-performance"
+        },
+        "configuration": {
+          "caseId": "short-greeting",
+          "prompt": "Say hi in one short sentence.",
+          "promptTokens": 16,
+          "expectedOutputTokens": 2,
+          "maxNewTokens": 8,
+          "cacheCapacity": 512,
+          "prefillStrategy": "auto",
+          "reusePromptCache": false,
+          "warmupIterations": 1,
+          "iterations": 3
+        },
+        "correctness": {
+          "expectedTokenIds": [
+            10979,
+            236888
+          ],
+          "expectedText": "Hi!",
+          "allIterationsMatchGolden": true
+        },
+        "load": {
+          "sessionLoadMs": 7068.9,
+          "note": "Includes device/cache/tokenizer initialization, model resource loading, and pipeline creation in the current browser process. Automatic routing currently selects the measured sequential reference path."
+        },
+        "memory": {
+          "retainedGpuBufferCount": 1599,
+          "retainedGpuBufferBytes": 848039236,
+          "scope": "retained-resource-graph",
+          "note": "Deduplicated byte sum of GPUBuffer objects retained by the composed decode graph, optional prefill graph, and logits readback buffer. Driver and pipeline memory are excluded."
+        },
+        "samples": [
+          {
+            "iteration": 0,
+            "timing": {
+              "requestSetupMs": 0.5,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0.1,
+              "promptTokensReused": 0,
+              "prefillMs": 248.3,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 248.9,
+              "decodeTokenMs": [
+                16.7,
+                16.3
+              ],
+              "interTokenLatencyMs": [
+                16.7
+              ],
+              "timePerOutputTokenMs": 16.7,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 282.1
+            },
+            "generatedTokenIds": [
+              10979,
+              236888
+            ],
+            "text": "Hi!",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 1,
+            "timing": {
+              "requestSetupMs": 0.3,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0.1,
+              "promptTokensReused": 0,
+              "prefillMs": 210.7,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 211.2,
+              "decodeTokenMs": [
+                14.4,
+                13.9
+              ],
+              "interTokenLatencyMs": [
+                14.4
+              ],
+              "timePerOutputTokenMs": 14.4,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 239.7
+            },
+            "generatedTokenIds": [
+              10979,
+              236888
+            ],
+            "text": "Hi!",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 2,
+            "timing": {
+              "requestSetupMs": 0.6,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0.1,
+              "promptTokensReused": 0,
+              "prefillMs": 208.4,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 209.1,
+              "decodeTokenMs": [
+                13.8,
+                14.6
+              ],
+              "interTokenLatencyMs": [
+                13.8
+              ],
+              "timePerOutputTokenMs": 13.8,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 237.5
+            },
+            "generatedTokenIds": [
+              10979,
+              236888
+            ],
+            "text": "Hi!",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          }
+        ],
+        "summary": {
+          "prefill": {
+            "medianMs": 210.7,
+            "p95Ms": 248.3,
+            "averageMs": 222.467
+          },
+          "timeToFirstToken": {
+            "medianMs": 211.2,
+            "p95Ms": 248.9,
+            "averageMs": 223.067
+          },
+          "decodeToken": {
+            "medianMs": 14.4,
+            "p95Ms": 16.7,
+            "averageMs": 14.95
+          },
+          "interTokenLatency": {
+            "medianMs": 14.4,
+            "p95Ms": 16.7,
+            "averageMs": 14.967
+          },
+          "timePerOutputToken": {
+            "medianMs": 14.4,
+            "p95Ms": 16.7,
+            "averageMs": 14.967
+          },
+          "total": {
+            "medianMs": 239.7,
+            "p95Ms": 282.1,
+            "averageMs": 253.1
+          },
+          "warmDecodeTokensPerSecond": 66.89,
+          "endToEndTokensPerSecond": 7.902
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "capturedAt": "2026-07-17T11:37:50.636Z",
+        "status": "owned-full-generation-baseline",
+        "speedupClaim": null,
+        "model": {
+          "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+          "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+          "sourceKey": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+          "fileSize": 2458111846
+        },
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+          "adapterInfo": {
+            "vendor": "apple",
+            "architecture": "metal-3"
+          },
+          "powerPreference": "high-performance"
+        },
+        "configuration": {
+          "caseId": "arithmetic",
+          "prompt": "Reply with only the number: 7 + 5.",
+          "promptTokens": 21,
+          "expectedOutputTokens": 2,
+          "maxNewTokens": 8,
+          "cacheCapacity": 512,
+          "prefillStrategy": "auto",
+          "reusePromptCache": false,
+          "warmupIterations": 1,
+          "iterations": 3
+        },
+        "correctness": {
+          "expectedTokenIds": [
+            236770,
+            236778
+          ],
+          "expectedText": "12",
+          "allIterationsMatchGolden": true
+        },
+        "load": {
+          "sessionLoadMs": 6857.1,
+          "note": "Includes device/cache/tokenizer initialization, model resource loading, and pipeline creation in the current browser process. Automatic routing currently selects the measured sequential reference path."
+        },
+        "memory": {
+          "retainedGpuBufferCount": 1599,
+          "retainedGpuBufferBytes": 848039236,
+          "scope": "retained-resource-graph",
+          "note": "Deduplicated byte sum of GPUBuffer objects retained by the composed decode graph, optional prefill graph, and logits readback buffer. Driver and pipeline memory are excluded."
+        },
+        "samples": [
+          {
+            "iteration": 0,
+            "timing": {
+              "requestSetupMs": 0.6,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0,
+              "promptTokensReused": 0,
+              "prefillMs": 372.1,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 372.8,
+              "decodeTokenMs": [
+                24.1,
+                21.1
+              ],
+              "interTokenLatencyMs": [
+                24.1
+              ],
+              "timePerOutputTokenMs": 24.1,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 418.3
+            },
+            "generatedTokenIds": [
+              236770,
+              236778
+            ],
+            "text": "12",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 1,
+            "timing": {
+              "requestSetupMs": 1.1,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0.1,
+              "promptTokensReused": 0,
+              "prefillMs": 396.2,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 397.5,
+              "decodeTokenMs": [
+                22.7,
+                21.9
+              ],
+              "interTokenLatencyMs": [
+                22.7
+              ],
+              "timePerOutputTokenMs": 22.7,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 442.1
+            },
+            "generatedTokenIds": [
+              236770,
+              236778
+            ],
+            "text": "12",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 2,
+            "timing": {
+              "requestSetupMs": 0.9,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0,
+              "promptTokensReused": 0,
+              "prefillMs": 378.1,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 379,
+              "decodeTokenMs": [
+                20.3,
+                21.7
+              ],
+              "interTokenLatencyMs": [
+                20.3
+              ],
+              "timePerOutputTokenMs": 20.3,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 421.2
+            },
+            "generatedTokenIds": [
+              236770,
+              236778
+            ],
+            "text": "12",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          }
+        ],
+        "summary": {
+          "prefill": {
+            "medianMs": 378.1,
+            "p95Ms": 396.2,
+            "averageMs": 382.133
+          },
+          "timeToFirstToken": {
+            "medianMs": 379,
+            "p95Ms": 397.5,
+            "averageMs": 383.1
+          },
+          "decodeToken": {
+            "medianMs": 21.7,
+            "p95Ms": 24.1,
+            "averageMs": 21.967
+          },
+          "interTokenLatency": {
+            "medianMs": 22.7,
+            "p95Ms": 24.1,
+            "averageMs": 22.367
+          },
+          "timePerOutputToken": {
+            "medianMs": 22.7,
+            "p95Ms": 24.1,
+            "averageMs": 22.367
+          },
+          "total": {
+            "medianMs": 421.2,
+            "p95Ms": 442.1,
+            "averageMs": 427.2
+          },
+          "warmDecodeTokensPerSecond": 45.524,
+          "endToEndTokensPerSecond": 4.682
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "capturedAt": "2026-07-17T11:37:59.313Z",
+        "status": "owned-full-generation-baseline",
+        "speedupClaim": null,
+        "model": {
+          "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+          "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+          "sourceKey": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+          "fileSize": 2458111846
+        },
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+          "adapterInfo": {
+            "vendor": "apple",
+            "architecture": "metal-3"
+          },
+          "powerPreference": "high-performance"
+        },
+        "configuration": {
+          "caseId": "arabic",
+          "prompt": "قل مرحباً بجملة قصيرة.",
+          "promptTokens": 18,
+          "expectedOutputTokens": 5,
+          "maxNewTokens": 12,
+          "cacheCapacity": 512,
+          "prefillStrategy": "auto",
+          "reusePromptCache": false,
+          "warmupIterations": 1,
+          "iterations": 3
+        },
+        "correctness": {
+          "expectedTokenIds": [
+            237143,
+            236910,
+            70436,
+            60774,
+            236888
+          ],
+          "expectedText": "أهلاً بك!",
+          "allIterationsMatchGolden": true
+        },
+        "load": {
+          "sessionLoadMs": 7049.4,
+          "note": "Includes device/cache/tokenizer initialization, model resource loading, and pipeline creation in the current browser process. Automatic routing currently selects the measured sequential reference path."
+        },
+        "memory": {
+          "retainedGpuBufferCount": 1599,
+          "retainedGpuBufferBytes": 848039236,
+          "scope": "retained-resource-graph",
+          "note": "Deduplicated byte sum of GPUBuffer objects retained by the composed decode graph, optional prefill graph, and logits readback buffer. Driver and pipeline memory are excluded."
+        },
+        "samples": [
+          {
+            "iteration": 0,
+            "timing": {
+              "requestSetupMs": 0.5,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0,
+              "promptTokensReused": 0,
+              "prefillMs": 269.8,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 270.3,
+              "decodeTokenMs": [
+                17.7,
+                17.7,
+                17.8,
+                18.2,
+                18.2
+              ],
+              "interTokenLatencyMs": [
+                17.7,
+                17.7,
+                17.8,
+                18.3
+              ],
+              "timePerOutputTokenMs": 17.875,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0.1,
+              "totalMs": 360.3
+            },
+            "generatedTokenIds": [
+              237143,
+              236910,
+              70436,
+              60774,
+              236888
+            ],
+            "text": "أهلاً بك!",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 1,
+            "timing": {
+              "requestSetupMs": 0.5,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0.1,
+              "promptTokensReused": 0,
+              "prefillMs": 326.7,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 327.3,
+              "decodeTokenMs": [
+                22.1,
+                22.2,
+                22,
+                21.7,
+                22.3
+              ],
+              "interTokenLatencyMs": [
+                22.2,
+                22.2,
+                22,
+                21.7
+              ],
+              "timePerOutputTokenMs": 22.025,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0.1,
+              "totalMs": 437.8
+            },
+            "generatedTokenIds": [
+              237143,
+              236910,
+              70436,
+              60774,
+              236888
+            ],
+            "text": "أهلاً بك!",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 2,
+            "timing": {
+              "requestSetupMs": 0.7,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0,
+              "promptTokensReused": 0,
+              "prefillMs": 324.1,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 324.8,
+              "decodeTokenMs": [
+                20,
+                20.6,
+                18.4,
+                18.8,
+                18.8
+              ],
+              "interTokenLatencyMs": [
+                20,
+                20.6,
+                18.5,
+                18.8
+              ],
+              "timePerOutputTokenMs": 19.475,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 421.6
+            },
+            "generatedTokenIds": [
+              237143,
+              236910,
+              70436,
+              60774,
+              236888
+            ],
+            "text": "أهلاً بك!",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          }
+        ],
+        "summary": {
+          "prefill": {
+            "medianMs": 324.1,
+            "p95Ms": 326.7,
+            "averageMs": 306.867
+          },
+          "timeToFirstToken": {
+            "medianMs": 324.8,
+            "p95Ms": 327.3,
+            "averageMs": 307.467
+          },
+          "decodeToken": {
+            "medianMs": 18.8,
+            "p95Ms": 22.3,
+            "averageMs": 19.767
+          },
+          "interTokenLatency": {
+            "medianMs": 18.8,
+            "p95Ms": 22.2,
+            "averageMs": 19.792
+          },
+          "timePerOutputToken": {
+            "medianMs": 19.475,
+            "p95Ms": 22.025,
+            "averageMs": 19.792
+          },
+          "total": {
+            "medianMs": 421.6,
+            "p95Ms": 437.8,
+            "averageMs": 406.567
+          },
+          "warmDecodeTokensPerSecond": 50.59,
+          "endToEndTokensPerSecond": 12.298
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "capturedAt": "2026-07-17T11:38:08.355Z",
+        "status": "owned-full-generation-baseline",
+        "speedupClaim": null,
+        "model": {
+          "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+          "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+          "sourceKey": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+          "fileSize": 2458111846
+        },
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+          "adapterInfo": {
+            "vendor": "apple",
+            "architecture": "metal-3"
+          },
+          "powerPreference": "high-performance"
+        },
+        "configuration": {
+          "caseId": "longer-instruction",
+          "prompt": "Name the three primary colors in one short sentence.",
+          "promptTokens": 19,
+          "expectedOutputTokens": 11,
+          "maxNewTokens": 16,
+          "cacheCapacity": 512,
+          "prefillStrategy": "auto",
+          "reusePromptCache": false,
+          "warmupIterations": 1,
+          "iterations": 3
+        },
+        "correctness": {
+          "expectedTokenIds": [
+            818,
+            5905,
+            7913,
+            659,
+            2604,
+            236764,
+            7070,
+            236764,
+            532,
+            3730,
+            236761
+          ],
+          "expectedText": "The primary colors are red, yellow, and blue.",
+          "allIterationsMatchGolden": true
+        },
+        "load": {
+          "sessionLoadMs": 6935,
+          "note": "Includes device/cache/tokenizer initialization, model resource loading, and pipeline creation in the current browser process. Automatic routing currently selects the measured sequential reference path."
+        },
+        "memory": {
+          "retainedGpuBufferCount": 1599,
+          "retainedGpuBufferBytes": 848039236,
+          "scope": "retained-resource-graph",
+          "note": "Deduplicated byte sum of GPUBuffer objects retained by the composed decode graph, optional prefill graph, and logits readback buffer. Driver and pipeline memory are excluded."
+        },
+        "samples": [
+          {
+            "iteration": 0,
+            "timing": {
+              "requestSetupMs": 0.8,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0.1,
+              "promptTokensReused": 0,
+              "prefillMs": 347.7,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 348.6,
+              "decodeTokenMs": [
+                18,
+                18.3,
+                19.1,
+                19.1,
+                17.8,
+                16.8,
+                16.7,
+                16.2,
+                16.6,
+                17.8,
+                17.6
+              ],
+              "interTokenLatencyMs": [
+                18,
+                18.4,
+                19.1,
+                19.1,
+                17.8,
+                16.8,
+                16.7,
+                16.2,
+                16.6,
+                17.8
+              ],
+              "timePerOutputTokenMs": 17.65,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 542.8
+            },
+            "generatedTokenIds": [
+              818,
+              5905,
+              7913,
+              659,
+              2604,
+              236764,
+              7070,
+              236764,
+              532,
+              3730,
+              236761
+            ],
+            "text": "The primary colors are red, yellow, and blue.",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 1,
+            "timing": {
+              "requestSetupMs": 0.7,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0,
+              "promptTokensReused": 0,
+              "prefillMs": 302.2,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 302.9,
+              "decodeTokenMs": [
+                17.8,
+                17.9,
+                18.9,
+                18.8,
+                18.6,
+                17.6,
+                19.3,
+                19.4,
+                18.8,
+                19.2,
+                20
+              ],
+              "interTokenLatencyMs": [
+                17.8,
+                17.9,
+                18.9,
+                18.8,
+                18.6,
+                17.6,
+                19.3,
+                19.4,
+                18.8,
+                19.2
+              ],
+              "timePerOutputTokenMs": 18.63,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 509.4
+            },
+            "generatedTokenIds": [
+              818,
+              5905,
+              7913,
+              659,
+              2604,
+              236764,
+              7070,
+              236764,
+              532,
+              3730,
+              236761
+            ],
+            "text": "The primary colors are red, yellow, and blue.",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 2,
+            "timing": {
+              "requestSetupMs": 0.7,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0.2,
+              "promptTokensReused": 0,
+              "prefillMs": 315.7,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 316.6,
+              "decodeTokenMs": [
+                16.5,
+                17.5,
+                17.1,
+                16.9,
+                16.7,
+                16.7,
+                16.6,
+                16.9,
+                18.4,
+                18.5,
+                18.4
+              ],
+              "interTokenLatencyMs": [
+                16.5,
+                17.6,
+                17.1,
+                16.9,
+                16.8,
+                16.7,
+                16.6,
+                16.9,
+                18.4,
+                18.5
+              ],
+              "timePerOutputTokenMs": 17.2,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0.1,
+              "totalMs": 507.1
+            },
+            "generatedTokenIds": [
+              818,
+              5905,
+              7913,
+              659,
+              2604,
+              236764,
+              7070,
+              236764,
+              532,
+              3730,
+              236761
+            ],
+            "text": "The primary colors are red, yellow, and blue.",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          }
+        ],
+        "summary": {
+          "prefill": {
+            "medianMs": 315.7,
+            "p95Ms": 347.7,
+            "averageMs": 321.867
+          },
+          "timeToFirstToken": {
+            "medianMs": 316.6,
+            "p95Ms": 348.6,
+            "averageMs": 322.7
+          },
+          "decodeToken": {
+            "medianMs": 17.8,
+            "p95Ms": 19.4,
+            "averageMs": 17.894
+          },
+          "interTokenLatency": {
+            "medianMs": 17.8,
+            "p95Ms": 19.3,
+            "averageMs": 17.827
+          },
+          "timePerOutputToken": {
+            "medianMs": 17.65,
+            "p95Ms": 18.63,
+            "averageMs": 17.827
+          },
+          "total": {
+            "medianMs": 509.4,
+            "p95Ms": 542.8,
+            "averageMs": 519.767
+          },
+          "warmDecodeTokensPerSecond": 55.885,
+          "endToEndTokensPerSecond": 21.163
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "capturedAt": "2026-07-17T11:38:17.243Z",
+        "status": "owned-full-generation-baseline",
+        "speedupClaim": null,
+        "model": {
+          "id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+          "revision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+          "sourceKey": "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/model.safetensors",
+          "fileSize": 2458111846
+        },
+        "environment": {
+          "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+          "adapterInfo": {
+            "vendor": "apple",
+            "architecture": "metal-3"
+          },
+          "powerPreference": "high-performance"
+        },
+        "configuration": {
+          "caseId": "prefill-32-boundary",
+          "prompt": "Reply with only OK. word word word word word word word word word word word word word word word word word word",
+          "promptTokens": 32,
+          "expectedOutputTokens": 1,
+          "maxNewTokens": 8,
+          "cacheCapacity": 512,
+          "prefillStrategy": "auto",
+          "reusePromptCache": false,
+          "warmupIterations": 1,
+          "iterations": 3
+        },
+        "correctness": {
+          "expectedTokenIds": [
+            7676
+          ],
+          "expectedText": "OK",
+          "allIterationsMatchGolden": true
+        },
+        "load": {
+          "sessionLoadMs": 6793.6,
+          "note": "Includes device/cache/tokenizer initialization, model resource loading, and pipeline creation in the current browser process. Automatic routing currently selects the measured sequential reference path."
+        },
+        "memory": {
+          "retainedGpuBufferCount": 1599,
+          "retainedGpuBufferBytes": 848039236,
+          "scope": "retained-resource-graph",
+          "note": "Deduplicated byte sum of GPUBuffer objects retained by the composed decode graph, optional prefill graph, and logits readback buffer. Driver and pipeline memory are excluded."
+        },
+        "samples": [
+          {
+            "iteration": 0,
+            "timing": {
+              "requestSetupMs": 0.6,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0,
+              "promptTokensReused": 0,
+              "prefillMs": 429.1,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 429.8,
+              "decodeTokenMs": [
+                16.2
+              ],
+              "interTokenLatencyMs": [],
+              "timePerOutputTokenMs": null,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 446.2
+            },
+            "generatedTokenIds": [
+              7676
+            ],
+            "text": "OK",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 1,
+            "timing": {
+              "requestSetupMs": 0.6,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0,
+              "promptTokensReused": 0,
+              "prefillMs": 517.4,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 518.1,
+              "decodeTokenMs": [
+                21.6
+              ],
+              "interTokenLatencyMs": [],
+              "timePerOutputTokenMs": null,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 539.7
+            },
+            "generatedTokenIds": [
+              7676
+            ],
+            "text": "OK",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          },
+          {
+            "iteration": 2,
+            "timing": {
+              "requestSetupMs": 0.5,
+              "visionPreprocessMs": 0,
+              "visionEncodeMs": 0,
+              "visionWeightLoadMs": 0,
+              "visionPatchEmbedMs": 0,
+              "visionLayerSetupMs": 0,
+              "visionLayerExecutionMs": 0,
+              "visionPostprocessMs": 0,
+              "cacheResetMs": 0.1,
+              "promptTokensReused": 0,
+              "prefillMs": 573.4,
+              "prefillMode": "sequential",
+              "prefillGpuProfiles": null,
+              "timeToFirstTokenMs": 574,
+              "decodeTokenMs": [
+                22.1
+              ],
+              "interTokenLatencyMs": [],
+              "timePerOutputTokenMs": null,
+              "logitsReadbackMs": 0,
+              "callbackMs": 0,
+              "totalMs": 596.3
+            },
+            "generatedTokenIds": [
+              7676
+            ],
+            "text": "OK",
+            "stopReason": "end-token",
+            "exactGoldenMatch": true
+          }
+        ],
+        "summary": {
+          "prefill": {
+            "medianMs": 517.4,
+            "p95Ms": 573.4,
+            "averageMs": 506.633
+          },
+          "timeToFirstToken": {
+            "medianMs": 518.1,
+            "p95Ms": 574,
+            "averageMs": 507.3
+          },
+          "decodeToken": {
+            "medianMs": 21.6,
+            "p95Ms": 22.1,
+            "averageMs": 19.967
+          },
+          "interTokenLatency": null,
+          "timePerOutputToken": null,
+          "total": {
+            "medianMs": 539.7,
+            "p95Ms": 596.3,
+            "averageMs": 527.4
+          },
+          "warmDecodeTokensPerSecond": 50.083,
+          "endToEndTokensPerSecond": 1.896
+        }
+      }
+    ],
+    "transformersJs": {
+      "schemaVersion": 1,
+      "capturedAt": "2026-07-17T11:43:32.385Z",
+      "runtime": "@huggingface/transformers",
+      "runtimeVersion": "4.2.0",
+      "modelId": "onnx-community/gemma-4-E2B-it-ONNX",
+      "modelRevision": "9f4bef82ea6e296bc69f8a2f5939f73af81b07a6",
+      "modelVariant": "q4f16",
+      "modelEquivalence": "model-family-only",
+      "loadMs": 309681.9,
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+        "adapterInfo": {
+          "vendor": "apple",
+          "architecture": "metal-3"
+        }
+      },
+      "configuration": {
+        "warmupIterations": 1,
+        "iterations": 3,
+        "sampler": "greedy",
+        "textOnly": true,
+        "freshGenerationStatePerSample": true
+      },
+      "cases": [
+        {
+          "id": "short-greeting",
+          "prompt": "Say hi in one short sentence.",
+          "promptTokens": 16,
+          "maxOutputTokens": 8,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "Hi!",
+              "generatedTokenIds": [
+                10979,
+                236888
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 82.8,
+                "interTokenLatencyMs": [
+                  37.1
+                ],
+                "timePerOutputTokenMs": 37.1,
+                "decodeTokensPerSecond": 28.369,
+                "totalMs": 153.5
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "Hi!",
+              "generatedTokenIds": [
+                10979,
+                236888
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 79.6,
+                "interTokenLatencyMs": [
+                  33.4
+                ],
+                "timePerOutputTokenMs": 33.4,
+                "decodeTokensPerSecond": 30.769,
+                "totalMs": 144.7
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "Hi!",
+              "generatedTokenIds": [
+                10979,
+                236888
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 82.3,
+                "interTokenLatencyMs": [
+                  32.5
+                ],
+                "timePerOutputTokenMs": 32.5,
+                "decodeTokensPerSecond": 31.056,
+                "totalMs": 146.7
+              }
+            }
+          ]
+        },
+        {
+          "id": "arithmetic",
+          "prompt": "Reply with only the number: 7 + 5.",
+          "promptTokens": 21,
+          "maxOutputTokens": 8,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "12",
+              "generatedTokenIds": [
+                236770,
+                236778
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 115.4,
+                "interTokenLatencyMs": [
+                  32.2
+                ],
+                "timePerOutputTokenMs": 32.2,
+                "decodeTokensPerSecond": 31.447,
+                "totalMs": 179
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "12",
+              "generatedTokenIds": [
+                236770,
+                236778
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 114.6,
+                "interTokenLatencyMs": [
+                  31.8
+                ],
+                "timePerOutputTokenMs": 31.8,
+                "decodeTokensPerSecond": 31.646,
+                "totalMs": 177.9
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "12",
+              "generatedTokenIds": [
+                236770,
+                236778
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 112.1,
+                "interTokenLatencyMs": [
+                  33
+                ],
+                "timePerOutputTokenMs": 33,
+                "decodeTokensPerSecond": 31.201,
+                "totalMs": 176.4
+              }
+            }
+          ]
+        },
+        {
+          "id": "arabic",
+          "prompt": "قل مرحباً بجملة قصيرة.",
+          "promptTokens": 18,
+          "maxOutputTokens": 12,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "أهلاً بك!",
+              "generatedTokenIds": [
+                237143,
+                236910,
+                70436,
+                60774,
+                236888
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 109,
+                "interTokenLatencyMs": [
+                  31.4,
+                  31,
+                  31.5,
+                  31.5
+                ],
+                "timePerOutputTokenMs": 31.35,
+                "decodeTokensPerSecond": 31.928,
+                "totalMs": 265.6
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "أهلاً بك!",
+              "generatedTokenIds": [
+                237143,
+                236910,
+                70436,
+                60774,
+                236888
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 110.1,
+                "interTokenLatencyMs": [
+                  31.3,
+                  30.6,
+                  31,
+                  30.9
+                ],
+                "timePerOutputTokenMs": 30.95,
+                "decodeTokensPerSecond": 32.216,
+                "totalMs": 265.4
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "أهلاً بك!",
+              "generatedTokenIds": [
+                237143,
+                236910,
+                70436,
+                60774,
+                236888
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 112.8,
+                "interTokenLatencyMs": [
+                  31.7,
+                  32.1,
+                  31.2,
+                  31.2
+                ],
+                "timePerOutputTokenMs": 31.55,
+                "decodeTokensPerSecond": 31.786,
+                "totalMs": 270.2
+              }
+            }
+          ]
+        },
+        {
+          "id": "longer-instruction",
+          "prompt": "Name the three primary colors in one short sentence.",
+          "promptTokens": 19,
+          "maxOutputTokens": 16,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "The three primary colors are red, yellow, and blue.",
+              "generatedTokenIds": [
+                818,
+                1806,
+                5905,
+                7913,
+                659,
+                2604,
+                236764,
+                7070,
+                236764,
+                532,
+                3730,
+                236761
+              ],
+              "exactTextMatch": false,
+              "timing": {
+                "timeToFirstTokenMs": 109.1,
+                "interTokenLatencyMs": [
+                  31.5,
+                  31.3,
+                  31.4,
+                  31,
+                  30.9,
+                  31.1,
+                  31.2,
+                  31.3,
+                  30.4,
+                  32.7,
+                  31.7
+                ],
+                "timePerOutputTokenMs": 31.318,
+                "decodeTokensPerSecond": 31.906,
+                "totalMs": 485.2
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "The three primary colors are red, yellow, and blue.",
+              "generatedTokenIds": [
+                818,
+                1806,
+                5905,
+                7913,
+                659,
+                2604,
+                236764,
+                7070,
+                236764,
+                532,
+                3730,
+                236761
+              ],
+              "exactTextMatch": false,
+              "timing": {
+                "timeToFirstTokenMs": 109.2,
+                "interTokenLatencyMs": [
+                  31.4,
+                  31.2,
+                  31.3,
+                  31.4,
+                  30.8,
+                  31.6,
+                  31.1,
+                  31.2,
+                  30.7,
+                  31.3,
+                  31.1
+                ],
+                "timePerOutputTokenMs": 31.191,
+                "decodeTokensPerSecond": 32.051,
+                "totalMs": 483.7
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "The three primary colors are red, yellow, and blue.",
+              "generatedTokenIds": [
+                818,
+                1806,
+                5905,
+                7913,
+                659,
+                2604,
+                236764,
+                7070,
+                236764,
+                532,
+                3730,
+                236761
+              ],
+              "exactTextMatch": false,
+              "timing": {
+                "timeToFirstTokenMs": 110.6,
+                "interTokenLatencyMs": [
+                  31.2,
+                  30.9,
+                  31,
+                  31.3,
+                  30.7,
+                  30.9,
+                  31,
+                  31.3,
+                  30.9,
+                  31.3,
+                  31.7
+                ],
+                "timePerOutputTokenMs": 31.109,
+                "decodeTokensPerSecond": 32.077,
+                "totalMs": 484.7
+              }
+            }
+          ]
+        },
+        {
+          "id": "prefill-32-boundary",
+          "prompt": "Reply with only OK. word word word word word word word word word word word word word word word word word word",
+          "promptTokens": 32,
+          "maxOutputTokens": 8,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "OK",
+              "generatedTokenIds": [
+                7676
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 113.6,
+                "interTokenLatencyMs": [],
+                "timePerOutputTokenMs": null,
+                "decodeTokensPerSecond": 31.447,
+                "totalMs": 145.5
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "OK",
+              "generatedTokenIds": [
+                7676
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 113.5,
+                "interTokenLatencyMs": [],
+                "timePerOutputTokenMs": null,
+                "decodeTokensPerSecond": 31.25,
+                "totalMs": 145.5
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "OK",
+              "generatedTokenIds": [
+                7676
+              ],
+              "exactTextMatch": true,
+              "timing": {
+                "timeToFirstTokenMs": 113.8,
+                "interTokenLatencyMs": [],
+                "timePerOutputTokenMs": null,
+                "decodeTokensPerSecond": 31.546,
+                "totalMs": 145.6
+              }
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "The ONNX Community q4f16 export is derived from the Gemma 4 E2B instruction model, but it is not the file-identical mixed 2/4/8-bit mobile-QAT safetensors artifact used by the owned runtime.",
+        "Gemma4ForCausalLM intentionally selects only embed_tokens and decoder_model_merged; vision and audio encoder sessions are excluded from load time and generation.",
+        "Token timestamps are captured by TextStreamer after each generated token reaches JavaScript. They include runtime dispatch, readback, sampling, and callback overhead."
+      ]
+    },
+    "liteRtLm": {
+      "schemaVersion": 1,
+      "capturedAt": "2026-07-17T11:46:54.832Z",
+      "runtime": "@litert-lm/core",
+      "runtimeVersion": "0.14.0",
+      "modelUrl": "https://huggingface.co/litert-community/gemma-4-E2B-it-litert-lm/resolve/main/gemma-4-E2B-it-web.litertlm",
+      "modelEquivalence": "model-family-only",
+      "loadMs": 199088.5,
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+        "adapterInfo": {
+          "vendor": "apple",
+          "architecture": "metal-3"
+        }
+      },
+      "configuration": {
+        "contextCapacity": 2048,
+        "warmupIterations": 1,
+        "iterations": 3,
+        "sampler": "greedy",
+        "freshConversationPerSample": true
+      },
+      "cases": [
+        {
+          "id": "short-greeting",
+          "prompt": "Say hi in one short sentence.",
+          "maxOutputTokens": 8,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "Hi!",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 52.6,
+                "chunkIntervalMs": [
+                  19.2
+                ],
+                "totalMs": 90.4,
+                "chunkCount": 2
+              },
+              "native": {
+                "prefillTokensPerSecond": 320.001,
+                "prefillTokenCount": 16,
+                "decodeTokensPerSecond": 76.923,
+                "decodeTokenCount": 3,
+                "timeToFirstTokenMs": 63
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "Hi!",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 53.1,
+                "chunkIntervalMs": [
+                  19.3
+                ],
+                "totalMs": 91.8,
+                "chunkCount": 2
+              },
+              "native": {
+                "prefillTokensPerSecond": 313.725,
+                "prefillTokenCount": 16,
+                "decodeTokensPerSecond": 75,
+                "decodeTokenCount": 3,
+                "timeToFirstTokenMs": 64.333
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "Hi!",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 53.9,
+                "chunkIntervalMs": [
+                  19.6
+                ],
+                "totalMs": 93.1,
+                "chunkCount": 2
+              },
+              "native": {
+                "prefillTokensPerSecond": 313.725,
+                "prefillTokenCount": 16,
+                "decodeTokensPerSecond": 73.171,
+                "decodeTokenCount": 3,
+                "timeToFirstTokenMs": 64.667
+              }
+            }
+          ]
+        },
+        {
+          "id": "arithmetic",
+          "prompt": "Reply with only the number: 7 + 5.",
+          "maxOutputTokens": 8,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "12",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 63.1,
+                "chunkIntervalMs": [
+                  20.3
+                ],
+                "totalMs": 103.4,
+                "chunkCount": 2
+              },
+              "native": {
+                "prefillTokensPerSecond": 349.999,
+                "prefillTokenCount": 21,
+                "decodeTokensPerSecond": 71.429,
+                "decodeTokenCount": 3,
+                "timeToFirstTokenMs": 74
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "12",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 63.2,
+                "chunkIntervalMs": [
+                  20.5
+                ],
+                "totalMs": 103.8,
+                "chunkCount": 2
+              },
+              "native": {
+                "prefillTokensPerSecond": 350,
+                "prefillTokenCount": 21,
+                "decodeTokensPerSecond": 69.767,
+                "decodeTokenCount": 3,
+                "timeToFirstTokenMs": 74.333
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "12",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 63.6,
+                "chunkIntervalMs": [
+                  20.8
+                ],
+                "totalMs": 105.7,
+                "chunkCount": 2
+              },
+              "native": {
+                "prefillTokensPerSecond": 350,
+                "prefillTokenCount": 21,
+                "decodeTokensPerSecond": 68.182,
+                "decodeTokenCount": 3,
+                "timeToFirstTokenMs": 74.667
+              }
+            }
+          ]
+        },
+        {
+          "id": "arabic",
+          "prompt": "قل مرحباً بجملة قصيرة.",
+          "maxOutputTokens": 12,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "أهلاً بك!",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 60.6,
+                "chunkIntervalMs": [
+                  19.6,
+                  20.3,
+                  19.1,
+                  19
+                ],
+                "totalMs": 157.6,
+                "chunkCount": 5
+              },
+              "native": {
+                "prefillTokensPerSecond": 310.346,
+                "prefillTokenCount": 18,
+                "decodeTokensPerSecond": 61.224,
+                "decodeTokenCount": 6,
+                "timeToFirstTokenMs": 74.333
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "أهلاً بك!",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 60.3,
+                "chunkIntervalMs": [
+                  19.7,
+                  19.2,
+                  19.9,
+                  19.8
+                ],
+                "totalMs": 158.2,
+                "chunkCount": 5
+              },
+              "native": {
+                "prefillTokensPerSecond": 310.346,
+                "prefillTokenCount": 18,
+                "decodeTokensPerSecond": 60,
+                "decodeTokenCount": 6,
+                "timeToFirstTokenMs": 74.667
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "أهلاً بك!",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 60.6,
+                "chunkIntervalMs": [
+                  20.5,
+                  20,
+                  20.2,
+                  20.6
+                ],
+                "totalMs": 162.3,
+                "chunkCount": 5
+              },
+              "native": {
+                "prefillTokensPerSecond": 310.346,
+                "prefillTokenCount": 18,
+                "decodeTokensPerSecond": 57.692,
+                "decodeTokenCount": 6,
+                "timeToFirstTokenMs": 75.333
+              }
+            }
+          ]
+        },
+        {
+          "id": "longer-instruction",
+          "prompt": "Name the three primary colors in one short sentence.",
+          "maxOutputTokens": 16,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "The primary colors are red, blue, and yellow.",
+              "exactTextMatch": false,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 64.5,
+                "chunkIntervalMs": [
+                  22.6,
+                  22,
+                  21.4,
+                  20,
+                  20.6,
+                  20.4,
+                  20.2,
+                  20.6,
+                  20.2,
+                  20.2
+                ],
+                "totalMs": 292.9,
+                "chunkCount": 11
+              },
+              "native": {
+                "prefillTokensPerSecond": 311.476,
+                "prefillTokenCount": 19,
+                "decodeTokensPerSecond": 51.948,
+                "decodeTokenCount": 12,
+                "timeToFirstTokenMs": 80.25
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "The primary colors are red, blue, and yellow.",
+              "exactTextMatch": false,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 62.9,
+                "chunkIntervalMs": [
+                  19.4,
+                  19.2,
+                  19.7,
+                  19.3,
+                  19.5,
+                  19.5,
+                  19.9,
+                  19.7,
+                  20.1,
+                  19.9
+                ],
+                "totalMs": 279.2,
+                "chunkCount": 11
+              },
+              "native": {
+                "prefillTokensPerSecond": 316.667,
+                "prefillTokenCount": 19,
+                "decodeTokensPerSecond": 55.046,
+                "decodeTokenCount": 12,
+                "timeToFirstTokenMs": 78.167
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "The primary colors are red, blue, and yellow.",
+              "exactTextMatch": false,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 63.4,
+                "chunkIntervalMs": [
+                  19.8,
+                  19.6,
+                  20.2,
+                  20,
+                  20,
+                  20,
+                  20.2,
+                  20.5,
+                  20.3,
+                  20.2
+                ],
+                "totalMs": 284.5,
+                "chunkCount": 11
+              },
+              "native": {
+                "prefillTokensPerSecond": 316.667,
+                "prefillTokenCount": 19,
+                "decodeTokensPerSecond": 53.812,
+                "decodeTokenCount": 12,
+                "timeToFirstTokenMs": 78.583
+              }
+            }
+          ]
+        },
+        {
+          "id": "prefill-32-boundary",
+          "prompt": "Reply with only OK. word word word word word word word word word word word word word word word word word word",
+          "maxOutputTokens": 8,
+          "samples": [
+            {
+              "iteration": 0,
+              "outputText": "OK",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 73.3,
+                "chunkIntervalMs": [],
+                "totalMs": 94.5,
+                "chunkCount": 1
+              },
+              "native": {
+                "prefillTokensPerSecond": 457.144,
+                "prefillTokenCount": 32,
+                "decodeTokensPerSecond": 86.956,
+                "decodeTokenCount": 2,
+                "timeToFirstTokenMs": 81.5
+              }
+            },
+            {
+              "iteration": 1,
+              "outputText": "OK",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 73,
+                "chunkIntervalMs": [],
+                "totalMs": 94.3,
+                "chunkCount": 1
+              },
+              "native": {
+                "prefillTokensPerSecond": 457.144,
+                "prefillTokenCount": 32,
+                "decodeTokensPerSecond": 86.956,
+                "decodeTokenCount": 2,
+                "timeToFirstTokenMs": 81.5
+              }
+            },
+            {
+              "iteration": 2,
+              "outputText": "OK",
+              "exactTextMatch": true,
+              "externallyObserved": {
+                "timeToFirstChunkMs": 74.5,
+                "chunkIntervalMs": [],
+                "totalMs": 96.8,
+                "chunkCount": 1
+              },
+              "native": {
+                "prefillTokensPerSecond": 457.142,
+                "prefillTokenCount": 32,
+                "decodeTokensPerSecond": 80,
+                "decodeTokenCount": 2,
+                "timeToFirstTokenMs": 82.5
+              }
+            }
+          ]
+        }
+      ],
+      "limitations": [
+        "The official Web .litertlm file is a specially optimized text-only export, not the pinned mobile-QAT safetensors file.",
+        "Externally observed callback intervals are chunk intervals. They are not promoted to per-token ITL because the preview API does not guarantee one token per callback.",
+        "Native LiteRT-LM TTFT and decode throughput are retained as supplemental runtime counters; cross-runtime claims use externally equivalent boundaries where available."
+      ]
+    },
+    "priorHuggingFaceSource": "huggingface-same-device-gap-analysis.electron-148.json"
+  }
+}

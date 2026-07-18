@@ -89,6 +89,7 @@ export interface GemmaTokenizer {
   readonly endTokenIds: readonly number[];
   readonly imageTokenId: number;
   encodePrompt(prompt: string): number[];
+  encodeText(text: string): number[];
   encodeMessages(
     messages: readonly GemmaChatMessage[],
     tools?: readonly GemmaFunctionTool[],
@@ -176,6 +177,9 @@ function createGemmaTokenizer(
     imageTokenId: GEMMA_IMAGE_TOKEN_ID,
     encodePrompt(prompt) {
       return encodeMessages([{ role: "user", content: prompt }]);
+    },
+    encodeText(text) {
+      return tokenizer.encode(text, { add_special_tokens: false });
     },
     encodeMessages,
     encodeInput(input) {

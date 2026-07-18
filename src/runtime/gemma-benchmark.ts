@@ -113,7 +113,18 @@ export async function benchmarkGemmaGeneration(
   const prefillStrategy = options.prefillStrategy ?? "auto";
   const adapterInfoPromise = readAdapterInfo();
   const loadStartedAt = performance.now();
-  const session = await loadGemmaGenerationSession({ cacheCapacity, prefillStrategy });
+  const session = await loadGemmaGenerationSession({
+    cacheCapacity,
+    sourceUrl: options.sourceUrl,
+    lmHeadMode: options.lmHeadMode,
+    oprojMode: options.oprojMode,
+    prefillStrategy,
+    prefillGateUpMode: options.prefillGateUpMode,
+    prefillRmsEpilogueMode: options.prefillRmsEpilogueMode,
+    prefillQkvSrqMode: options.prefillQkvSrqMode,
+    prefillPleInputMode: options.prefillPleInputMode,
+    prefillMaxInFlightBlocks: options.prefillMaxInFlightBlocks,
+  });
   const sessionLoadMs = performance.now() - loadStartedAt;
   const memory = session.estimateRetainedGpuMemory();
 

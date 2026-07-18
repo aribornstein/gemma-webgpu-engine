@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Gemma 4 E2B warm generation comparison</title>
+  <desc id="desc">Six charts compare Owned WebGPU and LiteRT-LM Web median TTFT, decode wall time, TPOT, ITL, decode tokens per second, and overall tokens per second for 32 input and 512 requested output tokens. Transformers.js has no warm result because its runtime was unavailable.</desc>
+  <rect width="1200" height="700" fill="#f7f5ef"/>
+  <text x="48" y="55" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700">Warm generation: 32 input / 512 output</text>
+  <text x="48" y="84" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="15">Median of 30 headless Chrome 150 runs per available runtime on Apple M4</text>
+
+  <rect x="48" y="105" width="14" height="14" fill="#d75238"/>
+  <text x="70" y="117" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="14">Owned WebGPU</text>
+  <rect x="208" y="105" width="14" height="14" fill="#247c6d"/>
+  <text x="230" y="117" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="14">LiteRT-LM Web</text>
+  <text x="390" y="117" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="14">Transformers.js: warm runtime unavailable</text>
+
+  <g transform="translate(48 148)">
+    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+    <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">TTFT</text>
+    <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">lower is better</text>
+    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="61" width="240" height="24" fill="#d75238"/>
+    <text x="314" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">479.70 ms</text>
+    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="109" width="78" height="24" fill="#247c6d"/>
+    <text x="168" y="126" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">155.65 ms</text>
+    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT reaches first output 3.08x sooner.</text>
+  </g>
+
+  <g transform="translate(425 148)">
+    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+    <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">Decode wall time</text>
+    <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">lower is better</text>
+    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="61" width="176" height="24" fill="#d75238"/>
+    <text x="250" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">9.93 s</text>
+    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="109" width="240" height="24" fill="#247c6d"/>
+    <text x="314" y="126" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">14.07 s</text>
+    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned completes decode 29.5% sooner.</text>
+  </g>
+
+  <g transform="translate(802 148)">
+    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+    <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">TPOT</text>
+    <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">lower is better</text>
+    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="61" width="170" height="24" fill="#d75238"/>
+    <text x="244" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">19.47 ms</text>
+    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="109" width="240" height="24" fill="#247c6d"/>
+    <text x="314" y="126" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">27.54 ms</text>
+    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned emits each post-first token 29.3% sooner.</text>
+  </g>
+
+  <g transform="translate(48 395)">
+    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+    <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">ITL</text>
+    <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">lower is better</text>
+    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="61" width="240" height="24" fill="#d75238"/>
+    <text x="314" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">19.20 ms</text>
+    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="109" width="240" height="24" fill="#eef0ec"/>
+    <text x="202" y="126" text-anchor="middle" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">not comparable</text>
+    <text x="22" y="175" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT exposes chunks, not guaranteed token events.</text>
+    <text x="22" y="195" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Its chunk interval is intentionally not labeled ITL.</text>
+  </g>
+
+  <g transform="translate(425 395)">
+    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+    <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">Decode tok/s</text>
+    <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">higher is better</text>
+    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="61" width="240" height="24" fill="#d75238"/>
+    <text x="314" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">51.37</text>
+    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="109" width="170" height="24" fill="#247c6d"/>
+    <text x="244" y="126" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">36.31</text>
+    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned decode throughput is 41.5% higher.</text>
+  </g>
+
+  <g transform="translate(802 395)">
+    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+    <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">Overall tok/s</text>
+    <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">higher is better</text>
+    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="61" width="240" height="24" fill="#d75238"/>
+    <text x="314" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">49.44</text>
+    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="109" width="175" height="24" fill="#247c6d"/>
+    <text x="249" y="126" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">36.07</text>
+    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned end-to-end throughput is 37.1% higher.</text>
+  </g>
+
+  <text x="48" y="663" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">External wall-clock boundaries. Each panel has an independent scale. Full run: 1,008 records, 630 scheduled skips, 0 errors.</text>
+</svg>
