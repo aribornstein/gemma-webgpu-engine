@@ -17,6 +17,14 @@ export interface GemmaVisionGenerationProgress {
   totalLayers: number;
 }
 
+export interface GemmaAudioGenerationProgress {
+  audioIndex: number;
+  audioCount: number;
+  phase: "preprocessing" | "encoding";
+  completedLayers: number;
+  totalLayers: number;
+}
+
 export interface GemmaPrefillGenerationProgress {
   completedPromptTokens: number;
   totalPromptTokens: number;
@@ -28,8 +36,10 @@ export type GemmaGenerationOptions = Partial<DecodingConfig> & {
   signal?: AbortSignal;
   onToken?: GemmaGenerationTokenHandler;
   onVisionProgress?: (progress: GemmaVisionGenerationProgress) => void;
+  onAudioProgress?: (progress: GemmaAudioGenerationProgress) => void;
   onPrefillProgress?: (progress: GemmaPrefillGenerationProgress) => void;
   constraint?: GenerationConstraint;
+  requireReasoning?: boolean;
   reusePromptCache?: boolean;
 };
 

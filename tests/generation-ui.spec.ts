@@ -122,6 +122,8 @@ test("validates controls and switches constraint editors", async ({ page }) => {
     "additionalProperties": false
   }`);
   await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
+  await page.getByRole("checkbox", { name: "Thinking" }).check();
+  await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Reset" }).click();
   await expect(page.getByRole("radio", { name: "None" })).toBeChecked();
@@ -162,8 +164,95 @@ test("applies editable generation examples", async ({ page }) => {
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toHaveValue(/"urgent"/);
   await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
 
+  await examples.selectOption("reasoning-logic");
+  await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/farmer.*fox.*chicken/s);
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeChecked();
+
+  await examples.selectOption("schema-reasoning");
+  await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/medication shipment/);
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).toHaveValue(/"inspect"/);
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeChecked();
+  await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
+
   await page.getByRole("spinbutton", { name: "Max tokens" }).fill("32");
   await expect(examples).toHaveValue("custom");
+});
+
+test("keeps Generate prompts while Chat clears its sent composer", async ({ page }) => {
+  await page.goto("/");
+  const workspace = page.getByLabel("Workspace");
+  const prompt = page.getByRole("textbox", { name: "Message" });
+
+  await workspace.selectOption("schema-reasoning");
+  const examplePrompt = await prompt.inputValue();
+  await page.evaluate(() => document.querySelector<HTMLFormElement>("#generation-form")?.dispatchEvent(
+    new Event("submit", { bubbles: true, cancelable: true }),
+  ));
+  await expect(prompt).toHaveValue(examplePrompt);
+
+  await workspace.selectOption("chat");
+  await prompt.fill("Keep this only until it is sent.");
+  await expect(prompt).toHaveValue("Keep this only until it is sent.");
+});
+
+test("clears the transcript without clearing the configured example prompt", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel("Workspace").selectOption("schema-reasoning");
+  const prompt = page.getByRole("textbox", { name: "Message" });
+  const examplePrompt = await prompt.inputValue();
+
+  await page.getByRole("button", { name: "Clear transcript" }).click();
+
+  await expect(page.getByRole("log")).toHaveText("No conversation yet.");
+  await expect(prompt).toHaveValue(examplePrompt);
+  await expect(page.locator("#request-status"))
+    .toHaveText(/Transcript cleared|Waiting for model/);
+});
+
+test("loads the synthesized speech example through the audio attachment path", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByLabel("Workspace").selectOption("audio-transcription");
+  await expect(page.getByRole("textbox", { name: "Message" }))
+    .toHaveValue("What is said in this audio? Return only the spoken words.");
+  await expect(page.getByRole("button", { name: "Add image" })).toBeHidden();
+  await expect(page.getByRole("button", { name: "Add audio" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Record mic" })).toBeVisible();
+  await expect(page.getByText("gemma-audio-demo.wav", { exact: true })).toBeVisible();
+  await expect(page.locator("#audio-player")).toBeVisible();
+});
+
+test("records microphone output into the audio attachment preview", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: {
+        getUserMedia: async () => {
+          const context = new AudioContext();
+          const destination = context.createMediaStreamDestination();
+          const oscillator = context.createOscillator();
+          oscillator.connect(destination);
+          oscillator.start();
+          await context.resume();
+          return destination.stream;
+        },
+      },
+    });
+  });
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Record mic" }).click();
+  await expect(page.getByRole("button", { name: "Stop recording" })).toBeVisible();
+  await expect(page.getByText("Recording 0:00", { exact: true })).toBeVisible();
+  await page.waitForTimeout(250);
+  await page.getByRole("button", { name: "Stop recording" }).click();
+  await expect(page.getByText("microphone-recording.wav", { exact: true })).toBeVisible();
+  const player = page.locator("#audio-player");
+  await expect(player).toBeVisible();
+  await expect.poll(() => player.evaluate((audio) =>
+    (audio as HTMLAudioElement).duration)).toBeGreaterThan(0);
 });
 
 test("keeps the vision example grounded in the selected image", async ({ page }) => {
@@ -192,6 +281,8 @@ test("shows only controls relevant to each example while Custom exposes all", as
   await page.goto("/");
   const workspace = page.getByLabel("Workspace");
   const addImage = page.getByRole("button", { name: "Add image" });
+  const addAudio = page.getByRole("button", { name: "Add audio" });
+  const recordMic = page.getByRole("button", { name: "Record mic" });
   const visualTokens = page.getByLabel("Visual tokens");
   const temperature = page.getByRole("spinbutton", { name: "Temperature" });
   const probability = page.getByText("Probability and penalties", { exact: true });
@@ -201,6 +292,8 @@ test("shows only controls relevant to each example while Custom exposes all", as
   await expect(workspace.locator("optgroup").first()).toHaveAttribute("label", "Workspaces");
   await expect(workspace.locator("optgroup").last()).toHaveAttribute("label", "Examples");
   await expect(addImage).toBeVisible();
+  await expect(addAudio).toBeVisible();
+  await expect(recordMic).toBeVisible();
   await expect(visualTokens).toBeVisible();
   await expect(temperature).toBeVisible();
   await expect(probability).toBeVisible();
@@ -211,11 +304,19 @@ test("shows only controls relevant to each example while Custom exposes all", as
 
   await workspace.selectOption("greedy-colors");
   await expect(addImage).toBeHidden();
+  await expect(addAudio).toBeHidden();
+  await expect(recordMic).toBeHidden();
   await expect(visualTokens).toBeHidden();
   await expect(temperature).toBeHidden();
   await expect(probability).toBeHidden();
   await expect(constraintModes).toBeHidden();
   await expect(thinking).toBeHidden();
+
+  await workspace.selectOption("audio-transcription");
+  await expect(addImage).toBeHidden();
+  await expect(addAudio).toBeVisible();
+  await expect(recordMic).toBeVisible();
+  await expect(visualTokens).toBeHidden();
 
   await workspace.selectOption("sampling-tagline");
   await expect(temperature).toBeVisible();
@@ -234,6 +335,16 @@ test("shows only controls relevant to each example while Custom exposes all", as
 
   await workspace.selectOption("schema-triage");
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeVisible();
+
+  await workspace.selectOption("schema-reasoning");
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeVisible();
+  await expect(thinking).toBeVisible();
+  await expect(thinking).toBeChecked();
+
+  await workspace.selectOption("reasoning-logic");
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeHidden();
+  await expect(thinking).toBeVisible();
+  await expect(thinking).toBeChecked();
 });
 
 test("keeps Chat selected through composing and image attachment", async ({ page }) => {

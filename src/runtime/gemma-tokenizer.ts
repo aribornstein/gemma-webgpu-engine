@@ -3,11 +3,28 @@ import type {
   GemmaVisionImageSource,
   GemmaVisionTokenBudget,
 } from "./gemma-vision-input";
+import type { GemmaAudioSource } from "./gemma-audio-input";
 
 const TOKENIZER_PATH = "gemma-4-e2b-tokenizer";
 const MODEL_ROOT = `${new URL(import.meta.url).origin}/models/`;
 const EOS_TOKEN_IDS = new Set([1, 50, 106]);
+export const GEMMA_START_CHANNEL_TOKEN_ID = 100;
+export const GEMMA_END_CHANNEL_TOKEN_ID = 101;
 export const GEMMA_IMAGE_TOKEN_ID = 258880;
+export const GEMMA_AUDIO_TOKEN_ID = 258881;
+export const GEMMA_BEGIN_AUDIO_TOKEN_ID = 256000;
+export const GEMMA_END_AUDIO_TOKEN_ID = 258883;
+
+export function expandGemmaAudioTokenIds(softTokenCount: number): number[] {
+  if (!Number.isInteger(softTokenCount) || softTokenCount < 1 || softTokenCount > 750) {
+    throw new Error("Gemma audio soft-token count is invalid");
+  }
+  return [
+    GEMMA_BEGIN_AUDIO_TOKEN_ID,
+    ...new Array<number>(softTokenCount).fill(GEMMA_AUDIO_TOKEN_ID),
+    GEMMA_END_AUDIO_TOKEN_ID,
+  ];
+}
 
 export type GemmaChatRole = "system" | "developer" | "user" | "assistant" | "tool";
 
@@ -20,7 +37,11 @@ export interface GemmaChatImagePart {
   type: "image";
 }
 
-export type GemmaChatContentPart = GemmaChatTextPart | GemmaChatImagePart;
+export interface GemmaChatAudioPart {
+  type: "audio";
+}
+
+export type GemmaChatContentPart = GemmaChatTextPart | GemmaChatImagePart | GemmaChatAudioPart;
 
 export interface GemmaChatToolCall {
   id?: string;
@@ -57,6 +78,7 @@ export interface GemmaFunctionTool {
 export interface GemmaStructuredGenerationInput {
   messages: readonly GemmaChatMessage[];
   images?: readonly GemmaVisionImageSource[];
+  audios?: readonly GemmaAudioSource[];
   visionTokenBudget?: GemmaVisionTokenBudget;
   tools?: readonly GemmaFunctionTool[];
   enableThinking?: boolean;
@@ -64,7 +86,8 @@ export interface GemmaStructuredGenerationInput {
 }
 
 export interface GemmaMultimodalGenerationInput extends GemmaStructuredGenerationInput {
-  images: readonly GemmaVisionImageSource[];
+  images?: readonly GemmaVisionImageSource[];
+  audios?: readonly GemmaAudioSource[];
 }
 
 export type GemmaGenerationInput =
@@ -88,6 +111,9 @@ export interface GemmaTokenizer {
   readonly vocabularySize: number;
   readonly endTokenIds: readonly number[];
   readonly imageTokenId: number;
+  readonly audioTokenId: number;
+  readonly beginAudioTokenId: number;
+  readonly endAudioTokenId: number;
   encodePrompt(prompt: string): number[];
   encodeText(text: string): number[];
   encodeMessages(
@@ -175,6 +201,9 @@ function createGemmaTokenizer(
     vocabularySize: tokenBytes.length,
     endTokenIds: Object.freeze([...EOS_TOKEN_IDS]),
     imageTokenId: GEMMA_IMAGE_TOKEN_ID,
+    audioTokenId: GEMMA_AUDIO_TOKEN_ID,
+    beginAudioTokenId: GEMMA_BEGIN_AUDIO_TOKEN_ID,
+    endAudioTokenId: GEMMA_END_AUDIO_TOKEN_ID,
     encodePrompt(prompt) {
       return encodeMessages([{ role: "user", content: prompt }]);
     },
@@ -259,7 +288,7 @@ function validateMessages(messages: readonly GemmaChatMessage[]): void {
 function validContent(content: GemmaChatMessage["content"]): boolean {
   if (typeof content === "string") return content.trim().length > 0;
   if (content.length === 0) return false;
-  return content.every((part) => part.type === "image" ||
+  return content.every((part) => part.type === "image" || part.type === "audio" ||
     (part.type === "text" && part.text.trim().length > 0));
 }
 

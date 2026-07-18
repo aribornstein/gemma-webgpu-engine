@@ -1,6 +1,7 @@
 import { ReadonlySafetensorsCache } from "../model/cached-safetensors";
 import { PinnedSafetensorsSource } from "../model/pinned-safetensors";
 import { GemmaVisionWeightCache } from "../model/gemma-vision-weights";
+import { GemmaAudioWeightCache } from "../model/gemma-audio-weights";
 import { loadDecodeMlpPleFixture } from "../model/decode-mlp-ple-fixture";
 import {
   loadGemmaTokenInputBatch,
@@ -32,6 +33,12 @@ import {
 } from "../webgpu/vision-image";
 import { GEMMA_VISION_LAYER_COUNT } from "../webgpu/vision-encoder";
 import {
+  destroyGemmaAudioEncodingResources,
+  encodeGemmaAudioFeatures,
+  type GemmaAudioEncodingResources,
+} from "../webgpu/audio-input-encoder";
+import { GEMMA_AUDIO_LAYER_COUNT } from "../model/gemma-audio-weights";
+import {
   createGemmaFixedPrefillResources,
   destroyGemmaFixedPrefillResources,
   GEMMA_FIXED_PREFILL_ROWS,
@@ -60,6 +67,9 @@ import {
   throwIfGemmaGenerationAborted,
 } from "./generation-control";
 import {
+  expandGemmaAudioTokenIds,
+  GEMMA_END_CHANNEL_TOKEN_ID,
+  GEMMA_START_CHANNEL_TOKEN_ID,
   loadGemmaTokenizer,
   type GemmaGenerationInput,
   type GemmaMultimodalGenerationInput,
@@ -71,6 +81,10 @@ import {
   validateGemmaVisionTokenBudget,
   type GemmaVisionInput,
 } from "./gemma-vision-input";
+import {
+  prepareGemmaAudio,
+  type GemmaAudioFeatures,
+} from "./gemma-audio-input";
 import { sampleToken, SeededRandom } from "./sampling";
 import {
   countGemmaReasoningTokens,
@@ -100,6 +114,8 @@ export type { GemmaGenerationUpdate } from "./generation-control";
 export type { GemmaPrefillMode, GemmaPrefillStrategy } from "./gemma-prefill-plan";
 
 export type GemmaGenerationStopReason = "end-token" | "stop-token" | "length";
+const GEMMA_REQUIRED_REASONING_TOKENS = 16;
+const GEMMA_MAX_REQUIRED_REASONING_TOKENS = 64;
 
 export interface GemmaGenerationResult {
   text: string;
@@ -124,6 +140,8 @@ export interface GemmaGenerationTiming {
   visionLayerSetupMs: number;
   visionLayerExecutionMs: number;
   visionPostprocessMs: number;
+  audioPreprocessMs: number;
+  audioEncodeMs: number;
   cacheResetMs: number;
   promptTokensReused: number;
   prefillMs: number;
@@ -157,6 +175,8 @@ interface MutableGemmaGenerationTiming {
   visionLayerSetupMs: number;
   visionLayerExecutionMs: number;
   visionPostprocessMs: number;
+  audioPreprocessMs: number;
+  audioEncodeMs: number;
   cacheResetMs: number;
   promptTokensReused: number;
   prefillMs: number;
@@ -203,6 +223,10 @@ interface PreparedGemmaPrompt {
   visionStarts: number[];
   visionIdentities: string[];
   visionPreprocessMs: number;
+  audioInputs: GemmaAudioFeatures[];
+  audioStarts: number[];
+  audioIdentities: string[];
+  audioPreprocessMs: number;
 }
 
 interface GemmaSoftTokenSource {
@@ -230,6 +254,7 @@ export class GemmaGenerationSession {
   private readonly logitsReadback: GPUBuffer;
   private readonly tokenInputCache = new Map<number, GemmaTokenInputs>();
   private readonly visionWeightCache = new GemmaVisionWeightCache();
+  private readonly audioWeightCache = new GemmaAudioWeightCache();
   private readonly evaluatedVisionIdentities: string[] = [];
   private tokenByteTrie: TokenByteTrie | null = null;
   private activeTiming: MutableGemmaGenerationTiming | null = null;
@@ -375,33 +400,49 @@ export class GemmaGenerationSession {
       signal,
       onToken,
       onVisionProgress,
+      onAudioProgress,
       onPrefillProgress,
       constraint,
+      requireReasoning = false,
       reusePromptCache = true,
       ...decodingOptions
     } = options;
     throwIfGemmaGenerationAborted(signal);
     const config = resolveGemmaGenerationConfig(decodingOptions);
+    if (requireReasoning && !usesGemmaThinking(input)) {
+      throw new Error("Required reasoning needs enableThinking");
+    }
     const compiledConstraint = constraint
       ? compileGenerationConstraint(constraint)
       : null;
     const tokenByteTrie = compiledConstraint ? this.getTokenByteTrie() : null;
-    const outputMode: GemmaModelOutputMode = compiledConstraint || !usesGemmaGpuGreedy(config)
+    let constraintActive = compiledConstraint !== null;
+    let allowReasoningChannel = usesGemmaThinking(input);
+    let inReasoningChannel = false;
+    let reasoningContentTokens = 0;
+    const forcedReasoningPrefix = requireReasoning
+      ? [GEMMA_START_CHANNEL_TOKEN_ID, ...this.tokenizer.encodeText("thought\n")]
+      : [];
+    const outputMode: GemmaModelOutputMode = compiledConstraint || requireReasoning ||
+      !usesGemmaGpuGreedy(config)
       ? "logits"
       : "greedy";
     const maxNewTokens = config.maxNewTokens;
     this.generating = true;
     const visionResources: GemmaVisionImageResources[] = [];
+    const audioResources: GemmaAudioEncodingResources[] = [];
     try {
       const preparedPrompt = await this.prepareGenerationInput(
         input,
         signal,
         onVisionProgress,
+        onAudioProgress,
       );
       const promptTokenIds = preparedPrompt.tokenIds;
       if (this.activeTiming) {
         this.activeTiming.requestSetupMs = performance.now() - setupStartedAt;
         this.activeTiming.visionPreprocessMs = preparedPrompt.visionPreprocessMs;
+        this.activeTiming.audioPreprocessMs = preparedPrompt.audioPreprocessMs;
       }
       if (maxNewTokens > availableGemmaOutputTokens(promptTokenIds.length, this.cacheCapacity)) {
         throw new Error(
@@ -415,6 +456,7 @@ export class GemmaGenerationSession {
         promptTokenIds,
         reusePromptCache,
         preparedPrompt.visionIdentities,
+        preparedPrompt.audioIdentities,
       );
       if (this.activeTiming) {
         this.activeTiming.cacheResetMs = performance.now() - resetStartedAt;
@@ -470,6 +512,48 @@ export class GemmaGenerationSession {
           });
         }
       }
+      for (let audioIndex = 0; audioIndex < preparedPrompt.audioInputs.length; audioIndex += 1) {
+        const promptStart = preparedPrompt.audioStarts[audioIndex];
+        const audioInput = preparedPrompt.audioInputs[audioIndex];
+        if (promptStart + audioInput.softTokenCount <= promptTokensReused) continue;
+        throwIfGemmaGenerationAborted(signal);
+        onAudioProgress?.({
+          audioIndex,
+          audioCount: preparedPrompt.audioInputs.length,
+          phase: "encoding",
+          completedLayers: 0,
+          totalLayers: GEMMA_AUDIO_LAYER_COUNT,
+        });
+        const audioEncodeStartedAt = performance.now();
+        const encoded = await encodeGemmaAudioFeatures(
+          this.device,
+          this.cache,
+          audioInput,
+          (progress) => {
+            throwIfGemmaGenerationAborted(signal);
+            onAudioProgress?.({
+              audioIndex,
+              audioCount: preparedPrompt.audioInputs.length,
+              phase: "encoding",
+              completedLayers: progress.completedLayers,
+              totalLayers: GEMMA_AUDIO_LAYER_COUNT,
+            });
+          },
+          signal,
+          this.audioWeightCache,
+        );
+        if (this.activeTiming) {
+          this.activeTiming.audioEncodeMs += performance.now() - audioEncodeStartedAt;
+        }
+        throwIfGemmaGenerationAborted(signal);
+        audioResources.push(encoded);
+        for (let tokenIndex = 0; tokenIndex < encoded.softTokenCount; tokenIndex += 1) {
+          softTokens.set(promptStart + tokenIndex, {
+            buffer: encoded.output,
+            byteOffset: tokenIndex * GEMMA_TEXT_HIDDEN_SIZE * 4,
+          });
+        }
+      }
       let modelOutput: GemmaModelOutput | null = null;
       const prefillStartedAt = performance.now();
       const pendingPromptTokenIds = promptTokenIds.slice(promptTokensReused);
@@ -477,7 +561,7 @@ export class GemmaGenerationSession {
         this.position,
         pendingPromptTokenIds.length,
         this.cacheCapacity,
-        this.prefillStrategy,
+        preparedPrompt.audioInputs.length > 0 ? "sequential" : this.prefillStrategy,
         this.prefill !== null,
         GEMMA_FIXED_PREFILL_ROWS,
       );
@@ -569,7 +653,19 @@ export class GemmaGenerationSession {
         if (outputMode === "greedy" && !modelOutput.prediction) {
           throw new Error("Gemma greedy mode produced no prediction");
         }
-        if (compiledConstraint && tokenByteTrie) {
+        if (index < forcedReasoningPrefix.length) {
+          token = forcedReasoningPrefix[index];
+        } else if (requireReasoning && inReasoningChannel) {
+          if (reasoningContentTokens >= GEMMA_MAX_REQUIRED_REASONING_TOKENS) {
+            token = GEMMA_END_CHANNEL_TOKEN_ID;
+          } else {
+            const logits = this.maskReasoningLogits(
+              requiredGemmaLogits(modelOutput),
+              reasoningContentTokens >= GEMMA_REQUIRED_REASONING_TOKENS,
+            );
+            token = sampleToken(logits, history, config, () => random.next());
+          }
+        } else if (compiledConstraint && tokenByteTrie && constraintActive) {
           const logits = requiredGemmaLogits(modelOutput);
           throwIfGemmaGenerationAborted(signal);
           token = this.selectConstrainedToken(
@@ -580,8 +676,10 @@ export class GemmaGenerationSession {
             compiledConstraint,
             tokenByteTrie,
             customStopTokens,
+            allowReasoningChannel ? [GEMMA_START_CHANNEL_TOKEN_ID] : [],
           );
-        } else if (!usesGemmaGpuGreedy(config)) {
+        } else if (requireReasoning || !usesGemmaGpuGreedy(config) ||
+          (compiledConstraint && !constraintActive)) {
           const logits = requiredGemmaLogits(modelOutput);
           throwIfGemmaGenerationAborted(signal);
           token = sampleToken(logits, history, config, () => random.next());
@@ -597,13 +695,25 @@ export class GemmaGenerationSession {
           stoppedOnStopToken = true;
           break;
         }
-        if (compiledConstraint) {
+        const startsReasoningChannel = allowReasoningChannel &&
+          token === GEMMA_START_CHANNEL_TOKEN_ID;
+        allowReasoningChannel = false;
+        if (startsReasoningChannel) {
+          constraintActive = false;
+          inReasoningChannel = true;
+        } else if (compiledConstraint && constraintActive) {
           const bytes = this.tokenizer.tokenBytes(token);
           if (!bytes) throw new Error(`Constraint selected non-text token ${token}`);
           compiledConstraint.acceptToken(bytes);
         }
         generatedTokenIds.push(token);
         history.push(token);
+        if (inReasoningChannel && token === GEMMA_END_CHANNEL_TOKEN_ID) {
+          inReasoningChannel = false;
+          if (compiledConstraint) constraintActive = true;
+        } else if (inReasoningChannel && index >= forcedReasoningPrefix.length) {
+          reasoningContentTokens += 1;
+        }
         const tokenEmittedAt = performance.now();
         if (this.activeTiming?.lastTokenEmittedAt !== null && this.activeTiming) {
           this.activeTiming.interTokenLatencyMs.push(
@@ -632,6 +742,11 @@ export class GemmaGenerationSession {
           throwIfGemmaGenerationAborted(signal);
         }
       }
+      if (compiledConstraint && !compiledConstraint.accepting) {
+        throw new Error(
+          "Max tokens reached before the generation constraint completed; increase maxNewTokens",
+        );
+      }
       const decodedText = this.tokenizer.decodeTokens(generatedTokenIds);
       const rawText = this.tokenizer.decodeRawTokens(generatedTokenIds);
       const parsedResponse = parseGemmaResponse(rawText, decodedText);
@@ -659,6 +774,9 @@ export class GemmaGenerationSession {
       for (const resources of visionResources.toReversed()) {
         destroyGemmaVisionImageResources(resources);
       }
+      for (const resources of audioResources.toReversed()) {
+        destroyGemmaAudioEncodingResources(resources);
+      }
       this.generating = false;
     }
   }
@@ -667,13 +785,22 @@ export class GemmaGenerationSession {
     this.assertAlive();
     const tokenIds = this.tokenizer.encodeInput(input);
     if (!isMultimodalGenerationInput(input)) return tokenIds.length;
-    const markerCount = tokenIds.filter((tokenId) => tokenId === this.tokenizer.imageTokenId).length;
-    if (markerCount !== input.images.length) {
+    const imageMarkerCount = tokenIds.filter(
+      (tokenId) => tokenId === this.tokenizer.imageTokenId,
+    ).length;
+    const audioMarkerCount = tokenIds.filter(
+      (tokenId) => tokenId === this.tokenizer.audioTokenId,
+    ).length;
+    if (imageMarkerCount !== (input.images?.length ?? 0)) {
       throw new Error("Gemma image parts and image sources must have equal counts");
+    }
+    if (audioMarkerCount !== (input.audios?.length ?? 0)) {
+      throw new Error("Gemma audio parts and audio sources must have equal counts");
     }
     const visionTokenBudget = input.visionTokenBudget ?? GEMMA_VISION_MAX_SOFT_TOKENS;
     validateGemmaVisionTokenBudget(visionTokenBudget);
-    return tokenIds.length - markerCount + markerCount * visionTokenBudget;
+    return tokenIds.length - imageMarkerCount + imageMarkerCount * visionTokenBudget -
+      audioMarkerCount + audioMarkerCount * 752;
   }
 
   async generateMeasured(
@@ -691,6 +818,8 @@ export class GemmaGenerationSession {
       visionLayerSetupMs: 0,
       visionLayerExecutionMs: 0,
       visionPostprocessMs: 0,
+      audioPreprocessMs: 0,
+      audioEncodeMs: 0,
       cacheResetMs: 0,
       promptTokensReused: 0,
       prefillMs: 0,
@@ -720,6 +849,8 @@ export class GemmaGenerationSession {
           visionLayerSetupMs: timing.visionLayerSetupMs,
           visionLayerExecutionMs: timing.visionLayerExecutionMs,
           visionPostprocessMs: timing.visionPostprocessMs,
+          audioPreprocessMs: timing.audioPreprocessMs,
+          audioEncodeMs: timing.audioEncodeMs,
           cacheResetMs: timing.cacheResetMs,
           promptTokensReused: timing.promptTokensReused,
           prefillMs: timing.prefillMs,
@@ -781,6 +912,7 @@ export class GemmaGenerationSession {
     destroyGemmaDecodeModelResources(this.resources);
     this.tokenInputCache.clear();
     this.visionWeightCache.clear();
+    this.audioWeightCache.clear();
     this.cache.close();
   }
 
@@ -802,13 +934,18 @@ export class GemmaGenerationSession {
     promptTokenIds: readonly number[],
     allowReuse = true,
     visionIdentities: readonly string[] = [],
+    audioIdentities: readonly string[] = [],
   ): number {
+    const multimodalIdentities = [
+      ...visionIdentities.map((identity) => `vision:${identity}`),
+      ...audioIdentities.map((identity) => `audio:${identity}`),
+    ];
     if (!allowReuse || !sameGemmaMultimodalIdentity(
-      visionIdentities,
+      multimodalIdentities,
       this.evaluatedVisionIdentities,
     )) {
       this.reset();
-      this.evaluatedVisionIdentities.push(...visionIdentities);
+      this.evaluatedVisionIdentities.push(...multimodalIdentities);
       return 0;
     }
     const prefixLength = reusableGemmaPromptPrefixLength(
@@ -823,7 +960,7 @@ export class GemmaGenerationSession {
       return prefixLength;
     }
     this.reset();
-    this.evaluatedVisionIdentities.push(...visionIdentities);
+    this.evaluatedVisionIdentities.push(...multimodalIdentities);
     return 0;
   }
 
@@ -925,7 +1062,7 @@ export class GemmaGenerationSession {
     tokens: readonly (readonly [number, GemmaSoftTokenSource])[],
   ): void {
     const encoder = this.device.createCommandEncoder({
-      label: "Copy Gemma vision soft tokens into language input",
+      label: "Copy Gemma multimodal soft tokens into language input",
     });
     for (const [row, source] of tokens) {
       encoder.copyBufferToBuffer(
@@ -943,11 +1080,13 @@ export class GemmaGenerationSession {
     input: GemmaGenerationInput,
     signal?: AbortSignal,
     onVisionProgress?: GemmaGenerationOptions["onVisionProgress"],
+    onAudioProgress?: GemmaGenerationOptions["onAudioProgress"],
   ): Promise<PreparedGemmaPrompt> {
     const rawTokenIds = this.tokenizer.encodeInput(input);
     if (!isMultimodalGenerationInput(input)) {
-      if (rawTokenIds.includes(this.tokenizer.imageTokenId)) {
-        throw new Error("Gemma image markers require structured image sources");
+      if (rawTokenIds.includes(this.tokenizer.imageTokenId) ||
+          rawTokenIds.includes(this.tokenizer.audioTokenId)) {
+        throw new Error("Gemma multimodal markers require structured media sources");
       }
       return {
         tokenIds: rawTokenIds,
@@ -955,53 +1094,105 @@ export class GemmaGenerationSession {
         visionStarts: [],
         visionIdentities: [],
         visionPreprocessMs: 0,
+        audioInputs: [],
+        audioStarts: [],
+        audioIdentities: [],
+        audioPreprocessMs: 0,
       };
     }
+    const images = input.images ?? [];
+    const audios = input.audios ?? [];
     const visionInputs: GemmaVisionInput[] = [];
     const visionTokenBudget = input.visionTokenBudget ?? GEMMA_VISION_MAX_SOFT_TOKENS;
     validateGemmaVisionTokenBudget(visionTokenBudget);
     let visionPreprocessMs = 0;
-    for (let imageIndex = 0; imageIndex < input.images.length; imageIndex += 1) {
+    for (let imageIndex = 0; imageIndex < images.length; imageIndex += 1) {
       throwIfGemmaGenerationAborted(signal);
       onVisionProgress?.({
         imageIndex,
-        imageCount: input.images.length,
+        imageCount: images.length,
         phase: "preprocessing",
         completedLayers: 0,
         totalLayers: GEMMA_VISION_LAYER_COUNT,
       });
       const visionPreprocessStartedAt = performance.now();
       visionInputs.push(await prepareGemmaVisionImage(
-        input.images[imageIndex],
+        images[imageIndex],
         signal,
         visionTokenBudget,
       ));
       visionPreprocessMs += performance.now() - visionPreprocessStartedAt;
       throwIfGemmaGenerationAborted(signal);
     }
-    const markerCount = rawTokenIds.filter(
+    const audioInputs: GemmaAudioFeatures[] = [];
+    let audioPreprocessMs = 0;
+    for (let audioIndex = 0; audioIndex < audios.length; audioIndex += 1) {
+      throwIfGemmaGenerationAborted(signal);
+      onAudioProgress?.({
+        audioIndex,
+        audioCount: audios.length,
+        phase: "preprocessing",
+        completedLayers: 0,
+        totalLayers: GEMMA_AUDIO_LAYER_COUNT,
+      });
+      const audioPreprocessStartedAt = performance.now();
+      audioInputs.push(await prepareGemmaAudio(audios[audioIndex], signal));
+      audioPreprocessMs += performance.now() - audioPreprocessStartedAt;
+      throwIfGemmaGenerationAborted(signal);
+    }
+    const imageMarkerCount = rawTokenIds.filter(
       (tokenId) => tokenId === this.tokenizer.imageTokenId,
     ).length;
-    if (markerCount !== visionInputs.length) {
+    if (imageMarkerCount !== visionInputs.length) {
       throw new Error("Gemma image parts and image sources must have equal counts");
+    }
+    const audioMarkerCount = rawTokenIds.filter(
+      (tokenId) => tokenId === this.tokenizer.audioTokenId,
+    ).length;
+    if (audioMarkerCount !== audioInputs.length) {
+      throw new Error("Gemma audio parts and audio sources must have equal counts");
     }
     const tokenIds: number[] = [];
     const visionStarts: number[] = [];
+    const audioStarts: number[] = [];
     let imageIndex = 0;
+    let audioIndex = 0;
     for (const tokenId of rawTokenIds) {
-      if (tokenId !== this.tokenizer.imageTokenId) {
-        tokenIds.push(tokenId);
+      if (tokenId === this.tokenizer.imageTokenId) {
+        const visionInput = visionInputs[imageIndex++];
+        visionStarts.push(tokenIds.length);
+        tokenIds.push(...new Array<number>(visionInput.softTokenCount).fill(tokenId));
         continue;
       }
-      const visionInput = visionInputs[imageIndex++];
-      visionStarts.push(tokenIds.length);
-      tokenIds.push(...new Array<number>(visionInput.softTokenCount).fill(tokenId));
+      if (tokenId === this.tokenizer.audioTokenId) {
+        const audioInput = audioInputs[audioIndex++];
+        const expanded = expandGemmaAudioTokenIds(audioInput.softTokenCount);
+        tokenIds.push(expanded[0]);
+        audioStarts.push(tokenIds.length);
+        tokenIds.push(...expanded.slice(1));
+        continue;
+      }
+      tokenIds.push(tokenId);
     }
     const visionIdentities = visionInputs.map(({ identity }, index) => {
       if (!identity) throw new Error(`Gemma vision image ${index} has no content identity`);
       return identity;
     });
-    return { tokenIds, visionInputs, visionStarts, visionIdentities, visionPreprocessMs };
+    const audioIdentities = audioInputs.map(({ identity }, index) => {
+      if (!identity) throw new Error(`Gemma audio source ${index} has no content identity`);
+      return identity;
+    });
+    return {
+      tokenIds,
+      visionInputs,
+      visionStarts,
+      visionIdentities,
+      visionPreprocessMs,
+      audioInputs,
+      audioStarts,
+      audioIdentities,
+      audioPreprocessMs,
+    };
   }
 
   private getTokenByteTrie(): TokenByteTrie {
@@ -1017,20 +1208,38 @@ export class GemmaGenerationSession {
     constraint: CompiledGenerationConstraint,
     trie: TokenByteTrie,
     customStopTokens: ReadonlySet<number>,
+    additionalLegalTokens: readonly number[] = [],
   ): number {
     const terminationTokens = new Set([
       ...this.tokenizer.endTokenIds,
       ...customStopTokens,
     ]);
-    const legalTokens = constraint.legalTokenIds(trie).filter(
-      (tokenId) => !terminationTokens.has(tokenId),
-    );
+    const legalTokens = [...new Set([
+      ...constraint.legalTokenIds(trie),
+      ...additionalLegalTokens,
+    ])].filter((tokenId) => !terminationTokens.has(tokenId));
     const legalTerminationTokens = constraint.accepting ? [...terminationTokens] : [];
     if (legalTokens.length === 0 && legalTerminationTokens.length === 0) {
       throw new Error("Generation constraint reached a tokenization dead end");
     }
     const masked = maskConstraintLogits(logits, legalTokens, legalTerminationTokens);
     return sampleToken(masked, history, config, () => random.next());
+  }
+
+  private maskReasoningLogits(
+    rawLogits: Float32Array,
+    allowEndChannel: boolean,
+  ): Float32Array {
+    const logits = rawLogits.slice();
+    for (let tokenId = 0; tokenId < logits.length; tokenId += 1) {
+      if (this.tokenizer.tokenBytes(tokenId) === null) {
+        logits[tokenId] = Number.NEGATIVE_INFINITY;
+      }
+    }
+    if (allowEndChannel) {
+      logits[GEMMA_END_CHANNEL_TOKEN_ID] = rawLogits[GEMMA_END_CHANNEL_TOKEN_ID];
+    }
+    return logits;
   }
 
   private assertAlive(): void {
@@ -1047,6 +1256,11 @@ export function loadGemmaGenerationSession(
 function requiredGemmaLogits(output: GemmaModelOutput): Float32Array {
   if (!output.logits) throw new Error("Gemma model output is missing logits");
   return output.logits;
+}
+
+function usesGemmaThinking(input: GemmaGenerationInput): boolean {
+  return typeof input === "object" && !Array.isArray(input) &&
+    "enableThinking" in input && input.enableThinking === true;
 }
 
 function averageGemmaLatency(samples: readonly number[]): number | null {
@@ -1066,5 +1280,8 @@ function isMultimodalGenerationInput(
   input: GemmaGenerationInput,
 ): input is GemmaMultimodalGenerationInput {
   return typeof input === "object" && !Array.isArray(input) &&
-    "messages" in input && "images" in input && Array.isArray(input.images);
+    "messages" in input && (
+      ("images" in input && Array.isArray(input.images)) ||
+      ("audios" in input && Array.isArray(input.audios))
+    );
 }

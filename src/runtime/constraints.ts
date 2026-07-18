@@ -72,12 +72,15 @@ export class CompiledGenerationConstraint {
     ];
     while (stack.length > 0) {
       const current = stack.pop()!;
-      if (current.node.tokenIds.length > 0 && this.viableStates.has(current.state.node)) {
+      if (current.node.tokenIds.length > 0 &&
+          isViableConstraintState(current.state, this.viableStates)) {
         legal.push(...current.node.tokenIds);
       }
       for (const [byte, child] of current.node.children) {
         const next = transitionByte(current.state, byte);
-        if (next && this.viableStates.has(next.node)) stack.push({ node: child, state: next });
+        if (next && isViableConstraintState(next, this.viableStates)) {
+          stack.push({ node: child, state: next });
+        }
       }
     }
     legal.sort((left, right) => left - right);
@@ -226,6 +229,53 @@ function transitionByte(state: ConstraintState, byte: number): ConstraintState |
 function transitionCharacter(node: DFA.Node, character: number): ConstraintState | null {
   const next = node.out.get(character);
   return next ? { node: next, pendingUtf8: [] } : null;
+}
+
+function isViableConstraintState(
+  state: ConstraintState,
+  viableStates: ReadonlySet<DFA.Node>,
+): boolean {
+  if (state.pendingUtf8.length === 0) return viableStates.has(state.node);
+  const completion = pendingUtf8CompletionRange(state.pendingUtf8);
+  if (!completion) return false;
+  for (const [characters, target] of state.node.out.entries()) {
+    if (viableStates.has(target) &&
+        characters.min <= completion.max && characters.max >= completion.min) return true;
+  }
+  return false;
+}
+
+function pendingUtf8CompletionRange(
+  pending: readonly number[],
+): { min: number; max: number } | null {
+  const lead = pending[0];
+  const length = lead <= 0xdf ? 2 : lead <= 0xef ? 3 : 4;
+  if (pending.length === 0 || pending.length >= length) return null;
+  const secondMin = lead === 0xe0 ? 0xa0 : lead === 0xf0 ? 0x90 : 0x80;
+  const secondMax = lead === 0xed ? 0x9f : lead === 0xf4 ? 0x8f : 0xbf;
+  if (pending.length > 1 && (pending[1] < secondMin || pending[1] > secondMax)) return null;
+  for (let index = 2; index < pending.length; index += 1) {
+    if (pending[index] < 0x80 || pending[index] > 0xbf) return null;
+  }
+  const minimumBytes = [...pending];
+  const maximumBytes = [...pending];
+  while (minimumBytes.length < length) {
+    const index = minimumBytes.length;
+    minimumBytes.push(index === 1 ? secondMin : 0x80);
+    maximumBytes.push(index === 1 ? secondMax : 0xbf);
+  }
+  return {
+    min: decodeUtf8CodePoint(minimumBytes),
+    max: decodeUtf8CodePoint(maximumBytes),
+  };
+}
+
+function decodeUtf8CodePoint(bytes: readonly number[]): number {
+  let codePoint = bytes[0] & (bytes.length === 2 ? 0x1f : bytes.length === 3 ? 0x0f : 0x07);
+  for (let index = 1; index < bytes.length; index += 1) {
+    codePoint = codePoint << 6 | bytes[index] & 0x3f;
+  }
+  return codePoint;
 }
 
 function findViableStates(dfa: DFA): ReadonlySet<DFA.Node> {

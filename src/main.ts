@@ -46,6 +46,11 @@ import {
   type GemmaVisionImageSource,
   type GemmaVisionTokenBudget,
 } from "./runtime/gemma-vision-input";
+import type { GemmaAudioSource } from "./runtime/gemma-audio-input";
+import {
+  startGemmaMicrophoneCapture,
+  type GemmaMicrophoneCapture,
+} from "./runtime/gemma-microphone";
 import type { GemmaDurableBenchmarkArtifact } from "./runtime/durable-benchmark";
 
 type GemmaCacheInitializationProgress = SafetensorsCacheInitializationProgress;
@@ -68,6 +73,7 @@ type ConstraintEditor = "all" | "none" | "regex" | "json" | "json-schema";
 
 interface ExampleUiProfile {
   vision: boolean;
+  audio?: boolean;
   sampling: boolean;
   constraint: Exclude<ConstraintEditor, "all">;
 }
@@ -75,6 +81,7 @@ interface ExampleUiProfile {
 interface ConsoleUiProfile {
   workspace: ConsoleWorkspace;
   vision: boolean;
+  audio: boolean;
   sampling: boolean;
   constraint: ConstraintEditor;
 }
@@ -83,10 +90,16 @@ interface GenerationExample {
   id: string;
   label: string;
   prompt: string;
+  enableThinking?: boolean;
+  requireReasoning?: boolean;
   controls: Partial<Record<GenerationExampleControl, number>>;
   history?: readonly GemmaChatMessage[];
   tools?: readonly GemmaFunctionTool[];
   image?: {
+    url: string;
+    filename: string;
+  };
+  audio?: {
     url: string;
     filename: string;
   };
@@ -97,6 +110,17 @@ interface GenerationExample {
 }
 
 const GENERATION_EXAMPLES: readonly GenerationExample[] = [
+  {
+    id: "audio-transcription",
+    label: "Browser audio · Transcription",
+    prompt: "What is said in this audio? Return only the spoken words.",
+    controls: { temperature: 0, maxNewTokens: 48 },
+    audio: {
+      url: "/examples/gemma-audio-demo.wav",
+      filename: "gemma-audio-demo.wav",
+    },
+    ui: { vision: false, audio: true, sampling: false, constraint: "none" },
+  },
   {
     id: "tool-weather",
     label: "Boston weather · Tool call",
@@ -218,6 +242,39 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
     },
     ui: { vision: false, sampling: false, constraint: "json-schema" },
   },
+  {
+    id: "reasoning-logic",
+    label: "River crossing · Reasoning",
+    prompt: "A farmer must take a fox, a chicken, and grain across a river. The boat carries only the farmer and one item. The fox cannot be left with the chicken, and the chicken cannot be left with the grain. Reason through the safe sequence, then give the answer clearly.",
+    enableThinking: true,
+    requireReasoning: true,
+    controls: { temperature: 0, maxNewTokens: 384 },
+    ui: { vision: false, sampling: false, constraint: "none" },
+  },
+  {
+    id: "schema-reasoning",
+    label: "Cold-chain decision · Schema + reasoning",
+    prompt: "A medication shipment was above 8°C for 18 minutes. Policy says a cold-chain breach occurs only when it is above 8°C for more than 15 minutes, and medication breaches require inspection. Reason through the policy, then return JSON with exactly these keys in this order: breach, action, rationale.",
+    enableThinking: true,
+    requireReasoning: true,
+    controls: { temperature: 0, maxNewTokens: 256 },
+    constraint: {
+      type: "json-schema",
+      maxDepth: 2,
+      whitespace: "compact",
+      schema: {
+        type: "object",
+        properties: {
+          breach: { type: "boolean" },
+          action: { enum: ["release", "inspect"] },
+          rationale: { type: "string" },
+        },
+        required: ["breach", "action", "rationale"],
+        additionalProperties: false,
+      },
+    },
+    ui: { vision: false, sampling: false, constraint: "json-schema" },
+  },
 ];
 
 const MODEL_CACHE_SENTINELS = [
@@ -262,6 +319,7 @@ app.innerHTML = `
           <h2 id="generation-heading">Conversation</h2>
         </div>
         <div class="heading-commands">
+          <button id="clear-transcript" class="quiet-command" type="button">Clear transcript</button>
           <button id="new-chat" class="quiet-command" type="button" disabled>New chat</button>
           <button id="load-model" class="secondary-command" type="button" title="Rebuild the WebGPU engine from existing local or cached weights" disabled>Load model</button>
         </div>
@@ -294,7 +352,7 @@ app.innerHTML = `
           <textarea id="prompt" name="prompt" rows="6" spellcheck="true">Name the three primary colors in one short sentence.</textarea>
         </label>
         <div id="image-controls" class="image-input-row">
-          <label class="image-picker" for="image-input">
+          <label id="image-picker" class="image-picker" for="image-input">
             <span>Add image</span>
             <input id="image-input" name="image" type="file" accept="image/*">
           </label>
@@ -302,6 +360,17 @@ app.innerHTML = `
             <img id="image-thumbnail" alt="Selected image preview">
             <span id="image-name"></span>
             <button id="remove-image" class="quiet-command" type="button">Remove</button>
+          </div>
+          <label id="audio-picker" class="image-picker" for="audio-input">
+            <span>Add audio</span>
+            <input id="audio-input" name="audio" type="file" accept="audio/*">
+          </label>
+          <button id="record-audio" class="image-picker" type="button">Record mic</button>
+          <span id="recording-status" class="recording-status" role="status" hidden></span>
+          <div id="audio-preview" class="image-preview" hidden>
+            <audio id="audio-player" controls preload="metadata"></audio>
+            <span id="audio-name"></span>
+            <button id="remove-audio" class="quiet-command" type="button">Remove</button>
           </div>
           <label id="image-budget" class="field image-budget">Visual tokens
             <select id="vision-token-budget" name="visionTokenBudget">
@@ -499,6 +568,7 @@ const gpuStatus = element<HTMLSpanElement>("gpu-status");
 const cacheStatus = element<HTMLSpanElement>("cache-status");
 const modelStatus = element<HTMLSpanElement>("model-status");
 const loadButton = element<HTMLButtonElement>("load-model");
+const clearTranscriptButton = element<HTMLButtonElement>("clear-transcript");
 const newChatButton = element<HTMLButtonElement>("new-chat");
 const generationPanel = element<HTMLElement>("generation-panel");
 const generateButton = element<HTMLButtonElement>("generate");
@@ -509,6 +579,11 @@ const controlsForm = element<HTMLFormElement>("controls-form");
 const exampleSelect = element<HTMLSelectElement>("generation-example");
 const promptInput = element<HTMLTextAreaElement>("prompt");
 const imageInput = element<HTMLInputElement>("image-input");
+const audioInput = element<HTMLInputElement>("audio-input");
+const imagePicker = element<HTMLLabelElement>("image-picker");
+const audioPicker = element<HTMLLabelElement>("audio-picker");
+const recordAudioButton = element<HTMLButtonElement>("record-audio");
+const recordingStatus = element<HTMLSpanElement>("recording-status");
 const visionTokenBudgetInput = element<HTMLSelectElement>("vision-token-budget");
 const thinkingControl = element<HTMLElement>("thinking-control");
 const enableThinkingInput = element<HTMLInputElement>("enable-thinking");
@@ -518,6 +593,10 @@ const imagePreview = element<HTMLDivElement>("image-preview");
 const imageThumbnail = element<HTMLImageElement>("image-thumbnail");
 const imageName = element<HTMLSpanElement>("image-name");
 const removeImageButton = element<HTMLButtonElement>("remove-image");
+const audioPreview = element<HTMLDivElement>("audio-preview");
+const audioPlayer = element<HTMLAudioElement>("audio-player");
+const audioName = element<HTMLSpanElement>("audio-name");
+const removeAudioButton = element<HTMLButtonElement>("remove-audio");
 const outputTool = element<HTMLDivElement>("output-heading").closest<HTMLDivElement>(".output-tool");
 if (!outputTool) throw new Error("Missing output tool");
 const ownedOutputTool = outputTool;
@@ -563,9 +642,15 @@ let controlsValidationTimer: number | null = null;
 let progressPhaseKey = "";
 let progressPhaseFraction = 0;
 let selectedImage: GemmaVisionImageSource | null = null;
+let selectedAudio: GemmaAudioSource | null = null;
 let imagePreviewUrl: string | null = null;
+let audioPreviewUrl: string | null = null;
+let audioRecorder: GemmaMicrophoneCapture | null = null;
+let audioRecordingTimer: number | null = null;
+let audioRecordingStartedAt = 0;
 let activeWorkspace: ConsoleWorkspace = "custom";
 let activeExample: GenerationExample | null = null;
+let forceFreshGeneration = false;
 let editBaseConversation: GemmaConversation | null = null;
 let benchmarkController: AbortController | null = null;
 let benchmarkArtifact: GemmaDurableBenchmarkArtifact | null = null;
@@ -589,6 +674,7 @@ loadButton.addEventListener("click", () => {
   void loadModel(session ? "manual-reload" : "initial");
 });
 newChatButton.addEventListener("click", clearConversation);
+clearTranscriptButton.addEventListener("click", clearTranscript);
 exampleSelect.addEventListener("change", () => {
   if (exampleSelect.value === "custom") {
     activateWorkspace("custom");
@@ -633,6 +719,15 @@ imageInput.addEventListener("change", () => {
   }
   selectImage(file, true);
 });
+audioInput.addEventListener("change", () => {
+  const file = audioInput.files?.[0] ?? null;
+  if (!file) {
+    clearSelectedAudio();
+    return;
+  }
+  selectAudio(file);
+});
+recordAudioButton.addEventListener("click", () => void toggleAudioRecording());
 visionTokenBudgetInput.addEventListener("change", () => {
   markExampleCustomized();
   validateControls();
@@ -641,13 +736,19 @@ removeImageButton.addEventListener("click", () => {
   markExampleCustomized();
   clearSelectedImage();
 });
+removeAudioButton.addEventListener("click", () => {
+  markExampleCustomized();
+  clearSelectedAudio();
+});
 benchmarkRunButton.addEventListener("click", () => void runBoundaryBenchmark());
 benchmarkStopButton.addEventListener("click", () => {
   benchmarkController?.abort(new DOMException("Benchmark cancelled", "AbortError"));
 });
 benchmarkDownloadButton.addEventListener("click", () => void downloadBenchmarkArtifact());
 window.addEventListener("beforeunload", () => {
+  discardAudioRecording();
   if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
+  if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
   session?.destroy();
 });
 
@@ -971,12 +1072,15 @@ async function generate(): Promise<void> {
   const editingRequest = editBaseConversation !== null;
   try {
     options = readGenerationOptions();
+    if (activeExample?.requireReasoning) options.requireReasoning = true;
+    if (forceFreshGeneration) options.reusePromptCache = false;
     turn = prepareGemmaConversationTurn(
       requestConversation,
       prompt,
       selectedImage ?? undefined,
       readVisionTokenBudget(),
       enableThinkingInput.checked,
+      selectedAudio ?? undefined,
     );
     renderPromptBudget(options.maxNewTokens ?? DEFAULT_GENERATION_CONFIG.maxNewTokens);
     renderValidConfiguration(options);
@@ -998,10 +1102,19 @@ async function generate(): Promise<void> {
       ? `Preparing ${image}`
       : `Encoding ${image} · layer ${progress.completedLayers}/${progress.totalLayers}`;
   };
+  options.onAudioProgress = (progress) => {
+    const audio = `audio ${progress.audioIndex + 1}/${progress.audioCount}`;
+    requestStatus.textContent = progress.phase === "preprocessing"
+      ? `Preparing ${audio}`
+      : `Encoding ${audio} · layer ${progress.completedLayers}/${progress.totalLayers}`;
+  };
   let draftText = "";
+  let draftReasoning = "";
   options.onToken = (update) => {
-    draftText = visibleGemmaDraft(update.rawText, update.text, enableThinkingInput.checked);
-    renderConversation(turn.userMessage, draftText);
+    const draft = visibleGemmaDraft(update.rawText, update.text, enableThinkingInput.checked);
+    draftText = draft.text;
+    draftReasoning = draft.reasoning;
+    renderConversation(turn.userMessage, draftText, "streaming", draftReasoning);
     outputTokenCount.textContent = `${update.generatedTokenIds.length} ${pluralize(update.generatedTokenIds.length, "token")}`;
   };
   setGenerating(true);
@@ -1032,9 +1145,11 @@ async function generate(): Promise<void> {
         measured.result.text,
         measured.result.reasoning,
       );
+      forceFreshGeneration = false;
       editBaseConversation = null;
-      promptInput.value = "";
+      if (activeWorkspace === "chat") promptInput.value = "";
       clearSelectedImage();
+      clearSelectedAudio();
       renderConversation();
     } else {
       renderConversation(turn.userMessage, "No text output.", "failed");
@@ -1063,11 +1178,24 @@ async function generate(): Promise<void> {
         turn.userMessage,
         draftText || (deviceRecoveryPending ? "WebGPU device lost" : ""),
         deviceRecoveryPending ? "failed" : "stopped",
+        draftReasoning,
       );
     } else {
-      requestStatus.textContent = errorMessage(error);
+      const message = errorMessage(error);
+      const incompleteConstraint = options.constraint &&
+        /constraint|constrained|max tokens/i.test(message);
+      requestStatus.textContent = incompleteConstraint
+        ? "No valid constrained output · increase Max tokens"
+        : message;
       element<HTMLElement>("metric-stop").textContent = "error";
-      renderConversation(turn.userMessage, draftText || errorMessage(error), "failed");
+      renderConversation(
+        turn.userMessage,
+        incompleteConstraint
+          ? "No valid constrained output. Increase Max tokens and run again."
+          : draftText || message,
+        "failed",
+        draftReasoning,
+      );
       if (isDeviceFailure(error)) {
         queueDeviceRecovery(activeSession, errorMessage(error));
       }
@@ -1104,20 +1232,28 @@ function readGenerationOptions(): GemmaGenerationOptions {
   });
   const constraint = readConstraint(data);
   if (constraint) compileGenerationConstraint(constraint);
-  if (constraint && enableThinkingInput.checked) {
-    throw new Error("Thinking cannot be combined with an output constraint");
-  }
   return { ...config, constraint };
 }
 
-function visibleGemmaDraft(rawText: string | undefined, decodedText: string, thinking: boolean): string {
-  if (!thinking || !rawText?.includes("<|channel>thought")) return decodedText;
-  if (!rawText.includes("<channel|>")) return "";
-  return parseGemmaResponse(rawText, decodedText).text;
+function visibleGemmaDraft(
+  rawText: string | undefined,
+  decodedText: string,
+  thinking: boolean,
+): { text: string; reasoning: string } {
+  if (!thinking || !rawText?.includes("<|channel>thought")) {
+    return { text: decodedText, reasoning: "" };
+  }
+  const reasoningStart = rawText.indexOf("<|channel>thought") + "<|channel>thought".length;
+  const reasoningEnd = rawText.indexOf("<channel|>", reasoningStart);
+  if (reasoningEnd < 0) {
+    return { text: "", reasoning: rawText.slice(reasoningStart).trim() };
+  }
+  return parseGemmaResponse(rawText, decodedText);
 }
 
 function applyGenerationExample(example: GenerationExample): void {
   controlsForm.reset();
+  enableThinkingInput.checked = example.enableThinking ?? false;
   conversation = createGemmaConversation(example.history, [], example.tools);
   renderConversation();
   newChatButton.disabled = !hasConversationState();
@@ -1154,20 +1290,34 @@ async function selectGenerationExample(example: GenerationExample): Promise<void
   exampleSelect.value = example.id;
   renderConsoleProfile();
   clearSelectedImage();
+  clearSelectedAudio();
   applyGenerationExample(example);
-  if (!example.image) return;
   try {
-    const image = await loadExampleImage(example.image.url);
-    if (exampleSelect.value !== example.id) return;
-    selectImage(image, false, example.image.url, example.image.filename);
+    if (example.image) {
+      const image = await loadExampleImage(example.image.url);
+      if (exampleSelect.value !== example.id) return;
+      selectImage(image, false, example.image.url, example.image.filename);
+    }
+    if (example.audio) {
+      const audio = await loadExampleAudio(example.audio.url, example.audio.filename);
+      if (exampleSelect.value !== example.id) return;
+      selectAudio(audio, false);
+    }
   } catch (error) {
     if (exampleSelect.value !== example.id) return;
     activateWorkspace("custom");
     clearSelectedImage();
-    configStatus.textContent = `Could not load example image: ${errorMessage(error)}`;
+    configStatus.textContent = `Could not load example media: ${errorMessage(error)}`;
     configStatus.dataset.valid = "false";
     generateButton.disabled = true;
   }
+}
+
+async function loadExampleAudio(url: string, filename: string): Promise<File> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+  const audio = await response.blob();
+  return new File([audio], filename, { type: audio.type || "audio/wav" });
 }
 
 async function loadExampleImage(url: string): Promise<ImageData> {
@@ -1218,7 +1368,7 @@ function validateControls(): boolean {
     renderPromptBudget(options.maxNewTokens ?? DEFAULT_GENERATION_CONFIG.maxNewTokens);
     renderValidConfiguration(options);
     if (session && !generationController) {
-      generateButton.disabled = promptInput.value.trim().length === 0;
+      generateButton.disabled = promptInput.value.trim().length === 0 || audioRecorder !== null;
     }
     return true;
   } catch (error) {
@@ -1243,6 +1393,8 @@ function renderPromptBudget(maxNewTokens: number): void {
     prompt,
     selectedImage ?? undefined,
     readVisionTokenBudget(),
+    false,
+    selectedAudio ?? undefined,
   );
   const promptTokens = session.promptTokenCount(turn.input);
   const availableOutput = availableGemmaOutputTokens(promptTokens, session.cacheCapacity);
@@ -1286,13 +1438,13 @@ function renderConstraintFields(): void {
 
 function activeConsoleProfile(): ConsoleUiProfile {
   if (activeWorkspace === "custom") {
-    return { workspace: "custom", vision: true, sampling: true, constraint: "all" };
+    return { workspace: "custom", vision: true, audio: true, sampling: true, constraint: "all" };
   }
   if (activeWorkspace === "chat") {
-    return { workspace: "chat", vision: true, sampling: true, constraint: "none" };
+    return { workspace: "chat", vision: true, audio: true, sampling: true, constraint: "none" };
   }
   if (!activeExample) throw new Error("Example workspace is missing its UI profile");
-  return { workspace: "example", ...activeExample.ui };
+  return { workspace: "example", audio: false, ...activeExample.ui };
 }
 
 function renderConsoleProfile(): void {
@@ -1308,9 +1460,14 @@ function renderConsoleProfile(): void {
     : "Transcript";
   generateButton.textContent = profile.workspace === "chat" ? "Send" : "Generate";
   promptInput.rows = profile.workspace === "chat" ? 3 : 6;
-  imageControls.hidden = !profile.vision;
+  imageControls.hidden = !profile.vision && !profile.audio;
+  imagePicker.hidden = !profile.vision;
+  imagePreview.hidden = !profile.vision || !selectedImage;
+  audioPicker.hidden = !profile.audio;
+  recordAudioButton.hidden = !profile.audio;
+  audioPreview.hidden = !profile.audio || !selectedAudio;
   imageBudget.hidden = !profile.vision || (profile.workspace === "chat" && !selectedImage);
-  thinkingControl.hidden = profile.workspace === "example";
+  thinkingControl.hidden = profile.workspace === "example" && !activeExample?.enableThinking;
   for (const control of samplingControls) control.hidden = !profile.sampling;
   probabilityControls.hidden = !profile.sampling;
   ownedStopTokenControl.hidden = profile.workspace === "example";
@@ -1327,6 +1484,7 @@ function activateWorkspace(workspace: Exclude<ConsoleWorkspace, "example">): voi
     editBaseConversation = null;
     promptInput.value = "";
     clearSelectedImage();
+    clearSelectedAudio();
     renderConversation();
   }
   renderConsoleProfile();
@@ -1415,16 +1573,40 @@ function setGenerating(generating: boolean): void {
   loadButton.disabled = generating || modelLifecycleBusy || deviceRecoveryPending ||
     (!localModelAvailable && !cacheAvailable) || !navigator.gpu;
   newChatButton.disabled = generating || !hasConversationState();
+  clearTranscriptButton.disabled = generating;
   exampleSelect.disabled = generating;
   promptInput.disabled = generating;
   imageInput.disabled = generating;
+  audioInput.disabled = generating;
+  recordAudioButton.disabled = generating;
   removeImageButton.disabled = generating;
+  removeAudioButton.disabled = generating;
   for (const control of controlsForm.elements) {
     if (control instanceof HTMLInputElement || control instanceof HTMLSelectElement ||
         control instanceof HTMLTextAreaElement || control instanceof HTMLButtonElement) {
+      if (control instanceof HTMLTextAreaElement && control.closest("#constraint-section")) {
+        control.readOnly = generating;
+        continue;
+      }
       control.disabled = generating;
     }
   }
+}
+
+function clearTranscript(): void {
+  conversation = createGemmaConversation(
+    activeExample?.history ?? [],
+    [],
+    activeExample?.tools ?? [],
+  );
+  editBaseConversation = null;
+  forceFreshGeneration = true;
+  renderConversation();
+  outputTokenCount.textContent = "0 tokens";
+  clearTelemetry();
+  newChatButton.disabled = !hasConversationState();
+  requestStatus.textContent = session ? "Transcript cleared · next run starts fresh" : "Waiting for model";
+  validateControls();
 }
 
 function clearConversation(): void {
@@ -1432,6 +1614,7 @@ function clearConversation(): void {
   editBaseConversation = null;
   promptInput.value = "";
   clearSelectedImage();
+  clearSelectedAudio();
   renderConversation();
   outputTokenCount.textContent = "0 tokens";
   newChatButton.disabled = true;
@@ -1507,6 +1690,7 @@ function renderMessage(
   if (message.role === "assistant" && message.reasoning) {
     const reasoning = document.createElement("details");
     reasoning.className = "message-reasoning";
+    reasoning.open = true;
     const summary = document.createElement("summary");
     summary.textContent = "Reasoning";
     const reasoningContent = document.createElement("div");
@@ -1595,12 +1779,14 @@ function messageText(message: GemmaChatMessage): string {
 
 function messageContentText(message: GemmaChatMessage): string {
   if (typeof message.content === "string") return message.content;
-  return message.content.map((part) => part.type === "image" ? "[Image]" : part.text).join("\n");
+  return message.content.map((part) => part.type === "image"
+    ? "[Image]"
+    : part.type === "audio" ? "[Audio]" : part.text).join("\n");
 }
 
 function hasConversationState(): boolean {
   return conversation.messages.length > 0 || conversation.images.length > 0 ||
-    conversation.tools.length > 0;
+    conversation.audios.length > 0 || conversation.tools.length > 0;
 }
 
 function selectImage(
@@ -1630,6 +1816,96 @@ function clearSelectedImage(): void {
   imagePreviewUrl = null;
   renderConsoleProfile();
   validateControls();
+}
+
+function selectAudio(audio: Blob, clearExample = true): void {
+  selectedAudio = audio;
+  if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+  audioPreviewUrl = URL.createObjectURL(audio);
+  audioPlayer.src = audioPreviewUrl;
+  audioName.textContent = audio instanceof File ? audio.name : "Audio";
+  audioPreview.hidden = false;
+  if (clearExample) markExampleCustomized();
+  validateControls();
+}
+
+function clearSelectedAudio(): void {
+  selectedAudio = null;
+  audioInput.value = "";
+  audioPreview.hidden = true;
+  audioPlayer.pause();
+  audioPlayer.removeAttribute("src");
+  audioPlayer.load();
+  audioName.textContent = "";
+  if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+  audioPreviewUrl = null;
+  validateControls();
+}
+
+async function toggleAudioRecording(): Promise<void> {
+  if (audioRecorder) {
+    await finishAudioRecording(audioRecorder);
+    return;
+  }
+  if (!navigator.mediaDevices?.getUserMedia || typeof AudioContext === "undefined") {
+    showRecordingStatus("Microphone recording is not supported in this browser", "error");
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true },
+    });
+    audioRecorder = await startGemmaMicrophoneCapture(stream);
+    audioRecordingStartedAt = performance.now();
+    recordAudioButton.textContent = "Stop recording";
+    recordAudioButton.dataset.recording = "true";
+    showRecordingStatus("Recording 0:00", "recording");
+    audioRecordingTimer = window.setInterval(renderRecordingDuration, 250);
+    validateControls();
+  } catch (error) {
+    showRecordingStatus(`Microphone unavailable: ${errorMessage(error)}`, "error");
+    releaseAudioRecorder();
+  }
+}
+
+async function finishAudioRecording(capture: GemmaMicrophoneCapture): Promise<void> {
+  try {
+    const wav = await capture.stop();
+    const recording = new File([wav], "microphone-recording.wav", { type: wav.type });
+    releaseAudioRecorder();
+    recordingStatus.hidden = true;
+    selectAudio(recording);
+  } catch (error) {
+    releaseAudioRecorder();
+    showRecordingStatus(errorMessage(error), "error");
+  }
+}
+
+function renderRecordingDuration(): void {
+  const elapsedSeconds = Math.floor((performance.now() - audioRecordingStartedAt) / 1_000);
+  const minutes = Math.floor(elapsedSeconds / 60);
+  const seconds = String(elapsedSeconds % 60).padStart(2, "0");
+  showRecordingStatus(`Recording ${minutes}:${seconds}`, "recording");
+}
+
+function showRecordingStatus(message: string, state: "recording" | "error"): void {
+  recordingStatus.textContent = message;
+  recordingStatus.dataset.state = state;
+  recordingStatus.hidden = false;
+}
+
+function releaseAudioRecorder(): void {
+  if (audioRecordingTimer !== null) window.clearInterval(audioRecordingTimer);
+  audioRecordingTimer = null;
+  audioRecorder = null;
+  recordAudioButton.textContent = "Record mic";
+  delete recordAudioButton.dataset.recording;
+  validateControls();
+}
+
+function discardAudioRecording(): void {
+  void audioRecorder?.discard();
+  releaseAudioRecorder();
 }
 
 function setBadge(target: HTMLElement, text: string, state: string): void {

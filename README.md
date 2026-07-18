@@ -145,13 +145,15 @@ from final display text while preserving the exact generated stream in `rawText`
 is one shared budget for reasoning and final-answer tokens. Assistant history stores the final
 answer in `content`; optional reasoning metadata is omitted from ordinary later-turn serialization.
 Set `preserveThinking: true` only when canonical assistant `toolCalls` and following `tool` messages
-must retain reasoning across a tool loop. Thinking cannot be combined with grammar-constrained
-decoding because channel markers are outside the requested output grammar.
+must retain reasoning across a tool loop. Thinking can be combined with grammar-constrained
+decoding: the first step permits either a schema-valid answer prefix or Gemma's reasoning-channel
+opener. If reasoning begins, its channel remains unconstrained and the grammar resumes immediately
+after `<channel|>`; otherwise the direct final answer is constrained from its first token.
 
 The console owns one persistent session and exposes exact greedy or seeded sampling, every penalty
 and probability control, custom stop IDs, regex/JSON/closed-schema constraints, streamed output,
 and cancellation. Editable examples populate the prompt and matching controls for greedy, sampling,
-regex, bounded JSON, and closed JSON Schema generation. Custom retains every control, while Chat
+regex, bounded JSON, closed JSON Schema, and reasoning-backed Schema generation. Custom retains every control, while Chat
 provides persistent multimodal history, user-turn editing/regeneration, a canonical Thinking toggle,
 collapsed reasoning disclosures, and reasoning-token telemetry. Examples expose only controls that
 affect their fixed scenario, and long-context diagnostics remain collapsed until requested. Its
@@ -189,6 +191,42 @@ module must run in the origin that owns the immutable `safetensors-cache-v1` dat
 that database readonly and never creates, upgrades, or writes either object store.
 Text requests reuse a retained common prompt prefix by default. Set `reusePromptCache: false` for
 controlled fresh-prefill measurements or requests that intentionally require a full cache reset.
+
+## Audio
+
+Structured user messages may include audio parts paired with browser audio sources. The runtime
+decodes browser-supported audio into mono PCM, resamples it to 16 kHz, computes the pinned 128-bin
+HTK log-mel representation, and executes the complete 12-layer audio tower and language projection
+on WebGPU. Audio is capped at 30 seconds and produces up to 750 language soft tokens. Tower layers
+are materialized and executed one at a time so the full 150,587,456-byte source contract does not
+need to remain resident as duplicated GPU execution state. The generated soft-token slots are
+wrapped in the checkpoint's canonical `<|audio>` and `<audio|>` boundary tokens before language
+prefill.
+
+```ts
+const result = await session.generate({
+	messages: [{
+		role: "user",
+		content: [{ type: "audio" }, { type: "text", text: "Transcribe this." }],
+	}],
+	audios: [audioBlob],
+}, { maxNewTokens: 64 });
+```
+
+The console accepts an audio file or records the microphone through `getUserMedia` and Web Audio.
+Capture is collected as mono PCM and finalized as a standard WAV so playback and model decoding do
+not depend on the browser's WebM/Opus container support. Microphone permission is requested only
+after **Record mic** is selected, and all capture tracks are stopped when recording ends or the page
+unloads. Browser microphone capture requires HTTPS or a local development origin such as
+`http://localhost`.
+
+The `Browser audio · Transcription` example loads
+`public/examples/gemma-audio-demo.wav`, a 2.693-second mono 16 kHz signed-16-bit PCM fixture that
+says “Web G P U audio is working in your browser.” The full audio GPU test decodes this WAV, extracts
+speech features, executes all 12 checkpoint layers, and validates finite 1,536-wide soft-token
+output under a WebGPU validation scope. This speech-length test also certifies the shared exact QAT
+projection for audio geometries above the language prefill graph's 32-row chunk size. The greedy
+live transcription returns “Web GPU audio is working in your browser.”
 
 ## Images
 

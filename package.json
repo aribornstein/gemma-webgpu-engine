@@ -35,6 +35,7 @@
   "dependencies": {
     "@huggingface/transformers": "^4.2.0",
     "ajv": "^8.20.0",
+    "fft.js": "^4.0.4",
     "refa": "^0.12.1"
   }
 }

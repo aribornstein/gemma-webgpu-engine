@@ -202,9 +202,17 @@ h3 {
 
 .heading-commands {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
+}
+
+#constraint-section textarea[readonly] {
+  opacity: 1;
+  color: var(--ink);
+  background: white;
+  cursor: text;
 }
 
 .model-progress {
@@ -395,6 +403,7 @@ textarea {
 
 .image-input-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   min-height: 58px;
@@ -419,6 +428,29 @@ textarea {
 .image-picker:focus-within {
   outline: 3px solid rgba(230, 83, 50, 0.28);
   outline-offset: 2px;
+}
+
+button.image-picker {
+  color: var(--ink);
+}
+
+button.image-picker[data-recording="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+
+.recording-status {
+  color: var(--muted);
+  font: 11px/1.4 var(--mono);
+}
+
+.recording-status[data-state="recording"] {
+  color: var(--accent);
+}
+
+.recording-status[data-state="error"] {
+  color: var(--danger);
 }
 
 .image-picker input {
@@ -450,6 +482,16 @@ textarea {
   height: 42px;
   border: 1px solid var(--line);
   object-fit: cover;
+}
+
+#audio-preview {
+  grid-template-columns: minmax(160px, 220px) minmax(80px, 1fr) auto;
+  flex: 1 1 360px;
+}
+
+#audio-preview audio {
+  width: 100%;
+  height: 36px;
 }
 
 .image-preview span {

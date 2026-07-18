@@ -56,6 +56,19 @@ test("preserves UTF-8 decoder state across token boundaries", () => {
   expect(constraint.accepting).toBe(true);
 });
 
+test("rejects incomplete UTF-8 prefixes that cannot start the grammar", () => {
+  const trie = new TokenByteTrie(source([
+    null,
+    Uint8Array.of(0xef),
+    Uint8Array.of(0xbf),
+    Uint8Array.of(0xbd),
+    "{",
+  ]));
+  const constraint = compileGenerationConstraint({ type: "regex", pattern: "\\{" });
+
+  expect(constraint.legalTokenIds(trie)).toEqual([4]);
+});
+
 test("enforces bounded JSON syntax incrementally", () => {
   acceptText(
     { type: "json", maxDepth: 3, whitespace: "none" },

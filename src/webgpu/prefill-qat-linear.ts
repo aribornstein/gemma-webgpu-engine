@@ -7,6 +7,7 @@ import {
 
 const WORKGROUP_SIZE = 32;
 const SRQ_WORKGROUP_SIZE = 256;
+const MAX_ROWS = 750;
 
 export interface GemmaPrefillQatLinearGeometry {
   rows: number;
@@ -457,7 +458,7 @@ function sliceSize(slice: GemmaPrefillBufferSlice): number {
 }
 
 function validateGeometry(geometry: GemmaPrefillQatLinearGeometry): void {
-  if (!Number.isInteger(geometry.rows) || geometry.rows < 1 || geometry.rows > 32 ||
+  if (!Number.isInteger(geometry.rows) || geometry.rows < 1 || geometry.rows > MAX_ROWS ||
       !Number.isInteger(geometry.inFeatures) || geometry.inFeatures < 4 ||
       !Number.isInteger(geometry.outFeatures) || geometry.outFeatures < 1 ||
       ![2, 4].includes(geometry.bits) ||

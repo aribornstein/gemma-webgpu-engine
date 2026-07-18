@@ -335,6 +335,8 @@ function roundTiming(timing: GemmaGenerationTiming): GemmaGenerationTiming {
     visionLayerSetupMs: round(timing.visionLayerSetupMs),
     visionLayerExecutionMs: round(timing.visionLayerExecutionMs),
     visionPostprocessMs: round(timing.visionPostprocessMs),
+    audioPreprocessMs: round(timing.audioPreprocessMs),
+    audioEncodeMs: round(timing.audioEncodeMs),
     cacheResetMs: round(timing.cacheResetMs),
     promptTokensReused: timing.promptTokensReused,
     prefillMs: round(timing.prefillMs),

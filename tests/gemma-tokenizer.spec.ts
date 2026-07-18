@@ -26,6 +26,43 @@ test("loads the pinned local tokenizer and applies the Gemma chat template", asy
   expect(result.ordinaryEnds).toBe(false);
 });
 
+test("emits the pinned audio marker for structured audio parts", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-tokenizer.ts";
+    const { loadGemmaTokenizer } = await import(modulePath);
+    const tokenizer = await loadGemmaTokenizer();
+    const tokenIds = tokenizer.encodeMessages([{
+      role: "user",
+      content: [{ type: "audio" }, { type: "text", text: "Transcribe this." }],
+    }]);
+    return {
+      audioTokenId: tokenizer.audioTokenId,
+      beginAudioTokenId: tokenizer.beginAudioTokenId,
+      endAudioTokenId: tokenizer.endAudioTokenId,
+      markerCount: tokenIds.filter((tokenId: number) => tokenId === tokenizer.audioTokenId).length,
+      decoded: tokenizer.decodeRawTokens(tokenIds),
+    };
+  });
+
+  expect(result.audioTokenId).toBe(258881);
+  expect(result.beginAudioTokenId).toBe(256000);
+  expect(result.endAudioTokenId).toBe(258883);
+  expect(result.markerCount).toBe(1);
+  expect(result.decoded).toContain("<|audio|>");
+});
+
+test("wraps audio soft-token slots in canonical boundary tokens", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-tokenizer.ts";
+    const { expandGemmaAudioTokenIds } = await import(modulePath);
+    return expandGemmaAudioTokenIds(3);
+  });
+
+  expect(result).toEqual([256000, 258881, 258881, 258881, 258883]);
+});
+
 test("preserves the greedy golden prompt and output token vectors", async ({ page }) => {
   await page.goto("/");
   const results = await page.evaluate(async () => {
@@ -96,7 +133,8 @@ test("applies the canonical boolean thinking template switch", async ({ page }) 
   await page.goto("/");
   const result = await page.evaluate(async () => {
     const modulePath = "/src/runtime/gemma-tokenizer.ts";
-    const { loadGemmaTokenizer } = await import(modulePath);
+    const tokenizerModule = await import(modulePath);
+    const { loadGemmaTokenizer } = tokenizerModule;
     const tokenizer = await loadGemmaTokenizer();
     const messages = [{ role: "user", content: "What is two plus two?" }] as const;
     const disabled = tokenizer.encodeInput({ messages });
@@ -105,6 +143,8 @@ test("applies the canonical boolean thinking template switch", async ({ page }) 
       disabled: tokenizer.decodeRawTokens(disabled),
       enabled: tokenizer.decodeRawTokens(enabled),
       enabledTokenIds: enabled,
+      startChannel: tokenizer.decodeRawTokens([tokenizerModule.GEMMA_START_CHANNEL_TOKEN_ID]),
+      endChannel: tokenizer.decodeRawTokens([tokenizerModule.GEMMA_END_CHANNEL_TOKEN_ID]),
       repeatedEnabled: tokenizer.encodeInput({ messages, enableThinking: true }),
     };
   });
@@ -112,6 +152,8 @@ test("applies the canonical boolean thinking template switch", async ({ page }) 
   expect(result.disabled).not.toContain("<|think|>");
   expect(result.enabled).toContain("<|turn>system\n<|think|>\n<turn|>");
   expect(result.enabled).toContain("<|turn>user\nWhat is two plus two?<turn|>");
+  expect(result.startChannel).toBe("<|channel>");
+  expect(result.endChannel).toBe("<channel|>");
   expect(result.repeatedEnabled).toEqual(result.enabledTokenIds);
 });
 
