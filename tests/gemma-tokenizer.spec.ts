@@ -52,6 +52,28 @@ test("emits the pinned audio marker for structured audio parts", async ({ page }
   expect(result.decoded).toContain("<|audio|>");
 });
 
+test("emits the pinned video marker for structured video parts", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-tokenizer.ts";
+    const { loadGemmaTokenizer } = await import(modulePath);
+    const tokenizer = await loadGemmaTokenizer();
+    const tokenIds = tokenizer.encodeMessages([{
+      role: "user",
+      content: [{ type: "video" }, { type: "text", text: "Describe this video." }],
+    }]);
+    return {
+      videoTokenId: tokenizer.videoTokenId,
+      markerCount: tokenIds.filter((tokenId: number) => tokenId === tokenizer.videoTokenId).length,
+      decoded: tokenizer.decodeRawTokens(tokenIds),
+    };
+  });
+
+  expect(result.videoTokenId).toBe(258884);
+  expect(result.markerCount).toBe(1);
+  expect(result.decoded).toContain("<|video|>");
+});
+
 test("wraps audio soft-token slots in canonical boundary tokens", async ({ page }) => {
   await page.goto("/");
   const result = await page.evaluate(async () => {
@@ -309,6 +331,65 @@ test("retains the selected visual-token budget in multimodal turns", async ({ pa
     visionTokenBudget: 70,
     images: [{}],
   });
+});
+
+test("retains video ownership in multimodal turns", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-conversation.ts";
+    const { commitGemmaConversationTurn, createGemmaConversation, prepareGemmaConversationTurn } =
+      await import(modulePath);
+    const video = new Blob([new Uint8Array([1, 2, 3])], { type: "video/webm" });
+    const initial = createGemmaConversation();
+    const turn = prepareGemmaConversationTurn(
+      initial,
+      "Describe this video.",
+      undefined,
+      70,
+      false,
+      undefined,
+      video,
+    );
+    const input = turn.input;
+    if (Array.isArray(input) || typeof input === "string") throw new Error("Expected video input");
+    const committed = commitGemmaConversationTurn(initial, turn, "A short recording.");
+    return {
+      content: input.messages.at(-1)?.content,
+      videos: input.videos?.length,
+      committedVideos: committed.videos.length,
+    };
+  });
+
+  expect(result).toEqual({
+    content: [{ type: "video" }, { type: "text", text: "Describe this video." }],
+    videos: 1,
+    committedVideos: 1,
+  });
+});
+
+test("preserves video ownership when editing a multimodal turn", async ({ page }) => {
+  await page.goto("/");
+  const result = await page.evaluate(async () => {
+    const modulePath = "/src/runtime/gemma-conversation.ts";
+    const { createGemmaConversation, prepareGemmaConversationEdit } = await import(modulePath);
+    const firstVideo = new Blob([new Uint8Array([1])], { type: "video/webm" });
+    const editedVideo = new Blob([new Uint8Array([2])], { type: "video/webm" });
+    const conversation = createGemmaConversation([
+      { role: "user", content: [{ type: "video" }, { type: "text", text: "First video" }] },
+      { role: "assistant", content: "First answer" },
+      { role: "user", content: [{ type: "video" }, { type: "text", text: "Second video" }] },
+      { role: "assistant", content: "Second answer" },
+    ], [], [], [], [firstVideo, editedVideo]);
+    const edit = prepareGemmaConversationEdit(conversation, 2, "Describe it differently.");
+    const input = edit.turn.input;
+    if (Array.isArray(input) || typeof input === "string") throw new Error("Expected video input");
+    return {
+      retainedVideos: edit.conversation.videos.length,
+      pendingVideos: input.videos?.map((video: Blob) => video === firstVideo ? "first" : "edited"),
+    };
+  });
+
+  expect(result).toEqual({ retainedVideos: 1, pendingVideos: ["first", "edited"] });
 });
 
 test("renders function declarations through the canonical tool system block", async ({ page }) => {

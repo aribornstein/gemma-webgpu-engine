@@ -51,9 +51,15 @@ import {
   startGemmaMicrophoneCapture,
   type GemmaMicrophoneCapture,
 } from "./runtime/gemma-microphone";
+import {
+  startGemmaCameraCapture,
+  type GemmaCameraCapture,
+} from "./runtime/gemma-camera";
+import type { GemmaVideoSource } from "./runtime/gemma-video-input";
 import type { GemmaDurableBenchmarkArtifact } from "./runtime/durable-benchmark";
 
 type GemmaCacheInitializationProgress = SafetensorsCacheInitializationProgress;
+const WEBCAM_RECORDING_LIMIT_SECONDS = 10;
 
 type GenerationExampleControl =
   | "temperature"
@@ -74,6 +80,7 @@ type ConstraintEditor = "all" | "none" | "regex" | "json" | "json-schema";
 interface ExampleUiProfile {
   vision: boolean;
   audio?: boolean;
+  video?: boolean;
   sampling: boolean;
   constraint: Exclude<ConstraintEditor, "all">;
 }
@@ -82,6 +89,7 @@ interface ConsoleUiProfile {
   workspace: ConsoleWorkspace;
   vision: boolean;
   audio: boolean;
+  video: boolean;
   sampling: boolean;
   constraint: ConstraintEditor;
 }
@@ -110,6 +118,14 @@ interface GenerationExample {
 }
 
 const GENERATION_EXAMPLES: readonly GenerationExample[] = [
+  {
+    id: "webcam-video",
+    label: "Webcam activity · Video",
+    prompt: "Describe the actions and visible changes in this video in chronological order.",
+    controls: { temperature: 0, maxNewTokens: 128 },
+    visionTokenBudget: 70,
+    ui: { vision: false, video: true, sampling: false, constraint: "none" },
+  },
   {
     id: "audio-transcription",
     label: "Browser audio · Transcription",
@@ -319,7 +335,6 @@ app.innerHTML = `
           <h2 id="generation-heading">Conversation</h2>
         </div>
         <div class="heading-commands">
-          <button id="clear-transcript" class="quiet-command" type="button">Clear transcript</button>
           <button id="new-chat" class="quiet-command" type="button" disabled>New chat</button>
           <button id="load-model" class="secondary-command" type="button" title="Rebuild the WebGPU engine from existing local or cached weights" disabled>Load model</button>
         </div>
@@ -372,6 +387,17 @@ app.innerHTML = `
             <span id="audio-name"></span>
             <button id="remove-audio" class="quiet-command" type="button">Remove</button>
           </div>
+          <label id="video-picker" class="image-picker" for="video-input">
+            <span>Add video</span>
+            <input id="video-input" name="video" type="file" accept="video/*">
+          </label>
+          <button id="record-video" class="image-picker" type="button">Record webcam</button>
+          <span id="video-recording-status" class="recording-status" role="status" hidden></span>
+          <div id="video-preview" class="image-preview" hidden>
+            <video id="video-player" controls muted playsinline preload="metadata"></video>
+            <span id="video-name"></span>
+            <button id="remove-video" class="quiet-command" type="button">Remove</button>
+          </div>
           <label id="image-budget" class="field image-budget">Visual tokens
             <select id="vision-token-budget" name="visionTokenBudget">
               <option value="70">Fast · 70</option>
@@ -392,7 +418,10 @@ app.innerHTML = `
       <div class="output-tool" aria-labelledby="output-heading">
         <div class="tool-heading">
           <h3 id="output-heading">Transcript</h3>
-          <span id="output-token-count">0 tokens</span>
+          <div class="tool-heading-actions">
+            <span id="output-token-count">0 tokens</span>
+            <button id="clear-transcript" class="quiet-command" type="button">Clear transcript</button>
+          </div>
         </div>
         <div id="generation-output" class="generation-output" role="log" aria-live="polite">No conversation yet.</div>
       </div>
@@ -580,10 +609,14 @@ const exampleSelect = element<HTMLSelectElement>("generation-example");
 const promptInput = element<HTMLTextAreaElement>("prompt");
 const imageInput = element<HTMLInputElement>("image-input");
 const audioInput = element<HTMLInputElement>("audio-input");
+const videoInput = element<HTMLInputElement>("video-input");
 const imagePicker = element<HTMLLabelElement>("image-picker");
 const audioPicker = element<HTMLLabelElement>("audio-picker");
+const videoPicker = element<HTMLLabelElement>("video-picker");
 const recordAudioButton = element<HTMLButtonElement>("record-audio");
 const recordingStatus = element<HTMLSpanElement>("recording-status");
+const recordVideoButton = element<HTMLButtonElement>("record-video");
+const videoRecordingStatus = element<HTMLSpanElement>("video-recording-status");
 const visionTokenBudgetInput = element<HTMLSelectElement>("vision-token-budget");
 const thinkingControl = element<HTMLElement>("thinking-control");
 const enableThinkingInput = element<HTMLInputElement>("enable-thinking");
@@ -597,6 +630,10 @@ const audioPreview = element<HTMLDivElement>("audio-preview");
 const audioPlayer = element<HTMLAudioElement>("audio-player");
 const audioName = element<HTMLSpanElement>("audio-name");
 const removeAudioButton = element<HTMLButtonElement>("remove-audio");
+const videoPreview = element<HTMLDivElement>("video-preview");
+const videoPlayer = element<HTMLVideoElement>("video-player");
+const videoName = element<HTMLSpanElement>("video-name");
+const removeVideoButton = element<HTMLButtonElement>("remove-video");
 const outputTool = element<HTMLDivElement>("output-heading").closest<HTMLDivElement>(".output-tool");
 if (!outputTool) throw new Error("Missing output tool");
 const ownedOutputTool = outputTool;
@@ -643,11 +680,16 @@ let progressPhaseKey = "";
 let progressPhaseFraction = 0;
 let selectedImage: GemmaVisionImageSource | null = null;
 let selectedAudio: GemmaAudioSource | null = null;
+let selectedVideo: GemmaVideoSource | null = null;
 let imagePreviewUrl: string | null = null;
 let audioPreviewUrl: string | null = null;
+let videoPreviewUrl: string | null = null;
 let audioRecorder: GemmaMicrophoneCapture | null = null;
 let audioRecordingTimer: number | null = null;
 let audioRecordingStartedAt = 0;
+let videoRecorder: GemmaCameraCapture | null = null;
+let videoRecordingTimer: number | null = null;
+let videoRecordingStartedAt = 0;
 let activeWorkspace: ConsoleWorkspace = "custom";
 let activeExample: GenerationExample | null = null;
 let forceFreshGeneration = false;
@@ -727,7 +769,16 @@ audioInput.addEventListener("change", () => {
   }
   selectAudio(file);
 });
+videoInput.addEventListener("change", () => {
+  const file = videoInput.files?.[0] ?? null;
+  if (!file) {
+    clearSelectedVideo();
+    return;
+  }
+  selectVideo(file);
+});
 recordAudioButton.addEventListener("click", () => void toggleAudioRecording());
+recordVideoButton.addEventListener("click", () => void toggleVideoRecording());
 visionTokenBudgetInput.addEventListener("change", () => {
   markExampleCustomized();
   validateControls();
@@ -740,6 +791,10 @@ removeAudioButton.addEventListener("click", () => {
   markExampleCustomized();
   clearSelectedAudio();
 });
+removeVideoButton.addEventListener("click", () => {
+  markExampleCustomized();
+  clearSelectedVideo();
+});
 benchmarkRunButton.addEventListener("click", () => void runBoundaryBenchmark());
 benchmarkStopButton.addEventListener("click", () => {
   benchmarkController?.abort(new DOMException("Benchmark cancelled", "AbortError"));
@@ -747,8 +802,10 @@ benchmarkStopButton.addEventListener("click", () => {
 benchmarkDownloadButton.addEventListener("click", () => void downloadBenchmarkArtifact());
 window.addEventListener("beforeunload", () => {
   discardAudioRecording();
+  discardVideoRecording();
   if (imagePreviewUrl) URL.revokeObjectURL(imagePreviewUrl);
   if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
+  if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
   session?.destroy();
 });
 
@@ -1081,6 +1138,7 @@ async function generate(): Promise<void> {
       readVisionTokenBudget(),
       enableThinkingInput.checked,
       selectedAudio ?? undefined,
+      selectedVideo ?? undefined,
     );
     renderPromptBudget(options.maxNewTokens ?? DEFAULT_GENERATION_CONFIG.maxNewTokens);
     renderValidConfiguration(options);
@@ -1150,6 +1208,7 @@ async function generate(): Promise<void> {
       if (activeWorkspace === "chat") promptInput.value = "";
       clearSelectedImage();
       clearSelectedAudio();
+      clearSelectedVideo();
       renderConversation();
     } else {
       renderConversation(turn.userMessage, "No text output.", "failed");
@@ -1291,6 +1350,7 @@ async function selectGenerationExample(example: GenerationExample): Promise<void
   renderConsoleProfile();
   clearSelectedImage();
   clearSelectedAudio();
+  clearSelectedVideo();
   applyGenerationExample(example);
   try {
     if (example.image) {
@@ -1368,7 +1428,8 @@ function validateControls(): boolean {
     renderPromptBudget(options.maxNewTokens ?? DEFAULT_GENERATION_CONFIG.maxNewTokens);
     renderValidConfiguration(options);
     if (session && !generationController) {
-      generateButton.disabled = promptInput.value.trim().length === 0 || audioRecorder !== null;
+      generateButton.disabled = promptInput.value.trim().length === 0 ||
+        audioRecorder !== null || videoRecorder !== null;
     }
     return true;
   } catch (error) {
@@ -1395,6 +1456,7 @@ function renderPromptBudget(maxNewTokens: number): void {
     readVisionTokenBudget(),
     false,
     selectedAudio ?? undefined,
+    selectedVideo ?? undefined,
   );
   const promptTokens = session.promptTokenCount(turn.input);
   const availableOutput = availableGemmaOutputTokens(promptTokens, session.cacheCapacity);
@@ -1438,13 +1500,27 @@ function renderConstraintFields(): void {
 
 function activeConsoleProfile(): ConsoleUiProfile {
   if (activeWorkspace === "custom") {
-    return { workspace: "custom", vision: true, audio: true, sampling: true, constraint: "all" };
+    return {
+      workspace: "custom",
+      vision: true,
+      audio: true,
+      video: true,
+      sampling: true,
+      constraint: "all",
+    };
   }
   if (activeWorkspace === "chat") {
-    return { workspace: "chat", vision: true, audio: true, sampling: true, constraint: "none" };
+    return {
+      workspace: "chat",
+      vision: true,
+      audio: true,
+      video: true,
+      sampling: true,
+      constraint: "none",
+    };
   }
   if (!activeExample) throw new Error("Example workspace is missing its UI profile");
-  return { workspace: "example", audio: false, ...activeExample.ui };
+  return { workspace: "example", audio: false, video: false, ...activeExample.ui };
 }
 
 function renderConsoleProfile(): void {
@@ -1460,13 +1536,17 @@ function renderConsoleProfile(): void {
     : "Transcript";
   generateButton.textContent = profile.workspace === "chat" ? "Send" : "Generate";
   promptInput.rows = profile.workspace === "chat" ? 3 : 6;
-  imageControls.hidden = !profile.vision && !profile.audio;
+  imageControls.hidden = !profile.vision && !profile.audio && !profile.video;
   imagePicker.hidden = !profile.vision;
   imagePreview.hidden = !profile.vision || !selectedImage;
   audioPicker.hidden = !profile.audio;
   recordAudioButton.hidden = !profile.audio;
   audioPreview.hidden = !profile.audio || !selectedAudio;
-  imageBudget.hidden = !profile.vision || (profile.workspace === "chat" && !selectedImage);
+  videoPicker.hidden = !profile.video;
+  recordVideoButton.hidden = !profile.video;
+  videoPreview.hidden = !profile.video || (!selectedVideo && !videoRecorder);
+  imageBudget.hidden = (!profile.vision && !profile.video) ||
+    (profile.workspace === "chat" && !selectedImage && !selectedVideo);
   thinkingControl.hidden = profile.workspace === "example" && !activeExample?.enableThinking;
   for (const control of samplingControls) control.hidden = !profile.sampling;
   probabilityControls.hidden = !profile.sampling;
@@ -1485,6 +1565,7 @@ function activateWorkspace(workspace: Exclude<ConsoleWorkspace, "example">): voi
     promptInput.value = "";
     clearSelectedImage();
     clearSelectedAudio();
+    clearSelectedVideo();
     renderConversation();
   }
   renderConsoleProfile();
@@ -1578,9 +1659,12 @@ function setGenerating(generating: boolean): void {
   promptInput.disabled = generating;
   imageInput.disabled = generating;
   audioInput.disabled = generating;
+  videoInput.disabled = generating;
   recordAudioButton.disabled = generating;
   removeImageButton.disabled = generating;
   removeAudioButton.disabled = generating;
+  recordVideoButton.disabled = generating;
+  removeVideoButton.disabled = generating;
   for (const control of controlsForm.elements) {
     if (control instanceof HTMLInputElement || control instanceof HTMLSelectElement ||
         control instanceof HTMLTextAreaElement || control instanceof HTMLButtonElement) {
@@ -1615,6 +1699,7 @@ function clearConversation(): void {
   promptInput.value = "";
   clearSelectedImage();
   clearSelectedAudio();
+  clearSelectedVideo();
   renderConversation();
   outputTokenCount.textContent = "0 tokens";
   newChatButton.disabled = true;
@@ -1635,11 +1720,15 @@ function renderConversation(
     ? [...displayedConversation.messages, pendingUser]
     : [...displayedConversation.messages];
   let imageIndex = 0;
+  let videoIndex = 0;
   for (const [messageIndex, message] of messages.entries()) {
     const imageCount = messageImageCount(message);
     const images = displayedConversation.images.slice(imageIndex, imageIndex + imageCount);
     imageIndex += imageCount;
-    output.append(renderMessage(message, undefined, messageIndex, images));
+    const videoCount = messageVideoCount(message);
+    const videos = displayedConversation.videos.slice(videoIndex, videoIndex + videoCount);
+    videoIndex += videoCount;
+    output.append(renderMessage(message, undefined, messageIndex, images, videos));
   }
   if (pendingUser) {
     output.append(renderMessage({
@@ -1673,6 +1762,7 @@ function renderMessage(
   state?: "streaming" | "stopped" | "failed" | "tool-call",
   messageIndex?: number,
   images: readonly GemmaVisionImageSource[] = [],
+  videos: readonly GemmaVideoSource[] = [],
 ): HTMLElement {
   const article = document.createElement("article");
   article.className = "conversation-message";
@@ -1699,10 +1789,11 @@ function renderMessage(
     reasoning.append(summary, reasoningContent);
     body.append(reasoning);
   }
-  if (images.length > 0) {
+  if (images.length > 0 || videos.length > 0) {
     const attachments = document.createElement("div");
     attachments.className = "conversation-attachments";
     for (const image of images) attachments.append(renderConversationImage(image));
+    for (const video of videos) attachments.append(renderConversationVideo(video));
     body.prepend(attachments);
   }
   if (activeWorkspace === "chat" && message.role === "user" && state === undefined &&
@@ -1742,6 +1833,20 @@ function renderConversationImage(image: GemmaVisionImageSource): HTMLElement {
   return frame;
 }
 
+function renderConversationVideo(video: GemmaVideoSource): HTMLElement {
+  const frame = document.createElement("div");
+  frame.className = "conversation-image conversation-video";
+  const player = document.createElement("video");
+  const url = URL.createObjectURL(video);
+  player.controls = true;
+  player.muted = true;
+  player.playsInline = true;
+  player.src = url;
+  player.addEventListener("loadedmetadata", () => URL.revokeObjectURL(url), { once: true });
+  frame.append(player);
+  return frame;
+}
+
 function beginConversationEdit(messageIndex: number): void {
   const message = conversation.messages[messageIndex];
   if (!message || message.role !== "user") return;
@@ -1756,6 +1861,8 @@ function beginConversationEdit(messageIndex: number): void {
   promptInput.value = messageText(message);
   if (edit.turn.image) selectImage(edit.turn.image, false);
   else clearSelectedImage();
+  if (edit.turn.video) selectVideo(edit.turn.video, false);
+  else clearSelectedVideo();
   requestStatus.textContent = "Editing message";
   renderConversation();
   promptInput.focus();
@@ -1771,6 +1878,12 @@ function messageImageCount(message: GemmaChatMessage): number {
     : message.content.filter((part) => part.type === "image").length;
 }
 
+function messageVideoCount(message: GemmaChatMessage): number {
+  return typeof message.content === "string"
+    ? 0
+    : message.content.filter((part) => part.type === "video").length;
+}
+
 function messageText(message: GemmaChatMessage): string {
   return typeof message.content === "string"
     ? message.content
@@ -1781,12 +1894,14 @@ function messageContentText(message: GemmaChatMessage): string {
   if (typeof message.content === "string") return message.content;
   return message.content.map((part) => part.type === "image"
     ? "[Image]"
-    : part.type === "audio" ? "[Audio]" : part.text).join("\n");
+    : part.type === "audio" ? "[Audio]"
+    : part.type === "video" ? "[Video]" : part.text).join("\n");
 }
 
 function hasConversationState(): boolean {
   return conversation.messages.length > 0 || conversation.images.length > 0 ||
-    conversation.audios.length > 0 || conversation.tools.length > 0;
+    conversation.audios.length > 0 || conversation.videos.length > 0 ||
+    conversation.tools.length > 0;
 }
 
 function selectImage(
@@ -1839,6 +1954,35 @@ function clearSelectedAudio(): void {
   audioName.textContent = "";
   if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
   audioPreviewUrl = null;
+  validateControls();
+}
+
+function selectVideo(video: Blob, clearExample = true): void {
+  selectedVideo = video;
+  if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
+  videoPreviewUrl = URL.createObjectURL(video);
+  videoPlayer.srcObject = null;
+  videoPlayer.src = videoPreviewUrl;
+  videoPlayer.controls = true;
+  videoName.textContent = video instanceof File ? video.name : "Video";
+  videoPreview.hidden = false;
+  if (clearExample) markExampleCustomized();
+  renderConsoleProfile();
+  validateControls();
+}
+
+function clearSelectedVideo(): void {
+  selectedVideo = null;
+  videoInput.value = "";
+  videoPreview.hidden = true;
+  videoPlayer.pause();
+  videoPlayer.srcObject = null;
+  videoPlayer.removeAttribute("src");
+  videoPlayer.load();
+  videoName.textContent = "";
+  if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
+  videoPreviewUrl = null;
+  renderConsoleProfile();
   validateControls();
 }
 
@@ -1906,6 +2050,88 @@ function releaseAudioRecorder(): void {
 function discardAudioRecording(): void {
   void audioRecorder?.discard();
   releaseAudioRecorder();
+}
+
+async function toggleVideoRecording(): Promise<void> {
+  if (videoRecorder) {
+    await finishVideoRecording(videoRecorder);
+    return;
+  }
+  if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+    showVideoRecordingStatus("Webcam recording is not supported in this browser", "error");
+    return;
+  }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: "user" },
+      audio: false,
+    });
+    videoRecorder = startGemmaCameraCapture(stream);
+    videoRecordingStartedAt = performance.now();
+    videoPlayer.srcObject = stream;
+    videoPlayer.controls = false;
+    videoPlayer.muted = true;
+    await videoPlayer.play();
+    videoPreview.hidden = false;
+    videoName.textContent = "Live webcam";
+    recordVideoButton.textContent = "Stop recording";
+    recordVideoButton.dataset.recording = "true";
+    showVideoRecordingStatus("Recording 0:00 / 0:10", "recording");
+    videoRecordingTimer = window.setInterval(renderVideoRecordingDuration, 250);
+    renderConsoleProfile();
+    validateControls();
+  } catch (error) {
+    showVideoRecordingStatus(`Webcam unavailable: ${errorMessage(error)}`, "error");
+    discardVideoRecording();
+  }
+}
+
+async function finishVideoRecording(capture: GemmaCameraCapture): Promise<void> {
+  if (capture !== videoRecorder) return;
+  try {
+    const video = await capture.stop();
+    const extension = video.type.includes("mp4") ? "mp4" : "webm";
+    const recording = new File([video], `webcam-recording.${extension}`, { type: video.type });
+    releaseVideoRecorder();
+    videoRecordingStatus.hidden = true;
+    selectVideo(recording);
+  } catch (error) {
+    releaseVideoRecorder();
+    showVideoRecordingStatus(errorMessage(error), "error");
+  }
+}
+
+function renderVideoRecordingDuration(): void {
+  const elapsedSeconds = Math.floor((performance.now() - videoRecordingStartedAt) / 1_000);
+  if (elapsedSeconds >= WEBCAM_RECORDING_LIMIT_SECONDS) {
+    if (videoRecorder) void finishVideoRecording(videoRecorder);
+    return;
+  }
+  showVideoRecordingStatus(
+    `Recording 0:${String(elapsedSeconds).padStart(2, "0")} / 0:10`,
+    "recording",
+  );
+}
+
+function showVideoRecordingStatus(message: string, state: "recording" | "error"): void {
+  videoRecordingStatus.textContent = message;
+  videoRecordingStatus.dataset.state = state;
+  videoRecordingStatus.hidden = false;
+}
+
+function releaseVideoRecorder(): void {
+  if (videoRecordingTimer !== null) window.clearInterval(videoRecordingTimer);
+  videoRecordingTimer = null;
+  videoRecorder = null;
+  videoPlayer.srcObject = null;
+  recordVideoButton.textContent = "Record webcam";
+  delete recordVideoButton.dataset.recording;
+  validateControls();
+}
+
+function discardVideoRecording(): void {
+  void videoRecorder?.discard();
+  releaseVideoRecorder();
 }
 
 function setBadge(target: HTMLElement, text: string, state: string): void {

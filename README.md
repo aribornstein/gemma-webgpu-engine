@@ -228,6 +228,34 @@ output under a WebGPU validation scope. This speech-length test also certifies t
 projection for audio geometries above the language prefill graph's 32-row chunk size. The greedy
 live transcription returns “Web GPU audio is working in your browser.”
 
+## Video
+
+Structured user messages may include a video part paired with a browser video source. Following the
+pinned Gemma 4 processor contract, the runtime samples the clip at one frame per second, prefixes
+each frame with its `mm:ss` timestamp, wraps repeated `<|video|>` soft-token positions with the
+canonical image boundary tokens, and executes every frame through the existing owned vision tower.
+Videos are limited to 60 seconds by the model card. Use the 70-token visual budget for ordinary
+video understanding so multiple frames do not spend document-scale vision compute.
+
+```ts
+const result = await session.generate({
+	messages: [{
+		role: "user",
+		content: [{ type: "video" }, { type: "text", text: "Describe this video." }],
+	}],
+	videos: [videoBlob],
+	visionTokenBudget: 70,
+}, { maxNewTokens: 128 });
+```
+
+The console accepts browser-supported video files and includes a `Webcam activity · Video` example.
+**Record webcam** requests camera permission only after activation, shows the live stream, records
+with the browser's supported MediaRecorder container, and replaces the live stream with a playable
+attachment when stopped. Webcam demo capture stops automatically after 10 seconds to bound frame
+count and latency; uploaded files retain the model's 60-second limit. Recorded and uploaded clips
+share the same Blob preprocessing and generation path, and all camera tracks are stopped after
+capture, cancellation, removal, or page unload.
+
 ## Images
 
 Structured user messages may include image parts paired with browser image sources. The owned

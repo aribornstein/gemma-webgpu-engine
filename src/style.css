@@ -494,6 +494,24 @@ button.image-picker[data-recording="true"] {
   height: 36px;
 }
 
+#video-preview {
+  grid-template-columns: minmax(160px, 240px) minmax(80px, 1fr) auto;
+  flex: 1 1 400px;
+}
+
+#video-preview video {
+  width: 100%;
+  max-height: 150px;
+  background: #111;
+}
+
+.conversation-video video {
+  display: block;
+  width: min(280px, 100%);
+  max-height: 180px;
+  background: #111;
+}
+
 .image-preview span {
   min-width: 0;
   overflow: hidden;
@@ -545,6 +563,22 @@ button.image-picker[data-recording="true"] {
 
 .tool-heading span {
   font: 11px var(--mono);
+}
+
+.tool-heading-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool-heading .quiet-command {
+  border-color: #64706b;
+  color: #dbe5dd;
+}
+
+.tool-heading .quiet-command:hover:not(:disabled) {
+  border-color: #8c9992;
+  color: #fff;
 }
 
 .generation-output {

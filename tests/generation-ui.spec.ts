@@ -135,6 +135,14 @@ test("applies editable generation examples", async ({ page }) => {
   await page.goto("/");
 
   const examples = page.getByLabel("Workspace");
+  await examples.selectOption("webcam-video");
+  await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/chronological order/);
+  await expect(page.getByRole("button", { name: "Add video" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Record webcam" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Add image" })).toBeHidden();
+  await expect(page.getByRole("button", { name: "Add audio" })).toBeHidden();
+  await expect(page.getByLabel("Visual tokens")).toHaveValue("70");
+
   await examples.selectOption("tool-weather");
   await expect(page.getByRole("log")).toContainText("get_current_weather");
   await expect(page.getByRole("textbox", { name: "Message" }))
@@ -180,6 +188,46 @@ test("applies editable generation examples", async ({ page }) => {
   await expect(examples).toHaveValue("custom");
 });
 
+test("records webcam output into the video attachment preview", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, "mediaDevices", {
+      configurable: true,
+      value: {
+        getUserMedia: async () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 64;
+          canvas.height = 48;
+          const context = canvas.getContext("2d")!;
+          let frame = 0;
+          window.setInterval(() => {
+            context.fillStyle = frame++ % 2 === 0 ? "#e65332" : "#16857a";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+          }, 50);
+          return canvas.captureStream(10);
+        },
+      },
+    });
+  });
+  await page.goto("/");
+  await page.getByLabel("Workspace").selectOption("webcam-video");
+
+  await page.getByRole("button", { name: "Record webcam" }).click();
+  await expect(page.getByRole("button", { name: "Stop recording" })).toBeVisible();
+  await expect(page.getByText("Recording 0:00 / 0:10", { exact: true })).toBeVisible();
+  await page.waitForTimeout(1_100);
+  await page.getByRole("button", { name: "Stop recording" }).click();
+
+  await expect(page.getByText(/webcam-recording\.(?:webm|mp4)/)).toBeVisible();
+  const preview = page.locator("#video-player");
+  await expect(preview).toBeVisible();
+  await expect(preview).toHaveAttribute("src", /^blob:/);
+  await expect.poll(() => preview.evaluate((element) =>
+    Number.isFinite((element as HTMLVideoElement).duration))).toBe(true);
+  await preview.evaluate((element) => (element as HTMLVideoElement).play());
+  await expect.poll(() => preview.evaluate((element) =>
+    (element as HTMLVideoElement).currentTime)).toBeGreaterThan(0);
+});
+
 test("keeps Generate prompts while Chat clears its sent composer", async ({ page }) => {
   await page.goto("/");
   const workspace = page.getByLabel("Workspace");
@@ -202,8 +250,10 @@ test("clears the transcript without clearing the configured example prompt", asy
   await page.getByLabel("Workspace").selectOption("schema-reasoning");
   const prompt = page.getByRole("textbox", { name: "Message" });
   const examplePrompt = await prompt.inputValue();
+  const clearTranscript = page.getByRole("button", { name: "Clear transcript" });
 
-  await page.getByRole("button", { name: "Clear transcript" }).click();
+  await expect(clearTranscript.locator("xpath=parent::*")).toHaveClass(/tool-heading-actions/);
+  await clearTranscript.click();
 
   await expect(page.getByRole("log")).toHaveText("No conversation yet.");
   await expect(prompt).toHaveValue(examplePrompt);

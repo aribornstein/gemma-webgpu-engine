@@ -4,6 +4,7 @@ import type {
   GemmaVisionTokenBudget,
 } from "./gemma-vision-input";
 import type { GemmaAudioSource } from "./gemma-audio-input";
+import type { GemmaVideoSource } from "./gemma-video-input";
 
 const TOKENIZER_PATH = "gemma-4-e2b-tokenizer";
 const MODEL_ROOT = `${new URL(import.meta.url).origin}/models/`;
@@ -12,6 +13,9 @@ export const GEMMA_START_CHANNEL_TOKEN_ID = 100;
 export const GEMMA_END_CHANNEL_TOKEN_ID = 101;
 export const GEMMA_IMAGE_TOKEN_ID = 258880;
 export const GEMMA_AUDIO_TOKEN_ID = 258881;
+export const GEMMA_VIDEO_TOKEN_ID = 258884;
+export const GEMMA_BEGIN_IMAGE_TOKEN_ID = 255999;
+export const GEMMA_END_IMAGE_TOKEN_ID = 258882;
 export const GEMMA_BEGIN_AUDIO_TOKEN_ID = 256000;
 export const GEMMA_END_AUDIO_TOKEN_ID = 258883;
 
@@ -41,7 +45,12 @@ export interface GemmaChatAudioPart {
   type: "audio";
 }
 
-export type GemmaChatContentPart = GemmaChatTextPart | GemmaChatImagePart | GemmaChatAudioPart;
+export interface GemmaChatVideoPart {
+  type: "video";
+}
+
+export type GemmaChatContentPart = GemmaChatTextPart | GemmaChatImagePart |
+  GemmaChatAudioPart | GemmaChatVideoPart;
 
 export interface GemmaChatToolCall {
   id?: string;
@@ -79,6 +88,7 @@ export interface GemmaStructuredGenerationInput {
   messages: readonly GemmaChatMessage[];
   images?: readonly GemmaVisionImageSource[];
   audios?: readonly GemmaAudioSource[];
+  videos?: readonly GemmaVideoSource[];
   visionTokenBudget?: GemmaVisionTokenBudget;
   tools?: readonly GemmaFunctionTool[];
   enableThinking?: boolean;
@@ -112,6 +122,7 @@ export interface GemmaTokenizer {
   readonly endTokenIds: readonly number[];
   readonly imageTokenId: number;
   readonly audioTokenId: number;
+  readonly videoTokenId: number;
   readonly beginAudioTokenId: number;
   readonly endAudioTokenId: number;
   encodePrompt(prompt: string): number[];
@@ -202,6 +213,7 @@ function createGemmaTokenizer(
     endTokenIds: Object.freeze([...EOS_TOKEN_IDS]),
     imageTokenId: GEMMA_IMAGE_TOKEN_ID,
     audioTokenId: GEMMA_AUDIO_TOKEN_ID,
+    videoTokenId: GEMMA_VIDEO_TOKEN_ID,
     beginAudioTokenId: GEMMA_BEGIN_AUDIO_TOKEN_ID,
     endAudioTokenId: GEMMA_END_AUDIO_TOKEN_ID,
     encodePrompt(prompt) {
@@ -289,6 +301,7 @@ function validContent(content: GemmaChatMessage["content"]): boolean {
   if (typeof content === "string") return content.trim().length > 0;
   if (content.length === 0) return false;
   return content.every((part) => part.type === "image" || part.type === "audio" ||
+    part.type === "video" ||
     (part.type === "text" && part.text.trim().length > 0));
 }
 

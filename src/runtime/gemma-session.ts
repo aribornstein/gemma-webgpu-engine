@@ -68,7 +68,9 @@ import {
 } from "./generation-control";
 import {
   expandGemmaAudioTokenIds,
+  GEMMA_BEGIN_IMAGE_TOKEN_ID,
   GEMMA_END_CHANNEL_TOKEN_ID,
+  GEMMA_END_IMAGE_TOKEN_ID,
   GEMMA_START_CHANNEL_TOKEN_ID,
   loadGemmaTokenizer,
   type GemmaGenerationInput,
@@ -85,6 +87,11 @@ import {
   prepareGemmaAudio,
   type GemmaAudioFeatures,
 } from "./gemma-audio-input";
+import {
+  formatGemmaVideoTimestamp,
+  GEMMA_VIDEO_MAX_FRAMES,
+  prepareGemmaVideo,
+} from "./gemma-video-input";
 import { sampleToken, SeededRandom } from "./sampling";
 import {
   countGemmaReasoningTokens,
@@ -791,16 +798,25 @@ export class GemmaGenerationSession {
     const audioMarkerCount = tokenIds.filter(
       (tokenId) => tokenId === this.tokenizer.audioTokenId,
     ).length;
+    const videoMarkerCount = tokenIds.filter(
+      (tokenId) => tokenId === this.tokenizer.videoTokenId,
+    ).length;
     if (imageMarkerCount !== (input.images?.length ?? 0)) {
       throw new Error("Gemma image parts and image sources must have equal counts");
     }
     if (audioMarkerCount !== (input.audios?.length ?? 0)) {
       throw new Error("Gemma audio parts and audio sources must have equal counts");
     }
+    if (videoMarkerCount !== (input.videos?.length ?? 0)) {
+      throw new Error("Gemma video parts and video sources must have equal counts");
+    }
     const visionTokenBudget = input.visionTokenBudget ?? GEMMA_VISION_MAX_SOFT_TOKENS;
     validateGemmaVisionTokenBudget(visionTokenBudget);
     return tokenIds.length - imageMarkerCount + imageMarkerCount * visionTokenBudget -
-      audioMarkerCount + audioMarkerCount * 752;
+      audioMarkerCount + audioMarkerCount * 752 - videoMarkerCount +
+      videoMarkerCount * GEMMA_VIDEO_MAX_FRAMES * (
+        visionTokenBudget + 2 + this.tokenizer.encodeText(" 00:00 ").length
+      );
   }
 
   async generateMeasured(
@@ -1085,7 +1101,8 @@ export class GemmaGenerationSession {
     const rawTokenIds = this.tokenizer.encodeInput(input);
     if (!isMultimodalGenerationInput(input)) {
       if (rawTokenIds.includes(this.tokenizer.imageTokenId) ||
-          rawTokenIds.includes(this.tokenizer.audioTokenId)) {
+          rawTokenIds.includes(this.tokenizer.audioTokenId) ||
+          rawTokenIds.includes(this.tokenizer.videoTokenId)) {
         throw new Error("Gemma multimodal markers require structured media sources");
       }
       return {
@@ -1102,7 +1119,8 @@ export class GemmaGenerationSession {
     }
     const images = input.images ?? [];
     const audios = input.audios ?? [];
-    const visionInputs: GemmaVisionInput[] = [];
+    const videos = input.videos ?? [];
+    const imageInputs: GemmaVisionInput[] = [];
     const visionTokenBudget = input.visionTokenBudget ?? GEMMA_VISION_MAX_SOFT_TOKENS;
     validateGemmaVisionTokenBudget(visionTokenBudget);
     let visionPreprocessMs = 0;
@@ -1116,13 +1134,33 @@ export class GemmaGenerationSession {
         totalLayers: GEMMA_VISION_LAYER_COUNT,
       });
       const visionPreprocessStartedAt = performance.now();
-      visionInputs.push(await prepareGemmaVisionImage(
+      imageInputs.push(await prepareGemmaVisionImage(
         images[imageIndex],
         signal,
         visionTokenBudget,
       ));
       visionPreprocessMs += performance.now() - visionPreprocessStartedAt;
       throwIfGemmaGenerationAborted(signal);
+    }
+    const videoInputs: Array<Array<{
+      visionInput: GemmaVisionInput;
+      timestampSeconds: number;
+    }>> = [];
+    for (const video of videos) {
+      const preparedVideo = await prepareGemmaVideo(video, signal);
+      const frames: Array<{ visionInput: GemmaVisionInput; timestampSeconds: number }> = [];
+      for (const frame of preparedVideo.frames) {
+        throwIfGemmaGenerationAborted(signal);
+        const visionPreprocessStartedAt = performance.now();
+        const visionInput = await prepareGemmaVisionImage(
+          frame.image,
+          signal,
+          visionTokenBudget,
+        );
+        visionPreprocessMs += performance.now() - visionPreprocessStartedAt;
+        frames.push({ visionInput, timestampSeconds: frame.timestampSeconds });
+      }
+      videoInputs.push(frames);
     }
     const audioInputs: GemmaAudioFeatures[] = [];
     let audioPreprocessMs = 0;
@@ -1143,7 +1181,7 @@ export class GemmaGenerationSession {
     const imageMarkerCount = rawTokenIds.filter(
       (tokenId) => tokenId === this.tokenizer.imageTokenId,
     ).length;
-    if (imageMarkerCount !== visionInputs.length) {
+    if (imageMarkerCount !== imageInputs.length) {
       throw new Error("Gemma image parts and image sources must have equal counts");
     }
     const audioMarkerCount = rawTokenIds.filter(
@@ -1152,16 +1190,40 @@ export class GemmaGenerationSession {
     if (audioMarkerCount !== audioInputs.length) {
       throw new Error("Gemma audio parts and audio sources must have equal counts");
     }
+    const videoMarkerCount = rawTokenIds.filter(
+      (tokenId) => tokenId === this.tokenizer.videoTokenId,
+    ).length;
+    if (videoMarkerCount !== videoInputs.length) {
+      throw new Error("Gemma video parts and video sources must have equal counts");
+    }
     const tokenIds: number[] = [];
+    const visionInputs: GemmaVisionInput[] = [];
     const visionStarts: number[] = [];
     const audioStarts: number[] = [];
     let imageIndex = 0;
     let audioIndex = 0;
+    let videoIndex = 0;
     for (const tokenId of rawTokenIds) {
       if (tokenId === this.tokenizer.imageTokenId) {
-        const visionInput = visionInputs[imageIndex++];
+        const visionInput = imageInputs[imageIndex++];
         visionStarts.push(tokenIds.length);
         tokenIds.push(...new Array<number>(visionInput.softTokenCount).fill(tokenId));
+        visionInputs.push(visionInput);
+        continue;
+      }
+      if (tokenId === this.tokenizer.videoTokenId) {
+        const frames = videoInputs[videoIndex++];
+        for (const [frameIndex, frame] of frames.entries()) {
+          const timestamp = formatGemmaVideoTimestamp(frame.timestampSeconds);
+          tokenIds.push(...this.tokenizer.encodeText(
+            `${frameIndex === 0 ? "" : " "}${timestamp} `,
+          ));
+          tokenIds.push(GEMMA_BEGIN_IMAGE_TOKEN_ID);
+          visionStarts.push(tokenIds.length);
+          tokenIds.push(...new Array<number>(frame.visionInput.softTokenCount).fill(tokenId));
+          tokenIds.push(GEMMA_END_IMAGE_TOKEN_ID);
+          visionInputs.push(frame.visionInput);
+        }
         continue;
       }
       if (tokenId === this.tokenizer.audioTokenId) {
@@ -1282,6 +1344,7 @@ function isMultimodalGenerationInput(
   return typeof input === "object" && !Array.isArray(input) &&
     "messages" in input && (
       ("images" in input && Array.isArray(input.images)) ||
-      ("audios" in input && Array.isArray(input.audios))
+      ("audios" in input && Array.isArray(input.audios)) ||
+      ("videos" in input && Array.isArray(input.videos))
     );
 }
