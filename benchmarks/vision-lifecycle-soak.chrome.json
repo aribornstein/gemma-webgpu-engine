@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-07-18T07:29:33.023Z",
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+  "requests": [
+    {
+      "imageIndex": 0,
+      "budget": 70,
+      "patchCount": 594,
+      "softTokenCount": 66,
+      "layerExecutionMilliseconds": 1215.1000001430511
+    },
+    {
+      "imageIndex": 1,
+      "budget": 140,
+      "patchCount": 1170,
+      "softTokenCount": 130,
+      "layerExecutionMilliseconds": 1837.8000000715256
+    },
+    {
+      "imageIndex": 0,
+      "budget": 280,
+      "patchCount": 2484,
+      "softTokenCount": 276,
+      "layerExecutionMilliseconds": 4388.5
+    },
+    {
+      "imageIndex": 1,
+      "budget": 70,
+      "patchCount": 567,
+      "softTokenCount": 63,
+      "layerExecutionMilliseconds": 857.6000001430511
+    },
+    {
+      "imageIndex": 0,
+      "budget": 140,
+      "patchCount": 1152,
+      "softTokenCount": 128,
+      "layerExecutionMilliseconds": 1775.5000001192093
+    },
+    {
+      "imageIndex": 1,
+      "budget": 280,
+      "patchCount": 2394,
+      "softTokenCount": 266,
+      "layerExecutionMilliseconds": 4290.599999904633
+    }
+  ],
+  "cancellation": {
+    "name": "AbortError",
+    "message": "vision soak cancelled",
+    "completedLayers": 2
+  },
+  "recovery": {
+    "patchCount": 567,
+    "softTokenCount": 63
+  },
+  "retainedVisionWeights": {
+    "loadedEntryCount": 18,
+    "sourceBytes": 189092736,
+    "materializedBytes": 221831168
+  },
+  "gpuError": null
+}

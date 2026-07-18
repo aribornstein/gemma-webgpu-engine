@@ -14,6 +14,7 @@
     "test:gpu": "playwright test tests/qat-linear-gpu.spec.ts",
     "benchmark:e2b": "E2B_PERFORMANCE_PROOF=1 playwright test tests/e2b-performance-proof.live.spec.ts --workers=1",
     "benchmark:e2b:report": "node --experimental-strip-types tools/render_e2b_performance_report.mjs",
+    "benchmark:vision": "GEMMA_VISION_OPTIMIZATION=1 playwright test tests/gemma-vision-optimization.live.spec.ts --workers=1",
     "benchmark:suite:smoke": "BENCHMARK_SUITE_SYNTHETIC_SMOKE=1 playwright test tests/benchmark-suite.smoke.spec.ts --workers=1",
     "benchmark:suite:live-smoke": "BENCHMARK_SUITE_LIVE=1 BENCHMARK_SUITE_PROFILE=smoke playwright test tests/benchmark-suite.live.spec.ts --workers=1",
     "benchmark:suite:full": "BENCHMARK_SUITE_LIVE=1 BENCHMARK_SUITE_PROFILE=full BENCHMARK_BROWSER_MODE=headless playwright test tests/benchmark-suite.live.spec.ts --workers=1",

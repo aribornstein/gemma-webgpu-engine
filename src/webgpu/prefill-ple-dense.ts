@@ -9,6 +9,7 @@ export interface GemmaPrefillPleDenseGeometry {
   rows: number;
   inFeatures: number;
   outFeatures: number;
+  outputRowsPerWorkgroup?: 1 | 2;
 }
 
 export interface GemmaPrefillPleDensePipeline extends GemmaPrefillPleDenseGeometry {
@@ -43,7 +44,8 @@ export function getGemmaPrefillPleDensePipeline(
     devicePipelines = new Map();
     pipelineCache.set(device, devicePipelines);
   }
-  const key = `${geometry.rows}:${geometry.inFeatures}:${geometry.outFeatures}`;
+  const key = `${geometry.rows}:${geometry.inFeatures}:${geometry.outFeatures}:` +
+    `${geometry.outputRowsPerWorkgroup ?? "auto"}`;
   const cached = devicePipelines.get(key);
   if (cached) return cached;
   const compiled = compileGemmaPrefillPleDensePipeline(device, geometry).catch((error) => {
@@ -59,7 +61,8 @@ export async function compileGemmaPrefillPleDensePipeline(
   geometry: GemmaPrefillPleDenseGeometry,
 ): Promise<GemmaPrefillPleDensePipeline> {
   validateGeometry(geometry);
-  const outputRowsPerWorkgroup = geometry.outFeatures >= 1024 ? 2 : 1;
+  const outputRowsPerWorkgroup = geometry.outputRowsPerWorkgroup ??
+    (geometry.outFeatures >= 1024 ? 2 : 1);
   const pipeline = await device.createComputePipelineAsync({
     label: `Gemma prefill PLE dense ${geometry.inFeatures}x${geometry.outFeatures}`,
     layout: "auto",
@@ -255,7 +258,9 @@ function validateGeometry(geometry: GemmaPrefillPleDenseGeometry): void {
   if (!Number.isInteger(geometry.rows) || geometry.rows < 1 ||
       !Number.isInteger(geometry.inFeatures) || geometry.inFeatures < 4 ||
       geometry.inFeatures % 4 !== 0 ||
-      !Number.isInteger(geometry.outFeatures) || geometry.outFeatures < 1) {
+      !Number.isInteger(geometry.outFeatures) || geometry.outFeatures < 1 ||
+      (geometry.outputRowsPerWorkgroup !== undefined &&
+        geometry.outputRowsPerWorkgroup !== 1 && geometry.outputRowsPerWorkgroup !== 2)) {
     throw new Error("Gemma prefill PLE dense geometry is invalid");
   }
 }

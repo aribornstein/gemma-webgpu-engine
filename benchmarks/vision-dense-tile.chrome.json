@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-07-18T07:27:30.345Z",
+  "browser": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+  "adapterInfo": {},
+  "geometry": {
+    "rows": 2520,
+    "hiddenSize": 768,
+    "layerIndex": 0
+  },
+  "methodology": {
+    "clock": "host-performance-now-around-submit-and-onSubmittedWorkDone",
+    "samplesPerMode": 10,
+    "order": "alternating-balanced",
+    "setupExcluded": true,
+    "readbackExcluded": true
+  },
+  "exactness": {
+    "outputBitMismatches": 0
+  },
+  "modes": {
+    "baselineOneRow": {
+      "samplesMs": [
+        323.89999997615814,
+        317.2000000476837,
+        320.5,
+        314.10000002384186,
+        318.7999999523163,
+        310.10000002384186,
+        315.2999999523163,
+        316.39999997615814,
+        314.09999990463257,
+        317.2999999523163
+      ],
+      "medianMs": 316.80000001192093,
+      "p95Ms": 322.36999998688697
+    },
+    "optimizedTwoRows": {
+      "samplesMs": [
+        283.60000002384186,
+        293.60000002384186,
+        274.6999999284744,
+        287.2000000476837,
+        275.2999999523163,
+        267.10000002384186,
+        266.60000002384186,
+        269.7000000476837,
+        269.89999997615814,
+        268.7999999523163
+      ],
+      "medianMs": 272.2999999523163,
+      "p95Ms": 290.72000003457066
+    }
+  },
+  "comparison": {
+    "medianSpeedup": 1.1634226958038827,
+    "p95Speedup": 1.1088676387883623,
+    "promoted": true
+  }
+}

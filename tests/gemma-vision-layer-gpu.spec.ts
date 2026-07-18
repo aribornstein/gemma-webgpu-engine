@@ -77,6 +77,7 @@ test("executes real Gemma vision layer 0 deterministically on WebGPU", async ({ 
         changed,
         finite,
         rowDistance,
+        queryOutputRowsPerWorkgroup: resources.query.pipeline.outputRowsPerWorkgroup,
         sourceBytes: weights.sourceBytes,
         gpuError: internalError?.message ?? validationError?.message ?? null,
       };
@@ -93,4 +94,5 @@ test("executes real Gemma vision layer 0 deterministically on WebGPU", async ({ 
   expect(result.changed).toBeGreaterThan(1400);
   expect(result.finite).toBe(true);
   expect(result.rowDistance).toBeGreaterThan(1);
+  expect(result.queryOutputRowsPerWorkgroup).toBe(2);
 });

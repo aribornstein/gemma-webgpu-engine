@@ -86,12 +86,17 @@ export interface GemmaVisionLayerResources {
   ownedBuffers: GPUBuffer[];
 }
 
+export interface GemmaVisionLayerOptions {
+  hiddenProjectionRowsPerWorkgroup?: 1 | 2;
+}
+
 export async function createGemmaVisionLayerResources(
   device: GPUDevice,
   hidden: GPUBuffer,
   rows: number,
   positions: Int32Array,
   weights: GemmaVisionLayerWeights,
+  options: GemmaVisionLayerOptions = {},
 ): Promise<GemmaVisionLayerResources> {
   if (!Number.isInteger(rows) || rows < 1 || rows > 2520 ||
       positions.length < rows * 2 || hidden.size < rows * HIDDEN_SIZE * 4) {
@@ -155,6 +160,9 @@ export async function createGemmaVisionLayerResources(
       rows,
       inFeatures,
       outFeatures,
+      outputRowsPerWorkgroup: outFeatures === HIDDEN_SIZE
+        ? options.hiddenProjectionRowsPerWorkgroup ?? 2
+        : undefined,
     });
     const codes = upload(`${label} signed-I8 weights`, projection.packedWeights);
     const rowScales = upload(`${label} row scales`, projection.rowScales);

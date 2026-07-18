@@ -235,8 +235,15 @@ postprocessing, and retained CPU vision-weight memory. A cold quality-tier reque
 cached entries from 180.3 MiB of source weights and retained 211.6 MiB of materialized CPU arrays.
 Thirteen additional same-session requests held that value and 1186.8 MiB of GPU buffers constant;
 the ten-run extension completed without browser or request errors and measured 5.4-5.8 seconds of
-warm vision work. GPU layer optimization and longer mixed-image, cancellation, and destruction
-soak testing remain open.
+warm vision work. The promoted two-output-row dense tile keeps exact output bits while improving
+the 2,520-patch layer-0 median from 316.80 to 272.30 ms (`1.16x`) and p95 from 322.37 to 290.72 ms
+(`1.11x`) across ten alternating samples per mode. A two-image, three-budget lifecycle soak then
+measured 4.29-4.39 seconds of maximum-budget layer execution, completed six mixed requests,
+cancelled after layer two, recovered on the same device, and retained exactly 211.6 MiB of
+materialized vision weights without WebGPU errors. Raw evidence is retained in
+[the dense-tile A/B artifact](benchmarks/vision-dense-tile.chrome.json) and
+[the lifecycle-soak artifact](benchmarks/vision-lifecycle-soak.chrome.json); rerun both with
+`npm run benchmark:vision`.
 
 Each preprocessed image receives a SHA-256 identity over its exact resized RGB bytes, dimensions,
 and visual-token budget. Multimodal K/V reuse requires the same ordered identity list and the same
@@ -311,8 +318,8 @@ The same artifact now includes Transformers.js 4.2.0 using the pinned ONNX Commu
 `q4f16` text-only export. It is a model-family comparison rather than file-identical execution:
 Transformers.js has much lower short-prompt TTFT, while the owned runtime decodes faster on the
 multi-token cases. The evidence does not support a blanket owned-runtime speedup claim. Automatic
-device-loss recovery, the first priority, is complete. Remaining work proceeds in this order:
-vision optimization; pinned audio; deterministic video frame ingestion; completion of the
+device-loss recovery and vision optimization, the first two priorities, are complete. Remaining
+work proceeds in this order: pinned audio; deterministic video frame ingestion; completion of the
 performance evidence; release reliability; promotion or rejection of remaining kernel candidates;
 the E4B compatibility audit; speculative decoding; and device-specific autotuning. See
 [PROJECT.md](PROJECT.md#execution-plan) for gates and details.

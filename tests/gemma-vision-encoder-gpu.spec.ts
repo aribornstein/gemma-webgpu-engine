@@ -132,3 +132,59 @@ test("rejects cancelled vision encoding before loading a layer", async ({ page }
     tensorReads: 0,
   });
 });
+
+test("stops vision encoding between completed layers when cancelled", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.goto("/");
+  const webGpuAvailable = await page.evaluate(() => Boolean(navigator.gpu));
+  test.skip(!webGpuAvailable, "Chrome does not expose WebGPU on this machine");
+
+  const result = await page.evaluate(async () => {
+    const sourcePath = "/src/model/pinned-safetensors.ts";
+    const devicePath = "/src/webgpu/device.ts";
+    const encoderPath = "/src/webgpu/vision-encoder.ts";
+    const [{ PinnedSafetensorsSource }, { getWebGpuDevice }, vision] =
+      await Promise.all([
+        import(sourcePath),
+        import(devicePath),
+        import(encoderPath),
+      ]);
+    const source = await PinnedSafetensorsSource.open();
+    const device = await getWebGpuDevice();
+    const hidden = device.createBuffer({
+      size: 768 * 4,
+      usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+    });
+    const controller = new AbortController();
+    const completed: number[] = [];
+    try {
+      await vision.runGemmaVisionEncoder(
+        device,
+        source,
+        hidden,
+        1,
+        new Int32Array([0, 0]),
+        (progress: { completedLayers: number }) => {
+          completed.push(progress.completedLayers);
+          if (progress.completedLayers === 2) {
+            controller.abort(new DOMException("vision cancelled", "AbortError"));
+          }
+        },
+        controller.signal,
+      );
+      return { error: null, completed };
+    } catch (error) {
+      return {
+        error: { name: (error as Error).name, message: (error as Error).message },
+        completed,
+      };
+    } finally {
+      hidden.destroy();
+    }
+  });
+
+  expect(result).toEqual({
+    error: { name: "AbortError", message: "vision cancelled" },
+    completed: [1, 2],
+  });
+});
