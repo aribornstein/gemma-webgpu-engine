@@ -178,6 +178,27 @@ test("applies editable generation examples", async ({ page }) => {
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toHaveValue(/"urgent"/);
   await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
 
+  await examples.selectOption("jerusalem-multilingual");
+  const languageLevel = page.getByLabel("Language level");
+  await expect(languageLevel).toHaveValue("A1");
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeChecked();
+  await expect(page.getByRole("spinbutton", { name: "Max tokens" })).toHaveValue("320");
+  await expect(page.getByRole("textbox", { name: "Message" })).not.toHaveValue(/[\u0590-\u05FF\u0600-\u06FF]/);
+  await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/generate the dialogue yourself/);
+  await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/Target A1/);
+  await expect(page.getByRole("textbox", { name: "JSON Schema" }))
+    .toHaveValue(/"level": \{\s+"const": "A1"[\s\S]*"visitor_request"[\s\S]*"local_direction"/);
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).not.toHaveValue(/route_plan/);
+  await languageLevel.selectOption("C3");
+  await expect(examples).toHaveValue("jerusalem-multilingual");
+  await expect(page.getByRole("textbox", { name: "Message" }))
+    .toHaveValue(/Target C3[\s\S]*experimental beyond-CEFR/);
+  await expect(page.getByRole("textbox", { name: "JSON Schema" }))
+    .toHaveValue(/"level": \{\s+"const": "C3"[\s\S]*"visitor_contextual_request"[\s\S]*"local_graceful_close"/);
+  await expect(page.getByRole("spinbutton", { name: "Max tokens" })).toHaveValue("768");
+  await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
+
   await examples.selectOption("reasoning-logic");
   await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/farmer.*fox.*chicken/s);
   await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeVisible();
@@ -345,6 +366,7 @@ test("shows only controls relevant to each example while Custom exposes all", as
   const probability = page.getByText("Probability and penalties", { exact: true });
   const constraintModes = page.getByRole("radiogroup", { name: "Output constraint" });
   const thinking = page.getByRole("checkbox", { name: "Thinking" });
+  const languageLevel = page.getByLabel("Language level");
 
   await expect(workspace.locator("optgroup").first()).toHaveAttribute("label", "Workspaces");
   await expect(workspace.locator("optgroup").last()).toHaveAttribute("label", "Examples");
@@ -357,6 +379,7 @@ test("shows only controls relevant to each example while Custom exposes all", as
   await expect(constraintModes).toBeVisible();
   await expect(thinking).toBeVisible();
   await expect(thinking).not.toBeChecked();
+  await expect(languageLevel).toBeHidden();
   await expect(page.getByRole("textbox", { name: "Stop token IDs" })).toBeVisible();
 
   await workspace.selectOption("greedy-colors");
@@ -393,7 +416,13 @@ test("shows only controls relevant to each example while Custom exposes all", as
   await workspace.selectOption("schema-triage");
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeVisible();
 
+  await workspace.selectOption("jerusalem-multilingual");
+  await expect(languageLevel).toBeVisible();
+  await expect(languageLevel).toHaveValue("A1");
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeVisible();
+
   await workspace.selectOption("schema-reasoning");
+  await expect(languageLevel).toBeHidden();
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeVisible();
   await expect(thinking).toBeVisible();
   await expect(thinking).toBeChecked();

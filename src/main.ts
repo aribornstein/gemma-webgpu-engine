@@ -104,6 +104,7 @@ interface GenerationExample {
   id: string;
   label: string;
   prompt: string;
+  languageLevel?: LanguageLevel;
   enableThinking?: boolean;
   requireReasoning?: boolean;
   controls: Partial<Record<GenerationExampleControl, number>>;
@@ -121,6 +122,73 @@ interface GenerationExample {
   constraint?: GenerationConstraint;
   expandProbabilityControls?: boolean;
   ui: ExampleUiProfile;
+}
+
+type LanguageLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2" | "C3";
+
+interface LanguageLevelProfile {
+  level: LanguageLevel;
+  label: string;
+  turns: readonly string[];
+  maxNewTokens: number;
+  guidance: string;
+}
+
+const MULTILINGUAL_EXAMPLE_ID = "jerusalem-multilingual";
+const LANGUAGE_LEVEL_PROFILES: readonly LanguageLevelProfile[] = [
+  { level: "A1", label: "A1", turns: ["visitor_request", "local_direction"], maxNewTokens: 128, guidance: "Use very short present-tense phrases and concrete high-frequency words." },
+  { level: "A2", label: "A2", turns: ["visitor_request", "local_two_step_direction", "visitor_confirmation"], maxNewTokens: 160, guidance: "Use a polite request, simple linked directions, basic connectors, and routine expressions." },
+  { level: "B1", label: "B1", turns: ["visitor_request", "local_landmark_direction", "visitor_distance_question", "local_distance_answer"], maxNewTokens: 224, guidance: "Use connected everyday language, a landmark, a reason for choosing the route, and a clear distance estimate." },
+  { level: "B2", label: "B2", turns: ["visitor_request", "local_precise_direction", "visitor_qualification", "local_alternative_route", "visitor_confirmation"], maxNewTokens: 288, guidance: "Use detailed spontaneous language, precise directions, a natural qualification, an alternative route, and varied connectors." },
+  { level: "C1", label: "C1", turns: ["visitor_contextual_request", "local_implied_route", "visitor_ambiguity_check", "local_polite_reformulation", "visitor_preference", "local_adjusted_advice"], maxNewTokens: 512, guidance: "Use fluent nuanced language, flexible structure, implicit local knowledge, polite register adjustment, and natural reformulation." },
+  { level: "C2", label: "C2", turns: ["visitor_nuanced_request", "local_route_distinction", "visitor_subtle_objection", "local_idiomatic_reformulation", "visitor_tradeoff_question", "local_precise_recommendation", "visitor_concise_acknowledgment"], maxNewTokens: 640, guidance: "Use precise idiomatic language, subtle distinctions between routes, concise reformulation, and controlled shifts of emphasis." },
+  { level: "C3", label: "C3 · experimental stress test", turns: ["visitor_contextual_request", "local_culturally_embedded_route", "visitor_ambiguity_check", "local_landmark_clarification", "visitor_alternative_request", "local_tradeoff_explanation", "visitor_rhetorical_reformulation", "local_graceful_close"], maxNewTokens: 768, guidance: "Use an experimental beyond-CEFR register with culturally embedded phrasing, rhetorical control, compression, fine-grained route nuance, and a graceful close." },
+];
+
+function multilingualExample(level: LanguageLevel): GenerationExample {
+  const profile = LANGUAGE_LEVEL_PROFILES.find((candidate) => candidate.level === level);
+  if (!profile) throw new Error(`Unsupported language level ${level}`);
+  const languageSchema = (pattern: string) => ({
+    type: "object",
+    properties: Object.fromEntries(profile.turns.map((turn) => [turn, { type: "string", pattern }])),
+    required: [...profile.turns],
+    additionalProperties: false,
+  });
+  return {
+    id: MULTILINGUAL_EXAMPLE_ID,
+    label: "Jerusalem bilingual · Constrained structure",
+    languageLevel: level,
+    enableThinking: true,
+    requireReasoning: true,
+    prompt: `Create parallel language practice for a visitor asking how to walk from Damascus Gate to the market in Jerusalem. Keep the route walkable inside the Old City; do not invent transit systems, waterways, or distant neighborhoods. Write modern Israeli Hebrew and natural Jerusalem Palestinian colloquial Arabic. Target ${level}. ${profile.guidance} Plan the shared meaning of each paired turn in English, draft each language independently, and verify grammar, natural local usage, and semantic alignment before answering. Script separation is strict: every value in hebrew must use Hebrew script with no Arabic letters, and every value in jerusalem_arabic must use Arabic script with no Hebrew letters. Do not transliterate. Return JSON only with exactly these root keys in order: level, hebrew, jerusalem_arabic, english_note. The hebrew and jerusalem_arabic objects must each contain exactly these parallel turn keys in order: ${profile.turns.join(", ")}. Write one distinct speaker turn per value, matched by key across languages and expressed naturally rather than word-for-word. In english_note, briefly identify the complexity features used. Do not quote, translate, or imitate a supplied example; generate the dialogue yourself.`,
+    controls: {
+      temperature: 0.4,
+      maxNewTokens: Math.max(320, profile.maxNewTokens),
+      topK: 40,
+      topP: 0.9,
+      repetitionPenalty: 1.08,
+      seed: 23,
+    },
+    constraint: {
+      type: "json-schema",
+      maxDepth: 3,
+      whitespace: "compact",
+      schema: {
+        type: "object",
+        properties: {
+          level: { const: level },
+          hebrew: languageSchema(String.raw`^[\u0590-\u05FF ,:;()'’-]+[.?!]$`),
+          jerusalem_arabic: languageSchema(
+            String.raw`^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF ,:;()'’-]+[.?!؟]$`,
+          ),
+          english_note: { type: "string" },
+        },
+        required: ["level", "hebrew", "jerusalem_arabic", "english_note"],
+        additionalProperties: false,
+      },
+    },
+    ui: { vision: false, sampling: true, constraint: "json-schema" },
+  };
 }
 
 const GENERATION_EXAMPLES: readonly GenerationExample[] = [
@@ -264,6 +332,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
     },
     ui: { vision: false, sampling: false, constraint: "json-schema" },
   },
+  multilingualExample("A1"),
   {
     id: "reasoning-logic",
     label: "River crossing · Reasoning",
@@ -364,6 +433,12 @@ app.innerHTML = `
           <optgroup label="Examples">
             ${GENERATION_EXAMPLES.map(({ id, label }) => `<option value="${id}">${label}</option>`).join("")}
           </optgroup>
+        </select>
+      </label>
+
+      <label class="field example-parameter-picker" id="language-level-picker" hidden>Language level
+        <select id="language-level" name="languageLevel">
+          ${LANGUAGE_LEVEL_PROFILES.map(({ level, label }) => `<option value="${level}">${label}</option>`).join("")}
         </select>
       </label>
 
@@ -613,6 +688,8 @@ const resetButton = element<HTMLButtonElement>("reset-controls");
 const generationForm = element<HTMLFormElement>("generation-form");
 const controlsForm = element<HTMLFormElement>("controls-form");
 const exampleSelect = element<HTMLSelectElement>("generation-example");
+const languageLevelPicker = element<HTMLLabelElement>("language-level-picker");
+const languageLevelInput = element<HTMLSelectElement>("language-level");
 const promptInput = element<HTMLTextAreaElement>("prompt");
 const imageInput = element<HTMLInputElement>("image-input");
 const audioInput = element<HTMLInputElement>("audio-input");
@@ -736,6 +813,10 @@ exampleSelect.addEventListener("change", () => {
   }
   const example = GENERATION_EXAMPLES.find(({ id }) => id === exampleSelect.value);
   if (example) void selectGenerationExample(example);
+});
+languageLevelInput.addEventListener("change", () => {
+  if (activeExample?.id !== MULTILINGUAL_EXAMPLE_ID) return;
+  void selectGenerationExample(multilingualExample(languageLevelInput.value as LanguageLevel));
 });
 generationForm.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -953,6 +1034,7 @@ function setBenchmarkRunning(running: boolean): void {
   newChatButton.disabled = running || !hasConversationState();
   generateButton.disabled = running || !session;
   exampleSelect.disabled = running;
+  languageLevelInput.disabled = running;
   promptInput.disabled = running;
   imageInput.disabled = running;
   removeImageButton.disabled = running;
@@ -1553,6 +1635,8 @@ function renderConsoleProfile(): void {
     ? "Messages"
     : "Transcript";
   generateButton.textContent = profile.workspace === "chat" ? "Send" : "Generate";
+  languageLevelPicker.hidden = activeExample?.id !== MULTILINGUAL_EXAMPLE_ID;
+  if (activeExample?.languageLevel) languageLevelInput.value = activeExample.languageLevel;
   promptInput.rows = profile.workspace === "chat" ? 3 : 6;
   imageControls.hidden = !profile.vision && !profile.audio && !profile.video;
   imagePicker.hidden = !profile.vision;
@@ -1677,6 +1761,7 @@ function setGenerating(generating: boolean): void {
   newChatButton.disabled = generating || !hasConversationState();
   clearTranscriptButton.disabled = generating;
   exampleSelect.disabled = generating;
+  languageLevelInput.disabled = generating;
   promptInput.disabled = generating;
   imageInput.disabled = generating;
   audioInput.disabled = generating;

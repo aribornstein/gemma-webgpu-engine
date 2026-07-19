@@ -351,7 +351,8 @@ h3 {
   max-height: 55vh;
 }
 
-.example-picker {
+.example-picker,
+.example-parameter-picker {
   grid-template-columns: 74px minmax(0, 1fr);
   align-items: center;
   margin-bottom: 15px;
@@ -361,8 +362,13 @@ h3 {
   text-transform: uppercase;
 }
 
-.example-picker select {
+.example-picker select,
+.example-parameter-picker select {
   text-transform: none;
+}
+
+.example-parameter-picker {
+  grid-template-columns: 110px minmax(0, 1fr);
 }
 
 .field {

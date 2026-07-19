@@ -199,7 +199,16 @@ after `<channel|>`; otherwise the direct final answer is constrained from its fi
 The console owns one persistent session and exposes exact greedy or seeded sampling, every penalty
 and probability control, custom stop IDs, regex/JSON/closed-schema constraints, streamed output,
 and cancellation. Editable examples populate the prompt and matching controls for greedy, sampling,
-regex, bounded JSON, closed JSON Schema, and reasoning-backed Schema generation. Custom retains every control, while Chat
+regex, bounded JSON, closed JSON Schema, multilingual Hebrew/Jerusalem Arabic level comparison,
+and reasoning-backed Schema generation. The multilingual example requires a bounded reasoning pass,
+then scales its closed dialogue schema
+from A1 through official CEFR C2, plus an explicitly experimental C3 stress test, and constrains each
+language to its Unicode script. All Hebrew and Arabic utterances remain model-generated: the prompt
+and schema contain no example dialogue, phrase bank, prescribed translation, or language-string
+constant. The schema guarantees shape and script separation, not linguistic correctness, semantic
+alignment, translation equivalence, or CEFR conformance. In particular, E2B multilingual output
+still requires native-speaker review; the example exposes that model limit instead of hiding it. Its reasoning and final answer
+share the output-token budget, so A1 reserves 320 output tokens. Custom retains every control, while Chat
 provides persistent multimodal history, user-turn editing/regeneration, a canonical Thinking toggle,
 collapsed reasoning disclosures, and reasoning-token telemetry. Examples expose only controls that
 affect their fixed scenario, and long-context diagnostics remain collapsed until requested. Its
@@ -637,10 +646,10 @@ type GenerationConstraint =
 		};
 ```
 
-Generic JSON accepts any JSON root value. JSON Object requires an object root while allowing model-chosen keys and arbitrary nested JSON values. JSON Schema is the preferred contract for closed decision payloads. Regex constraints target regular output formats and deliberately reject assertions and backreferences. Nested JSON uses a bounded grammar rather than pretending an unbounded JSON language is regular. The supported schema subset includes `type`, `const`, `enum`, `oneOf`, `anyOf`, closed objects whose declared properties are all required, and bounded homogeneous arrays. Unknown keywords, references, optional/open schema properties, and other unsupported constructs fail configuration explicitly.
+Generic JSON accepts any JSON root value. JSON Object requires an object root while allowing model-chosen keys and arbitrary nested JSON values. JSON Schema is the preferred contract for closed decision payloads. Regex constraints target regular output formats and deliberately reject assertions and backreferences. Nested JSON uses a bounded grammar rather than pretending an unbounded JSON language is regular. The supported schema subset includes `type`, `const`, `enum`, `oneOf`, `anyOf`, closed objects whose declared properties are all required, bounded homogeneous arrays, and anchored full-string `pattern` constraints over direct JSON characters. String patterns that are unanchored or admit JSON escapes/control characters fail configuration explicitly, as do unknown keywords, references, optional/open schema properties, and other unsupported constructs.
 
 Constraints operate on the exact tokenizer's UTF-8 token bytes, including partial multi-byte characters across token boundaries. A token trie and minimized DFA determine legal token IDs for each state. The current correctness-first path masks the resident CPU logits before top-k/min-p/typical-p/top-p filtering and sampling; GPU candidate masking remains a performance milestone. EOS and configured stop tokens are legal only in an accepting state, dead ends are explicit errors, and regex, JSON, and AJV schema checks validate final output independently.
 
 Constrained decoding does not reduce the cost of Gemma's transformer pass by itself. Its expected end-to-end gains come from preventing malformed output and retries, stopping at the first complete accepted payload, reducing sampling/readback work, and producing fewer unnecessary tokens. Performance claims require measured constrained and unconstrained runs with the same prompt and output contract.
 
-Focused browser tests cover trie pruning, full-match regex behavior, split-token UTF-8, invalid syntax, bounded JSON, open object roots, the closed schema subset, unsupported constructs, and masking. Live cached-model gates produced exact constrained `Hi!` and `{"ok":true}` outputs plus an open Paris object with model-chosen keys, streaming/JSON parity, and no WebGPU validation or internal errors.
+Focused browser tests cover trie pruning, full-match regex behavior, split-token UTF-8, invalid syntax, bounded JSON, open object roots, anchored schema string patterns, the closed schema subset, unsupported constructs, and masking. Live cached-model gates produced exact constrained `Hi!` and `{"ok":true}` outputs, an open Paris object with model-chosen keys, and script-pure A1/C3 Jerusalem dialogues with level-specific schemas, streaming/JSON parity, and no WebGPU validation or internal errors.

@@ -387,7 +387,7 @@ function schemaPattern(
     throw new Error("JSON Schema constraint requires type, const, enum, oneOf, or anyOf");
   }
   return alternate(types.map((type) => {
-    if (type === "string") return JSON_STRING;
+    if (type === "string") return schemaStringPattern(schema);
     if (type === "number") return JSON_NUMBER;
     if (type === "integer") return JSON_INTEGER;
     if (type === "boolean") return "(?:true|false)";
@@ -396,6 +396,26 @@ function schemaPattern(
     if (type === "object") return schemaObjectPattern(schema, maxDepth, whitespace, depth);
     throw new Error(`Unsupported JSON Schema type: ${String(type)}`);
   }));
+}
+
+function schemaStringPattern(schema: JsonSchema): string {
+  if (schema.pattern === undefined) return JSON_STRING;
+  if (typeof schema.pattern !== "string") {
+    throw new Error("JSON Schema string pattern must be a string");
+  }
+  if (!schema.pattern.startsWith("^") || !schema.pattern.endsWith("$")) {
+    throw new Error("JSON Schema string pattern must be anchored with ^ and $");
+  }
+  let expression: RegExp;
+  try {
+    expression = new RegExp(schema.pattern, "u");
+  } catch (error) {
+    throw new Error(`Invalid JSON Schema string pattern: ${errorMessage(error)}`);
+  }
+  if (["\"", "\\", "\n", "\r", "\t"].some((value) => expression.test(value))) {
+    throw new Error("JSON Schema string pattern cannot admit JSON escapes or control characters");
+  }
+  return `"${schema.pattern.slice(1, -1)}"`;
 }
 
 function schemaArrayPattern(
@@ -457,7 +477,7 @@ function schemaObjectPattern(
 function assertSchemaKeywords(schema: JsonSchema): void {
   const supported = new Set([
     "$schema", "title", "description", "default", "examples",
-    "type", "const", "enum", "oneOf", "anyOf",
+    "type", "const", "enum", "oneOf", "anyOf", "pattern",
     "properties", "required", "additionalProperties",
     "items", "minItems", "maxItems",
   ]);

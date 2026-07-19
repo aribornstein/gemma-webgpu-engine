@@ -113,6 +113,26 @@ test("enforces the supported closed JSON Schema subset", () => {
   )).toThrow("violates the generation constraint");
 });
 
+test("enforces anchored string patterns while generating schema values", () => {
+  const schema = {
+    type: "object",
+    properties: {
+      hebrew: { type: "string", pattern: String.raw`^[\u0590-\u05FF ?!]+$` },
+      arabic: { type: "string", pattern: String.raw`^[\u0600-\u06FF ?!]+$` },
+    },
+    required: ["hebrew", "arabic"],
+    additionalProperties: false,
+  };
+  acceptText(
+    { type: "json-schema", schema, whitespace: "none" },
+    "{\"hebrew\":\"שלום!\",\"arabic\":\"مرحبا!\"}",
+  );
+  expect(() => acceptText(
+    { type: "json-schema", schema, whitespace: "none" },
+    "{\"hebrew\":\"שלום!\",\"arabic\":\"איך أمشي؟\"}",
+  )).toThrow("violates the generation constraint");
+});
+
 test("rejects unsupported regular and schema constructs", () => {
   expect(() => compileGenerationConstraint({ type: "regex", pattern: "a(?=b)" })).toThrow(
     "Unsupported generation constraint",
@@ -132,7 +152,7 @@ test("rejects unsupported regular and schema constructs", () => {
   expect(() => compileGenerationConstraint({
     type: "json-schema",
     schema: { type: "string", pattern: "[a-z]+" },
-  })).toThrow("Unsupported JSON Schema keywords: pattern");
+  })).toThrow("must be anchored");
 });
 
 test("masks logits to legal and accepting-state termination tokens", () => {
