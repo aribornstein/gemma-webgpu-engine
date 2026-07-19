@@ -50,6 +50,12 @@ terminal with:
 tail -f benchmarks/suite/headless/<timestamp>-full/progress.json
 ```
 
+The browser status page polls the same file once per second. Select a run with:
+
+```text
+http://127.0.0.1:5174/benchmark-status.html?run=benchmarks/suite/headless/<timestamp>-full
+```
+
 The top-level count uses `progressUnit: "measured-runs"`: it counts durable result rows, not model
 loads, calibration, or warmups, so it is not a wall-clock percentage while setup is active. During
 warmup, `phaseProgress` reports the current workload index, retry attempt, and completed warmup
@@ -75,9 +81,9 @@ conversation modes, the affected runtime is relaunched and warmed before the sch
 ## Workloads And Modes
 
 The full deterministic matrix targets input/output token counts of `32/32`, `32/128`, `32/512`,
-`256/128`, `1,024/128`, `4,096/128`, and `8,192/128` when the runtime context supports the input plus
-output. Prompt padding is calibrated with each runtime's own input tokenizer when exposed. Generated
-text is retokenized with that runtime's raw-output tokenizer path.
+`153/128`, `256/128`, `639/128`, `1,024/128`, `4,096/128`, and `8,192/128` when the runtime context
+supports the input plus output. Prompt padding is calibrated with each runtime's own input tokenizer
+when exposed. Generated text is retokenized with that runtime's raw-output tokenizer path.
 
 The four modes are:
 
@@ -134,8 +140,18 @@ The latest synthetic structure check is under `benchmarks/suite-smoke/headless/`
   arbitrary prompt tokenization or EOS suppression. Its nominal 4,096-token deterministic prompt
   expands to 9,711 LiteRT tokens and exceeds the 8,192-token context, so LiteRT 4K/8K rows are
   reported as unsupported. Native prefill/decode counters remain native.
-- The pinned Hugging Face browser bundle is absent. The adapter reports unavailable and does not
-  substitute prior evidence or another model artifact.
+- The pinned Hugging Face adapter loads immutable upstream source revision
+  `158f16ae0f672943ca304d59c47c8e3a264e399e` through a Blob module and routes model requests to the
+  exact local snapshot. The upstream API exposes aggregate readiness but not separate parse,
+  upload, graph-creation, or compile stages, and fixes its default KV capacity at 8,192 tokens.
 - Browser Battery Status may be unavailable. In that case power source is recorded as `unknown`.
 - CDP can observe aggregate transfer activity during load, but runtime-internal parse/upload/compile
   boundaries remain null unless the runtime exposes them.
+
+## Latest Full Evidence
+
+The completed Chromium 150 / Apple M4 run is
+[`2026-07-18T13-53-16-717Z-full`](suite/headless/2026-07-18T13-53-16-717Z-full/report.md): 2,094
+measured records, 810 planned Transformers.js skips, 1,422 equal-work-eligible records, and 30
+retained pinned-runtime errors. The report must be read with its correctness table: materially short
+outputs remain durable evidence but are not promoted into equal-work performance aggregates.

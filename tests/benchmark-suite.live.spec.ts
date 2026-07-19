@@ -16,7 +16,11 @@ import type {
 } from "../src/benchmark/suite/types";
 import { createBenchmarkWorkloads, createSmokeWorkload } from "../src/benchmark/suite/workloads";
 
-type RuntimeId = "owned-webgpu" | "transformers-js" | "litert-lm-web";
+type RuntimeId =
+  | "owned-webgpu"
+  | "transformers-js"
+  | "litert-lm-web"
+  | "pinned-hugging-face-webgpu";
 
 const ENABLED = process.env.BENCHMARK_SUITE_LIVE === "1";
 const PROFILE = process.env.BENCHMARK_SUITE_PROFILE === "smoke" ? "smoke" : "full";
@@ -28,12 +32,12 @@ const FULL_LIMITATIONS = [
   "Track B compares complete deployable browser stacks and does not isolate library implementation performance.",
   "Token counts are runtime-tokenizer-specific; cross-artifact tokens/second is not a unit-invariant measure.",
   "LiteRT-LM exposes chunk callbacks rather than guaranteed token callbacks, so only chunk intervals are reported.",
-  "Pinned Hugging Face current-browser execution is unavailable because its pinned browser bundle is absent.",
+  "The pinned Hugging Face runtime is loaded from its immutable upstream browser bundle because the raw host serves it with a non-module MIME type.",
   "The 8,192-token input row is executed only by runtimes whose configured context can also hold the requested output.",
 ];
 
 test.skip(!ENABLED, "Set BENCHMARK_SUITE_LIVE=1 to run multi-GB rigorous benchmarks");
-test.setTimeout(8 * 60 * 60_000);
+test.setTimeout((PROFILE === "full" ? 24 : 8) * 60 * 60_000);
 
 test("runs the reproducible browser benchmark suite", async () => {
   const profile = PROFILE === "smoke"
@@ -134,7 +138,7 @@ test("runs the reproducible browser benchmark suite", async () => {
       const initialized = await initializeRuntime(instance.page, entry.runtimeId as RuntimeId, {
         mode: "network-cold-startup",
         cacheCapacity: contextCapacity(entry.runtimeId),
-        ...(entry.runtimeId === "owned-webgpu" ? { sourceUrl: "/models/gemma-4-e2b/model.safetensors" } : {}),
+        ...(usesLocalSafetensors(entry.runtimeId) ? { sourceUrl: "/models/gemma-4-e2b/model.safetensors" } : {}),
       });
       const network = await monitor.finish();
       await applyNetworkObservation(instance.page, network.bytes, network.durationMs);
@@ -172,7 +176,7 @@ test("runs the reproducible browser benchmark suite", async () => {
       const initialized = await initializeRuntime(instance.page, entry.runtimeId as RuntimeId, {
         mode: "cached-cold-startup",
         cacheCapacity: contextCapacity(entry.runtimeId),
-        ...(entry.runtimeId === "owned-webgpu" ? { sourceUrl: "/models/gemma-4-e2b/model.safetensors" } : {}),
+        ...(usesLocalSafetensors(entry.runtimeId) ? { sourceUrl: "/models/gemma-4-e2b/model.safetensors" } : {}),
       });
       const network = await monitor.finish();
       await applyNetworkObservation(instance.page, network.bytes, network.durationMs);
@@ -582,7 +586,7 @@ async function recoverWarmRuntime(
   const initialized = await initializeRuntime(instance.page, runtimeId, {
     mode: "cached-cold-startup",
     cacheCapacity: contextCapacity(runtimeId),
-    ...(runtimeId === "owned-webgpu" ? { sourceUrl: "/models/gemma-4-e2b/model.safetensors" } : {}),
+    ...(usesLocalSafetensors(runtimeId) ? { sourceUrl: "/models/gemma-4-e2b/model.safetensors" } : {}),
   });
   const supportedWorkloads = workloads.filter((workload) => supportsWorkload(runtimeId, workload));
   for (const [workloadOffset, workload] of supportedWorkloads.entries()) {
@@ -853,8 +857,17 @@ function contextCapacity(runtimeId: string): number {
   return runtimeId === "transformers-js" ? 16384 : 8192;
 }
 
+function usesLocalSafetensors(runtimeId: string): boolean {
+  return runtimeId === "owned-webgpu" || runtimeId === "pinned-hugging-face-webgpu";
+}
+
 function parseRuntimeIds(value: string | undefined): RuntimeId[] {
-  const allowed = new Set<RuntimeId>(["owned-webgpu", "transformers-js", "litert-lm-web"]);
+  const allowed = new Set<RuntimeId>([
+    "owned-webgpu",
+    "transformers-js",
+    "litert-lm-web",
+    "pinned-hugging-face-webgpu",
+  ]);
   const selected = value?.split(",").map((item) => item.trim()).filter(Boolean) ?? [...allowed];
   for (const runtimeId of selected) {
     if (!allowed.has(runtimeId as RuntimeId)) throw new Error(`Unknown benchmark runtime: ${runtimeId}`);

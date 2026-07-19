@@ -350,44 +350,52 @@ combined.
 
 ### Full-run comparison
 
-![Six-metric comparison of Owned WebGPU and LiteRT-LM Web on the warm 32-input/512-output workload](benchmarks/full-suite-warm-comparison.svg)
+![Owned WebGPU full-control runtime compared in greedy mode with Xenova's greedy-only optimized WebGPU path and LiteRT-LM Web](benchmarks/full-suite-warm-comparison.svg)
 
-The clearest matched long-decode comparison uses the full suite's warm steady-state
-`input-32-output-512` workload. Values are medians of 30 valid headless Chrome 150 runs per
-available runtime on Apple M4. Lower latency is better; higher throughput is better.
+The completed current-browser suite retained 2,094 measured records across owned WebGPU, Xenova
+(Greedy) from the immutable pinned Hugging Face WebGPU bundle, Transformers.js, and LiteRT-LM Web. The clearest
+matched long-decode row is warm steady-state `input-32-output-512`: medians of 30 equal-work
+eligible headless Chrome 150 runs on Apple M4. Lower latency is better; higher throughput is better.
+This is a greedy-mode speed comparison, not a feature-equivalent runtime ranking. Owned WebGPU is
+the full-control engine: its shared transformer path supports exact greedy decoding, seeded sampling,
+probability and penalty controls, and tokenizer-aware constrained decoding. The specialized Xenova
+WebGPU path is optimized for greedy decoding only and does not support sampling or constraints.
 
-| Metric | Owned WebGPU | LiteRT-LM Web | Transformers.js |
-| --- | ---: | ---: | ---: |
-| **TTFT** | **479.70 ms** | **155.65 ms** | unavailable |
-| **TPOT** | **19.47 ms/token** | **27.54 ms/token** | unavailable |
-| **ITL** | **19.20 ms** | not comparable | unavailable |
-| **Decode** | **9.93 s** | **14.07 s** | unavailable |
-| **Decode tok/s** | **51.37 tok/s** | **36.31 tok/s** | unavailable |
-| **Overall tok/s** | **49.44 tok/s** | **36.07 tok/s** | unavailable |
+| Metric | Owned WebGPU (full control) | Xenova (greedy only) | LiteRT-LM Web | Transformers.js |
+| --- | ---: | ---: | ---: | ---: |
+| **TTFT** | 413.10 ms | 284.55 ms | 123.30 ms | unavailable |
+| **Total** | 10.12 s | 8.11 s | 12.88 s | unavailable |
+| **Decode tok/s** | 52.56 tok/s | 65.27 tok/s | 40.08 tok/s | unavailable |
+| **Characters/s** | 170.49 | 213.17 | 228.50 | unavailable |
 
-TTFT and completion use common external wall-clock boundaries. `Decode` here is wall time after
-the first visible output, not a runtime-native model-evaluation counter. TPOT is the decode wall
-time per post-first-output token. Owned WebGPU emits one callback per token, so its stream intervals
-support ITL; LiteRT-LM exposes chunk callbacks with no one-token guarantee, so its chunk interval is
-not mislabeled as ITL. Overall throughput includes prefill and every emitted output token.
-Transformers.js is unavailable in this warm comparison because sustained ONNX WebGPU generation
-failed qualification; its six successful cold-start records remain in the full report. See the
-[complete 1,008-record report](benchmarks/suite/headless/2026-07-17T16-22-56-126Z-full/report.md)
-for every workload, mode, exclusion, and limitation.
+TTFT and completion use common external wall-clock boundaries. Decode throughput uses each
+runtime's retokenized output, while characters per second is retained because the model-family
+artifacts use different tokenizers. Within this greedy-only row, Xenova has lower TTFT and total
+latency and higher decode throughput, while LiteRT-LM has the lowest TTFT. Owned has lower total
+latency and higher decode throughput than LiteRT-LM while retaining sampling and constrained
+decoding over the same owned engine. Xenova's numbers are therefore a specialized greedy baseline,
+not evidence of a better general-purpose decoding runtime.
+
+Transformers.js produced six valid cold-start records, then failed warm setup three times in ONNX
+Runtime WebGPU; its remaining 810 scheduled warm and conversation entries are explicit skips. The
+pinned runtime's reused-cache 4,096-token conversation path produced 30 retained invalid records
+because no DenseGemv variant accepted that shape. Owned returned valid output there but stopped
+materially short, so its 4,096-token rows are excluded from equal-work aggregates. See the
+[complete 2,094-record report](benchmarks/suite/headless/2026-07-18T13-53-16-717Z-full/report.md)
+for every workload, mode, exclusion, correctness result, and limitation.
 
 ## Roadmap
 
-The current-browser owned-versus-LiteRT-LM run is recorded in
+The current-browser four-runtime run is recorded in
 [benchmarks/BENCHMARK_RESULTS.md](benchmarks/BENCHMARK_RESULTS.md), with raw samples in
-[benchmarks/e2b-performance-proof.chrome.json](benchmarks/e2b-performance-proof.chrome.json).
-The same artifact now includes Transformers.js 4.2.0 using the pinned ONNX Community Gemma 4 E2B
-`q4f16` text-only export. It is a model-family comparison rather than file-identical execution:
-Transformers.js has much lower short-prompt TTFT, while the owned runtime decodes faster on the
-multi-token cases. The evidence does not support a blanket owned-runtime speedup claim. Automatic
-device-loss recovery and vision optimization, the first two priorities, are complete. Remaining
-work proceeds in this order: pinned audio; deterministic video frame ingestion; completion of the
-performance evidence; release reliability; promotion or rejection of remaining kernel candidates;
-the E4B compatibility audit; speculative decoding; and device-specific autotuning. See
+[benchmarks/suite/headless/2026-07-18T13-53-16-717Z-full/raw-results.jsonl](benchmarks/suite/headless/2026-07-18T13-53-16-717Z-full/raw-results.jsonl).
+Transformers.js 4.2.0 and LiteRT-LM use model-family artifacts rather than file-identical execution;
+the owned and pinned Hugging Face rows use the exact mobile-QAT snapshot. The evidence positions
+Owned as the broader full-control runtime, not as a blanket speed winner against a greedy-specialized
+path. Automatic device-loss recovery, vision, audio, video, and the performance-evidence milestone
+are complete. Remaining work proceeds with release
+reliability, promotion or rejection of remaining kernel candidates, the E4B compatibility audit,
+speculative decoding, and device-specific autotuning. See
 [PROJECT.md](PROJECT.md#execution-plan) for gates and details.
 
 The contextual Custom/Chat console, safe history editing, content-identified multimodal prefix

@@ -1,12 +1,59 @@
 # Gemma 4 E2B Browser Performance Proof
 
-Captured: 2026-07-17T11:46:54.890Z
+Captured: 2026-07-19T01:27:52.857Z
 
-Status: **partial**
+Status: **complete with retained exclusions and runtime limitations**
 
 ## Verdict
 
 No blanket performance-superiority claim is supported. The tables below report the measured wins, losses, evidence gaps, and artifact-equivalence limits directly.
+
+## Current Full Suite
+
+The current-browser headless suite completed its deterministic schedule in 11.6 hours on Apple M4
+with Chromium 150. It retained 2,094 measured records, marked 810 Transformers.js warm and
+conversation entries as planned skips, and generated [JSON, Markdown, CSV, and HTML evidence](suite/headless/2026-07-18T13-53-16-717Z-full/report.md).
+
+- 1,422 records are valid for equal-work performance aggregation.
+- 672 records remain in correctness reporting but are excluded from equal-work aggregates: 642
+	materially short generations and 30 pinned-runtime errors.
+- Transformers.js produced six valid cold-start records. Its isolated eight-record smoke passed,
+	but full-profile warm setup failed three times in ONNX Runtime WebGPU buffer mapping; all 810
+	remaining entries were retained as explicit schedule skips.
+- The pinned Hugging Face runtime used immutable source revision
+	`158f16ae0f672943ca304d59c47c8e3a264e399e` and the exact local model snapshot. Its 4,096-token
+	fresh conversation runs succeeded, while all 30 reused-cache attempts failed because no
+	`DenseGemv` WebGPU variant accepted that shape.
+- Owned WebGPU emitted valid output rather than a runtime error at 4,096 tokens, but stopped at 13
+	output tokens, so those rows are not used for equal-work throughput claims.
+
+### Representative warm medians
+
+The 32-input/512-output row is the longest equal-work-eligible decode shared by owned, pinned, and
+LiteRT-LM in this run. Each value below is the median of 30 valid measurements.
+
+| Runtime | Artifact relation | TTFT | Total | Decode tok/s | Characters/s |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Owned WebGPU | exact mobile-QAT snapshot | 413.10 ms | 10.12 s | 52.56 | 170.49 |
+| Pinned Hugging Face WebGPU | exact mobile-QAT snapshot | 284.55 ms | 8.11 s | 65.27 | 213.17 |
+| LiteRT-LM Web | model-family optimized bundle | 123.30 ms | 12.88 s | 40.08 | 228.50 |
+| Transformers.js | model-family ONNX q4f16 | unavailable | unavailable | unavailable | unavailable |
+
+Pinned Hugging Face leads owned on all three token-based latency/throughput columns. LiteRT-LM
+has the lowest TTFT; owned completes sooner and decodes faster than LiteRT-LM on this row.
+Characters per second is retained beside tokenizer-specific token throughput. These mixed outcomes
+are why the verdict remains qualified rather than a blanket speedup claim.
+
+The detailed report also includes 153, 256, 639, 1,024, and 4,096-token prefill boundaries,
+fresh-versus-reused conversation rows, startup distributions, confidence intervals, correctness,
+and every exclusion. The raw source is
+[`raw-results.jsonl`](suite/headless/2026-07-18T13-53-16-717Z-full/raw-results.jsonl).
+
+## Earlier Compact Proof
+
+The remainder of this document preserves the earlier compact proof for historical comparison. Its
+pinned row predates the restored current-browser adapter and must not be mixed with the full-suite
+aggregates above.
 
 ## Environment
 

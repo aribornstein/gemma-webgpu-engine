@@ -1,7 +1,3 @@
-import { LiteRtLmBenchmarkAdapter } from "./adapters/litert-lm";
-import { OwnedWebGpuBenchmarkAdapter } from "./adapters/owned-webgpu";
-import { PinnedHuggingFaceBenchmarkAdapter } from "./adapters/pinned-hugging-face";
-import { TransformersJsBenchmarkAdapter } from "./adapters/transformers-js";
 import { captureBrowserEnvironment, type BrowserEnvironmentInput } from "./environment";
 import { runScheduledCase } from "./runner";
 import type {
@@ -31,7 +27,7 @@ export async function initializeBenchmarkRuntime(
   environmentInput: BrowserEnvironmentInput,
 ): Promise<{ startup: LoadResult; environment: BenchmarkEnvironment; limitations: readonly string[] }> {
   await disposeBenchmarkRuntime();
-  adapter = createAdapter(runtimeId);
+  adapter = await createAdapter(runtimeId);
   if (!adapter.available) throw new Error(`${runtimeId} is unavailable: ${adapter.limitations.join(" ")}`);
   environment = await captureBrowserEnvironment(environmentInput);
   startup = await adapter.load(loadOptions);
@@ -103,11 +99,23 @@ function requiredAdapter(): BenchmarkAdapter {
   return adapter;
 }
 
-function createAdapter(runtimeId: BenchmarkRuntimeId): BenchmarkAdapter {
+async function createAdapter(runtimeId: BenchmarkRuntimeId): Promise<BenchmarkAdapter> {
   switch (runtimeId) {
-    case "owned-webgpu": return new OwnedWebGpuBenchmarkAdapter();
-    case "transformers-js": return new TransformersJsBenchmarkAdapter();
-    case "litert-lm-web": return new LiteRtLmBenchmarkAdapter();
-    case "pinned-hugging-face-webgpu": return new PinnedHuggingFaceBenchmarkAdapter();
+    case "owned-webgpu": {
+      const { OwnedWebGpuBenchmarkAdapter } = await import("./adapters/owned-webgpu");
+      return new OwnedWebGpuBenchmarkAdapter();
+    }
+    case "transformers-js": {
+      const { TransformersJsBenchmarkAdapter } = await import("./adapters/transformers-js");
+      return new TransformersJsBenchmarkAdapter();
+    }
+    case "litert-lm-web": {
+      const { LiteRtLmBenchmarkAdapter } = await import("./adapters/litert-lm");
+      return new LiteRtLmBenchmarkAdapter();
+    }
+    case "pinned-hugging-face-webgpu": {
+      const { PinnedHuggingFaceBenchmarkAdapter } = await import("./adapters/pinned-hugging-face");
+      return new PinnedHuggingFaceBenchmarkAdapter();
+    }
   }
 }

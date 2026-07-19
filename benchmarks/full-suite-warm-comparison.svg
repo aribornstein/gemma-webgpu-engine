@@ -1,94 +1,114 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
-  <title id="title">Gemma 4 E2B warm generation comparison</title>
-  <desc id="desc">Six charts compare Owned WebGPU and LiteRT-LM Web median TTFT, decode wall time, TPOT, ITL, decode tokens per second, and overall tokens per second for 32 input and 512 requested output tokens. Transformers.js has no warm result because its runtime was unavailable.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Owned WebGPU full-control warm generation</title>
+  <desc id="desc">Six charts center the Owned WebGPU full-control runtime in a greedy-mode comparison with Xenova's greedy-only optimized WebGPU path and LiteRT-LM Web. Owned also supports seeded sampling and constrained decoding. The charts report median TTFT, decode wall time, TPOT, ITL, decode tokens per second, and overall tokens per second for 32 input and 512 requested output tokens. Transformers.js has no warm result because its runtime failed qualification.</desc>
   <rect width="1200" height="700" fill="#f7f5ef"/>
-  <text x="48" y="55" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700">Warm generation: 32 input / 512 output</text>
-  <text x="48" y="84" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="15">Median of 30 headless Chrome 150 runs per available runtime on Apple M4</text>
+  <text x="48" y="55" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="28" font-weight="700">Owned WebGPU: full-control generation</text>
+  <text x="48" y="84" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="15">Greedy-mode benchmark; Owned also supports seeded sampling and constrained decoding</text>
 
   <rect x="48" y="105" width="14" height="14" fill="#d75238"/>
-  <text x="70" y="117" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="14">Owned WebGPU</text>
-  <rect x="208" y="105" width="14" height="14" fill="#247c6d"/>
-  <text x="230" y="117" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="14">LiteRT-LM Web</text>
-  <text x="390" y="117" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="14">Transformers.js: warm runtime unavailable</text>
+  <text x="70" y="117" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="14" font-weight="700">Owned WebGPU · full control</text>
+  <rect x="300" y="105" width="14" height="14" fill="#315f8c"/>
+  <text x="322" y="117" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="14">Xenova (Greedy) · greedy only</text>
+  <rect x="590" y="105" width="14" height="14" fill="#247c6d"/>
+  <text x="612" y="117" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="14">LiteRT-LM Web</text>
+  <text x="760" y="117" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="14">Transformers.js: warm runtime unavailable</text>
 
   <g transform="translate(48 148)">
-    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+    <rect width="350" height="250" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
     <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">TTFT</text>
     <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">lower is better</text>
-    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
-    <rect x="82" y="61" width="240" height="24" fill="#d75238"/>
-    <text x="314" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">479.70 ms</text>
-    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
-    <rect x="82" y="109" width="78" height="24" fill="#247c6d"/>
-    <text x="168" y="126" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">155.65 ms</text>
-    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT reaches first output 3.08x sooner.</text>
+    <text x="22" y="75" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="58" width="240" height="23" fill="#d75238"/>
+    <text x="314" y="74" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">413.10 ms</text>
+    <text x="22" y="106" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="11">Xenova<tspan x="22" dy="12">(Greedy)</tspan></text>
+    <rect x="82" y="96" width="165" height="23" fill="#315f8c"/>
+    <text x="239" y="112" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">284.55 ms</text>
+    <text x="22" y="151" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="134" width="72" height="23" fill="#247c6d"/>
+    <text x="162" y="150" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">123.30 ms</text>
+    <text x="22" y="213" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Greedy timing; feature sets are not equivalent.</text>
   </g>
 
   <g transform="translate(425 148)">
-    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+    <rect width="350" height="250" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
     <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">Decode wall time</text>
     <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">lower is better</text>
-    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
-    <rect x="82" y="61" width="176" height="24" fill="#d75238"/>
-    <text x="250" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">9.93 s</text>
-    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
-    <rect x="82" y="109" width="240" height="24" fill="#247c6d"/>
-    <text x="314" y="126" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">14.07 s</text>
-    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned completes decode 29.5% sooner.</text>
+    <text x="22" y="75" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="58" width="183" height="23" fill="#d75238"/>
+    <text x="257" y="74" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">9.70 s</text>
+    <text x="22" y="106" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="11">Xenova<tspan x="22" dy="12">(Greedy)</tspan></text>
+    <rect x="82" y="96" width="147" height="23" fill="#315f8c"/>
+    <text x="221" y="112" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">7.83 s</text>
+    <text x="22" y="151" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="134" width="240" height="23" fill="#247c6d"/>
+    <text x="314" y="150" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">12.75 s</text>
+    <text x="22" y="213" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned uses one engine across every decode mode.</text>
   </g>
 
   <g transform="translate(802 148)">
-    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+    <rect width="350" height="250" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
     <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">TPOT</text>
     <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">lower is better</text>
-    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
-    <rect x="82" y="61" width="170" height="24" fill="#d75238"/>
-    <text x="244" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">19.47 ms</text>
-    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
-    <rect x="82" y="109" width="240" height="24" fill="#247c6d"/>
-    <text x="314" y="126" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">27.54 ms</text>
-    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned emits each post-first token 29.3% sooner.</text>
+    <text x="22" y="75" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="58" width="183" height="23" fill="#d75238"/>
+    <text x="257" y="74" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">19.03 ms</text>
+    <text x="22" y="106" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="11">Xenova<tspan x="22" dy="12">(Greedy)</tspan></text>
+    <rect x="82" y="96" width="147" height="23" fill="#315f8c"/>
+    <text x="221" y="112" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">15.32 ms</text>
+    <text x="22" y="151" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="134" width="240" height="23" fill="#247c6d"/>
+    <text x="314" y="150" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">24.95 ms</text>
+    <text x="22" y="213" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned supports greedy, sampling, and constraints.</text>
   </g>
 
-  <g transform="translate(48 395)">
-    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+  <g transform="translate(48 425)">
+    <rect width="350" height="250" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
     <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">ITL</text>
     <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">lower is better</text>
-    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
-    <rect x="82" y="61" width="240" height="24" fill="#d75238"/>
-    <text x="314" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">19.20 ms</text>
-    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
-    <rect x="82" y="109" width="240" height="24" fill="#eef0ec"/>
-    <text x="202" y="126" text-anchor="middle" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">not comparable</text>
-    <text x="22" y="175" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT exposes chunks, not guaranteed token events.</text>
-    <text x="22" y="195" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Its chunk interval is intentionally not labeled ITL.</text>
+    <text x="22" y="75" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="58" width="240" height="23" fill="#d75238"/>
+    <text x="314" y="74" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">18.55 ms</text>
+    <text x="22" y="106" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="11">Xenova<tspan x="22" dy="12">(Greedy)</tspan></text>
+    <rect x="82" y="96" width="199" height="23" fill="#315f8c"/>
+    <text x="273" y="112" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">15.40 ms</text>
+    <text x="22" y="151" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="134" width="240" height="23" fill="#eef0ec"/>
+    <text x="202" y="150" text-anchor="middle" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">not comparable</text>
+    <text x="22" y="205" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT exposes chunks, not guaranteed token events.</text>
+    <text x="22" y="225" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Its chunk interval is intentionally not labeled ITL.</text>
   </g>
 
-  <g transform="translate(425 395)">
-    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+  <g transform="translate(425 425)">
+    <rect width="350" height="250" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
     <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">Decode tok/s</text>
     <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">higher is better</text>
-    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
-    <rect x="82" y="61" width="240" height="24" fill="#d75238"/>
-    <text x="314" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">51.37</text>
-    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
-    <rect x="82" y="109" width="170" height="24" fill="#247c6d"/>
-    <text x="244" y="126" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">36.31</text>
-    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned decode throughput is 41.5% higher.</text>
+    <text x="22" y="75" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="58" width="193" height="23" fill="#d75238"/>
+    <text x="267" y="74" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">52.56</text>
+    <text x="22" y="106" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="11">Xenova<tspan x="22" dy="12">(Greedy)</tspan></text>
+    <rect x="82" y="96" width="240" height="23" fill="#315f8c"/>
+    <text x="314" y="112" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">65.27</text>
+    <text x="22" y="151" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="134" width="147" height="23" fill="#247c6d"/>
+    <text x="221" y="150" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">40.08</text>
+    <text x="22" y="213" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Xenova's comparison path is greedy-only.</text>
   </g>
 
-  <g transform="translate(802 395)">
-    <rect width="350" height="220" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
+  <g transform="translate(802 425)">
+    <rect width="350" height="250" rx="6" fill="#ffffff" stroke="#d8ddd5"/>
     <text x="22" y="34" fill="#18221f" font-family="Helvetica, Arial, sans-serif" font-size="18" font-weight="700">Overall tok/s</text>
     <text x="328" y="34" text-anchor="end" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="12">higher is better</text>
-    <text x="22" y="78" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
-    <rect x="82" y="61" width="240" height="24" fill="#d75238"/>
-    <text x="314" y="78" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">49.44</text>
-    <text x="22" y="126" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
-    <rect x="82" y="109" width="175" height="24" fill="#247c6d"/>
-    <text x="249" y="126" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">36.07</text>
-    <text x="22" y="184" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned end-to-end throughput is 37.1% higher.</text>
+    <text x="22" y="75" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned</text>
+    <rect x="82" y="58" width="192" height="23" fill="#d75238"/>
+    <text x="266" y="74" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">50.47</text>
+    <text x="22" y="106" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="11">Xenova<tspan x="22" dy="12">(Greedy)</tspan></text>
+    <rect x="82" y="96" width="240" height="23" fill="#315f8c"/>
+    <text x="314" y="112" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">63.16</text>
+    <text x="22" y="151" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">LiteRT</text>
+    <rect x="82" y="134" width="151" height="23" fill="#247c6d"/>
+    <text x="225" y="150" text-anchor="end" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="13" font-weight="700">39.75</text>
+    <text x="22" y="213" fill="#7a625c" font-family="Helvetica, Arial, sans-serif" font-size="13">Owned is the project's full-control runtime.</text>
   </g>
 
-  <text x="48" y="663" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">External wall-clock boundaries. Each panel has an independent scale. Full run: 1,008 records, 630 scheduled skips, 0 errors.</text>
+  <text x="48" y="720" fill="#56615d" font-family="Helvetica, Arial, sans-serif" font-size="13">External wall-clock boundaries; independent panel scales. Full run: 2,094 measured records, 810 planned skips, 30 retained runtime errors.</text>
 </svg>

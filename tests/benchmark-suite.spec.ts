@@ -17,6 +17,7 @@ import type {
   GenerationCallbacks,
   GenerationResult,
 } from "../src/benchmark/suite/types";
+import { createBenchmarkWorkloads } from "../src/benchmark/suite/workloads";
 import { validateGeneration } from "../src/benchmark/suite/validation";
 
 const testCase: BenchmarkCase = {
@@ -66,6 +67,21 @@ test("seeded block schedule is reproducible and changes runtime order", () => {
   expect(first.map((entry) => entry.sequence)).toEqual(
     Array.from({ length: first.length }, (_, index) => index),
   );
+});
+
+test("full workload matrix covers prefill boundaries, long decode, and prefix-reuse inputs", () => {
+  const workloads = createBenchmarkWorkloads();
+  expect(workloads.map((workload) => [workload.targetInputTokens, workload.targetOutputTokens])).toEqual([
+    [32, 32],
+    [32, 128],
+    [32, 512],
+    [153, 128],
+    [256, 128],
+    [639, 128],
+    [1024, 128],
+    [4096, 128],
+    [8192, 128],
+  ]);
 });
 
 test("measurement ignores empty chunks and keeps multi-token chunks intact", async () => {
