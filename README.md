@@ -199,16 +199,24 @@ after `<channel|>`; otherwise the direct final answer is constrained from its fi
 The console owns one persistent session and exposes exact greedy or seeded sampling, every penalty
 and probability control, custom stop IDs, regex/JSON/closed-schema constraints, streamed output,
 and cancellation. Editable examples populate the prompt and matching controls for greedy, sampling,
-regex, bounded JSON, closed JSON Schema, multilingual Hebrew/Jerusalem Arabic level comparison,
-and reasoning-backed Schema generation. The multilingual example requires a bounded reasoning pass,
-then scales its closed dialogue schema
-from A1 through official CEFR C2, plus an explicitly experimental C3 stress test, and constrains each
-language to its Unicode script. All Hebrew and Arabic utterances remain model-generated: the prompt
-and schema contain no example dialogue, phrase bank, prescribed translation, or language-string
-constant. The schema guarantees shape and script separation, not linguistic correctness, semantic
-alignment, translation equivalence, or CEFR conformance. In particular, E2B multilingual output
-still requires native-speaker review; the example exposes that model limit instead of hiding it. Its reasoning and final answer
-share the output-token budget, so A1 reserves 320 output tokens. Custom retains every control, while Chat
+regex, bounded JSON, closed JSON Schema, two Hebrew best-of-N methods, and reasoning-backed Schema
+generation. Both best-of-N examples accept any safe integer of at least 2 seed-diverse Hebrew
+candidates from A1 through official CEFR C2 plus an experimental C3 stress test. The comparative
+judge method exposes separate editable generation and judge prompts. Configure 1–4 judge rounds;
+every judge evaluates all candidates together in one call, with its ordering sampled without
+replacement without enumerating the $N!$ permutation space. Scores are averaged across the complete
+judge set before selection, and tied or incomplete scores abstain. Randomized unique orders mitigate,
+but do not eliminate, positional bias.
+
+The log-likelihood method enables Thinking for every candidate, captures raw-model token
+log-probabilities during the existing logits readback, and ranks the sum of generated reasoning and
+answer log-likelihoods without judge calls. It is a fast single-pass reasoning-confidence experiment,
+not a complete PiCSAR implementation: full PiCSAR separately conditions on each reasoning chain to
+estimate final-answer confidence. PiCSAR was validated on tasks with definitive answers, while this
+Hebrew dialogue task is open-ended, so higher likelihood must not be assumed to mean higher language
+quality without native-speaker evaluation. Both methods are self-reranking rather than fluency
+certification, so output still
+requires native-speaker review. Custom retains every control, while Chat
 provides persistent multimodal history, user-turn editing/regeneration, a canonical Thinking toggle,
 collapsed reasoning disclosures, and reasoning-token telemetry. Examples expose only controls that
 affect their fixed scenario, and long-context diagnostics remain collapsed until requested. Its

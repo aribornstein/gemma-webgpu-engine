@@ -178,26 +178,60 @@ test("applies editable generation examples", async ({ page }) => {
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toHaveValue(/"urgent"/);
   await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
 
-  await examples.selectOption("jerusalem-multilingual");
+  await expect(examples.getByRole("option", { name: "Best of N · Comparative judge" })).toBeAttached();
+  await expect(examples.getByRole("option", { name: "Best of N · Log likelihood" })).toBeAttached();
+  await examples.selectOption("best-of-n-judge-hebrew");
   const languageLevel = page.getByLabel("Language level");
   await expect(languageLevel).toHaveValue("A1");
-  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeVisible();
-  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeChecked();
+  await expect(page.getByText("Reasoning-free drafts · Comparative Thinking judges", { exact: true })).toBeVisible();
+  const candidateCount = page.getByRole("spinbutton", { name: "Candidates" });
+  await expect(candidateCount).toHaveValue("2");
+  await expect(candidateCount).not.toHaveAttribute("max");
+  const judgeCount = page.getByRole("spinbutton", { name: /^Judges\b/ });
+  await expect(judgeCount).toHaveValue("2");
+  await expect(judgeCount).toHaveAttribute("max", "2");
+  await expect(page.getByRole("button", { name: "Generate 2 + 2 judges" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Generation prompt" })).toBeVisible();
+  const judgePrompt = page.getByRole("textbox", { name: "Example judge prompt" });
+  await expect(judgePrompt).toHaveValue(/Compare all anonymous Hebrew candidates/);
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeHidden();
   await expect(page.getByRole("spinbutton", { name: "Max tokens" })).toHaveValue("320");
-  await expect(page.getByRole("textbox", { name: "Message" })).not.toHaveValue(/[\u0590-\u05FF\u0600-\u06FF]/);
-  await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/generate the dialogue yourself/);
-  await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/Target A1/);
+  const generationPrompt = page.getByRole("textbox", { name: "Generation prompt" });
+  await expect(generationPrompt).not.toHaveValue(/[\u0590-\u05FF\u0600-\u06FF]/);
+  await expect(generationPrompt).toHaveValue(/generate the dialogue yourself/);
+  await expect(generationPrompt).toHaveValue(/level A1/);
+  await expect(generationPrompt).toHaveValue(/modern Israeli Hebrew/);
   await expect(page.getByRole("textbox", { name: "JSON Schema" }))
     .toHaveValue(/"level": \{\s+"const": "A1"[\s\S]*"visitor_request"[\s\S]*"local_direction"/);
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).not.toHaveValue(/jerusalem_arabic/);
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).not.toHaveValue(/route_plan/);
+  await candidateCount.fill("3");
+  await expect(judgeCount).toHaveAttribute("max", "4");
+  await judgeCount.fill("3");
+  await judgePrompt.fill("Custom independent Hebrew audit instructions.");
+  await expect(page.getByRole("button", { name: "Generate 3 + 3 judges" })).toBeVisible();
   await languageLevel.selectOption("C3");
-  await expect(examples).toHaveValue("jerusalem-multilingual");
-  await expect(page.getByRole("textbox", { name: "Message" }))
-    .toHaveValue(/Target C3[\s\S]*experimental beyond-CEFR/);
+  await expect(examples).toHaveValue("best-of-n-judge-hebrew");
+  await expect(candidateCount).toHaveValue("3");
+  await expect(judgeCount).toHaveValue("3");
+  await expect(judgePrompt).toHaveValue("Custom independent Hebrew audit instructions.");
+  await candidateCount.fill("20");
+  await expect(candidateCount).toHaveValue("20");
+  await expect(page.getByRole("button", { name: "Generate 20 + 3 judges" })).toBeVisible();
+  await expect(generationPrompt)
+    .toHaveValue(/level C3[\s\S]*experimental beyond-CEFR/);
   await expect(page.getByRole("textbox", { name: "JSON Schema" }))
     .toHaveValue(/"level": \{\s+"const": "C3"[\s\S]*"visitor_contextual_request"[\s\S]*"local_graceful_close"/);
   await expect(page.getByRole("spinbutton", { name: "Max tokens" })).toHaveValue("768");
   await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
+
+  await examples.selectOption("best-of-n-likelihood-hebrew");
+  await expect(page.getByText("Thinking candidates · Joint generated-token likelihood", { exact: true })).toBeVisible();
+  await expect(page.getByRole("spinbutton", { name: /^Judges\b/ })).toBeHidden();
+  await expect(page.getByRole("textbox", { name: "Example judge prompt" })).toBeHidden();
+  await expect(page.getByRole("button", { name: "Generate 2 + rank" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { name: "Thinking" })).toBeChecked();
 
   await examples.selectOption("reasoning-logic");
   await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue(/farmer.*fox.*chicken/s);
@@ -416,7 +450,7 @@ test("shows only controls relevant to each example while Custom exposes all", as
   await workspace.selectOption("schema-triage");
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeVisible();
 
-  await workspace.selectOption("jerusalem-multilingual");
+  await workspace.selectOption("best-of-n-judge-hebrew");
   await expect(languageLevel).toBeVisible();
   await expect(languageLevel).toHaveValue("A1");
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeVisible();

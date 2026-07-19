@@ -64,6 +64,21 @@ export function sampleToken(rawLogits: ArrayLike<number>, history: readonly numb
   return candidates[candidates.length - 1].token;
 }
 
+export function tokenLogProbability(rawLogits: ArrayLike<number>, token: number): number {
+  if (!Number.isInteger(token) || token < 0 || token >= rawLogits.length) {
+    throw new Error(`Token ${token} is outside logits length ${rawLogits.length}`);
+  }
+  let maximum = Number.NEGATIVE_INFINITY;
+  for (let index = 0; index < rawLogits.length; index += 1) {
+    maximum = Math.max(maximum, rawLogits[index]);
+  }
+  let denominator = 0;
+  for (let index = 0; index < rawLogits.length; index += 1) {
+    denominator += Math.exp(rawLogits[index] - maximum);
+  }
+  return rawLogits[token] - maximum - Math.log(denominator);
+}
+
 function cumulativeCut<T extends { probability: number }>(items: T[], threshold: number): T[] {
   let cumulative = 0;
   let end = 0;

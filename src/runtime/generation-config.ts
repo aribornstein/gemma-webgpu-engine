@@ -41,6 +41,7 @@ export type GemmaGenerationOptions = Partial<DecodingConfig> & {
   constraint?: GenerationConstraint;
   requireReasoning?: boolean;
   reusePromptCache?: boolean;
+  captureTokenLogProbabilities?: boolean;
 };
 
 export const DEFAULT_GENERATION_CONFIG: DecodingConfig = {

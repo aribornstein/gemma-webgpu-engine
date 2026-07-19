@@ -8,7 +8,7 @@ import {
   emitGemmaGenerationUpdate,
   throwIfGemmaGenerationAborted,
 } from "../src/runtime/generation-control";
-import { sampleToken, SeededRandom } from "../src/runtime/sampling";
+import { sampleToken, SeededRandom, tokenLogProbability } from "../src/runtime/sampling";
 
 test("temperature zero performs greedy decoding", () => {
   expect(sampleToken([0.2, 4, 1], [], { ...DEFAULT_DECODING_CONFIG, temperature: 0 }, () => 0.5)).toBe(1);
@@ -136,6 +136,13 @@ test("typical-p can select a non-leading token closest to entropy", () => {
     typicalP: 0.3,
   };
   expect(sampleToken([Math.log(0.45), Math.log(0.4), Math.log(0.15)], [], config, () => 0.5)).toBe(1);
+});
+
+test("computes selected-token log probability from raw model logits", () => {
+  const logits = [Math.log(0.6), Math.log(0.3), Math.log(0.1)];
+  expect(tokenLogProbability(logits, 0)).toBeCloseTo(Math.log(0.6));
+  expect(tokenLogProbability(logits, 2)).toBeCloseTo(Math.log(0.1));
+  expect(() => tokenLogProbability(logits, 3)).toThrow(/outside logits length/);
 });
 
 test("streams immutable accumulated token updates with backpressure", async () => {

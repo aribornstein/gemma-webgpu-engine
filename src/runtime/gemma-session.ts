@@ -92,7 +92,7 @@ import {
   GEMMA_VIDEO_MAX_FRAMES,
   prepareGemmaVideo,
 } from "./gemma-video-input";
-import { sampleToken, SeededRandom } from "./sampling";
+import { sampleToken, SeededRandom, tokenLogProbability } from "./sampling";
 import {
   countGemmaReasoningTokens,
   parseGemmaResponse,
@@ -132,6 +132,11 @@ export interface GemmaGenerationResult {
   toolCalls: readonly GemmaParsedToolCall[];
   promptTokenIds: number[];
   generatedTokenIds: number[];
+  tokenLogProbabilities?: readonly number[];
+  reasoningLogProbability?: number;
+  answerLogProbability?: number;
+  confidenceReasoningTokenCount?: number;
+  confidenceAnswerTokenCount?: number;
   decodingConfig: DecodingConfig;
   stoppedOnEndToken: boolean;
   stoppedOnStopToken: boolean;
@@ -412,6 +417,7 @@ export class GemmaGenerationSession {
       constraint,
       requireReasoning = false,
       reusePromptCache = true,
+      captureTokenLogProbabilities = false,
       ...decodingOptions
     } = options;
     throwIfGemmaGenerationAborted(signal);
@@ -431,6 +437,7 @@ export class GemmaGenerationSession {
       ? [GEMMA_START_CHANNEL_TOKEN_ID, ...this.tokenizer.encodeText("thought\n")]
       : [];
     const outputMode: GemmaModelOutputMode = compiledConstraint || requireReasoning ||
+      captureTokenLogProbabilities ||
       !usesGemmaGpuGreedy(config)
       ? "logits"
       : "greedy";
@@ -650,6 +657,11 @@ export class GemmaGenerationSession {
       if (!modelOutput) throw new Error("Gemma prompt produced no model output");
 
       const generatedTokenIds: number[] = [];
+      const tokenLogProbabilities: number[] = [];
+      let reasoningLogProbability = 0;
+      let answerLogProbability = 0;
+      let confidenceReasoningTokenCount = 0;
+      let confidenceAnswerTokenCount = 0;
       const history = [...promptTokenIds];
       const random = new SeededRandom(config.seed);
       const customStopTokens = new Set(config.stopTokenIds);
@@ -703,6 +715,9 @@ export class GemmaGenerationSession {
           stoppedOnStopToken = true;
           break;
         }
+        const logProbability = captureTokenLogProbabilities
+          ? tokenLogProbability(requiredGemmaLogits(modelOutput), token)
+          : null;
         const startsReasoningChannel = allowReasoningChannel &&
           token === GEMMA_START_CHANNEL_TOKEN_ID;
         allowReasoningChannel = false;
@@ -715,6 +730,16 @@ export class GemmaGenerationSession {
           compiledConstraint.acceptToken(bytes);
         }
         generatedTokenIds.push(token);
+        if (logProbability !== null) {
+          tokenLogProbabilities.push(logProbability);
+          if (inReasoningChannel && token !== GEMMA_END_CHANNEL_TOKEN_ID) {
+            reasoningLogProbability += logProbability;
+            confidenceReasoningTokenCount += 1;
+          } else if (!startsReasoningChannel && token !== GEMMA_END_CHANNEL_TOKEN_ID) {
+            answerLogProbability += logProbability;
+            confidenceAnswerTokenCount += 1;
+          }
+        }
         history.push(token);
         if (inReasoningChannel && token === GEMMA_END_CHANNEL_TOKEN_ID) {
           inReasoningChannel = false;
@@ -771,6 +796,13 @@ export class GemmaGenerationSession {
         toolCalls,
         promptTokenIds,
         generatedTokenIds,
+        ...(captureTokenLogProbabilities ? {
+          tokenLogProbabilities: Object.freeze([...tokenLogProbabilities]),
+          reasoningLogProbability,
+          answerLogProbability,
+          confidenceReasoningTokenCount,
+          confidenceAnswerTokenCount,
+        } : {}),
         decodingConfig: config,
         stoppedOnEndToken,
         stoppedOnStopToken,

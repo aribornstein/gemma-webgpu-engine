@@ -371,6 +371,33 @@ h3 {
   grid-template-columns: 110px minmax(0, 1fr);
 }
 
+.best-of-summary > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: none;
+}
+
+.best-of-summary input {
+  width: 72px;
+  flex: 0 0 72px;
+  font: 700 15px var(--mono);
+}
+
+.best-of-summary small {
+  color: var(--muted);
+  font: 11px/1.4 var(--mono);
+}
+
+.judge-prompt-field {
+  margin-top: 14px;
+}
+
+.judge-prompt-field textarea {
+  min-height: 176px;
+  font: 13px/1.55 var(--mono);
+}
+
 .field {
   display: grid;
   gap: 7px;
@@ -620,6 +647,34 @@ button.image-picker[data-recording="true"] {
 
 .conversation-message[data-role="assistant"] .conversation-role {
   color: #81c7ae;
+}
+
+.best-of-message[data-role="candidate"] .conversation-role {
+  color: #8fd5bd;
+}
+
+.best-of-message[data-role="judge"] .conversation-role {
+  color: #e9cb77;
+}
+
+.best-of-message[data-state="selected"] {
+  box-shadow: inset 3px 0 #69c69f;
+}
+
+.best-of-message[data-state="selected"] .conversation-content,
+.best-of-message[data-state="selected"] .conversation-role {
+  color: #a9e4ca;
+}
+
+.best-of-message[data-state="inconclusive"] .conversation-content,
+.best-of-message[data-state="inconclusive"] .conversation-role {
+  color: #efc176;
+}
+
+.best-of-meta {
+  color: #91a099;
+  font: 10px/1.4 var(--mono);
+  text-transform: uppercase;
 }
 
 .conversation-message[data-state="stopped"],
