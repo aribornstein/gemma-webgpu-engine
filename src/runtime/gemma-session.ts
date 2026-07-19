@@ -436,6 +436,7 @@ export class GemmaGenerationSession {
       : "greedy";
     const maxNewTokens = config.maxNewTokens;
     this.generating = true;
+    let completed = false;
     const visionResources: GemmaVisionImageResources[] = [];
     const audioResources: GemmaAudioEncodingResources[] = [];
     try {
@@ -762,7 +763,7 @@ export class GemmaGenerationSession {
       );
       const toolCalls = parseGemmaToolCalls(rawText);
       compiledConstraint?.validateFinal(parsedResponse.text);
-      return {
+      const result: GemmaGenerationResult = {
         text: parsedResponse.text,
         reasoning: parsedResponse.reasoning,
         reasoningTokenCount,
@@ -777,6 +778,8 @@ export class GemmaGenerationSession {
           ? "end-token"
           : stoppedOnStopToken ? "stop-token" : "length",
       };
+      completed = true;
+      return result;
     } finally {
       for (const resources of visionResources.toReversed()) {
         destroyGemmaVisionImageResources(resources);
@@ -784,6 +787,7 @@ export class GemmaGenerationSession {
       for (const resources of audioResources.toReversed()) {
         destroyGemmaAudioEncodingResources(resources);
       }
+      if (!completed) this.invalidatePromptCache();
       this.generating = false;
     }
   }
@@ -941,6 +945,10 @@ export class GemmaGenerationSession {
     const encoder = this.device.createCommandEncoder({ label: "Reset Gemma K/V caches" });
     for (const cache of this.resources.stack.ownerCaches.values()) cache.encodeClear(encoder);
     this.device.queue.submit([encoder.finish()]);
+    this.invalidatePromptCache();
+  }
+
+  private invalidatePromptCache(): void {
     this.position = 0;
     this.evaluatedTokenIds.length = 0;
     this.evaluatedVisionIdentities.length = 0;

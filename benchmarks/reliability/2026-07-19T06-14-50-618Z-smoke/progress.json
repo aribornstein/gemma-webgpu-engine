@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "profile": "smoke",
+  "status": "failed",
+  "phase": "failed",
+  "currentScenario": null,
+  "completed": 5,
+  "failures": 0,
+  "browserErrors": 0,
+  "startedAt": "2026-07-19T06:14:50.618Z",
+  "updatedAt": "2026-07-19T06:15:28.936Z",
+  "targetDurationMs": 0,
+  "elapsedMs": 38318,
+  "remainingMs": 0,
+  "percentComplete": 100,
+  "failure": "Reliability scenario cancellation-recovery failed: page.evaluate: Error: Cancelled cache state was reused: 4 !== 0\n    at assertEqual (http://127.0.0.1:5174/src/reliability/smoke-harness.ts:308:9)\n    at executeCancellationRecovery (http://127.0.0.1:5174/src/reliability/smoke-harness.ts:170:2)\n    at async Module.executeReliabilitySmokeScenario (http://127.0.0.1:5174/src/reliability/smoke-harness.ts:24:18)\n    at async <anonymous>:329:30",
+  "latest": {
+    "schemaVersion": 1,
+    "sequence": 4,
+    "scenario": "prefix-reuse",
+    "startedAt": "2026-07-19T06:15:27.997Z",
+    "completedAt": "2026-07-19T06:15:28.535Z",
+    "durationMs": 534.2000000476837,
+    "passed": true,
+    "result": {
+      "scenario": "prefix-reuse",
+      "durationMs": 534.2000000476837,
+      "details": {
+        "promptTokensReused": 18,
+        "freshTiming": {
+          "totalMs": 374.39999997615814,
+          "timeToFirstTokenMs": 223.5,
+          "prefillMs": 222.89999997615814,
+          "promptTokensReused": 0,
+          "decodeTokenCount": 11,
+          "logitsReadbackMs": 0,
+          "visionEncodeMs": 0,
+          "audioEncodeMs": 0
+        },
+        "reusedTiming": {
+          "totalMs": 159.70000004768372,
+          "timeToFirstTokenMs": 13.600000023841858,
+          "prefillMs": 12.899999976158142,
+          "promptTokensReused": 18,
+          "decodeTokenCount": 11,
+          "logitsReadbackMs": 0,
+          "visionEncodeMs": 0,
+          "audioEncodeMs": 0
+        }
+      },
+      "memory": {
+        "gpuBufferCount": 1599,
+        "gpuBufferBytes": 854330692,
+        "visionWeightEntryCount": 0,
+        "visionWeightSourceBytes": 0,
+        "visionWeightMaterializedBytes": 0,
+        "scope": "retained-resource-graph"
+      }
+    }
+  }
+}

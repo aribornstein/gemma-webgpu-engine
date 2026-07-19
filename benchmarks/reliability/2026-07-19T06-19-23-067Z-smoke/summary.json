@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "profile": "smoke",
+  "passed": true,
+  "startedAt": "2026-07-19T06:19:23.067Z",
+  "completedAt": "2026-07-19T06:39:31.229Z",
+  "elapsedMs": 1208162,
+  "targetDurationMs": 1200000,
+  "environment": {
+    "capturedAt": "2026-07-19T06:19:23.073Z",
+    "gitCommit": "e0b407cb9b4331934b2ba72925e50e3712485df9",
+    "operatingSystem": "Darwin 25.5.0 arm64",
+    "physicalDevice": "Aris-MacBook-Air.local",
+    "cpu": "Apple M4",
+    "totalRamBytes": 34359738368,
+    "browser": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+      "language": "en-US",
+      "visibilityState": "visible",
+      "adapterInfo": null,
+      "features": []
+    }
+  },
+  "initialization": {
+    "loadMs": 7365.799999952316,
+    "localModelAvailable": true,
+    "memory": {
+      "gpuBufferCount": 1599,
+      "gpuBufferBytes": 854330692,
+      "visionWeightEntryCount": 0,
+      "visionWeightSourceBytes": 0,
+      "visionWeightMaterializedBytes": 0,
+      "scope": "retained-resource-graph"
+    }
+  },
+  "completedScenarios": 586,
+  "scenarioCounts": {
+    "golden": 197,
+    "sampling": 71,
+    "regex-constraint": 68,
+    "json-constraint": 68,
+    "prefix-reuse": 71,
+    "cancellation-recovery": 71,
+    "vision": 11,
+    "audio": 10,
+    "lifecycle-reload": 8,
+    "device-loss-recovery": 11
+  },
+  "missingMandatoryScenarios": [],
+  "failedEvents": [],
+  "browserErrors": [],
+  "expectedBrowserEvents": [
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo",
+    "console: WebGPU device lost GPUDeviceLostInfo"
+  ],
+  "failure": null,
+  "memory": {
+    "gpuBufferByteMinimum": 854330692,
+    "gpuBufferByteMaximum": 854330692,
+    "gpuBufferByteSpread": 0,
+    "gpuBufferCountMinimum": 1599,
+    "gpuBufferCountMaximum": 1599
+  }
+}

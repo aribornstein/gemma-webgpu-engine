@@ -5,9 +5,10 @@ import type {
 } from "./gemma-vision-input";
 import type { GemmaAudioSource } from "./gemma-audio-input";
 import type { GemmaVideoSource } from "./gemma-video-input";
+import { modelAssetUrl } from "../model/model-assets";
 
 const TOKENIZER_PATH = "gemma-4-e2b-tokenizer";
-const MODEL_ROOT = `${new URL(import.meta.url).origin}/models/`;
+const MODEL_ROOT = modelAssetUrl("");
 const EOS_TOKEN_IDS = new Set([1, 50, 106]);
 export const GEMMA_START_CHANNEL_TOKEN_ID = 100;
 export const GEMMA_END_CHANNEL_TOKEN_ID = 101;
@@ -107,12 +108,12 @@ export type GemmaGenerationInput =
 
 env.allowLocalModels = true;
 env.allowRemoteModels = false;
-env.localModelPath = "/models/";
+env.localModelPath = MODEL_ROOT;
 env.useBrowserCache = false;
 const fetchFromEngineOrigin = globalThis.fetch.bind(globalThis);
 env.fetch = (input, init) => {
   const resolved = typeof input === "string" && input.startsWith("/models/")
-    ? new URL(input, MODEL_ROOT).href
+    ? new URL(input.slice("/models/".length), MODEL_ROOT).href
     : input;
   return fetchFromEngineOrigin(resolved, init);
 };

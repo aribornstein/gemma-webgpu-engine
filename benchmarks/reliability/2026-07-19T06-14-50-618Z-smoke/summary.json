@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "profile": "smoke",
+  "passed": false,
+  "startedAt": "2026-07-19T06:14:50.618Z",
+  "completedAt": "2026-07-19T06:15:28.935Z",
+  "elapsedMs": 38317,
+  "targetDurationMs": 0,
+  "environment": {
+    "capturedAt": "2026-07-19T06:14:50.623Z",
+    "gitCommit": "e0b407cb9b4331934b2ba72925e50e3712485df9",
+    "operatingSystem": "Darwin 25.5.0 arm64",
+    "physicalDevice": "Aris-MacBook-Air.local",
+    "cpu": "Apple M4",
+    "totalRamBytes": 34359738368,
+    "browser": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+      "language": "en-US",
+      "visibilityState": "visible",
+      "adapterInfo": null,
+      "features": []
+    }
+  },
+  "initialization": {
+    "loadMs": 7463.600000023842,
+    "localModelAvailable": true,
+    "memory": {
+      "gpuBufferCount": 1599,
+      "gpuBufferBytes": 854330692,
+      "visionWeightEntryCount": 0,
+      "visionWeightSourceBytes": 0,
+      "visionWeightMaterializedBytes": 0,
+      "scope": "retained-resource-graph"
+    }
+  },
+  "completedScenarios": 5,
+  "scenarioCounts": {
+    "golden": 1,
+    "sampling": 1,
+    "regex-constraint": 1,
+    "json-constraint": 1,
+    "prefix-reuse": 1,
+    "cancellation-recovery": 0,
+    "vision": 0,
+    "audio": 0,
+    "lifecycle-reload": 0,
+    "device-loss-recovery": 0
+  },
+  "missingMandatoryScenarios": [
+    "cancellation-recovery",
+    "vision",
+    "audio",
+    "lifecycle-reload",
+    "device-loss-recovery"
+  ],
+  "failedEvents": [],
+  "browserErrors": [],
+  "failure": "Reliability scenario cancellation-recovery failed: page.evaluate: Error: Cancelled cache state was reused: 4 !== 0\n    at assertEqual (http://127.0.0.1:5174/src/reliability/smoke-harness.ts:308:9)\n    at executeCancellationRecovery (http://127.0.0.1:5174/src/reliability/smoke-harness.ts:170:2)\n    at async Module.executeReliabilitySmokeScenario (http://127.0.0.1:5174/src/reliability/smoke-harness.ts:24:18)\n    at async <anonymous>:329:30",
+  "memory": {
+    "gpuBufferByteMinimum": 854330692,
+    "gpuBufferByteMaximum": 854330692,
+    "gpuBufferByteSpread": 0,
+    "gpuBufferCountMinimum": 1599,
+    "gpuBufferCountMaximum": 1599
+  }
+}

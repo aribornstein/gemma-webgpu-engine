@@ -30,6 +30,7 @@ reference-output
 /benchmarks/suite/**/report.html
 /benchmarks/suite/**/summary.json
 /benchmarks/suite-smoke/
+/benchmarks/reliability/**/*.jsonl
 
 # Editor directories and files
 .vscode/*

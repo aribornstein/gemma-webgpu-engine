@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "profile": "smoke",
+  "passed": true,
+  "startedAt": "2026-07-19T06:17:24.451Z",
+  "completedAt": "2026-07-19T06:18:34.096Z",
+  "elapsedMs": 69645,
+  "targetDurationMs": 0,
+  "environment": {
+    "capturedAt": "2026-07-19T06:17:24.458Z",
+    "gitCommit": "e0b407cb9b4331934b2ba72925e50e3712485df9",
+    "operatingSystem": "Darwin 25.5.0 arm64",
+    "physicalDevice": "Aris-MacBook-Air.local",
+    "cpu": "Apple M4",
+    "totalRamBytes": 34359738368,
+    "browser": {
+      "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/150.0.0.0 Safari/537.36",
+      "language": "en-US",
+      "visibilityState": "visible",
+      "adapterInfo": null,
+      "features": []
+    }
+  },
+  "initialization": {
+    "loadMs": 7265.099999904633,
+    "localModelAvailable": true,
+    "memory": {
+      "gpuBufferCount": 1599,
+      "gpuBufferBytes": 854330692,
+      "visionWeightEntryCount": 0,
+      "visionWeightSourceBytes": 0,
+      "visionWeightMaterializedBytes": 0,
+      "scope": "retained-resource-graph"
+    }
+  },
+  "completedScenarios": 10,
+  "scenarioCounts": {
+    "golden": 1,
+    "sampling": 1,
+    "regex-constraint": 1,
+    "json-constraint": 1,
+    "prefix-reuse": 1,
+    "cancellation-recovery": 1,
+    "vision": 1,
+    "audio": 1,
+    "lifecycle-reload": 1,
+    "device-loss-recovery": 1
+  },
+  "missingMandatoryScenarios": [],
+  "failedEvents": [],
+  "browserErrors": [],
+  "expectedBrowserEvents": [
+    "console: WebGPU device lost GPUDeviceLostInfo"
+  ],
+  "failure": null,
+  "memory": {
+    "gpuBufferByteMinimum": 854330692,
+    "gpuBufferByteMaximum": 854330692,
+    "gpuBufferByteSpread": 0,
+    "gpuBufferCountMinimum": 1599,
+    "gpuBufferCountMaximum": 1599
+  }
+}

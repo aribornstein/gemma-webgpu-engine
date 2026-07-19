@@ -7,7 +7,7 @@ import {
   initializeGemmaSafetensorsCache,
   type SafetensorsCacheInitializationProgress,
 } from "./model/safetensors-cache-initializer";
-import { GEMMA_LOCAL_SAFETENSORS_URL } from "./model/pinned-safetensors";
+import { modelAssetUrl } from "./model/model-assets";
 import {
   compileGenerationConstraint,
   type GenerationConstraint,
@@ -60,6 +60,12 @@ import type { GemmaDurableBenchmarkArtifact } from "./runtime/durable-benchmark"
 
 type GemmaCacheInitializationProgress = SafetensorsCacheInitializationProgress;
 const WEBCAM_RECORDING_LIMIT_SECONDS = 10;
+const PUBLIC_DEMO = import.meta.env.VITE_PUBLIC_DEMO === "true";
+const LOCAL_SAFETENSORS_URL = modelAssetUrl("gemma-4-e2b/model.safetensors");
+
+function appAssetUrl(path: string): string {
+  return new URL(path.replace(/^\/+/, ""), document.baseURI).href;
+}
 
 type GenerationExampleControl =
   | "temperature"
@@ -132,7 +138,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
     prompt: "What is said in this audio? Return only the spoken words.",
     controls: { temperature: 0, maxNewTokens: 48 },
     audio: {
-      url: "/examples/gemma-audio-demo.wav",
+      url: appAssetUrl("examples/gemma-audio-demo.wav"),
       filename: "gemma-audio-demo.wav",
     },
     ui: { vision: false, audio: true, sampling: false, constraint: "none" },
@@ -178,7 +184,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
     prompt: "Transcribe the printed caption in this image as accurately as possible, including the credit line. Then briefly describe whether the photograph matches the caption. Mark any unreadable words as [unclear] and do not use outside knowledge.",
     controls: { temperature: 0, maxNewTokens: 256 },
     image: {
-      url: "/examples/dolphin_capt_image.png",
+      url: appAssetUrl("examples/dolphin_capt_image.png"),
       filename: "dolphin_capt_image.png",
     },
     visionTokenBudget: 280,
@@ -190,7 +196,7 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
     prompt: "Describe this historical group photograph. Read the printed caption in the image and use only text you can actually discern there to identify people by row. Quote uncertain spellings as uncertain, and do not infer identities from faces or outside knowledge.",
     controls: { temperature: 0, maxNewTokens: 256 },
     image: {
-      url: "/examples/the-mathematics-club-of-gottingen-1902.jpg",
+      url: appAssetUrl("examples/the-mathematics-club-of-gottingen-1902.jpg"),
       filename: "the-mathematics-club-of-gottingen-1902.jpg",
     },
     visionTokenBudget: 280,
@@ -814,7 +820,7 @@ async function initializeCapabilities(): Promise<void> {
   setBadge(gpuStatus, hasWebGpu ? "WebGPU ready" : "WebGPU unavailable", hasWebGpu ? "ready" : "error");
   let cacheExists = false;
   try {
-    localModelAvailable = await localModelExists();
+    localModelAvailable = PUBLIC_DEMO ? false : await localModelExists();
     cacheExists = await modelCacheDatabaseExists();
     cacheAvailable = localModelAvailable ? false : await inventoryModelCache();
     setBadge(
@@ -969,7 +975,12 @@ async function loadModel(reason: ModelLoadReason = "initial"): Promise<void> {
   const cachedOnly = reason !== "initial";
   const cacheInitializer = cachedOnly
     ? undefined
-    : window.__gemmaEngineCacheInitializer ?? initializeGemmaSafetensorsCache;
+    : window.__gemmaEngineCacheInitializer ?? (
+      PUBLIC_DEMO
+        ? (onProgress: (progress: GemmaCacheInitializationProgress) => void) =>
+          initializeGemmaSafetensorsCache(onProgress, { localUrl: null })
+        : initializeGemmaSafetensorsCache
+    );
   if (!localModelAvailable && !cacheAvailable && !cacheInitializer) return;
   modelLifecycleBusy = true;
   loadButton.disabled = true;
@@ -1006,7 +1017,7 @@ async function loadModel(reason: ModelLoadReason = "initial"): Promise<void> {
     const { loadGemmaGenerationSession } = await import("./runtime/gemma-session");
     const loadOwnedSession = () => loadGemmaGenerationSession({
       cacheCapacity: GEMMA_VALIDATED_CONTEXT_CAPACITY,
-      sourceUrl: localModelAvailable ? GEMMA_LOCAL_SAFETENSORS_URL : undefined,
+      sourceUrl: localModelAvailable ? LOCAL_SAFETENSORS_URL : undefined,
       prefillStrategy: "auto",
       });
     try {
@@ -2172,7 +2183,7 @@ async function modelCacheDatabaseExists(): Promise<boolean> {
 
 async function localModelExists(): Promise<boolean> {
   try {
-    const response = await fetch(GEMMA_LOCAL_SAFETENSORS_URL, { method: "HEAD" });
+    const response = await fetch(LOCAL_SAFETENSORS_URL, { method: "HEAD" });
     return response.ok &&
       response.headers.get("content-length") === String(GEMMA_4_E2B_CACHE_SPEC.fileSize);
   } catch {

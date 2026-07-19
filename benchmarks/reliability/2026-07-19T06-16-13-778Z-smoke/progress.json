@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "profile": "smoke",
+  "status": "failed",
+  "phase": "failed",
+  "currentScenario": null,
+  "completed": 10,
+  "failures": 0,
+  "browserErrors": 1,
+  "startedAt": "2026-07-19T06:16:13.778Z",
+  "updatedAt": "2026-07-19T06:16:58.930Z",
+  "targetDurationMs": 0,
+  "elapsedMs": 45152,
+  "remainingMs": 0,
+  "percentComplete": 100,
+  "failure": null,
+  "latest": {
+    "schemaVersion": 1,
+    "sequence": 9,
+    "scenario": "device-loss-recovery",
+    "startedAt": "2026-07-19T06:16:51.255Z",
+    "completedAt": "2026-07-19T06:16:58.926Z",
+    "durationMs": 7666.399999976158,
+    "passed": true,
+    "result": {
+      "scenario": "device-loss-recovery",
+      "durationMs": 7666.399999976158,
+      "details": {
+        "lossReason": "destroyed",
+        "lossMessage": "Device was destroyed.",
+        "loadMs": 7265.299999952316,
+        "recoveryText": "12"
+      },
+      "memory": {
+        "gpuBufferCount": 1599,
+        "gpuBufferBytes": 854330692,
+        "visionWeightEntryCount": 0,
+        "visionWeightSourceBytes": 0,
+        "visionWeightMaterializedBytes": 0,
+        "scope": "retained-resource-graph"
+      }
+    }
+  }
+}

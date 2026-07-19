@@ -34,6 +34,52 @@ npm run test:gpu
 npm run build
 ```
 
+## Static Demo And Library
+
+`npm run build` creates two minified, base-relative browser outputs:
+
+- `build/index.html` is the complete generation console for static hosting.
+- `build/library/gemma-webgpu-engine.min.js` is the public ES-module entry.
+
+The build includes the tokenizer, validated runtime fixture, examples, icons, and separately
+cacheable WebAssembly support. It deliberately excludes the 2.46 GB local checkpoint. On a new
+origin, **Download model** range-fetches
+[`google/gemma-4-E2B-it-qat-mobile-transformers`](https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers)
+from `resolve/main/model.safetensors` directly into resumable IndexedDB storage, then loads the
+Owned WebGPU engine from that cache. No model bytes pass through the static host.
+
+To publish with GitHub Pages, deploy the contents of `build/` as the Pages artifact. All generated
+URLs are relative, so both a user site and a repository path such as
+`https://<account>.github.io/gemma-webgpu-engine/` work without a custom base setting. The build
+also emits `.nojekyll`. GitHub Pages supplies the HTTPS secure context required by WebGPU and media
+capture.
+
+The library uses the same IndexedDB and lightweight `models/` support files as the console:
+
+```js
+import {
+	initializeGemmaSafetensorsCache,
+	loadGemmaGenerationSession,
+} from "./library/gemma-webgpu-engine.min.js";
+
+await initializeGemmaSafetensorsCache(
+	(progress) => console.log(progress),
+	{ localUrl: null },
+);
+
+const session = await loadGemmaGenerationSession({ cacheCapacity: 32_768 });
+const result = await session.generate("Say hi in one short sentence.", {
+	maxNewTokens: 16,
+	temperature: 0,
+});
+console.log(result.text);
+session.destroy();
+```
+
+The first download is approximately 2.46 GB and requires enough persistent browser storage. If the
+Hugging Face repository requires acceptance or authentication for a visitor, static hosting cannot
+hide a token; access must be granted upstream or supplied by a separate authenticated application.
+
 ## Generate
 
 The owned runtime exposes a persistent generation session:
@@ -348,6 +394,30 @@ pipeline with labeled synthetic data. Real runs use `benchmark:suite:live-smoke`
 `benchmark:suite:full`, or `benchmark:suite:full:headed`; headed and headless aggregates are never
 combined.
 
+### Reliability smoke
+
+The release-reliability harness runs the production Owned WebGPU session against the local pinned
+model, retaining append-only `events.jsonl` plus atomic `progress.json` and `summary.json` artifacts
+under `benchmarks/reliability/<timestamp>-smoke/`. The default profile runs for 20 minutes after
+completing every mandatory scenario; set `RELIABILITY_SMOKE_MINUTES` to a value from 0 through 40
+to change the timed repetition window.
+
+```bash
+npm run reliability:smoke:validate
+npm run reliability:smoke
+```
+
+The mandatory profile covers exact greedy goldens, repeated seeded sampling, regex and JSON
+constraints, prefix reuse, cancellation followed by exact recovery, vision, audio, idempotent
+destruction and reload, simulated device loss, browser errors, and retained-memory plateau checks.
+The first validation exposed prompt-cache metadata surviving cancellation; unsuccessful generation
+now invalidates that metadata before any later request can reuse it. The first
+[20.1-minute smoke](benchmarks/reliability/2026-07-19T06-19-23-067Z-smoke/summary.json) passed 586
+scenarios with zero failed events, zero unexpected browser errors, all mandatory classes covered,
+11 intentional device-loss recoveries, and zero retained GPU-buffer byte or count spread. The
+1.5-2.5-hour release soak, interrupted real-cache reads, and target-browser/hardware matrix remain
+release gates; extended diagnosis uses a 3-6-hour profile when those gates reveal instability.
+
 ### Full-run comparison
 
 ![Owned WebGPU full-control runtime compared in greedy mode with Xenova's greedy-only optimized WebGPU path and LiteRT-LM Web](benchmarks/full-suite-warm-comparison.svg)
@@ -393,10 +463,11 @@ Transformers.js 4.2.0 and LiteRT-LM use model-family artifacts rather than file-
 the owned and pinned Hugging Face rows use the exact mobile-QAT snapshot. The evidence positions
 Owned as the broader full-control runtime, not as a blanket speed winner against a greedy-specialized
 path. Automatic device-loss recovery, vision, audio, video, and the performance-evidence milestone
-are complete. Remaining work proceeds with release
-reliability, promotion or rejection of remaining kernel candidates, the E4B compatibility audit,
-speculative decoding, and device-specific autotuning. See
-[PROJECT.md](PROJECT.md#execution-plan) for gates and details.
+are complete. Release reliability is the remaining ship gate. The prioritized backlog then gates the
+exact cooperative O projection end to end, profiles retained-context decode and the current prefill
+graph, audits prefix-reuse integration, and measures GPU constraint masking. E4B compatibility,
+speculative decoding, and device-specific autotuning remain expansion tracks. See the
+[execution plan and current backlog](PROJECT.md#execution-plan) for gates and details.
 
 The contextual Custom/Chat console, safe history editing, content-identified multimodal prefix
 reuse, and canonical reasoning input/result contracts are complete. Reasoning serialization,

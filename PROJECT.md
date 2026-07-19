@@ -144,16 +144,71 @@ tools/             artifact download, hashing, and reference export
 
 ## Execution plan
 
+**Current status:** the owned E2B generation engine is feature-complete for text, vision, audio,
+video, full decoding control, prefix reuse, long-context operation, device-loss recovery, and
+performance evidence. Items 1-5 below are complete. Release reliability is the remaining ship gate;
+items 7-10 are evidence-gated optimization or expansion work and do not block the existing E2B
+runtime architecture.
+
 1. **Automatic device-loss recovery (complete):** every loaded session observes loss of its owning device, invalidates the stale session, lets in-flight generation unwind to an explicit `device-lost` result, then reacquires WebGPU and rebuilds pipelines, buffers, model resources, and caches without reloading the page or invoking the downloader. Committed conversation state is preserved while interrupted output remains uncommitted. The console's **Reload engine** action also destroys the current session and device before rebuilding strictly from existing local or IndexedDB weights. Live idle-loss and in-flight-loss gates recovered in 8.5 and 8.2 seconds, made zero remote model requests, and the idle-loss replacement generated the exact primary-colors golden afterward. Focused tests cover intentional reset, unexpected loss replacement, singleton reuse, and the UI reload contract.
 2. **Vision optimization (complete):** cache-backed tensor loading, immutable same-session materialized weights, stage timing, live mid-tower cancellation/recovery, full generation at 2,520 patches, retained CPU-memory accounting, and repeated-request stress gates pass. The promoted two-output-row 768-wide dense tile is bit-exact and improves maximum-budget layer-0 median/p95 by `1.16x/1.11x`. A retained two-image, three-budget soak completes six mixed requests, cancels after layer two, recovers on the same device, keeps the 211.6 MiB materialized cache stable, and reports no WebGPU errors. Broader repeated full-session construction/destruction remains part of release reliability rather than this kernel milestone.
 3. **Audio (complete):** pinned preprocessing, strict tower/bridge materialization, owned 12-layer WebGPU execution, dynamic soft-token insertion, cancellation, progress reporting, file upload, microphone capture, and a synthesized-speech demo are implemented without changing the historical language cache. Primitive, real-layer, full-tower speech, tokenizer, UI, build, and regression gates pass. Live transcription quality remains release evidence rather than unfinished runtime architecture.
 4. **Video (complete):** the pinned processor contract is implemented with canonical `<|video|>` token `258884`, `mm:ss` frame timestamps, image boundary tokens, one-frame-per-second deterministic browser sampling, and the documented 60-second limit. Every frame reuses the validated owned vision tower and content-derived multimodal cache identity. The console supports browser video upload plus a `Webcam activity · Video` example with live preview, MediaRecorder capture, playable attachment replacement, track cleanup, and a 10-second demo cap. Browser tests cover timestamp planning, long-video rejection, real canvas-stream recording and decode, canonical tokenization, conversation ownership/editing, workspace controls, and webcam preview.
 5. **Finish performance evidence (complete):** the 11.6-hour current-browser [full suite](benchmarks/suite/headless/2026-07-18T13-53-16-717Z-full/report.md) retains 2,094 measured records across owned WebGPU, the immutable pinned Hugging Face bundle, Transformers.js, and LiteRT-LM, plus 810 explicit Transformers.js skips. It covers long decode; 153, 256, 639, 1,024, and 4,096-token prefill boundaries; fresh and reused conversation state; startup; confidence intervals; correctness; and exclusions. The exact owned/pinned mobile-QAT comparison shows pinned Hugging Face ahead on the valid 32/512 warm row; LiteRT-LM has lower TTFT but lower decode throughput than owned there. No blanket owned-runtime speedup is claimed. Transformers.js passed isolated smoke and six cold-start records but failed full-profile warm setup three times in ONNX Runtime WebGPU. Pinned Hugging Face's 4,096-token reused-cache path retained 30 shape-guard errors, and materially short owned outputs are excluded from equal-work aggregates. The ONNX `q4f16` and `.litertlm` rows remain model-family comparisons; native internal timers remain supplemental unless their boundaries are demonstrably equivalent.
-6. **Release reliability:** stress resource destruction and repeated requests, handle interrupted pinned-range reads, run the full target-browser matrix, and retain reproducible correctness and benchmark artifacts. Include longer mixed-request, cancellation, and session-lifecycle soaks after automatic device-loss recovery is in place.
+6. **Release reliability:** the first durable 20.1-minute smoke passed 586 mixed production-session scenarios with zero failed events, zero unexpected browser errors, all mandatory scenario classes covered, 11 intentional device-loss recoveries, and zero retained GPU-buffer byte or count spread. It also exposed and verified a fix for prompt-cache metadata surviving cancellation. Stress resource destruction and repeated requests further, handle interrupted pinned-range reads, run the full target-browser matrix, and retain reproducible correctness and benchmark artifacts. The longer release soak and cross-browser/hardware evidence remain the ship gate.
 7. **Promote or reject remaining kernel candidates:** use the cross-runtime proof to choose measured bottlenecks, then continue evidence-gated kernel work below the decoding-policy layer. The measured pass rejected exact QKV source-layout, retained the existing gate/up and down kernels because they already beat equivalent pinned-HF timings, and promoted a block-major full-logit LM head after all-logit error, exact greedy/seeded/constraint sequences, retained memory, median, and p95 passed. A row-cooperative O-projection alternate is exact and improves 200-dispatch aggregate median/p95 by 5.37%/8.33%, but remains non-default until full-generation canonical and end-to-end A/B gates pass. Keep all logits available for sampling and constraints; do not add greedy-only queueing or argmax-only handoff. The prior kernels remain load-time fallbacks.
 8. **E4B compatibility audit:** create a pinned E4B manifest and parameterized architecture comparison, then estimate and probe load memory, retained GPU memory, K/V growth, TTFT, TPOT, ITL, and decode throughput. E4B is not a weight-only swap: compared with E2B it changes the decoder from 35 layers / 1,536 hidden / 6,144 MLP / one KV head to 42 layers / 2,560 hidden / 10,240 MLP / two KV heads, changes layer ownership and quantization profiles, and grows the mobile-QAT artifact from about 2.46 GB to 3.53 GB. First parameterize planner, tensor contracts, cache ownership, projection dimensions, tokenizer/model selection, and fixtures; then decide whether a complete owned E4B port meets the target device's latency and memory budget. Keep the full port optional until this gate passes. Google's published M4 Max Web LiteRT figures provide only directional context: E4B reports roughly 3.3 GB and 44 tok/s versus E2B roughly 1.8 GB and 73 tok/s, so same-device measurement remains required.
 9. **Speculative decoding:** integrate a compatible Gemma 4 E2B assistant artifact, implement proposal generation and multi-position target verification, preserve exact acceptance and sampling semantics, and coordinate draft and target cache commit or rollback. Quantization and packaging of the separately published assistant remain part of this milestone because the mobile target artifact does not include it.
 10. **Device-specific autotuning:** measure eligible kernel and scheduling alternatives per adapter, persist validated choices, and retain deterministic fallback paths. No tuning result advances automatically unless it preserves the corresponding token, tensor, constraint, memory, and cancellation gates.
+
+### Current backlog
+
+Work is ordered by release value and confidence. Every performance item must retain the current
+greedy, seeded-sampling, penalty, constraint, streaming, cancellation, and cache-correctness gates.
+
+1. **Release reliability (ship gate):** run repeated construction/destruction and mixed text,
+	multimodal, cancellation, recovery, and long-session soaks; harden interrupted pinned-range
+	reads; and retain a full target-browser matrix with reproducible artifacts. The durable browser
+	harness exposes a zero-duration mandatory validation profile and a 20-minute timed smoke via
+	`npm run reliability:smoke:validate` and `npm run reliability:smoke`. It covers all greedy
+	goldens, deterministic sampling, regex/JSON constraints, exact prefix reuse, cancellation and
+	golden recovery, vision, audio, double destruction/reload, simulated device loss, retained-memory
+	plateau checks, append-only events, and atomic progress/summary artifacts. Its first mandatory run
+	exposed reusable prompt-cache metadata after cancellation; failed generation now invalidates that
+	metadata, and the complete mandatory profile passes. The first [20.1-minute smoke](benchmarks/reliability/2026-07-19T06-19-23-067Z-smoke/summary.json)
+	then passed 586 scenarios with zero failures, zero unexpected browser errors, and zero retained
+	GPU-buffer spread. Use 20-40 minutes for smoke development, 1.5-2.5 hours for the release soak,
+	and 3-6 hours for extended/overnight diagnosis. The release profile must add longer retained-state
+	and cancellation pressure; interrupted real-cache reads run separately; each target browser and
+	hardware environment requires its own retained run. Those longer and matrix gates remain open.
+2. **Gate cooperative O projection:** run canonical full-generation parity and randomized
+	end-to-end A/B measurements for `oprojMode: "cooperative-rows"`. Its operator boundary is exact
+	and currently improves 200-dispatch median/p95 by `5.37%`/`8.33%`; promote it only if complete
+	generation, memory, median, and p95 gates pass.
+3. **Profile retained-context decode:** the full suite showed exact prefix reuse reducing TTFT from
+	`448.85/2274.50/3538.30 ms` to `16.75/17.40/17.75 ms` at the 32/153/256-token boundaries, while
+	equal-work decode throughput at 153/256 tokens fell from about `69-73 tok/s` fresh to
+	`53-55 tok/s` reused. Run randomized same-output GPU-stage A/B measurements to distinguish
+	cache-addressing or synchronization cost from ordering and thermal effects before changing code.
+4. **Reprofile the current prefill graph:** collect fresh stage timestamps after the promoted
+	gate/up and RMS epilogue fusions at 32, 153, 256, 639, and 1,024 tokens. Select the next candidate
+	from measured current-graph time rather than the older pre-fusion result, then require exact
+	prompt IDs, generated IDs, cache state, cancellation recovery, median, and p95.
+5. **Audit prefix-reuse integration:** preserve the already validated longest-common-token-prefix
+	behavior across chat, regeneration, tool loops, constrained retries, and unchanged multimodal
+	follow-ups, and remove only unnecessary application-level resets. Never reuse rows after changed
+	token IDs or changed media identities.
+6. **Move sparse constraint masking to GPU:** benchmark tokenizer-trie candidate masking without
+	changing accepted-token sets or seeded selection order. Keep the resident CPU full-logit path as
+	the correctness fallback until regex, JSON, schema, sampling, and dead-end parity all pass.
+7. **Expansion tracks:** perform the E4B compatibility audit before committing to a port; pursue
+	speculative decoding only with exact target verification and sampling semantics; add
+	adapter-specific autotuning only with persistent validated choices and deterministic fallbacks.
+
+Explicitly excluded from this backlog are EOS suppression, greedy-only queued execution,
+argmax-only LM-head handoff, and previously rejected scheduling/kernel candidates without new
+device-specific evidence. Those approaches either change output behavior, narrow the decoding
+contract, or already failed a median/p95 promotion gate.
 
 Completed adjacent milestones remain in force: multi-turn hardening, including content-identified multimodal K/V reuse, and reasoning configuration, including canonical thinking and tool-loop serialization.
 
