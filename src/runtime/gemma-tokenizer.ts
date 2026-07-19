@@ -1,4 +1,8 @@
-import { AutoTokenizer, env, type PreTrainedTokenizer } from "@huggingface/transformers";
+import {
+  env,
+  GemmaTokenizer as TransformersGemmaTokenizer,
+  type PreTrainedTokenizer,
+} from "@huggingface/transformers";
 import type {
   GemmaVisionImageSource,
   GemmaVisionTokenBudget,
@@ -9,6 +13,7 @@ import { modelAssetUrl } from "../model/model-assets";
 
 const TOKENIZER_PATH = "gemma-4-e2b-tokenizer";
 const MODEL_ROOT = modelAssetUrl("");
+const TOKENIZER_URL = new URL(`${TOKENIZER_PATH}/`, MODEL_ROOT).href;
 const EOS_TOKEN_IDS = new Set([1, 50, 106]);
 export const GEMMA_START_CHANNEL_TOKEN_ID = 100;
 export const GEMMA_END_CHANNEL_TOKEN_ID = 101;
@@ -142,11 +147,19 @@ export interface GemmaTokenizer {
 }
 
 export async function loadGemmaTokenizer(): Promise<GemmaTokenizer> {
-  const [tokenizer, templateResponse] = await Promise.all([
-    AutoTokenizer.from_pretrained(TOKENIZER_PATH, { local_files_only: true }),
-    fetch(new URL(`${TOKENIZER_PATH}/chat_template.jinja`, MODEL_ROOT)),
+  const [tokenizerJsonResponse, tokenizerConfigResponse, templateResponse] = await Promise.all([
+    fetch(new URL("tokenizer.json", TOKENIZER_URL)),
+    fetch(new URL("tokenizer_config.json", TOKENIZER_URL)),
+    fetch(new URL("chat_template.jinja", TOKENIZER_URL)),
   ]);
+  if (!tokenizerJsonResponse.ok || !tokenizerConfigResponse.ok) {
+    throw new Error("Pinned Gemma tokenizer is unavailable");
+  }
   if (!templateResponse.ok) throw new Error("Pinned Gemma chat template is unavailable");
+  const tokenizer = new TransformersGemmaTokenizer(
+    await tokenizerJsonResponse.json(),
+    await tokenizerConfigResponse.json(),
+  );
   return createGemmaTokenizer(tokenizer, await templateResponse.text());
 }
 
