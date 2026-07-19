@@ -6,6 +6,7 @@ import { TokenByteTrie, type TokenByteTrieNode } from "./token-byte-trie";
 const DEFAULT_JSON_DEPTH = 4;
 const MAX_JSON_DEPTH = 8;
 const MAX_SCHEMA_PROPERTIES = 12;
+const JSON_GRAMMAR_MAX_NODES = 50_000;
 const JSON_STRING = String.raw`"(?:[^"\\\x00-\x1F]|\\["\\/bfnrt]|\\u[0-9A-Fa-f]{4})*"`;
 const JSON_NUMBER = String.raw`-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?`;
 const JSON_INTEGER = String.raw`-?(?:0|[1-9][0-9]*)`;
@@ -13,6 +14,7 @@ const JSON_INTEGER = String.raw`-?(?:0|[1-9][0-9]*)`;
 export type GenerationConstraint =
   | { type: "regex"; pattern: string }
   | { type: "json"; maxDepth?: number; whitespace?: JsonWhitespace }
+  | { type: "json-object"; maxDepth?: number; whitespace?: JsonWhitespace }
   | {
       type: "json-schema";
       schema: object;
@@ -120,7 +122,16 @@ export function compileGenerationConstraint(
     const source = `${whitespace}${jsonValuePattern(maxDepth, whitespace)}${whitespace}`;
     return compilePattern(source, (text) => {
       JSON.parse(text);
-    });
+    }, JSON_GRAMMAR_MAX_NODES);
+  }
+  if (constraint.type === "json-object") {
+    const source = `${whitespace}${jsonObjectPattern(maxDepth, whitespace)}${whitespace}`;
+    return compilePattern(source, (text) => {
+      const value: unknown = JSON.parse(text);
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw new Error("Generated JSON must be an object");
+      }
+    }, JSON_GRAMMAR_MAX_NODES);
   }
 
   const source = `${whitespace}${schemaPattern(
@@ -142,7 +153,7 @@ export function compileGenerationConstraint(
       const detail = ajv.errorsText(validator.errors, { separator: "; " });
       throw new Error(`Generated JSON does not satisfy its schema: ${detail}`);
     }
-  });
+  }, JSON_GRAMMAR_MAX_NODES);
 }
 
 export function maskConstraintLogits(
@@ -175,6 +186,7 @@ function compileRegexConstraint(pattern: string): CompiledGenerationConstraint {
 function compilePattern(
   source: string,
   validateOutput: (text: string) => void,
+  maxNodes?: number,
 ): CompiledGenerationConstraint {
   try {
     const parser = JS.Parser.fromLiteral({ source, flags: "u" });
@@ -189,8 +201,15 @@ function compilePattern(
     const { expression, maxCharacter } = parser.parse({
       assertions: "throw",
       backreferences: "throw",
+      maxNodes,
     });
-    const dfa = DFA.fromFA(NFA.fromRegex(expression, { maxCharacter }));
+    const nfa = NFA.fromRegex(
+      expression,
+      { maxCharacter },
+      undefined,
+      new NFA.LimitedNodeFactory(maxNodes),
+    );
+    const dfa = DFA.fromFA(nfa, new DFA.LimitedNodeFactory(maxNodes));
     dfa.removeUnreachable();
     dfa.minimize();
     if (dfa.finals.size === 0) throw new Error("constraint accepts no output");
@@ -322,8 +341,17 @@ function jsonValuePattern(depth: number, whitespace: string): string {
   if (depth <= 0) return primitive;
   const child = jsonValuePattern(depth - 1, whitespace);
   const array = `\\[${whitespace}(?:${child}(?:${whitespace},${whitespace}${child})*)?${whitespace}\\]`;
-  const object = `\\{${whitespace}(?:${JSON_STRING}${whitespace}:${whitespace}${child}(?:${whitespace},${whitespace}${JSON_STRING}${whitespace}:${whitespace}${child})*)?${whitespace}\\}`;
+  const object = jsonObjectMembersPattern(child, whitespace);
   return `(?:${primitive}|${array}|${object})`;
+}
+
+function jsonObjectPattern(depth: number, whitespace: string): string {
+  const child = jsonValuePattern(Math.max(0, depth - 1), whitespace);
+  return jsonObjectMembersPattern(child, whitespace);
+}
+
+function jsonObjectMembersPattern(child: string, whitespace: string): string {
+  return `\\{${whitespace}(?:${JSON_STRING}${whitespace}:${whitespace}${child}(?:${whitespace},${whitespace}${JSON_STRING}${whitespace}:${whitespace}${child})*)?${whitespace}\\}`;
 }
 
 type JsonSchema = Record<string, unknown>;

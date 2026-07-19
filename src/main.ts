@@ -81,7 +81,7 @@ type GenerationExampleControl =
   | "seed";
 
 type ConsoleWorkspace = "custom" | "chat" | "example";
-type ConstraintEditor = "all" | "none" | "regex" | "json" | "json-schema";
+type ConstraintEditor = "all" | "none" | "regex" | "json" | "json-object" | "json-schema";
 
 interface ExampleUiProfile {
   vision: boolean;
@@ -237,10 +237,10 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
   {
     id: "json-city",
     label: "Paris facts · JSON",
-    prompt: "Return one compact JSON object about Paris with keys city, country, and landmarks, where landmarks is an array of exactly two strings. Return JSON only.",
+    prompt: "Return one compact JSON object about Paris. Choose useful keys and values. Return JSON only.",
     controls: { temperature: 0, maxNewTokens: 64 },
-    constraint: { type: "json", maxDepth: 3, whitespace: "compact" },
-    ui: { vision: false, sampling: false, constraint: "json" },
+    constraint: { type: "json-object", maxDepth: 3, whitespace: "compact" },
+    ui: { vision: false, sampling: false, constraint: "json-object" },
   },
   {
     id: "schema-triage",
@@ -518,6 +518,7 @@ app.innerHTML = `
             <label><input type="radio" name="constraintMode" value="none" checked><span>None</span></label>
             <label><input type="radio" name="constraintMode" value="regex"><span>Regex</span></label>
             <label><input type="radio" name="constraintMode" value="json"><span>JSON</span></label>
+            <label><input type="radio" name="constraintMode" value="json-object"><span>Object</span></label>
             <label><input type="radio" name="constraintMode" value="json-schema"><span>Schema</span></label>
           </div>
 
@@ -703,6 +704,7 @@ let editBaseConversation: GemmaConversation | null = null;
 let benchmarkController: AbortController | null = null;
 let benchmarkArtifact: GemmaDurableBenchmarkArtifact | null = null;
 let conversation: GemmaConversation = createGemmaConversation();
+let standaloneConversationSeed: GemmaConversation = createGemmaConversation();
 
 if (import.meta.env.DEV) {
   window.__gemmaEngineForceDeviceLoss = () => {
@@ -750,13 +752,11 @@ resetButton.addEventListener("click", () => {
   validateControls();
 });
 controlsForm.addEventListener("input", () => {
-  markExampleCustomized();
   renderConstraintFields();
   if (controlsValidationTimer !== null) window.clearTimeout(controlsValidationTimer);
   controlsValidationTimer = window.setTimeout(validateControls, 120);
 });
 promptInput.addEventListener("input", () => {
-  markExampleCustomized();
   validateControls();
 });
 imageInput.addEventListener("change", () => {
@@ -765,7 +765,7 @@ imageInput.addEventListener("change", () => {
     clearSelectedImage();
     return;
   }
-  selectImage(file, true);
+  selectImage(file);
 });
 audioInput.addEventListener("change", () => {
   const file = audioInput.files?.[0] ?? null;
@@ -786,19 +786,15 @@ videoInput.addEventListener("change", () => {
 recordAudioButton.addEventListener("click", () => void toggleAudioRecording());
 recordVideoButton.addEventListener("click", () => void toggleVideoRecording());
 visionTokenBudgetInput.addEventListener("change", () => {
-  markExampleCustomized();
   validateControls();
 });
 removeImageButton.addEventListener("click", () => {
-  markExampleCustomized();
   clearSelectedImage();
 });
 removeAudioButton.addEventListener("click", () => {
-  markExampleCustomized();
   clearSelectedAudio();
 });
 removeVideoButton.addEventListener("click", () => {
-  markExampleCustomized();
   clearSelectedVideo();
 });
 benchmarkRunButton.addEventListener("click", () => void runBoundaryBenchmark());
@@ -1136,12 +1132,16 @@ async function generate(): Promise<void> {
 
   let options: GemmaGenerationOptions;
   let turn: PreparedGemmaConversationTurn;
+  if (activeWorkspace !== "chat") {
+    conversation = cloneConversation(standaloneConversationSeed);
+    editBaseConversation = null;
+  }
   const requestConversation = editBaseConversation ?? conversation;
   const editingRequest = editBaseConversation !== null;
   try {
     options = readGenerationOptions();
     if (activeExample?.requireReasoning) options.requireReasoning = true;
-    if (forceFreshGeneration) options.reusePromptCache = false;
+    if (activeWorkspace !== "chat" || forceFreshGeneration) options.reusePromptCache = false;
     turn = prepareGemmaConversationTurn(
       requestConversation,
       prompt,
@@ -1324,7 +1324,8 @@ function visibleGemmaDraft(
 function applyGenerationExample(example: GenerationExample): void {
   controlsForm.reset();
   enableThinkingInput.checked = example.enableThinking ?? false;
-  conversation = createGemmaConversation(example.history, [], example.tools);
+  standaloneConversationSeed = createGemmaConversation(example.history, [], example.tools);
+  conversation = cloneConversation(standaloneConversationSeed);
   renderConversation();
   newChatButton.disabled = !hasConversationState();
   promptInput.value = example.prompt;
@@ -1340,7 +1341,8 @@ function applyGenerationExample(example: GenerationExample): void {
   modeInput.checked = true;
   if (example.constraint?.type === "regex") {
     setControlValue("regexPattern", example.constraint.pattern);
-  } else if (example.constraint?.type === "json" ||
+    } else if (example.constraint?.type === "json" ||
+      example.constraint?.type === "json-object" ||
       example.constraint?.type === "json-schema") {
     setControlValue("jsonMaxDepth", example.constraint.maxDepth ?? 4);
     setControlValue("jsonWhitespace", example.constraint.whitespace ?? "compact");
@@ -1367,12 +1369,12 @@ async function selectGenerationExample(example: GenerationExample): Promise<void
     if (example.image) {
       const image = await loadExampleImage(example.image.url);
       if (exampleSelect.value !== example.id) return;
-      selectImage(image, false, example.image.url, example.image.filename);
+      selectImage(image, example.image.url, example.image.filename);
     }
     if (example.audio) {
       const audio = await loadExampleAudio(example.audio.url, example.audio.filename);
       if (exampleSelect.value !== example.id) return;
-      selectAudio(audio, false);
+      selectAudio(audio);
     }
   } catch (error) {
     if (exampleSelect.value !== example.id) return;
@@ -1424,6 +1426,7 @@ function readConstraint(data: FormData): GenerationConstraint | undefined {
   const maxDepth = numberValue(data, "jsonMaxDepth");
   const whitespace = String(data.get("jsonWhitespace")) as JsonWhitespace;
   if (mode === "json") return { type: "json", maxDepth, whitespace };
+  if (mode === "json-object") return { type: "json-object", maxDepth, whitespace };
   const schemaText = String(data.get("jsonSchema") ?? "");
   const schema: unknown = JSON.parse(schemaText);
   if (!schema || typeof schema !== "object" || Array.isArray(schema)) {
@@ -1460,8 +1463,11 @@ function renderPromptBudget(maxNewTokens: number): void {
     promptBudget.dataset.valid = "true";
     return;
   }
+  const budgetConversation = activeWorkspace === "chat"
+    ? editBaseConversation ?? conversation
+    : standaloneConversationSeed;
   const turn = prepareGemmaConversationTurn(
-    editBaseConversation ?? conversation,
+    budgetConversation,
     prompt,
     selectedImage ?? undefined,
     readVisionTokenBudget(),
@@ -1505,7 +1511,8 @@ function renderConstraintFields(): void {
   constraintModeSelector.hidden = editor !== "all";
   const mode = editor === "all" ? String(data.get("constraintMode")) : editor;
   element<HTMLElement>("constraint-regex").hidden = mode !== "regex";
-  element<HTMLElement>("constraint-json").hidden = mode !== "json" && mode !== "json-schema";
+  element<HTMLElement>("constraint-json").hidden = mode !== "json" &&
+    mode !== "json-object" && mode !== "json-schema";
   element<HTMLElement>("constraint-json-schema").hidden = mode !== "json-schema";
 }
 
@@ -1565,7 +1572,10 @@ function renderConsoleProfile(): void {
   renderConstraintFields();
 }
 
-function activateWorkspace(workspace: Exclude<ConsoleWorkspace, "example">): void {
+function activateWorkspace(
+  workspace: Exclude<ConsoleWorkspace, "example">,
+  preserveStandaloneSeed = false,
+): void {
   const enteringChat = workspace === "chat" && activeWorkspace !== "chat";
   activeWorkspace = workspace;
   activeExample = null;
@@ -1578,13 +1588,13 @@ function activateWorkspace(workspace: Exclude<ConsoleWorkspace, "example">): voi
     clearSelectedAudio();
     clearSelectedVideo();
     renderConversation();
+  } else if (workspace === "custom" && !preserveStandaloneSeed) {
+    standaloneConversationSeed = createGemmaConversation();
+    conversation = createGemmaConversation();
+    editBaseConversation = null;
+    renderConversation();
   }
   renderConsoleProfile();
-}
-
-function markExampleCustomized(): void {
-  if (activeWorkspace !== "example") return;
-  activateWorkspace("custom");
 }
 
 function renderTelemetry(
@@ -1689,11 +1699,9 @@ function setGenerating(generating: boolean): void {
 }
 
 function clearTranscript(): void {
-  conversation = createGemmaConversation(
-    activeExample?.history ?? [],
-    [],
-    activeExample?.tools ?? [],
-  );
+  conversation = activeWorkspace === "chat"
+    ? createGemmaConversation()
+    : cloneConversation(standaloneConversationSeed);
   editBaseConversation = null;
   forceFreshGeneration = true;
   renderConversation();
@@ -1706,6 +1714,7 @@ function clearTranscript(): void {
 
 function clearConversation(): void {
   conversation = createGemmaConversation();
+  standaloneConversationSeed = createGemmaConversation();
   editBaseConversation = null;
   promptInput.value = "";
   clearSelectedImage();
@@ -1716,6 +1725,16 @@ function clearConversation(): void {
   newChatButton.disabled = true;
   requestStatus.textContent = session ? "New conversation" : "Waiting for model";
   validateControls();
+}
+
+function cloneConversation(source: GemmaConversation): GemmaConversation {
+  return createGemmaConversation(
+    source.messages,
+    source.images,
+    source.tools,
+    source.audios,
+    source.videos,
+  );
 }
 
 function renderConversation(
@@ -1870,9 +1889,9 @@ function beginConversationEdit(messageIndex: number): void {
   );
   editBaseConversation = edit.conversation;
   promptInput.value = messageText(message);
-  if (edit.turn.image) selectImage(edit.turn.image, false);
+  if (edit.turn.image) selectImage(edit.turn.image);
   else clearSelectedImage();
-  if (edit.turn.video) selectVideo(edit.turn.video, false);
+  if (edit.turn.video) selectVideo(edit.turn.video);
   else clearSelectedVideo();
   requestStatus.textContent = "Editing message";
   renderConversation();
@@ -1917,7 +1936,6 @@ function hasConversationState(): boolean {
 
 function selectImage(
   image: GemmaVisionImageSource,
-  clearExample: boolean,
   previewUrl?: string,
   filename?: string,
 ): void {
@@ -1927,7 +1945,6 @@ function selectImage(
   imageThumbnail.src = previewUrl ?? imagePreviewUrl!;
   imageName.textContent = filename ?? (image instanceof File ? image.name : "Image");
   imagePreview.hidden = false;
-  if (clearExample) markExampleCustomized();
   renderConsoleProfile();
   validateControls();
 }
@@ -1944,14 +1961,13 @@ function clearSelectedImage(): void {
   validateControls();
 }
 
-function selectAudio(audio: Blob, clearExample = true): void {
+function selectAudio(audio: Blob): void {
   selectedAudio = audio;
   if (audioPreviewUrl) URL.revokeObjectURL(audioPreviewUrl);
   audioPreviewUrl = URL.createObjectURL(audio);
   audioPlayer.src = audioPreviewUrl;
   audioName.textContent = audio instanceof File ? audio.name : "Audio";
   audioPreview.hidden = false;
-  if (clearExample) markExampleCustomized();
   validateControls();
 }
 
@@ -1968,7 +1984,7 @@ function clearSelectedAudio(): void {
   validateControls();
 }
 
-function selectVideo(video: Blob, clearExample = true): void {
+function selectVideo(video: Blob): void {
   selectedVideo = video;
   if (videoPreviewUrl) URL.revokeObjectURL(videoPreviewUrl);
   videoPreviewUrl = URL.createObjectURL(video);
@@ -1977,7 +1993,6 @@ function selectVideo(video: Blob, clearExample = true): void {
   videoPlayer.controls = true;
   videoName.textContent = video instanceof File ? video.name : "Video";
   videoPreview.hidden = false;
-  if (clearExample) markExampleCustomized();
   renderConsoleProfile();
   validateControls();
 }

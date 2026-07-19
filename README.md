@@ -628,6 +628,7 @@ Generation supports tokenizer-aware output constraints as a first-class API alon
 type GenerationConstraint =
 	| { type: "regex"; pattern: string }
 	| { type: "json"; maxDepth?: number; whitespace?: "none" | "compact" | "any" }
+	| { type: "json-object"; maxDepth?: number; whitespace?: "none" | "compact" | "any" }
 	| {
 			type: "json-schema";
 			schema: object;
@@ -636,10 +637,10 @@ type GenerationConstraint =
 		};
 ```
 
-JSON Schema is the preferred contract for decision payloads. Regex constraints target regular output formats and deliberately reject assertions and backreferences. Nested JSON uses a bounded grammar rather than pretending an unbounded JSON language is regular. The supported schema subset includes `type`, `const`, `enum`, `oneOf`, `anyOf`, closed objects whose declared properties are all required, and bounded homogeneous arrays. Unknown keywords, references, optional/open object properties, and other unsupported constructs fail configuration explicitly.
+Generic JSON accepts any JSON root value. JSON Object requires an object root while allowing model-chosen keys and arbitrary nested JSON values. JSON Schema is the preferred contract for closed decision payloads. Regex constraints target regular output formats and deliberately reject assertions and backreferences. Nested JSON uses a bounded grammar rather than pretending an unbounded JSON language is regular. The supported schema subset includes `type`, `const`, `enum`, `oneOf`, `anyOf`, closed objects whose declared properties are all required, and bounded homogeneous arrays. Unknown keywords, references, optional/open schema properties, and other unsupported constructs fail configuration explicitly.
 
 Constraints operate on the exact tokenizer's UTF-8 token bytes, including partial multi-byte characters across token boundaries. A token trie and minimized DFA determine legal token IDs for each state. The current correctness-first path masks the resident CPU logits before top-k/min-p/typical-p/top-p filtering and sampling; GPU candidate masking remains a performance milestone. EOS and configured stop tokens are legal only in an accepting state, dead ends are explicit errors, and regex, JSON, and AJV schema checks validate final output independently.
 
 Constrained decoding does not reduce the cost of Gemma's transformer pass by itself. Its expected end-to-end gains come from preventing malformed output and retries, stopping at the first complete accepted payload, reducing sampling/readback work, and producing fewer unnecessary tokens. Performance claims require measured constrained and unconstrained runs with the same prompt and output contract.
 
-Focused browser tests cover trie pruning, full-match regex behavior, split-token UTF-8, invalid syntax, bounded JSON, the closed schema subset, unsupported constructs, and masking. Live cached-model gates produced exact constrained `Hi!` and `{"ok":true}` outputs with streaming/JSON parity and no WebGPU validation or internal errors.
+Focused browser tests cover trie pruning, full-match regex behavior, split-token UTF-8, invalid syntax, bounded JSON, open object roots, the closed schema subset, unsupported constructs, and masking. Live cached-model gates produced exact constrained `Hi!` and `{"ok":true}` outputs plus an open Paris object with model-chosen keys, streaming/JSON parity, and no WebGPU validation or internal errors.

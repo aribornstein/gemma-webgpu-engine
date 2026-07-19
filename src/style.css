@@ -862,7 +862,7 @@ button.image-picker[data-recording="true"] {
 
 .segmented-control {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   border: 1px solid var(--line-strong);
   border-radius: 3px;
   overflow: hidden;
@@ -1109,11 +1109,12 @@ button.image-picker[data-recording="true"] {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .segmented-control label:nth-child(2) {
+  .segmented-control label:nth-child(2),
+  .segmented-control label:nth-child(4) {
     border-right: 0;
   }
 
-  .segmented-control label:nth-child(-n + 2) {
+  .segmented-control label:nth-child(-n + 4) {
     border-bottom: 1px solid var(--line-strong);
   }
 }

@@ -80,6 +80,18 @@ test("enforces bounded JSON syntax incrementally", () => {
   }).toThrow("violates the generation constraint");
 });
 
+test("enforces an open JSON object root without prescribing properties", () => {
+  const constraint = { type: "json-object", maxDepth: 3, whitespace: "none" } as const;
+  acceptText(constraint, "{\"city\":\"Paris\",\"facts\":[true,2]}");
+  acceptText(constraint, "{}");
+  expect(() => acceptText(constraint, "[\"Paris\"]")).toThrow(
+    "violates the generation constraint",
+  );
+  expect(() => acceptText(constraint, "\"Paris\"")).toThrow(
+    "violates the generation constraint",
+  );
+});
+
 test("enforces the supported closed JSON Schema subset", () => {
   const schema = {
     type: "object",

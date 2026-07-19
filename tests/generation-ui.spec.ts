@@ -125,6 +125,11 @@ test("validates controls and switches constraint editors", async ({ page }) => {
   await page.getByRole("checkbox", { name: "Thinking" }).check();
   await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
 
+  await page.getByRole("radio", { name: "Object" }).check();
+  await expect(page.getByRole("spinbutton", { name: "Maximum depth" })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeHidden();
+  await expect(page.getByText("json-object constraint valid", { exact: true })).toBeVisible();
+
   await page.getByRole("button", { name: "Reset" }).click();
   await expect(page.getByRole("radio", { name: "None" })).toBeChecked();
   await expect(page.getByText("Exact greedy configuration", { exact: true })).toBeVisible();
@@ -166,7 +171,8 @@ test("applies editable generation examples", async ({ page }) => {
 
   await examples.selectOption("json-city");
   await expect(page.getByRole("spinbutton", { name: "Maximum depth" })).toHaveValue("3");
-  await expect(page.getByText("json constraint valid", { exact: true })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeHidden();
+  await expect(page.getByText("json-object constraint valid", { exact: true })).toBeVisible();
 
   await examples.selectOption("schema-triage");
   await expect(page.getByRole("textbox", { name: "JSON Schema" })).toHaveValue(/"urgent"/);
@@ -185,7 +191,8 @@ test("applies editable generation examples", async ({ page }) => {
   await expect(page.getByText("json-schema constraint valid", { exact: true })).toBeVisible();
 
   await page.getByRole("spinbutton", { name: "Max tokens" }).fill("32");
-  await expect(examples).toHaveValue("custom");
+  await expect(examples).toHaveValue("schema-reasoning");
+  await expect(page.getByRole("textbox", { name: "JSON Schema" })).toBeVisible();
 });
 
 test("records webcam output into the video attachment preview", async ({ page }) => {
