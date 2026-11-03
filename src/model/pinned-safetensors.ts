@@ -14,9 +14,12 @@ export const GEMMA_PINNED_SAFETENSORS_URL =
   `https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/` +
   `${MODEL_REVISION}/model.safetensors`;
 
-export const GEMMA_SAFETENSORS_DOWNLOAD_URL =
-  "https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers/resolve/main/" +
-  "model.safetensors";
+/**
+ * Download source for the browser cache. It resolves the pinned revision so an upstream change to
+ * `main` cannot silently populate the cache with different bytes. The IndexedDB cache identity
+ * (`GEMMA_4_E2B_CACHE_SPEC.sourceKey`) is unchanged, so existing caches remain valid.
+ */
+export const GEMMA_SAFETENSORS_DOWNLOAD_URL = GEMMA_PINNED_SAFETENSORS_URL;
 
 export const GEMMA_LOCAL_SAFETENSORS_URL = "/models/gemma-4-e2b/model.safetensors";
 

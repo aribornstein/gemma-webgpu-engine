@@ -4,7 +4,12 @@ let deviceGeneration = 0;
 export function getWebGpuDevice(): Promise<GPUDevice> {
   if (!devicePromise) {
     const generation = ++deviceGeneration;
-    devicePromise = createDevice(generation);
+    const pending = createDevice(generation);
+    devicePromise = pending;
+    // A failed request must not poison later attempts (for example after a transient failure).
+    pending.catch(() => {
+      if (devicePromise === pending) devicePromise = null;
+    });
   }
   return devicePromise;
 }

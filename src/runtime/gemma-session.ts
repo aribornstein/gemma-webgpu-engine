@@ -256,6 +256,7 @@ export class GemmaGenerationSession {
   private readonly evaluatedTokenIds: number[] = [];
   private destroyed = false;
   private generating = false;
+  private activeGeneration: AbortController | null = null;
   private readonly device: GPUDevice;
   private readonly cache: GemmaSessionTensorSource;
   private readonly tokenizer: GemmaTokenizer;
@@ -332,14 +333,24 @@ export class GemmaGenerationSession {
         prefillMaxInFlightBlocks !== 4 && prefillMaxInFlightBlocks !== 8) {
       throw new Error("Gemma prefill in-flight block count must be 1, 2, 4, or 8");
     }
-    const [device, cache, tokenizer, fixture] = await Promise.all([
-      getWebGpuDevice(),
-      options.sourceUrl
-        ? PinnedSafetensorsSource.open(options.sourceUrl)
-        : ReadonlySafetensorsCache.open(),
-      loadGemmaTokenizer(),
-      loadDecodeMlpPleFixture(),
-    ]);
+    const cachePromise: Promise<GemmaSessionTensorSource> = options.sourceUrl
+      ? PinnedSafetensorsSource.open(options.sourceUrl)
+      : ReadonlySafetensorsCache.open();
+    let device: GPUDevice;
+    let cache: GemmaSessionTensorSource;
+    let tokenizer: GemmaTokenizer;
+    let fixture: Awaited<ReturnType<typeof loadDecodeMlpPleFixture>>;
+    try {
+      [device, cache, tokenizer, fixture] = await Promise.all([
+        getWebGpuDevice(),
+        cachePromise,
+        loadGemmaTokenizer(),
+        loadDecodeMlpPleFixture(),
+      ]);
+    } catch (error) {
+      cachePromise.then((opened) => opened.close(), () => undefined);
+      throw error;
+    }
     if (!device.features.has("subgroups") || !device.features.has("shader-f16")) {
       cache.close();
       throw new Error("Gemma generation requires WebGPU subgroups and shader-f16");
@@ -409,7 +420,7 @@ export class GemmaGenerationSession {
     if (this.generating) throw new Error("Gemma generation is already in progress");
     const setupStartedAt = performance.now();
     const {
-      signal,
+      signal: callerSignal,
       onToken,
       onVisionProgress,
       onAudioProgress,
@@ -420,7 +431,12 @@ export class GemmaGenerationSession {
       captureTokenLogProbabilities = false,
       ...decodingOptions
     } = options;
-    throwIfGemmaGenerationAborted(signal);
+    throwIfGemmaGenerationAborted(callerSignal);
+    // destroy() aborts through this controller so in-flight work unwinds before release.
+    const lifecycle = new AbortController();
+    const signal = callerSignal
+      ? AbortSignal.any([callerSignal, lifecycle.signal])
+      : lifecycle.signal;
     const config = resolveGemmaGenerationConfig(decodingOptions);
     if (requireReasoning && !usesGemmaThinking(input)) {
       throw new Error("Required reasoning needs enableThinking");
@@ -443,6 +459,7 @@ export class GemmaGenerationSession {
       : "greedy";
     const maxNewTokens = config.maxNewTokens;
     this.generating = true;
+    this.activeGeneration = lifecycle;
     let completed = false;
     const visionResources: GemmaVisionImageResources[] = [];
     const audioResources: GemmaAudioEncodingResources[] = [];
@@ -698,8 +715,9 @@ export class GemmaGenerationSession {
             customStopTokens,
             allowReasoningChannel ? [GEMMA_START_CHANNEL_TOKEN_ID] : [],
           );
-        } else if (requireReasoning || !usesGemmaGpuGreedy(config) ||
-          (compiledConstraint && !constraintActive)) {
+        } else if (!modelOutput.prediction) {
+          // Logits mode without a GPU prediction (sampling, penalties, reasoning, released
+          // constraints, or greedy with log-probability capture) selects on the CPU.
           const logits = requiredGemmaLogits(modelOutput);
           throwIfGemmaGenerationAborted(signal);
           token = sampleToken(logits, history, config, () => random.next());
@@ -821,6 +839,8 @@ export class GemmaGenerationSession {
       }
       if (!completed) this.invalidatePromptCache();
       this.generating = false;
+      this.activeGeneration = null;
+      if (this.destroyed) this.releaseResources();
     }
   }
 
@@ -956,9 +976,23 @@ export class GemmaGenerationSession {
     };
   }
 
+  /**
+   * Releases GPU and cache resources. Calling it during generate() aborts that request with an
+   * AbortError and defers release until the request has unwound.
+   */
   destroy(): void {
     if (this.destroyed) return;
     this.destroyed = true;
+    if (this.generating) {
+      this.activeGeneration?.abort(
+        new DOMException("Gemma generation session was destroyed", "AbortError"),
+      );
+      return;
+    }
+    this.releaseResources();
+  }
+
+  private releaseResources(): void {
     if (this.prefill) destroyGemmaFixedPrefillResources(this.prefill);
     this.logitsReadback.destroy();
     destroyGemmaDecodeModelResources(this.resources);
@@ -968,6 +1002,10 @@ export class GemmaGenerationSession {
     this.cache.close();
   }
 
+  /**
+   * @internal Diagnostic hook for recovery tests. It destroys the shared WebGPU device, which
+   * invalidates every session on this page; applications should not call it.
+   */
   simulateDeviceLoss(): void {
     this.assertAlive();
     this.device.destroy();

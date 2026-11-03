@@ -7,6 +7,8 @@ export interface SafetensorsCacheSpec {
   fileSize: number;
   dataStart: number;
   tensorCount: number;
+  /** SHA-256 of the complete safetensors prefix (length word plus JSON header). */
+  headerSha256?: string;
 }
 
 export interface CachedTensorDescriptor {
@@ -43,6 +45,7 @@ export const GEMMA_4_E2B_CACHE_SPEC: Readonly<SafetensorsCacheSpec> = {
   fileSize: 2_458_111_846,
   dataStart: 375_400,
   tensorCount: 2_780,
+  headerSha256: "ab25de27861de1a3f39de9e8b8c645143597a867ddefde4415c15bf4ad13d2fc",
 };
 
 export class ReadonlySafetensorsCache {
@@ -83,6 +86,13 @@ export class ReadonlySafetensorsCache {
         throw new Error(`IndexedDB ${spec.databaseName} does not match the safetensors schema`);
       }
       const metadata = await readStoreValue(database, META_STORE, spec.sourceKey);
+      // Downloads written by this engine record completion explicitly; legacy caches without
+      // the flag are verified by reading tensors instead.
+      if (isRecord(metadata) && metadata.complete === false) {
+        throw new Error(
+          `IndexedDB ${spec.databaseName} download is incomplete; resume cache initialization`,
+        );
+      }
       const descriptors = parseMetadata(metadata, spec);
       return new ReadonlySafetensorsCache(database, spec, descriptors);
     } catch (error) {
