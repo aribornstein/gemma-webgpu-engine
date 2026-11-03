@@ -12,6 +12,12 @@ import {
 import { createGemmaRotaryBlock, createGemmaRotaryRows } from "../model/gemma-rope";
 import { getWebGpuDevice } from "../webgpu/device";
 import type { GemmaLmHeadMode } from "../webgpu/decode-lm-head";
+import type {
+  GemmaResearchActivationCapture,
+  GemmaResearchCaptureSite,
+  GemmaResearchContinuationScore,
+  GemmaResearchOverlay,
+} from "../research/engine-types";
 import type { DecodeOprojNormMode } from "../webgpu/decode-oproj-norm";
 import {
   uploadGemmaTokenInputBatch,
@@ -28,6 +34,14 @@ import {
   type GemmaModelOutputMode,
 } from "../webgpu/decode-model";
 import { updateGemmaDecodeStackToken } from "../webgpu/decode-stack";
+import { encodeGemmaLmHeadPass } from "../webgpu/decode-lm-head";
+import {
+  createResearchResidualCapture,
+  createResearchResidualEditResources,
+  destroyResearchResidualEditResources,
+  getResearchResidualCapturePipeline,
+  getResearchResidualEditPipeline,
+} from "../webgpu/research-residual-edit";
 import {
   GEMMA_MAX_GPU_TOP_K,
   gemmaTopCandidateListLength,
@@ -315,6 +329,8 @@ export class GemmaGenerationSession {
   private readonly evaluatedVisionIdentities: string[] = [];
   private tokenByteTrie: TokenByteTrie | null = null;
   private activeTiming: MutableGemmaGenerationTiming | null = null;
+  private researchFinalOverlay: { a: Float32Array; u: Float32Array; coefficient: number } | null = null;
+  private researchVectorReadback: GPUBuffer | null = null;
   readonly cacheCapacity: number;
   readonly deviceLost: Promise<GPUDeviceLostInfo>;
 
@@ -514,14 +530,17 @@ export class GemmaGenerationSession {
     const forcedReasoningPrefix = requireReasoning
       ? [GEMMA_START_CHANNEL_TOKEN_ID, ...this.tokenizer.encodeText("thought\n")]
       : [];
+    const researchOverlayActive = this.researchFinalOverlay !== null ||
+      Boolean(this.resources.stack.researchEdit);
     const outputMode: GemmaModelOutputMode = compiledConstraint || requireReasoning ||
-      captureTokenLogProbabilities || beamOptions ||
+      captureTokenLogProbabilities || beamOptions || researchOverlayActive ||
       !usesGemmaGpuGreedy(config)
       ? "logits"
       : "greedy";
     // Plain top-k sampling selects candidates on the GPU and reads back only those; the ranked
     // candidates are exactly the CPU sampler's (softcap and temperature are monotonic).
-    const usesGpuCandidates = outputMode === "logits" && !compiledConstraint && !requireReasoning &&
+    const usesGpuCandidates = outputMode === "logits" && !researchOverlayActive &&
+      !compiledConstraint && !requireReasoning &&
       !captureTokenLogProbabilities && !beamOptions && config.temperature > 0 &&
       config.topK >= 1 && config.topK <= GEMMA_MAX_GPU_TOP_K &&
       (config.repetitionWindow === 0 || (
@@ -679,7 +698,9 @@ export class GemmaGenerationSession {
         this.position,
         pendingPromptTokenIds.length,
         this.cacheCapacity,
-        preparedPrompt.audioInputs.length > 0 ? "sequential" : this.prefillStrategy,
+        preparedPrompt.audioInputs.length > 0 || this.resources.stack.researchEdit
+          ? "sequential"
+          : this.prefillStrategy,
         this.prefill !== null,
         GEMMA_FIXED_PREFILL_ROWS,
       );
@@ -1152,6 +1173,11 @@ export class GemmaGenerationSession {
   private releaseResources(): void {
     if (this.prefill) destroyGemmaFixedPrefillResources(this.prefill);
     this.logitsReadback.destroy();
+    this.researchVectorReadback?.destroy();
+    if (this.resources.stack.researchEdit) {
+      destroyResearchResidualEditResources(this.resources.stack.researchEdit);
+      this.resources.stack.researchEdit = null;
+    }
     destroyGemmaDecodeModelResources(this.resources);
     this.tokenInputCache.clear();
     this.visionWeightCache.clear();
@@ -1239,6 +1265,7 @@ export class GemmaGenerationSession {
       outputMode === "logits" ? this.logitsReadback : undefined,
       topCandidates,
     );
+    if (output.logits) await this.applyResearchFinalOverlay(output.logits);
     if (this.activeTiming) this.activeTiming.logitsReadbackMs += output.logitsReadbackMs;
     this.position += 1;
     this.evaluatedTokenIds.push(tokenId);
@@ -1303,6 +1330,7 @@ export class GemmaGenerationSession {
       outputMode === "logits" ? this.logitsReadback : undefined,
       this.activeTiming?.profilePrefillStages === true,
     );
+    if (output.logits) await this.applyResearchFinalOverlay(output.logits);
     if (output.gpuProfile) this.activeTiming?.prefillGpuProfiles.push(output.gpuProfile);
     if (this.activeTiming) this.activeTiming.logitsReadbackMs += output.logitsReadbackMs;
     this.position += tokenIds.length;
@@ -1611,6 +1639,256 @@ export class GemmaGenerationSession {
         ? "length"
         : this.tokenizer.isEndToken(terminal) ? "end-token" : "stop-token",
     };
+  }
+
+  /**
+   * @internal Research-only. Installs (or clears with null) a rank-1 effective-weight overlay.
+   * `final` applies `logits += coefficient * dot(a, h_final) * (W_head b)` to every logits readback
+   * (h_final is the LM head input); `residual` applies `h += coefficient * b * dot(a, h)` after the
+   * given layer on the GPU and re-derives the next layer's input. Packed weights are never changed.
+   * Any overlay forces full-logit selection, and a residual overlay forces sequential prefill.
+   * Changing the overlay invalidates the prompt cache.
+   */
+  async setResearchOverlay(overlay: GemmaResearchOverlay | null): Promise<void> {
+    this.assertAlive();
+    if (this.generating) throw new Error("Cannot change the research overlay during generation");
+    if (this.resources.stack.researchEdit) {
+      await this.device.queue.onSubmittedWorkDone();
+      destroyResearchResidualEditResources(this.resources.stack.researchEdit);
+      this.resources.stack.researchEdit = null;
+    }
+    this.researchFinalOverlay = null;
+    this.invalidatePromptCache();
+    if (!overlay) return;
+    const hidden = this.resources.stack.layers[0].mlp.nextInput.size / 4;
+    if (overlay.a.length !== hidden || overlay.b.length !== hidden) {
+      throw new Error(`Research overlay vectors must have ${hidden} elements`);
+    }
+    if (!Number.isFinite(overlay.coefficient)) throw new Error("Research overlay coefficient must be finite");
+    if (overlay.site === "final") {
+      if (overlay.coefficient === 0) return;
+      const u = await this.researchHeadProjection(overlay.b);
+      this.researchFinalOverlay = { a: Float32Array.from(overlay.a), u, coefficient: overlay.coefficient };
+      return;
+    }
+    const layer = this.resources.stack.layers[overlay.site.layer];
+    if (!layer || !Number.isInteger(overlay.site.layer)) {
+      throw new Error(`Research overlay layer ${overlay.site.layer} is out of range`);
+    }
+    const pipeline = await getResearchResidualEditPipeline(this.device);
+    this.resources.stack.researchEdit = createResearchResidualEditResources(
+      this.device,
+      pipeline,
+      overlay.site.layer,
+      {
+        hidden: layer.mlp.hidden,
+        normWeightsAndScale: layer.mlp.modelWeights.postPleNextInputNormAndLayerScale,
+        nextInput: layer.mlp.nextInput,
+        nextSum: layer.mlp.nextSum,
+        inScale: layer.mlp.modelScales.nextInput,
+      },
+      overlay.a,
+      overlay.b,
+      overlay.coefficient,
+    );
+  }
+
+  /**
+   * @internal Research-only. Teacher-forced log-probabilities of `continuationTokenIds` after
+   * `promptTokenIds`, computed sequentially from a fresh cache with the model's softcapped logits
+   * (and any research overlay). No sampling transforms are applied.
+   */
+  async researchScoreContinuation(
+    promptTokenIds: readonly number[],
+    continuationTokenIds: readonly number[],
+  ): Promise<GemmaResearchContinuationScore> {
+    this.assertAlive();
+    if (this.generating) throw new Error("Gemma generation is already in progress");
+    if (promptTokenIds.length < 1 || continuationTokenIds.length < 1) {
+      throw new Error("Continuation scoring needs a prompt and at least one continuation token");
+    }
+    if (promptTokenIds.length + continuationTokenIds.length > this.cacheCapacity) {
+      throw new Error("Continuation scoring exceeds the session cache capacity");
+    }
+    this.generating = true;
+    try {
+      this.reset();
+      let output = null;
+      for (let index = 0; index < promptTokenIds.length; index += 1) {
+        output = await this.evaluateToken(
+          promptTokenIds[index],
+          undefined,
+          index === promptTokenIds.length - 1 ? "logits" : "none",
+        );
+      }
+      const tokenLogProbs: number[] = [];
+      for (let index = 0; index < continuationTokenIds.length; index += 1) {
+        const token = continuationTokenIds[index];
+        tokenLogProbs.push(tokenLogProbability(
+          requiredGemmaLogits(output!),
+          token,
+          GEMMA_FINAL_LOGIT_SOFTCAP,
+        ));
+        if (index + 1 < continuationTokenIds.length) {
+          output = await this.evaluateToken(token, undefined, "logits");
+        }
+      }
+      const sumLogProb = tokenLogProbs.reduce((sum, value) => sum + value, 0);
+      return {
+        tokenIds: [...continuationTokenIds],
+        tokenLogProbs,
+        sumLogProb,
+        meanLogProb: sumLogProb / tokenLogProbs.length,
+        tokenCount: tokenLogProbs.length,
+      };
+    } finally {
+      this.invalidatePromptCache();
+      this.generating = false;
+    }
+  }
+
+  /**
+   * @internal Research-only. Evaluates `tokenIds` sequentially from a fresh cache and copies the
+   * requested activations after each listed position. Layer sites read that layer's next-layer
+   * input (normalized, SRQ-rounded f32); `final` reads the LM head input; `residual` reads the
+   * residual stream after the last layer.
+   */
+  async researchCaptureActivations(
+    tokenIds: readonly number[],
+    positions: readonly number[],
+    sites: readonly GemmaResearchCaptureSite[],
+    maxBytes = 1 << 22,
+  ): Promise<GemmaResearchActivationCapture[]> {
+    this.assertAlive();
+    if (this.generating) throw new Error("Gemma generation is already in progress");
+    const wanted = new Set(positions);
+    for (const position of wanted) {
+      if (!Number.isInteger(position) || position < 0 || position >= tokenIds.length) {
+        throw new Error(`Capture position ${position} is outside the token sequence`);
+      }
+    }
+    const residualLayers = [...new Set(sites.flatMap((site) => typeof site === "object" ? [site.residual] : []))];
+    const capturePipeline = residualLayers.length ? await getResearchResidualCapturePipeline(this.device) : null;
+    const residualCaptures = residualLayers.map((layerIndex) => {
+      const layer = this.resources.stack.layers[layerIndex];
+      if (!layer) throw new Error(`Capture layer ${layerIndex} is out of range`);
+      return createResearchResidualCapture(this.device, capturePipeline!, layerIndex, layer.mlp.hidden);
+    });
+    const buffers = sites.map((site) => {
+      if (site === "final") return this.resources.stack.finalInput;
+      if (site === "residual") return this.resources.stack.hidden;
+      if (typeof site === "object") return residualCaptures.find((capture) => capture.layerIndex === site.residual)!.buffer;
+      const layer = this.resources.stack.layers[site];
+      if (!layer) throw new Error(`Capture layer ${site} is out of range`);
+      return layer.mlp.nextInput;
+    });
+    const bytes = wanted.size * buffers.reduce((sum, buffer) => sum + buffer.size, 0);
+    if (bytes > maxBytes) throw new Error(`Capture needs ${bytes} bytes, above the ${maxBytes} byte limit`);
+    if (tokenIds.length > this.cacheCapacity) throw new Error("Capture exceeds the session cache capacity");
+    this.generating = true;
+    const captures: GemmaResearchActivationCapture[] = [];
+    this.resources.stack.researchCaptures = residualCaptures;
+    try {
+      this.reset();
+      for (let position = 0; position < tokenIds.length; position += 1) {
+        await this.evaluateToken(tokenIds[position], undefined, "none");
+        if (!wanted.has(position)) continue;
+        for (let index = 0; index < sites.length; index += 1) {
+          captures.push({
+            site: sites[index],
+            tokenPosition: position,
+            values: await this.readResearchVector(buffers[index]),
+          });
+        }
+      }
+      return captures;
+    } finally {
+      this.resources.stack.researchCaptures = null;
+      await this.device.queue.onSubmittedWorkDone();
+      for (const capture of residualCaptures) capture.buffer.destroy();
+      this.invalidatePromptCache();
+      this.generating = false;
+    }
+  }
+
+  /**
+   * @internal Research-only. `W_head b` through the frozen LM head with its output SRQ disabled
+   * (pre-softcap, unquantized). The final-site overlay adds its multiple after the head's output SRQ.
+   */
+  async researchHeadProjection(b: Float32Array): Promise<Float32Array> {
+    this.assertAlive();
+    const hidden = this.resources.stack.finalInput.size / 4;
+    if (b.length !== hidden) throw new Error("Head projection vector has the wrong size");
+    let sum = 0;
+    for (const value of b) sum += Math.fround(value);
+    const make = (label: string, size: number, usage: GPUBufferUsageFlags) =>
+      this.device.createBuffer({ label, size, usage });
+    const activation = make("Research head activation", hidden * 4, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
+    const activationSum = make("Research head activation sum", 4, GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST);
+    const params = make("Research head params", 16, GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST);
+    try {
+      this.device.queue.writeBuffer(activation, 0, Float32Array.from(b));
+      this.device.queue.writeBuffer(activationSum, 0, new Float32Array([sum]));
+      // Output SRQ disabled so the projection is the unquantized linear map.
+      this.device.queue.writeBuffer(params, 0, new Float32Array([0, 0, 0, 0]));
+      const lmHead = this.resources.lmHead;
+      const bindGroup = this.device.createBindGroup({
+        label: "Research head projection",
+        layout: this.resources.lmHeadPipeline.pipeline.getBindGroupLayout(0),
+        entries: [
+          { binding: 0, resource: { buffer: activation } },
+          { binding: 1, resource: { buffer: lmHead.modelWeights.packed } },
+          { binding: 2, resource: { buffer: lmHead.modelWeights.rowScales } },
+          { binding: 3, resource: { buffer: activationSum } },
+          { binding: 4, resource: { buffer: lmHead.logits } },
+          { binding: 5, resource: { buffer: params } },
+        ],
+      });
+      await this.device.queue.onSubmittedWorkDone();
+      const encoder = this.device.createCommandEncoder({ label: "Research head projection" });
+      const pass = encoder.beginComputePass({ label: "Research head projection" });
+      encodeGemmaLmHeadPass(pass, this.resources.lmHeadPipeline, { ...lmHead, bindGroup });
+      pass.end();
+      encoder.copyBufferToBuffer(lmHead.logits, 0, this.logitsReadback, 0, lmHead.logits.size);
+      this.device.queue.submit([encoder.finish()]);
+      await this.logitsReadback.mapAsync(GPUMapMode.READ);
+      const projection = new Float32Array(this.logitsReadback.getMappedRange(0, lmHead.logits.size).slice(0));
+      this.logitsReadback.unmap();
+      this.invalidatePromptCache();
+      return projection;
+    } finally {
+      activation.destroy();
+      activationSum.destroy();
+      params.destroy();
+    }
+  }
+
+  private async readResearchVector(source: GPUBuffer): Promise<Float32Array> {
+    if (!this.researchVectorReadback || this.researchVectorReadback.size < source.size) {
+      this.researchVectorReadback?.destroy();
+      this.researchVectorReadback = this.device.createBuffer({
+        label: "Research vector readback",
+        size: Math.max(source.size, 1536 * 4),
+        usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+      });
+    }
+    const encoder = this.device.createCommandEncoder({ label: "Research vector copy" });
+    encoder.copyBufferToBuffer(source, 0, this.researchVectorReadback, 0, source.size);
+    this.device.queue.submit([encoder.finish()]);
+    await this.researchVectorReadback.mapAsync(GPUMapMode.READ, 0, source.size);
+    const values = new Float32Array(this.researchVectorReadback.getMappedRange(0, source.size).slice(0));
+    this.researchVectorReadback.unmap();
+    return values;
+  }
+
+  private async applyResearchFinalOverlay(logits: Float32Array): Promise<void> {
+    const overlay = this.researchFinalOverlay;
+    if (!overlay) return;
+    const h = await this.readResearchVector(this.resources.stack.finalInput);
+    let projection = 0;
+    for (let index = 0; index < h.length; index += 1) projection += overlay.a[index] * h[index];
+    const scale = overlay.coefficient * projection;
+    for (let index = 0; index < logits.length; index += 1) logits[index] += scale * overlay.u[index];
   }
 
   private getTokenByteTrie(): TokenByteTrie {

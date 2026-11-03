@@ -790,6 +790,25 @@ app.innerHTML = `
             <div><dt>Total</dt><dd id="benchmark-total">-</dd></div>
           </dl>
         </section>
+        <section class="benchmark-tool" aria-labelledby="overlay-heading">
+          <div class="benchmark-heading">
+            <div>
+              <p class="eyebrow">RESEARCH</p>
+              <h3 id="overlay-heading">Rank-1 overlay</h3>
+            </div>
+          </div>
+          <label class="field">Patch manifest (JSON)
+            <input id="overlay-patch" type="file" accept="application/json,.json">
+          </label>
+          <label class="field">Coefficient (gate × alpha)
+            <input id="overlay-coefficient" type="number" step="0.01" value="0">
+          </label>
+          <div class="benchmark-command-row">
+            <button id="overlay-apply" class="primary-command" type="button" disabled>Apply overlay</button>
+            <button id="overlay-clear" class="quiet-command" type="button" disabled>Clear</button>
+          </div>
+          <p id="overlay-status" class="benchmark-status" role="status">No overlay · packed weights are never modified</p>
+        </section>
       </details>
     </aside>
   </main>
@@ -1032,6 +1051,51 @@ removeVideoButton.addEventListener("click", () => {
   clearSelectedVideo();
 });
 benchmarkRunButton.addEventListener("click", () => void runBoundaryBenchmark());
+const overlayPatchInput = element<HTMLInputElement>("overlay-patch");
+const overlayCoefficientInput = element<HTMLInputElement>("overlay-coefficient");
+const overlayApplyButton = element<HTMLButtonElement>("overlay-apply");
+const overlayClearButton = element<HTMLButtonElement>("overlay-clear");
+const overlayStatus = element<HTMLParagraphElement>("overlay-status");
+let overlayPatch: { id: string; site: "final" | { layer: number }; a: number[]; b: number[] } | null = null;
+overlayPatchInput.addEventListener("change", async () => {
+  const file = overlayPatchInput.files?.[0];
+  overlayPatch = null;
+  overlayApplyButton.disabled = true;
+  if (!file) return;
+  try {
+    const patch = JSON.parse(await file.text());
+    if (!Array.isArray(patch.a) || !Array.isArray(patch.b) || !(patch.site === "final" || Number.isInteger(patch.site?.layer))) {
+      throw new Error("Patch needs site, a and b");
+    }
+    overlayPatch = patch;
+    overlayApplyButton.disabled = !session || generationController !== null;
+    overlayStatus.textContent = `Loaded patch ${patch.id ?? file.name}`;
+  } catch (error) {
+    overlayStatus.textContent = `Invalid patch: ${errorMessage(error)}`;
+  }
+});
+overlayApplyButton.addEventListener("click", async () => {
+  if (!session || !overlayPatch || generationController) return;
+  const coefficient = Number(overlayCoefficientInput.value);
+  try {
+    await session.setResearchOverlay({
+      site: overlayPatch.site,
+      a: Float32Array.from(overlayPatch.a),
+      b: Float32Array.from(overlayPatch.b),
+      coefficient,
+    });
+    overlayClearButton.disabled = false;
+    overlayStatus.textContent = `Overlay ${overlayPatch.id} active · coefficient ${coefficient} · prompt cache reset`;
+  } catch (error) {
+    overlayStatus.textContent = `Overlay failed: ${errorMessage(error)}`;
+  }
+});
+overlayClearButton.addEventListener("click", async () => {
+  if (!session || generationController) return;
+  await session.setResearchOverlay(null);
+  overlayClearButton.disabled = true;
+  overlayStatus.textContent = "No overlay · packed weights are never modified";
+});
 benchmarkStopButton.addEventListener("click", () => {
   benchmarkController?.abort(new DOMException("Benchmark cancelled", "AbortError"));
 });
