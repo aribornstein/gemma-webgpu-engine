@@ -38,17 +38,23 @@ function staticDemoAssets(): Plugin {
   };
 }
 
-export default defineConfig({
+// The dev server serves public/ (including an optional local model.safetensors). Production
+// builds copy only the allow-listed assets above so the 2.46 GB checkpoint is never bundled.
+export default defineConfig(({ command }) => ({
   base: "./",
-  publicDir: false,
-  define: {
-    "import.meta.env.VITE_PUBLIC_DEMO": JSON.stringify("true"),
+  publicDir: command === "serve" ? "public" : false,
+  define: command === "build"
+    ? { "import.meta.env.VITE_PUBLIC_DEMO": JSON.stringify("true") }
+    : {},
+  plugins: command === "build" ? [staticDemoAssets()] : [],
+  server: {
+    port: 5174,
+    strictPort: true,
   },
-  plugins: [staticDemoAssets()],
   build: {
     outDir: "build",
     emptyOutDir: true,
     minify: "oxc",
     target: "es2022",
   },
-});
+}));
