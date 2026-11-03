@@ -1,0 +1,142 @@
+{
+ "families": [
+  "quest_delivery",
+  "doctor_appointment",
+  "bicycle_rental",
+  "bakery",
+  "post_office",
+  "museum",
+  "garage",
+  "library",
+  "taxi"
+ ],
+ "rows": 72,
+ "sites": {
+  "residual12": {
+   "state_norm": 32.9,
+   "a_dot_h": 32.9,
+   "instr_half_diff_norm": 2.167,
+   "content_half_diff_norm": 1.755,
+   "content_raw_half_diff_norm": 4.387,
+   "permuted_instr_half_diff_norm": 0.467,
+   "cos_instr_content": -0.037,
+   "cos_content_contentRaw": 0.256,
+   "instr_family_cosines": [
+    0.861,
+    0.884,
+    0.88,
+    0.874,
+    0.849,
+    0.784,
+    0.866,
+    0.888,
+    0.884
+   ]
+  },
+  "residual16": {
+   "state_norm": 64.93,
+   "a_dot_h": 64.93,
+   "instr_half_diff_norm": 9.674,
+   "content_half_diff_norm": 3.889,
+   "content_raw_half_diff_norm": 7.08,
+   "permuted_instr_half_diff_norm": 1.024,
+   "cos_instr_content": 0.134,
+   "cos_content_contentRaw": 0.16,
+   "instr_family_cosines": [
+    0.916,
+    0.939,
+    0.955,
+    0.939,
+    0.942,
+    0.937,
+    0.895,
+    0.932,
+    0.928
+   ]
+  },
+  "residual20": {
+   "state_norm": 51.31,
+   "a_dot_h": 51.31,
+   "instr_half_diff_norm": 7.739,
+   "content_half_diff_norm": 3.484,
+   "content_raw_half_diff_norm": 5.686,
+   "permuted_instr_half_diff_norm": 1.441,
+   "cos_instr_content": 0.17,
+   "cos_content_contentRaw": 0.19,
+   "instr_family_cosines": [
+    0.907,
+    0.897,
+    0.944,
+    0.896,
+    0.921,
+    0.901,
+    0.871,
+    0.926,
+    0.919
+   ]
+  },
+  "residual22": {
+   "state_norm": 50.71,
+   "a_dot_h": 50.71,
+   "instr_half_diff_norm": 6.505,
+   "content_half_diff_norm": 2.722,
+   "content_raw_half_diff_norm": 4.706,
+   "permuted_instr_half_diff_norm": 1.821,
+   "cos_instr_content": 0.142,
+   "cos_content_contentRaw": 0.239,
+   "instr_family_cosines": [
+    0.881,
+    0.89,
+    0.935,
+    0.885,
+    0.892,
+    0.876,
+    0.869,
+    0.908,
+    0.901
+   ]
+  },
+  "residual24": {
+   "state_norm": 50.08,
+   "a_dot_h": 50.08,
+   "instr_half_diff_norm": 9.197,
+   "content_half_diff_norm": 2.872,
+   "content_raw_half_diff_norm": 4.785,
+   "permuted_instr_half_diff_norm": 1.405,
+   "cos_instr_content": 0.166,
+   "cos_content_contentRaw": 0.298,
+   "instr_family_cosines": [
+    0.952,
+    0.956,
+    0.966,
+    0.952,
+    0.949,
+    0.949,
+    0.947,
+    0.957,
+    0.943
+   ]
+  },
+  "residual26": {
+   "state_norm": 43.63,
+   "a_dot_h": 43.63,
+   "instr_half_diff_norm": 6.707,
+   "content_half_diff_norm": 2.578,
+   "content_raw_half_diff_norm": 4.186,
+   "permuted_instr_half_diff_norm": 1.106,
+   "cos_instr_content": 0.177,
+   "cos_content_contentRaw": 0.257,
+   "instr_family_cosines": [
+    0.922,
+    0.915,
+    0.943,
+    0.925,
+    0.914,
+    0.916,
+    0.91,
+    0.924,
+    0.9
+   ]
+  }
+ }
+}

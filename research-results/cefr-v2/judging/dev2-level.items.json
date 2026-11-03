@@ -1,0 +1,6311 @@
+{
+ "role": "level",
+ "criteria": [],
+ "items": [
+  {
+   "order": 1,
+   "item_id": "item-95bb4650db",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. האם אתה מחפש ארנק?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מחפש ארנק שחור. האם אתה זוכר משהו על השם של הבעלים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מיכל לוי. אני מחפש את הארנק שלך."
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא נמצא במשרד."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני יכול לתת לך את המידע."
+    }
+   ]
+  },
+  {
+   "order": 2,
+   "item_id": "item-9186b741ac",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבין. חפשתי. האם אתה זוכר את הצבע?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. למדתי. האם אתה זוכר שם פרטי?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מיכל לוי. תודה."
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא. הוא. בבית."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני לא יודע. אני צריך לבדוק."
+    }
+   ]
+  },
+  {
+   "order": 3,
+   "item_id": "item-41924f0292",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אני ממש מצטער לשמוע. האם תוכל/י לתאר לי קצת את הארנק, אולי颜色 או חפץ בולט שבו, כדי שאוכל לנסות לחפש?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבין שאת/ה מחפש/ת ארנק שחור, אבל קצת יותר פרטים יסייעו לי. האם תוכל/י לציין אם הוא היה עשוי בד, או שיש עליו סימנים כלשהם, אולי שם או כתובת?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "אוקיי, מיכל לוי. האם אתה בטוח שמדובר באותו ארנק? ואם כן, האם אתה זוכר מתי בדיוק הגעת לספרים או לאתרת את החבילה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני בדק את התיק של הארנק, ואני חייבת להגיד שאינו נמצא אצלי כרגע. הוא נמצא ככל הנראה במשרד של החנות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבינה את רצונך לחזיר אותו, אבל אני לא יכולה להעביר אותו מעבר למקום. אם אתה מחפש/חפשת את הארנק, האם תרצה/י לבדוק אם מיכל לוי מגיע לחנות היום כדי לבדוק אם הוא מגיע לאסוף אותו?"
+    }
+   ]
+  },
+  {
+   "order": 4,
+   "item_id": "item-e888ff0b31",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. יש לנו הזמנה עבור דוד כהן."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבינה. הזמנה היא לשלושה לילות."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החדר הוא 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החיר הוא 900."
+    }
+   ]
+  },
+  {
+   "order": 5,
+   "item_id": "item-745abfa680",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום רב, אשמח לבדוק עבורך את ההזמנה, אילו פרטים נוספים יש לך לגבי החסימה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "בהחלט, אני מצטער/ת, ברצונך להזמין בדיוק עבור שתי אדריכלות עבור חדר 214, כולל ארוחת בוקר, כדי שאוכל לאשר את ההזמנה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ההזמנה שקיבלתי עבורך מתייחסת לחדר מספר 214. האם זה מתאים לך?"
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארוחת הבוקר כלולה כחלק מהתעריף. האם תרצה שאבצע את ההרשמה עבור שני הלילות למישהו, או שיש לך עוד שאלות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "עלות ההזמנה עבור שתי לילות במקרה הזה היא 900 אירו את המול, כולל כל התקציבים שציינתי. האם תרצה להמשיך בהמשך ולקבל את ההרשמה המלאה?"
+    }
+   ]
+  },
+  {
+   "order": 6,
+   "item_id": "item-a17982d2dd",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, יש לנו חבילה של כדורים נגד כאבי ראש, 25 אירו\""
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, אחת מתוך התיבות עולות ב-25 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כל קופסה מכילה 20 כדורים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "קופסה אחת עולה 25 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "תודה, זה סכום כולל של 25 ש\"ש."
+    }
+   ]
+  },
+  {
+   "order": 7,
+   "item_id": "item-f8633c64cc",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, יש לנו סרגל כדורים נגד כאבי ראש, וכאחד שקובע בשווי 25 אירו, שבו כל קופסה מכילה 20 כדורים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז, תרצלי לסחף עבור קופסה אחת של הכדורים, במחיר של 25 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כל קופסה מכילה 20 כדורים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הקופסה של הכדורים עולה 25 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בכל מקרה, אם תרצי להעביר את הסכום כעת, אני מוכן לקבל אותו."
+    }
+   ]
+  },
+  {
+   "order": 8,
+   "item_id": "item-8ca7f57c05",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. יש לי."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "הקופסה זה. זה דולר 25."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הקופסה היא של 20 כדורים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה דולר 25."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הכסף."
+    }
+   ]
+  },
+  {
+   "order": 9,
+   "item_id": "item-5b4744d03e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "הארנק הכה כה: אכן, ראינו, הוא בתוך העלון שלנו, וזה נמצא כאן. מי הבעלים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, זה היה שחור, בדיוק כמו שתירו. האם הדבר שנותר, זה הכתוב שם?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מיכל לוי, שזה מלמד. האם זה נראה אליך?"
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הכל טמון, המקום שבו הוא נמצא עדיין לא נקבע."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האם את מבטיחה שזה את המתאים? אנחנו עדיין צריכים לראות את זה בצד אחר."
+    }
+   ]
+  },
+  {
+   "order": 10,
+   "item_id": "item-61d6bda040",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "מה תרצה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז שתי כרטיסים לחיפה. המחיר הוא 34 אישקלול."
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס הבא לחיפה יוצא ב-10:30 מהרכבת 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא יוצא מהרכבת 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי כרטיסים עולות 34 אישקלול."
+    }
+   ]
+  },
+  {
+   "order": 11,
+   "item_id": "item-bd7ae6c5e6",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Ordering a tea at a neighborhood cafe",
+    "character": {
+     "name": "Roni",
+     "role": "cafe server",
+     "personality": "warm and efficient",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "tea",
+      "type": "drink",
+      "name": "tea",
+      "quantity": 1,
+      "price_ils": 12
+     }
+    ],
+    "topics": [
+     "ordering",
+     "food and drink",
+     "prices"
+    ],
+    "quest": {
+     "goal": "order one tea without sugar",
+     "paid": false,
+     "state_note": "The order has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אפשר תה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, מה תרצה לאכול/לשתות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה תה בלי סוכר."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבינה, תה אחד בלי סוכר – זה 12 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "12 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לך גם מים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש לנו מים, הם בדרך כלל חינם/לצורך השלמה של הזמנה)."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני אשלם אחר כך."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, תה מוכן?"
+    }
+   ]
+  },
+  {
+   "order": 12,
+   "item_id": "item-5f398ec92f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Ordering a tea at a neighborhood cafe",
+    "character": {
+     "name": "Roni",
+     "role": "cafe server",
+     "personality": "warm and efficient",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "tea",
+      "type": "drink",
+      "name": "tea",
+      "quantity": 1,
+      "price_ils": 12
+     }
+    ],
+    "topics": [
+     "ordering",
+     "food and drink",
+     "prices"
+    ],
+    "quest": {
+     "goal": "order one tea without sugar",
+     "paid": false,
+     "state_note": "The order has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אפשר תה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה. כמה תה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה תה בלי סוכר."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה. תכדחס כל תור הזהב."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה עולה 12 אולר."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לך גם מים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש גם מים. כמה אתה רוצה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני אשלם אחר כך."
+    },
+    {
+     "speaker": "npc",
+     "text": "קולך. תה."
+    }
+   ]
+  },
+  {
+   "order": 13,
+   "item_id": "item-e3e2fd1fe8",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. דוד כהן? תודה."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. יש לך הזמנה לשליחת חדר 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החדר הוא 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. ארוחת בוקר כלולה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר הוא 900 אישקל."
+    }
+   ]
+  },
+  {
+   "order": 14,
+   "item_id": "item-3d09485afc",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "איפה אתה רוצה לנסוע?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "הכרטיסים עולים שלושים וארבע עשרה אילולות."
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס יוצא בשעה 10:30."
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא יוצא מהרמפה 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי כרטיסים עולות ששים ושבע אילולות."
+    }
+   ]
+  },
+  {
+   "order": 15,
+   "item_id": "item-cb4a2f35bd",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מצטער לשמוע. האם תוכל/י לתאר לי איזה ארנק בדיוק, כדי שאוכל לנסות ולענות לך?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אכן, למצפי שהמצאנו ארנק שחור, והוא נמצא במשרד, האם תוכל/י לומר לי מי הבעלים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "הבנתי, מיכל לוי. האם תוכל/ת לספק לי פרטים נוספים או אולי לדבר איתי בפרטי כדי שנוכל למצוא אותו?"
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא מאוחסן כרגע במשרד שלנו. אולי תרצה/י לחזור אלינו בעוד כמה ימים או אולי תוכל/י לחפש אותו שוב בהתבסס על פרטים, אם יש לך, או שאוכל לעזור לך עם משהו אחר בעניין העניינים ברצונך למצוא?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מצטער/ת, עד כה, למרות שמיכל לוי, לא התגלה עד כה שמישהו כבר פונה אלינו עם הודעה ספציפית לגבי החזר, או שקיבלנו אישור מאיזו צד לגבי העניין."
+    }
+   ]
+  },
+  {
+   "order": 16,
+   "item_id": "item-3983e6045f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "האם אתה יכול לתאר את הארנק?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "האם זה הארנק השחור שקיבלנו."
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מיכל לוי? מה דעתך."
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הארנק נמצא במשרד."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני יכול לבדוק."
+    }
+   ]
+  },
+  {
+   "order": 17,
+   "item_id": "item-37756bff6e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, ברוך הבא. תספר לי, המטרה הייתה לרכש משהו עבורם, או שהכר את הקשר?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "עבור שתי לילות, מספר החדרים 214, והכול, החבירה כולל ארוחת בוקר מהש השש עד השש בבוקר. הנה התקיימה השערות ההתאמה: [חיוך](https://emoji.com/smile/emoji/316292)"
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החדר המוקצה לשני הלילות הוא 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארוחת הבוקר כלולה במסגרת הטיפול."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסיכום המינימלי החודש הוא 1800 ש\"ח, מכיוון שזו פירובו של שתי לינה בשווי 900 ש\"ח לכל לילה."
+    }
+   ]
+  },
+  {
+   "order": 18,
+   "item_id": "item-6e26889689",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, יש לנו כרטיסי אוטובוס לחיפה, שנקבע לשעה 10:30, בפלטפורמה 5, והעלות עבור שני כרטיסים היא 34 ש\"ש בסך הכל."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בהחלט, אני מתכוון לתת לך שתי כרטיסים, כל אחד מחוסר 17 ש\"ש, וסה\"כ 34 ש\"ש לביניהם. האם תרצה להמשיך, או שתרצה שאסכם לך את הפרטים נוספים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס הראשוני לחיפה יוצא בשעה 10:30, ומצופה שהוא יצא מפלטפורמה מס' 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המסע המתוכנן הוא בדרך כלל לפי השעות, ובהתאם לתזכורות המפורטות של תוכנית ההתנועה הזו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "על סמך המידע שיש לי, המחיר הכולל לשני הכרטיסים הוא 34 ש\"ש."
+    }
+   ]
+  },
+  {
+   "order": 19,
+   "item_id": "item-04e0b68c34",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. אני מוצא את החדר."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. יש לך הזמנה לחדר 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החדר הוא 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, הפארט."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר הוא 900 אישקל."
+    }
+   ]
+  },
+  {
+   "order": 20,
+   "item_id": "item-91eacdaa2f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "אנו מתנצלים, מובא שהיה בה, האם תוכל/י לתארת/נו להוות את הארנק, או להתייחס/ה אליו בצורה כלשהי?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז, האם תוכל/י לספק/לא לציין/ל, אולי, אם תוכל/י, מה כתוב במרכיב הפנימי או אם יש לך איזה פרט נוסף שייתכן שיעזור לנו למצוא אותו?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "כדי שאוכל לנסות ולעזור, האם תוכל/ה לאשר/לא לשער, שזו אכן הצבע של הארנק, ומוודא/ת שאת/ה פונה/ת לגבי מיכל לוי, כמובן, אם יש לך מידע נוסף לגבי התקשורת עם בעלותך על המכשיר, בהתחשב בכך שוב, הוא נמצא כאן"
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אמתי שקיבלנו עד כה מידע, והאנו מאמינים שכל המידע שסיפקת, כלומר שמדובר בארנק שחור שבו נרשם בשמו 'מיכל לוי', נועד להתייחס לממצא שבו, הארנק שנמצא (שנמצא בדיוק בתקופת ה\"ממצא\" שציינת) נשאר במשרד"
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אשמח אם תוכל/י להיענות ולשצור אליך, או, אם יש לך דרך שבה תוכל/י ליצור קשר, ננסה לנסות לגשר בין הצדדים בנוגע לעניין הזה."
+    }
+   ]
+  },
+  {
+   "order": 21,
+   "item_id": "item-5de20900c1",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! תפוחים עולים 10 דולר אחד. רוצה שני?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים עולים 20 דולר."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים עולים 20 דולר."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן."
+    }
+   ]
+  },
+  {
+   "order": 22,
+   "item_id": "item-4d6660b44d",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! יש לי שני תפוחים למכירה, והם עולים יחד עשר אולטים. האם תרצה לקנות אותם?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "מצוין, אם תרצה לקנות שתי תפוחים, המחיר יהיה עשר אולטים. מה דעתך?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים יעלו בדיוק עשר אולטים. אתה מחליט לקנות אותם?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "מעולה, אז שתי תפוחים למחיר של עשר אולטים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, הנה 10 אולטים. תודה רבה על הרכישה!"
+    }
+   ]
+  },
+  {
+   "order": 23,
+   "item_id": "item-64eab43bfe",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, יש לי. זה אחד המחירים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אחת. זה 25 אילם."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "קופסה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "25."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני לא לוקח כסף."
+    }
+   ]
+  },
+  {
+   "order": 24,
+   "item_id": "item-b4c1ca3fc5",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אני יכולה לבדוק. מה שם ההזמנה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז יש הזמנה עבור דוד כהן לשתי לילות. נראה שיש כאן הזמנה עבור שתי חדרים בחדר 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החדר הוא מספר 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארוחת הבוקר כלולה. היא מגיעה מ-07:00 עד 10:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר עבור שתי לילות הוא 1900 אירוש."
+    }
+   ]
+  },
+  {
+   "order": 25,
+   "item_id": "item-203cdbc3b1",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "איפה אתה רוצה ללכת?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "איזו שעה אתה רוצה לנסוע?"
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס הבא לחיפה יוצא בשעה 10:30 מפלג 5. המחיר עבור שתי כרטיסים הן 34 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הם כנראה יוצאו בקרוב."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "34 ש\"ח."
+    }
+   ]
+  },
+  {
+   "order": 26,
+   "item_id": "item-1cbbe9dd77",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "במה אוכל לסייע לך, אנו שמחה שפתוחה לשמוע פרטים בנוגע להזמנתך, ברוך הבא לחטיף, אנו מתמחים בשירות המיוחד עבור אורח היקרי, ונוכל להתייעץ בנוגע לפרטים הנוגעים לטיול והתארגנות במסגרת המלצנו המפורטים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "במובן ששתי לילות, וההזמנה שלך היא למספר 2, ובהתאם, מדובר בהזמנה לשתי ערב, ובהתאם, הסעיף הכולל שווה 900 אישקל עבור שתי לילות, ואנו כמובן כוללות אופציית ארוחת היצרה, שתקיימת בין השעות 07:"
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בהתאם להזמנה המקורית, המומלץ לחשוף אותך ישירות לכניסה ל**חדר 214**."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בהחלט, ארוחת הבוקר כלולה במסגרת התקציב, והיא תהיה זמינה עבורך בין השעות 07:00 עד 10:00, ברגילאי."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה\"כ עבור שהות של שתי לילות בכמה, אך ככל שציינתי, המכסה את כל ההתחייבויות הנדרשות עבור התקופת שהות, והם פשוט הכל, וכל עוד ניתן לנהל את ההזמנה בצורה נאותה."
+    }
+   ]
+  },
+  {
+   "order": 27,
+   "item_id": "item-85be538785",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! שני תפוחים, כמה שאתה מעוניין? תפוח אחד עשוי כ-10 ₪, ואם תרצה שניים, זה יקרה בדיוק 20 ₪."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז שני תפוחים עשויים סך הכל 20 ש\"ח. מה דעתך, האם תרצה לרכוש אותם?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שני תפוחים בעצמם עשויים 20 ₪, אבל חשוב לזכור שזה המחיר לתפוח אחד, אז אם תרצה להתייחס למספר הכולל, זה יהיה סכום כולל של 20 ₪."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, אני שמח! המשמעות היא שאתה מוכן להתקדם עם המעסיקה הזו?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "איך תרצה, תרצה להגיש לי את התשלום כרגע?"
+    }
+   ]
+  },
+  {
+   "order": 28,
+   "item_id": "item-f2362ed1a7",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! שני תפוחים עולים עשר שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני יכול לתת לך שני תפוחים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים עולות עשר שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מחכה לתשלום."
+    }
+   ]
+  },
+  {
+   "order": 29,
+   "item_id": "item-e1b6f7c006",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Ordering a tea at a neighborhood cafe",
+    "character": {
+     "name": "Roni",
+     "role": "cafe server",
+     "personality": "warm and efficient",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "tea",
+      "type": "drink",
+      "name": "tea",
+      "quantity": 1,
+      "price_ils": 12
+     }
+    ],
+    "topics": [
+     "ordering",
+     "food and drink",
+     "prices"
+    ],
+    "quest": {
+     "goal": "order one tea without sugar",
+     "paid": false,
+     "state_note": "The order has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אפשר תה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, אשמח להביא לך תה, ממה תרצה שנכין אותו?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה תה בלי סוכר."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר גמור, תה חם בלי סוכר, זה מה שאני מבינה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התה הזה עולה 12 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לך גם מים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש לנו כמובן מים, אם תרצה שתביא לך מים או שתקח לך משהו אחר?"
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני אשלם אחר כך."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, תה שלך מוכן."
+    }
+   ]
+  },
+  {
+   "order": 30,
+   "item_id": "item-3fe0185428",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, האם אתה מחפש ארנק שחור?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אנו נמצאים במלאי ארנקים שחורים. האם יש לך פרטים נוספים או, אולי, שמי/ת?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מיכל לוי, איפה האם/ה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אנו החזיקים בו/ה בבית/במשרד. האם אתה/את אולי/אולי זוכר/ת למה שיש/י בו/י?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני/אני יכול/ה לחייב/י אותך/י להתקשר/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/לפסיק/"
+    }
+   ]
+  },
+  {
+   "order": 31,
+   "item_id": "item-67eb0c092e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! שתי תפוחים עלולות לעלות 20 י חדשים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "איפה אתה רוצה לרכוש את התפוחים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים בעוד 20 י חדשים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "באיזה סוג של תפוחים אתה מחפש?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "תשלום עכשיו."
+    }
+   ]
+  },
+  {
+   "order": 32,
+   "item_id": "item-6d1d14971f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. אני יכול לראות שהיו מחפשים ארנק. האם תוכל לספק לי את שמותו?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבין. אפשר לעבור על שאלות."
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "תודה. אני מקווה שאתה מוצא את הארנק שלך."
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבין שאתה מחפש את הארנק. אני יכול לומר לך שהוא נמצא בחנות היום."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אנא הצג לפטור."
+    }
+   ]
+  },
+  {
+   "order": 33,
+   "item_id": "item-4439ed7bd9",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, יש לנו סוגים שונים. האם תוכלי לתת לי פרטים על סוג הכאב שאת/ה חווה, ומה רמת הכו intenso של הכאב?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "בנוסף, האם יש לך העדפה ספציפית לגבי סוג הכדורים, או שאת/ה מעדיף/ה להתייעץ/ה עם רוקח לגבי המלצה מדויקת?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "קופסה אחת מכילה 20 תוספים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "קופסת תוספי כאבי ראש עולה 25 ₪."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אשמח לקבל את העסקה."
+    }
+   ]
+  },
+  {
+   "order": 34,
+   "item_id": "item-075500bd2a",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, יש לי. יש לי קופסה אחת."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "מחיר הקופסה אחד הוא 25 איל."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הקופסה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "25 איל."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "לא."
+    }
+   ]
+  },
+  {
+   "order": 35,
+   "item_id": "item-f8d3ee883e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Ordering a tea at a neighborhood cafe",
+    "character": {
+     "name": "Roni",
+     "role": "cafe server",
+     "personality": "warm and efficient",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "tea",
+      "type": "drink",
+      "name": "tea",
+      "quantity": 1,
+      "price_ils": 12
+     }
+    ],
+    "topics": [
+     "ordering",
+     "food and drink",
+     "prices"
+    ],
+    "quest": {
+     "goal": "order one tea without sugar",
+     "paid": false,
+     "state_note": "The order has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אפשר תה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, מה אתה רוצה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה תה בלי סוכר."
+    },
+    {
+     "speaker": "npc",
+     "text": "תה אחד. זה 12 איל."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "12 איל."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לך גם מים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש. כמה אתה רוצה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני אשלם אחר כך."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 36,
+   "item_id": "item-e4dc06f8c6",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "מה זה ארנק?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארנק שחור."
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבינה. האם אתה מוצא משהו?"
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האם יש לך פרטים נוספים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני אבד את הארנק."
+    }
+   ]
+  },
+  {
+   "order": 37,
+   "item_id": "item-333c298133",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום רב, אני שמח לקבל את פנכם. מותר לי לבדוק את ההזמנה של דוד כהן. האם מדובר בהזמנה לחדר מספר 214 למשך שתי לילות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "תודה. ובהתאם למה שצוי ברשימה, יש לנו הזמנה לשתי לילות. האם תרצה שאשמח לספק לך מידע נוסף לגבי השירותים שנותרו לך, או אולי תרצה לתאם משהו אחר?"
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ההזמנה שלך היא לחדר 214. התשלום עבור שתי לילות כולל גם ארוחת בוקר מכל היום, שמוערכת כ-0 אירו, כפי שצוי ברשימה."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארוחת הבוקר כלולה במסגרת ההזמנה שלך. היא מוצעת לך בין השעות 7:00 למרות, ואינה דורשת תשלום נפרד."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה\"כ עבור שתי הלילות והכול הוא 900 אירו."
+    }
+   ]
+  },
+  {
+   "order": 38,
+   "item_id": "item-bcd626cb90",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! תפוחים עולים 10."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים זה עולה 20."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מוכר."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר הוא 20."
+    }
+   ]
+  },
+  {
+   "order": 39,
+   "item_id": "item-3587dfca1b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבוקר טוב, אשמח לאשר את ההזמנה עבור דוד כהן, עבור שתילישי, במאצ'ר 214, כולל ארוחת בוקר, והסה\"כ כולל 900 ש\"ח עבור שהייה, נכון?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "אשמח לוודא שוב, האם להתייחס לשהייה שבה שבועיים, או שאתה מתכוון שתי לילות בדיוק, כדי שאוכל להתייחס אליהם בצורה מדויקת יותר?"
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ההזמנה שלכם היא עבור החדר מספר 214. האם יש לכם שאלות נוספות לגבי שהות שלכם, אולי לגבי שירותים, או לגבי הטיולים באזור?"
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארוחת הבוקר כלולה במסגרת ההזמנה, והשירות מתקיימים בין 07:00 ל-10:00 בשעה שבה מתקיימת בה, בהתאם להנחיות, ובהתאם למבנה התשלום שצוין, אשר כולל את כל העניינים הנדרשים עבור שתי בלילות, כפי שצוי"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה\"כ הכול עבור שתיליליארבע, כולל את כל השירותים, הוא 900 ש\"ח."
+    }
+   ]
+  },
+  {
+   "order": 40,
+   "item_id": "item-d262e7c7b7",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "מה אתה רוצה לקנות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי כרטיסים לחיפה. המחיר הוא 34."
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס הבא לחיפה יוצא ב-10:30."
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "מבית."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "34."
+    }
+   ]
+  },
+  {
+   "order": 41,
+   "item_id": "item-16d61d97d1",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, יש לנו כרטיסי אוטובוס לחיפה, החבורה הבאה יוצאת בשעה 10:30 מפינה 5, והעלות עבור שני כרטיסים היא 34 ₪."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי כרטיסי אילך לחיפה, המצויים עבור כל שניה, הם בסך 34 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס הבא לחיפה יוצא בשעה 10:30, מהרצוף 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "מפינה 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כדי לשלוש ש\"ש, כי הצעתי לך כבר את המידע המלא, ואם מתכוונים לגבי כל התיאור שנתקבל כרגע, סך העלות עבור שני הכרטיסים הוא 34 ₪."
+    }
+   ]
+  },
+  {
+   "order": 42,
+   "item_id": "item-fb4f0a4e23",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Ordering a tea at a neighborhood cafe",
+    "character": {
+     "name": "Roni",
+     "role": "cafe server",
+     "personality": "warm and efficient",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "tea",
+      "type": "drink",
+      "name": "tea",
+      "quantity": 1,
+      "price_ils": 12
+     }
+    ],
+    "topics": [
+     "ordering",
+     "food and drink",
+     "prices"
+    ],
+    "quest": {
+     "goal": "order one tea without sugar",
+     "paid": false,
+     "state_note": "The order has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אפשר תה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אני יכול להביא תה."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה תה בלי סוכר."
+    },
+    {
+     "speaker": "npc",
+     "text": "טוב. תה אחד עשר אלף."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה עשר אלף."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לך גם מים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש מים."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני אשלם אחר כך."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 43,
+   "item_id": "item-2f2d18f9ca",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Ordering a tea at a neighborhood cafe",
+    "character": {
+     "name": "Roni",
+     "role": "cafe server",
+     "personality": "warm and efficient",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "tea",
+      "type": "drink",
+      "name": "tea",
+      "quantity": 1,
+      "price_ils": 12
+     }
+    ],
+    "topics": [
+     "ordering",
+     "food and drink",
+     "prices"
+    ],
+    "quest": {
+     "goal": "order one tea without sugar",
+     "paid": false,
+     "state_note": "The order has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אפשר תה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, איזה סוג תה תרצה, בלי סוכר?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה תה בלי סוכר."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, תה אחד, וזה יכל ב-12 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אחרי כל מה שצוין, זה בסך 12 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לך גם מים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אנו מתמחים בעיקר במוצרי מיובש כרגע, אבל אם תרצה, אני יכול להמליץ על המגוון שלנו!"
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני אשלם אחר כך."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבטח, תה מוכן!"
+    }
+   ]
+  },
+  {
+   "order": 44,
+   "item_id": "item-e05b128795",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! תפוחים עולים 10."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני נותן לך שתיים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "עולים 20."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "קנו."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "לא."
+    }
+   ]
+  },
+  {
+   "order": 45,
+   "item_id": "item-b7a7e82026",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. אני רואה הזמנה. אתה מגיע למרחב 214?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, הזמנה היא לשתי לילות. המחיר הוא 900 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "חדר 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר הוא 900 אירו."
+    }
+   ]
+  },
+  {
+   "order": 46,
+   "item_id": "item-cd52747c4a",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אכן יש לי קינוח בכלי שמיועד לכאבי ראש, הוא כזה של חמישה יחידות ומחיר שלושה אולרים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז תרצה קופסה אחת, המחיר שלה הוא חמישים ואחד אולרים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בכל קופסה יש 20 כדורים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הקופסה עולה 25 אולרים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מצטערת, כרגע איננו מקבלות תשלומים."
+    }
+   ]
+  },
+  {
+   "order": 47,
+   "item_id": "item-77512f3388",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Ordering a tea at a neighborhood cafe",
+    "character": {
+     "name": "Roni",
+     "role": "cafe server",
+     "personality": "warm and efficient",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "tea",
+      "type": "drink",
+      "name": "tea",
+      "quantity": 1,
+      "price_ils": 12
+     }
+    ],
+    "topics": [
+     "ordering",
+     "food and drink",
+     "prices"
+    ],
+    "quest": {
+     "goal": "order one tea without sugar",
+     "paid": false,
+     "state_note": "The order has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אפשר תה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. מה אתה רוצה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה תה בלי סוכר."
+    },
+    {
+     "speaker": "npc",
+     "text": "תה אחד. זה עולה 12."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "12."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לך גם מים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש גם."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני אשלם אחר כך."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 48,
+   "item_id": "item-507c628b83",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום רב, אשמח לבדוק את ההזמנה שלכם. האם תוכלו לאשר ששם ההזמנה הוא דוד כהן, ואנו מאשרים שההזמנה היא עבור דירת חדר 214 למשך שתיים, כפי שצוין?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "תודה, אשמח לוודא שאתה מתכוון למשך שתי לילות. הנה סיכום: יש לכם הזמנה לשתי ארוחות במלון, והיא כוללת ארוחת בוקר, ועלות המלון עבור שתי הלילות היא 900 אירו לכל לילה."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החדר המיועד לכם הוא חדר 214. האם יש לכם שאלות נוספות לגבי התאריך, או אולי למועד ספציפי אחר?"
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארוחת הבוקר כלולה כחלק מהתשלום. היא מוגשת לכם בין השעות 07:00 ל-10:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה\"כ לשימוש בשירותים הוא 900 אירו עבור שתי לילות, כפי שצוין בהזמנה. האם יש לכם שאלות נוספות או שתרצו לסגור את התהליך?"
+    }
+   ]
+  },
+  {
+   "order": 49,
+   "item_id": "item-ede6f2e156",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, יש לי. יש לי לק box של תרופות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני נותנת לך קופסה אחת. זה עולה 25 איל."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הקופסה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "25 איל."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני לא לוקחת כסף."
+    }
+   ]
+  },
+  {
+   "order": 50,
+   "item_id": "item-3dd106247f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "איזה אוטוס?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי כרטיסים. המחיר הוא 34 אלף אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס יוצא בשעה 10:30."
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "רחוב 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה 34 אירו."
+    }
+   ]
+  },
+  {
+   "order": 51,
+   "item_id": "item-490d0630f4",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני לא רואה ארנק. האם זה ארנק שחור?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מחפש ארנק שחור. מה שם?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מיכל לוי."
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא נמצא במשרד."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "תראה."
+    }
+   ]
+  },
+  {
+   "order": 52,
+   "item_id": "item-8f11602abd",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. יש הזמנה."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבינה. יש לך שתי לילות."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החדר הוא 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. ארוחת בוקר כלולה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר הוא 900 אירו."
+    }
+   ]
+  },
+  {
+   "order": 53,
+   "item_id": "item-d7341421b7",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Ordering a tea at a neighborhood cafe",
+    "character": {
+     "name": "Roni",
+     "role": "cafe server",
+     "personality": "warm and efficient",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "tea",
+      "type": "drink",
+      "name": "tea",
+      "quantity": 1,
+      "price_ils": 12
+     }
+    ],
+    "topics": [
+     "ordering",
+     "food and drink",
+     "prices"
+    ],
+    "quest": {
+     "goal": "order one tea without sugar",
+     "paid": false,
+     "state_note": "The order has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אפשר תה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, מה אתה רוצה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה תה בלי סוכר."
+    },
+    {
+     "speaker": "npc",
+     "text": "התה אחד. זה יחד אל המאה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "על זה אלף איירם."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לך גם מים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש גם מים."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני אשלם אחר כך."
+    },
+    {
+     "speaker": "npc",
+     "text": "קמח."
+    }
+   ]
+  },
+  {
+   "order": 54,
+   "item_id": "item-1dd1398691",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. אני יודע ארנק. הוא באגף. מי הבעלים שלך?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. זה ארנק שחור."
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מיכל לוי. אני רואה."
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא בבית. אני לא יודע."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני לא יכול לקחת אותו. אני מחכה למالك."
+    }
+   ]
+  },
+  {
+   "order": 55,
+   "item_id": "item-03e2cd7723",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "מה קרה? האם זה ארנק שחור?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני רואה. אולי עשית את זה בחנות."
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מיכל לוי. נהיה זה."
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מחפש אותו. בדקתי את المكتب."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "תתקש. אני צריך לראות."
+    }
+   ]
+  },
+  {
+   "order": 56,
+   "item_id": "item-2f8a26a584",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, יש לנו סדנא של תרופות לכאבי ראש, שכל פעם כביכול מכילות 20, והם בתמורה 25 אירו, לכל חבילה."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר, אשמח להתקשר עבורך, ומה בדיוק צריך, כדי שאוכל להכין לך את הדבר המתאים, אם כי כרגע אני יכולה להתייחס רק לסדנא של קופסה אחת בדרך כלל."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בכל קופסה, בדיוק 20 כדורים, כדי שלא יתקשה לך עם המינון."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החבילה של כדורים הזו עומדת בסך 25 אירו, כמובן, לכל פעם שתוכלי, בהתאם שאת מבקשת להיענות עם העמלה של הקופה."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנה, אם תרצי, אבל בהתאם לרצונך בטיפול בנושא, כרגע אני רק מתייחסת להצעה עצמה."
+    }
+   ]
+  },
+  {
+   "order": 57,
+   "item_id": "item-c7528e258d",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, שני תפוחים עשויים לחסכא 20 ש\"ש, ואם תרצה, אני יכול לעזור לך לקבל החלטה!"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "במובן של שני תפוחים, הנה הממוצע, מכל אחד ב-10 ש\"ש, כלומר 20 ש\"ש הכולל, ומה שאתה מחשב, ואיך תרצה להתקדם?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שני תפוחים עולה בדיוק 20 ש\"ש, אם תרצה לקבלם, או להמשיך לשקול משהו נוסף?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "במספיק, אני יכול להכין לך שתי פרי, וכל אחת שלהן תהיה ב-10 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, ובהנחה שאתה מתכוון לשלם עבור שני התפוחים, הסכום הכולל יהיה 20 ש\"ש."
+    }
+   ]
+  },
+  {
+   "order": 58,
+   "item_id": "item-5996149d3b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים עולים עשר דולר."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני יכול לתת לך שתי תפוחים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים עולה עשר דולר."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, קח את התפוחים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני לא מקבל כסף."
+    }
+   ]
+  },
+  {
+   "order": 59,
+   "item_id": "item-6d35a19418",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, יש לי חבילה של תמידי כאב ראש."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "כמה תמידי כאב ראש."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בקופסה יש 20 תמידי כאב ראש."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החבילה עולה 25 איגוע."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "25 איגוע."
+    }
+   ]
+  },
+  {
+   "order": 60,
+   "item_id": "item-52cdb6b83c",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. אני מוצא את הזמנתך. יש לך הזמנה ללינה."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. יש לך הזמנה לשתי לילות."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "חדר 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, הארוחת בוקר כלולה. היא מגיעה מ-07:00 עד 10:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר."
+    }
+   ]
+  },
+  {
+   "order": 61,
+   "item_id": "item-9d5bc399c2",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולים תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! שני תפוחים עולים 20 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה שתי תפוחים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, שני תפוחים הם 20 אירו. תרצה לקנות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה שני תפוחים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שני תפוחים הם 20 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה לקנות אותם."
+    },
+    {
+     "speaker": "npc",
+     "text": "מעולה! תרצה לקנות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "תשלום, אני מקבל את הכסף."
+    }
+   ]
+  },
+  {
+   "order": 62,
+   "item_id": "item-5582b3695c",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום רב, אשמח לבדוק את הזמנתך עבור דוד כהן; האם תוכל/י לאשר שזו ההזמנה עבור שתי לילות בחדר 214, כולל ארוחת בוקר, והאם יש לך שאלות נוספות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, אני מאשרת שההזמנה עבור דוד כהן היא עבור שתי לילות בחדר 214, והיא כוללת גם ארוחת בוקר, והסכום הכולל הוא 900 ש\"ח עבור התקופה."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החדר שבו הקצאנו לך הוא מספר 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארוחת הבוקר כלולה במסגרת ההזמנה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסכום הכולל עבור השבועיים הוא 900 ש\"ח, וזו העלות המצטברת עבור השבועות הללו."
+    }
+   ]
+  },
+  {
+   "order": 63,
+   "item_id": "item-52124eec41",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אני מצטער. האם אתה יכול לומר לי מה הכל של הארנק?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מחפש ארנק שחור. האם תוכל לספר לי את השם שלך?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "תודה, מיכל לוי. האם אתה בטוח שאתה מחפש את אותו הארנק?"
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מתנצל, אני לא יכול לחפש עבורך ארנקים. אני יכול רק לומר לך שאני בדקתי במאגר הבוערים, והארנק שניתן למצוא הוא האדום."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הארנק שניתן למצוא לא הועבר."
+    }
+   ]
+  },
+  {
+   "order": 64,
+   "item_id": "item-cb1c9593e7",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Ordering a tea at a neighborhood cafe",
+    "character": {
+     "name": "Roni",
+     "role": "cafe server",
+     "personality": "warm and efficient",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "tea",
+      "type": "drink",
+      "name": "tea",
+      "quantity": 1,
+      "price_ils": 12
+     }
+    ],
+    "topics": [
+     "ordering",
+     "food and drink",
+     "prices"
+    ],
+    "quest": {
+     "goal": "order one tea without sugar",
+     "paid": false,
+     "state_note": "The order has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אפשר תה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, מה תרצה לאכול או לשתות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה תה בלי סוכר."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, תה אחד, ללא סוכר, על 12 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "מכדי שנוכל להתקדם, האם תרצה שנשלח את ההזמנה/ההערכה, או שאתה מתכוון לשאול לגבי העלות של התור אולם, או שאתה מתכוון למשהו אחר לגבי התשומת הלב של ההזמנה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לך גם מים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אidan לצרכי, אשמח להגיש לך גם מיצוי, אם תרצה."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני אשלם אחר כך."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבטח, תה מוכן בהתאם לשיקול הדעת שלך."
+    }
+   ]
+  },
+  {
+   "order": 65,
+   "item_id": "item-0baf72aad1",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Asking about a lost wallet at a small clothing shop",
+    "character": {
+     "name": "Avi",
+     "role": "shop clerk",
+     "personality": "helpful and cautious",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "wallet",
+      "type": "lost_item",
+      "name": "black wallet",
+      "quantity": 1,
+      "notes": "found in the shop yesterday; kept in the shop office"
+     },
+     {
+      "id": "owner",
+      "type": "person",
+      "name": "Michal Levi",
+      "notes": "the learner; name on the identity card inside the wallet"
+     }
+    ],
+    "topics": [
+     "shopping",
+     "lost and found",
+     "descriptions",
+     "names"
+    ],
+    "quest": {
+     "goal": "recover the lost black wallet",
+     "paid": false,
+     "state_note": "The wallet has not been handed back; return is decided externally"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, איבדתי ארנק כאן אתמול."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבין. האם זה ארנק שחור?"
+    },
+    {
+     "speaker": "learner",
+     "text": "זה ארנק שחורה."
+    },
+    {
+     "speaker": "npc",
+     "text": "כן. האם אתה מכיר שם?"
+    },
+    {
+     "speaker": "learner",
+     "text": "השם שלי מיכל לוי."
+    },
+    {
+     "speaker": "npc",
+     "text": "תודה, מיכל. תן לי זמן."
+    },
+    {
+     "speaker": "learner",
+     "text": "איפה הארנק עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא נמצא במשרד."
+    },
+    {
+     "speaker": "learner",
+     "text": "אפשר לקחת אותו היום?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא."
+    }
+   ]
+  },
+  {
+   "order": 66,
+   "item_id": "item-35c289f867",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, למי אתה זקוק לטיסה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בשמחה, יש לנו כרטיסים לחיפה. אנחנו מציעים שני כרטיסים למסافر אחד, והם עולים כולו 34 ש\"ח. האם תרצה שנכשיר אותך לטיסה המיועדת ל-10:30 מנסיק 5?"
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס הראשון לחיפה יוצא בשעה 10:30 מסין 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנה פרטי הכרטיסים: יש לנו שני כרטיסים למסافر, ואם תרצה לקנות, העלות הכוללת היא 34 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "העלות עבור שני הכרטיסים היא 34 ש\"ח."
+    }
+   ]
+  },
+  {
+   "order": 67,
+   "item_id": "item-9c442e0cbf",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying headache pills at a neighborhood pharmacy",
+    "character": {
+     "name": "Dana",
+     "role": "pharmacist",
+     "personality": "kind and careful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "headache_pills",
+      "type": "product",
+      "name": "box of headache pills",
+      "quantity": 1,
+      "price_ils": 25,
+      "notes": "one box contains 20 pills"
+     }
+    ],
+    "topics": [
+     "health",
+     "pharmacy",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one box of headache pills",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש לך כדורים נגד כאב ראש?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, יש לי קופסה של כדורי כאבי ראש ל-25 איל."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה קופסה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני יכולה לתת לך קופסה אחת."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה כדורים יש בקופסה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הקופסה מכילה 20 כדורים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הקופסה עולה 25 איל."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אפשר לשלם עכשיו?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מצפה לשמוע."
+    }
+   ]
+  },
+  {
+   "order": 68,
+   "item_id": "item-4a012e8f42",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אנו מוכנים לקבל אתכם. האם יש לכם שמירת הזמנה על שם דוד כהן?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר גמור, אנו מתעדכן: הזמנה עבור דוד כהן, עבור שתי לילות, וחדר 214, כולל ארוחת בוקר. הסכום הכולל הוא 900 ₪."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ההזמנה היא לחדר 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארוחת בוקר כלולה בחוזה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסכום הכולל עבור שתי לילות הוא 900 אישקל."
+    }
+   ]
+  },
+  {
+   "order": 69,
+   "item_id": "item-3ce6eb969e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, יש לנו כרטיסים לשני כיוונים עבור חיפה, למה בדיוק התכוונת, ואיזה לוחות זמנים עבורך הכי מתאימים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בכל להתק, יש לך שני כרטיסים לחיפה, והטיסה הבא לחיפה מתוכננת לקפוץ ב-10:30 מהרצף 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס הראשון שפוסה לחיפה יוצא המוקדם ביותר, ומהצדי ה-5, במידה וכל אחד מהם ירצה לנסוע בו, כל כרטיס (או שתי כרטיסים, כפי שציינת) שווה 34 ש\"ש הכול, וכל כרטיס בודד עשוי להתקבל עבור 17 ש"
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האם הכוונה לרצף הספציפי שציינתי לגבי המיעדים, או שאתה מתכוון לגבי פרטי הכביסה או הזמנת התייחסות נוספת למסגרת השיחה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי כרטיסים לחיפה כלשהם על סך סה\"כ של 34 ש\"ש, כלומר, כל כרטיס ייכלול כ-17 ש\"ש בנפרד אם תבחר במעשה עצמאית, אך כרגע, הכל נשאר באופן שעדיין לא סופק, ועדיין לא סופקו מכיוון שעדיין לא בוצע ס"
+    }
+   ]
+  },
+  {
+   "order": 70,
+   "item_id": "item-48866dfa58",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. מהם פרטי הזמנתו?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה. יש לך הזמנה לשירות לאיפה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הזמנתך היא למחר בחדר 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן.הוא כלול."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר להזמנה שלך היא 900 אירו ללילה."
+    }
+   ]
+  },
+  {
+   "order": 71,
+   "item_id": "item-0c005e2612",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Checking in at the reception desk of a small city hotel",
+    "character": {
+     "name": "Yael",
+     "role": "hotel receptionist",
+     "personality": "polite and organized",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "guest",
+      "type": "person",
+      "name": "David Cohen",
+      "notes": "the learner; the reservation is under this name"
+     },
+     {
+      "id": "reservation",
+      "type": "booking",
+      "name": "room reservation",
+      "quantity": 2,
+      "price_ils": 900,
+      "notes": "quantity is the number of nights; price_ils is the total for two nights"
+     },
+     {
+      "id": "room",
+      "type": "room",
+      "name": "room 214"
+     },
+     {
+      "id": "breakfast",
+      "type": "service",
+      "name": "breakfast",
+      "price_ils": 0,
+      "notes": "included in the price; served from 07:00 to 10:00"
+     }
+    ],
+    "topics": [
+     "travel",
+     "hotel",
+     "numbers",
+     "prices"
+    ],
+    "quest": {
+     "goal": "check in for a two-night stay",
+     "paid": false,
+     "state_note": "The stay has not been paid for"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "ערב טוב, יש לי הזמנה על שם דוד כהן."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. אני רואה הזמנה לשניים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני נשאר שתי לילות."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני אבדוק את המזמינים. תודה."
+    },
+    {
+     "speaker": "learner",
+     "text": "מה מספר החדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החדר הוא 214."
+    },
+    {
+     "speaker": "learner",
+     "text": "ארוחת בוקר כלול?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ארוחת בוקר כלולה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה אני צריך לשלם?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר הוא 900 אישקל."
+    }
+   ]
+  },
+  {
+   "order": 72,
+   "item_id": "item-584ebc16b1",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying bus tickets at the ticket window of a central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "ticket clerk",
+     "personality": "brisk but helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "bus_ticket",
+      "type": "ticket",
+      "name": "bus ticket to Haifa",
+      "quantity": 2,
+      "price_ils": 34,
+      "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+     },
+     {
+      "id": "haifa",
+      "type": "place",
+      "name": "Haifa",
+      "notes": "destination"
+     },
+     {
+      "id": "departure",
+      "type": "schedule",
+      "name": "next bus to Haifa",
+      "notes": "departs at 10:30 from platform 5"
+     }
+    ],
+    "topics": [
+     "travel",
+     "transport",
+     "time",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two bus tickets to Haifa",
+     "paid": false,
+     "state_note": "The tickets have not been paid for or issued"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לנסוע לחיפה."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבטח, יש לנו כרגע קבוצה מוכנה לסיעה לחיפה בשעה 10:30 מהרצף 5, והתקציב עבור שתי כרטיסי המטען הוא 34 ש\"ח, כלומר 17 ש\"ח לכרטיס יחיד."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך שתי כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבטח, שתי כרטיסים לחיפה – סה\"ק 34 ש\"ח. האם תרצה שתצטרף לשיחה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "מתי האוטובוס יוצאת?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס המיועד לחיפה יוצא בשעה 10:30 מהרצף 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "מאיזה רציף?"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוס יוצא מהרצף 5."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה הכל ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה\"כ עבור שתי הכרטיסים הוא 34 ש\"ח."
+    }
+   ]
+  }
+ ]
+}

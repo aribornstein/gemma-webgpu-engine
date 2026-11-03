@@ -1,0 +1,59 @@
+{
+ "fit": {
+  "slope_per_log_word": 1.327,
+  "intercept": -0.78,
+  "r2_on_unedited": 0.773,
+  "n": 144
+ },
+ "arms": {
+  "agent_p6": {
+   "observed_gap": 2.42,
+   "gap_predicted_by_length": 1.92,
+   "gap_beyond_length": 0.5,
+   "a1_words": 4.1,
+   "b2_words": 17.1
+  },
+  "best_of_2": {
+   "observed_gap": 2.12,
+   "gap_predicted_by_length": 1.8,
+   "gap_beyond_length": 0.32,
+   "a1_words": 5.0,
+   "b2_words": 19.6
+  },
+  "best_of_2_candidate": {
+   "observed_gap": 2.17,
+   "gap_predicted_by_length": 1.8,
+   "gap_beyond_length": 0.37,
+   "a1_words": 4.9,
+   "b2_words": 19.0
+  },
+  "random_p6": {
+   "observed_gap": -0.58,
+   "gap_predicted_by_length": -0.93,
+   "gap_beyond_length": 0.35,
+   "a1_words": 10.2,
+   "b2_words": 5.1
+  },
+  "raw_base": {
+   "observed_gap": 0.08,
+   "gap_predicted_by_length": -0.01,
+   "gap_beyond_length": 0.09,
+   "a1_words": 6.7,
+   "b2_words": 6.8
+  },
+  "strong_prompt": {
+   "observed_gap": 2.04,
+   "gap_predicted_by_length": 1.72,
+   "gap_beyond_length": 0.33,
+   "a1_words": 5.3,
+   "b2_words": 19.7
+  },
+  "wrong_level_p6": {
+   "observed_gap": -2.0,
+   "gap_predicted_by_length": -1.54,
+   "gap_beyond_length": -0.46,
+   "a1_words": 14.3,
+   "b2_words": 4.6
+  }
+ }
+}

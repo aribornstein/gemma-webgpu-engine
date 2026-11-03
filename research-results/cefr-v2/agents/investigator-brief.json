@@ -1,0 +1,525 @@
+{
+ "role": "weight_space_investigator (round 2)",
+ "goal": "Propose up to 8 effective-weight overlay configurations that make canonical-prompt (metadata-only) Hebrew NPC dialogue follow the requested CEFR level (A1 simpler, B2 richer) while keeping hard state checks (numbers/prices, no payment claims, no Latin spillover) at the raw level.",
+ "operator": "Per site L: h <- h + c * b * dot(a, h) after layer L (effective W + c b a^T on the residual write). b = unit direction, a = unit mean-state direction (dot(a,h) ~ state norm), c = gate * m * magnitude / s / (number of sites). gate = +1 for A1, -1 for B2 (external) or reversed (wrong_level). m = 1 shifts the residual by half the measured A1-B2 difference. Multiple sites form a rank-k edit (k <= 4); m is split across sites.",
+ "available_direction_types": {
+  "instr": "instruction-induced: mean residual difference strong-prompt minus canonical-prompt over the model's own replies, A1 minus B2 (fit on 9 direction families, family cosines 0.87-0.97)",
+  "content": "canonical-prompt state of the model's own A1-instructed minus B2-instructed replies, length-residualized"
+ },
+ "available_sites": [
+  12,
+  16,
+  20,
+  22,
+  24,
+  26
+ ],
+ "direction_summary": {
+  "residual12": {
+   "state_norm": 32.9,
+   "a_dot_h": 32.9,
+   "instr_half_diff_norm": 2.167,
+   "content_half_diff_norm": 1.755,
+   "content_raw_half_diff_norm": 4.387,
+   "permuted_instr_half_diff_norm": 0.467,
+   "cos_instr_content": -0.037,
+   "cos_content_contentRaw": 0.256,
+   "instr_family_cosines": [
+    0.861,
+    0.884,
+    0.88,
+    0.874,
+    0.849,
+    0.784,
+    0.866,
+    0.888,
+    0.884
+   ]
+  },
+  "residual16": {
+   "state_norm": 64.93,
+   "a_dot_h": 64.93,
+   "instr_half_diff_norm": 9.674,
+   "content_half_diff_norm": 3.889,
+   "content_raw_half_diff_norm": 7.08,
+   "permuted_instr_half_diff_norm": 1.024,
+   "cos_instr_content": 0.134,
+   "cos_content_contentRaw": 0.16,
+   "instr_family_cosines": [
+    0.916,
+    0.939,
+    0.955,
+    0.939,
+    0.942,
+    0.937,
+    0.895,
+    0.932,
+    0.928
+   ]
+  },
+  "residual20": {
+   "state_norm": 51.31,
+   "a_dot_h": 51.31,
+   "instr_half_diff_norm": 7.739,
+   "content_half_diff_norm": 3.484,
+   "content_raw_half_diff_norm": 5.686,
+   "permuted_instr_half_diff_norm": 1.441,
+   "cos_instr_content": 0.17,
+   "cos_content_contentRaw": 0.19,
+   "instr_family_cosines": [
+    0.907,
+    0.897,
+    0.944,
+    0.896,
+    0.921,
+    0.901,
+    0.871,
+    0.926,
+    0.919
+   ]
+  },
+  "residual22": {
+   "state_norm": 50.71,
+   "a_dot_h": 50.71,
+   "instr_half_diff_norm": 6.505,
+   "content_half_diff_norm": 2.722,
+   "content_raw_half_diff_norm": 4.706,
+   "permuted_instr_half_diff_norm": 1.821,
+   "cos_instr_content": 0.142,
+   "cos_content_contentRaw": 0.239,
+   "instr_family_cosines": [
+    0.881,
+    0.89,
+    0.935,
+    0.885,
+    0.892,
+    0.876,
+    0.869,
+    0.908,
+    0.901
+   ]
+  },
+  "residual24": {
+   "state_norm": 50.08,
+   "a_dot_h": 50.08,
+   "instr_half_diff_norm": 9.197,
+   "content_half_diff_norm": 2.872,
+   "content_raw_half_diff_norm": 4.785,
+   "permuted_instr_half_diff_norm": 1.405,
+   "cos_instr_content": 0.166,
+   "cos_content_contentRaw": 0.298,
+   "instr_family_cosines": [
+    0.952,
+    0.956,
+    0.966,
+    0.952,
+    0.949,
+    0.949,
+    0.947,
+    0.957,
+    0.943
+   ]
+  },
+  "residual26": {
+   "state_norm": 43.63,
+   "a_dot_h": 43.63,
+   "instr_half_diff_norm": 6.707,
+   "content_half_diff_norm": 2.578,
+   "content_raw_half_diff_norm": 4.186,
+   "permuted_instr_half_diff_norm": 1.106,
+   "cos_instr_content": 0.177,
+   "cos_content_contentRaw": 0.257,
+   "instr_family_cosines": [
+    0.922,
+    0.915,
+    0.943,
+    0.925,
+    0.914,
+    0.916,
+    0.91,
+    0.924,
+    0.9
+   ]
+  }
+ },
+ "steering_results_dev_families_market_cafe_pharmacy": {
+  "arms": {
+   "raw": {
+    "n": 12,
+    "gap": -0.015,
+    "a1Words": 5.2,
+    "b2Words": 5.1,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "strong": {
+    "n": 12,
+    "gap": 0.979,
+    "a1Words": 4.8,
+    "b2Words": 9.9,
+    "hardPass": 0.67,
+    "spillover": 0
+   },
+   "instr-L16-m1": {
+    "n": 12,
+    "gap": 0.409,
+    "a1Words": 3.9,
+    "b2Words": 7.3,
+    "hardPass": 0.58,
+    "spillover": 0
+   },
+   "instr-L16-m2": {
+    "n": 12,
+    "gap": 0.816,
+    "a1Words": 3.7,
+    "b2Words": 8.5,
+    "hardPass": 0.58,
+    "spillover": 0
+   },
+   "instr-L16-m4": {
+    "n": 12,
+    "gap": 4.895,
+    "a1Words": 1.3,
+    "b2Words": 22.7,
+    "hardPass": 0.58,
+    "spillover": 0
+   },
+   "instr-L22-m1": {
+    "n": 12,
+    "gap": 0.077,
+    "a1Words": 5.4,
+    "b2Words": 5.8,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "instr-L22-m2": {
+    "n": 12,
+    "gap": 0.411,
+    "a1Words": 5.4,
+    "b2Words": 6.4,
+    "hardPass": 0.67,
+    "spillover": 0
+   },
+   "instr-L22-m4": {
+    "n": 12,
+    "gap": 1.922,
+    "a1Words": 3.6,
+    "b2Words": 12.1,
+    "hardPass": 0.5,
+    "spillover": 0
+   },
+   "instr-L26-m1": {
+    "n": 12,
+    "gap": 0.263,
+    "a1Words": 4.6,
+    "b2Words": 5.7,
+    "hardPass": 0.92,
+    "spillover": 0
+   },
+   "instr-L26-m2": {
+    "n": 12,
+    "gap": 0.412,
+    "a1Words": 5,
+    "b2Words": 6.1,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "instr-L26-m4": {
+    "n": 12,
+    "gap": 0.886,
+    "a1Words": 4.1,
+    "b2Words": 7.6,
+    "hardPass": 0.58,
+    "spillover": 0
+   },
+   "content-L16-m1": {
+    "n": 12,
+    "gap": 0.08,
+    "a1Words": 5.1,
+    "b2Words": 5.7,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "content-L16-m2": {
+    "n": 12,
+    "gap": -0.026,
+    "a1Words": 5.1,
+    "b2Words": 5.7,
+    "hardPass": 0.67,
+    "spillover": 0
+   },
+   "content-L16-m4": {
+    "n": 12,
+    "gap": 0.029,
+    "a1Words": 4.3,
+    "b2Words": 6,
+    "hardPass": 0.58,
+    "spillover": 0.08
+   },
+   "content-L22-m1": {
+    "n": 12,
+    "gap": 0.148,
+    "a1Words": 4.5,
+    "b2Words": 5.6,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "content-L22-m2": {
+    "n": 12,
+    "gap": 0.155,
+    "a1Words": 5.1,
+    "b2Words": 6.3,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "content-L22-m4": {
+    "n": 12,
+    "gap": 0.194,
+    "a1Words": 4.4,
+    "b2Words": 5.7,
+    "hardPass": 0.67,
+    "spillover": 0
+   },
+   "content-L26-m1": {
+    "n": 12,
+    "gap": 0.114,
+    "a1Words": 5.6,
+    "b2Words": 5.5,
+    "hardPass": 0.67,
+    "spillover": 0.08
+   },
+   "content-L26-m2": {
+    "n": 12,
+    "gap": 0.12,
+    "a1Words": 4.4,
+    "b2Words": 5.5,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "content-L26-m4": {
+    "n": 12,
+    "gap": 0.024,
+    "a1Words": 4.8,
+    "b2Words": 5.4,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "random-instr-L16-m2": {
+    "n": 12,
+    "gap": 0.035,
+    "a1Words": 4.4,
+    "b2Words": 5.4,
+    "hardPass": 0.5,
+    "spillover": 0
+   },
+   "permuted-instr-L16-m2": {
+    "n": 12,
+    "gap": 0.237,
+    "a1Words": 4.4,
+    "b2Words": 5.8,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "flip-instr-L16-m2": {
+    "n": 12,
+    "gap": -0.645,
+    "a1Words": 7.2,
+    "b2Words": 3.7,
+    "hardPass": 0.67,
+    "spillover": 0
+   },
+   "random-instr-L22-m2": {
+    "n": 12,
+    "gap": 0.706,
+    "a1Words": 5.6,
+    "b2Words": 8.8,
+    "hardPass": 0.5,
+    "spillover": 0
+   },
+   "permuted-instr-L22-m2": {
+    "n": 12,
+    "gap": -0.146,
+    "a1Words": 5.9,
+    "b2Words": 4.9,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "flip-instr-L22-m2": {
+    "n": 12,
+    "gap": -0.259,
+    "a1Words": 5.8,
+    "b2Words": 4.8,
+    "hardPass": 0.67,
+    "spillover": 0
+   },
+   "random-instr-L26-m2": {
+    "n": 12,
+    "gap": 0.134,
+    "a1Words": 5.1,
+    "b2Words": 5.3,
+    "hardPass": 0.67,
+    "spillover": 0
+   },
+   "permuted-instr-L26-m2": {
+    "n": 12,
+    "gap": -0.241,
+    "a1Words": 5.2,
+    "b2Words": 4.9,
+    "hardPass": 0.83,
+    "spillover": 0
+   },
+   "flip-instr-L26-m2": {
+    "n": 12,
+    "gap": -0.23,
+    "a1Words": 5.6,
+    "b2Words": 5.4,
+    "hardPass": 0.83,
+    "spillover": 0
+   }
+  },
+  "candidates": {
+   "instr-L16": {
+    "gaps_by_m": {
+     "0": -0.015,
+     "1": 0.409,
+     "2": 0.816,
+     "4": 4.895
+    },
+    "spearman": 0.904,
+    "best_m": 4,
+    "best_minus_raw": 4.91,
+    "controls_minus": {},
+    "criteria": {
+     "monotonic": true,
+     "spearman_positive": true,
+     "best_minus_raw_ge_0_30": true,
+     "controls_ge_0_20": null,
+     "hard_pass_ok": false,
+     "spillover_ok": true
+    },
+    "pass_without_controls": false,
+    "pass": false
+   },
+   "instr-L22": {
+    "gaps_by_m": {
+     "0": -0.015,
+     "1": 0.077,
+     "2": 0.411,
+     "4": 1.922
+    },
+    "spearman": 0.775,
+    "best_m": 4,
+    "best_minus_raw": 1.938,
+    "controls_minus": {},
+    "criteria": {
+     "monotonic": true,
+     "spearman_positive": true,
+     "best_minus_raw_ge_0_30": true,
+     "controls_ge_0_20": null,
+     "hard_pass_ok": false,
+     "spillover_ok": true
+    },
+    "pass_without_controls": false,
+    "pass": false
+   },
+   "instr-L26": {
+    "gaps_by_m": {
+     "0": -0.015,
+     "1": 0.263,
+     "2": 0.412,
+     "4": 0.886
+    },
+    "spearman": 0.829,
+    "best_m": 4,
+    "best_minus_raw": 0.901,
+    "controls_minus": {},
+    "criteria": {
+     "monotonic": true,
+     "spearman_positive": true,
+     "best_minus_raw_ge_0_30": true,
+     "controls_ge_0_20": null,
+     "hard_pass_ok": false,
+     "spillover_ok": true
+    },
+    "pass_without_controls": false,
+    "pass": false
+   },
+   "content-L16": {
+    "gaps_by_m": {
+     "0": -0.015,
+     "1": 0.08,
+     "2": -0.026,
+     "4": 0.029
+    },
+    "spearman": -0.022,
+    "best_m": 1,
+    "best_minus_raw": 0.096,
+    "controls_minus": {},
+    "criteria": {
+     "monotonic": false,
+     "spearman_positive": false,
+     "best_minus_raw_ge_0_30": false,
+     "controls_ge_0_20": null,
+     "hard_pass_ok": true,
+     "spillover_ok": true
+    },
+    "pass_without_controls": false,
+    "pass": false
+   },
+   "content-L22": {
+    "gaps_by_m": {
+     "0": -0.015,
+     "1": 0.148,
+     "2": 0.155,
+     "4": 0.194
+    },
+    "spearman": 0.339,
+    "best_m": 4,
+    "best_minus_raw": 0.209,
+    "controls_minus": {},
+    "criteria": {
+     "monotonic": true,
+     "spearman_positive": true,
+     "best_minus_raw_ge_0_30": false,
+     "controls_ge_0_20": null,
+     "hard_pass_ok": false,
+     "spillover_ok": true
+    },
+    "pass_without_controls": false,
+    "pass": false
+   },
+   "content-L26": {
+    "gaps_by_m": {
+     "0": -0.015,
+     "1": 0.114,
+     "2": 0.12,
+     "4": 0.024
+    },
+    "spearman": 0.097,
+    "best_m": 2,
+    "best_minus_raw": 0.135,
+    "controls_minus": {},
+    "criteria": {
+     "monotonic": false,
+     "spearman_positive": true,
+     "best_minus_raw_ge_0_30": false,
+     "controls_ge_0_20": null,
+     "hard_pass_ok": true,
+     "spillover_ok": true
+    },
+    "pass_without_controls": false,
+    "pass": false
+   }
+  }
+ },
+ "gate_decision": "Strict prereg gate failed because at m=4 hard pass dropped below raw-0.10 at every site. Under disclosed deviation D1 (largest m keeping the guardrails), instr at layer 26, m=2 passes: gap +0.41 vs raw -0.02, beats random/permuted/flip by 0.28/0.65/0.64, hard pass 0.83 = raw. instr L16 m2 gives gap 0.82 (near strong prompt 0.98) but hard pass 0.58. content directions did not pass.",
+ "screening_next": "Your configs will be screened on the OTHER three development families (bus_ticket_purchase, hotel_checkin, lost_item_shop), 2 levels x 2 seeds x 3 turns, against raw. The top 2 by complexity gap subject to hard pass >= raw-0.10 go to the full blind panel on all 6 development families (5 turns).",
+ "constraints": [
+  "at most 8 configs",
+  "type must be instr or content",
+  "sites subset of [12,16,20,22,24,26], at most 4 sites",
+  "m in (0, 6]",
+  "gate external (self-gating not available for these directions)"
+ ],
+ "output_format": "JSON array of {\"arm\":\"p1\",\"type\":\"instr\",\"sites\":[26],\"m\":2.5,\"gate\":\"external\",\"rationale\":\"...\"}"
+}

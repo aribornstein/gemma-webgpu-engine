@@ -1,0 +1,17 @@
+{
+ "agreement": {
+  "n": 288,
+  "exact": 0.844,
+  "within_one": 1.0,
+  "pearson": 0.938
+ },
+ "cefr_control_reserved": {
+  "agent_p6": 2.62,
+  "best_of_2": 2.38,
+  "best_of_2_candidate": 2.29,
+  "random_p6": -0.83,
+  "raw_base": 0.0,
+  "strong_prompt": 2.29,
+  "wrong_level_p6": -2.12
+ }
+}

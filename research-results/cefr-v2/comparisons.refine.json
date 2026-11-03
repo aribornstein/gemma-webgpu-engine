@@ -1,0 +1,661 @@
+{
+ "unit": "scenario family (paired), percentile cluster bootstrap 2000x",
+ "comparisons": {
+  "cefr_control": {
+   "agent_r1 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.917,
+    "ci95": [
+     0.5,
+     1.333
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 1.5,
+     "cafe_order": 0.0,
+     "hotel_checkin": 0.5,
+     "lost_item_shop": 1.0,
+     "market_purchase": 1.0,
+     "pharmacy_purchase": 1.5
+    }
+   },
+   "agent_r2 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.583,
+    "ci95": [
+     0.333,
+     0.833
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 1.0,
+     "cafe_order": 0.0,
+     "hotel_checkin": 0.5,
+     "lost_item_shop": 1.0,
+     "market_purchase": 0.5,
+     "pharmacy_purchase": 0.5
+    }
+   },
+   "agent_r1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -1.0,
+    "ci95": [
+     -1.333,
+     -0.667
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -1.0,
+     "cafe_order": -1.0,
+     "hotel_checkin": -1.5,
+     "lost_item_shop": -1.5,
+     "market_purchase": -0.5,
+     "pharmacy_purchase": -0.5
+    }
+   },
+   "agent_r2 - best_of_2": {
+    "families": 6,
+    "mean_diff": -1.333,
+    "ci95": [
+     -1.5,
+     -1.167
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -1.5,
+     "cafe_order": -1.0,
+     "hotel_checkin": -1.5,
+     "lost_item_shop": -1.5,
+     "market_purchase": -1.0,
+     "pharmacy_purchase": -1.5
+    }
+   },
+   "agent_p6 - raw_base": {
+    "families": 6,
+    "mean_diff": 2.167,
+    "ci95": [
+     1.667,
+     2.5
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 2.5,
+     "cafe_order": 1.0,
+     "hotel_checkin": 2.5,
+     "lost_item_shop": 2.5,
+     "market_purchase": 2.0,
+     "pharmacy_purchase": 2.5
+    }
+   }
+  },
+  "complexity_gap": {
+   "agent_r1 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.415,
+    "ci95": [
+     0.209,
+     0.62
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.263,
+     "cafe_order": 0.49,
+     "hotel_checkin": 0.03,
+     "lost_item_shop": 0.895,
+     "market_purchase": 0.475,
+     "pharmacy_purchase": 0.334
+    }
+   },
+   "agent_r2 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.25,
+    "ci95": [
+     -0.023,
+     0.506
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.218,
+     "cafe_order": 0.466,
+     "hotel_checkin": -0.131,
+     "lost_item_shop": 0.764,
+     "market_purchase": 0.193,
+     "pharmacy_purchase": 0.423
+    }
+   },
+   "agent_r1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -1.112,
+    "ci95": [
+     -1.611,
+     -0.66
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -2.118,
+     "cafe_order": -0.487,
+     "hotel_checkin": -1.511,
+     "lost_item_shop": -1.217,
+     "market_purchase": -0.877,
+     "pharmacy_purchase": -0.46
+    }
+   },
+   "agent_r2 - best_of_2": {
+    "families": 6,
+    "mean_diff": -1.277,
+    "ci95": [
+     -1.919,
+     -0.689
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -2.599,
+     "cafe_order": -0.511,
+     "hotel_checkin": -1.672,
+     "lost_item_shop": -1.348,
+     "market_purchase": -1.159,
+     "pharmacy_purchase": -0.371
+    }
+   },
+   "agent_p6 - raw_base": {
+    "families": 6,
+    "mean_diff": 2.105,
+    "ci95": [
+     1.537,
+     2.698
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 1.167,
+     "cafe_order": 1.899,
+     "hotel_checkin": 1.448,
+     "lost_item_shop": 3.344,
+     "market_purchase": 2.826,
+     "pharmacy_purchase": 1.948
+    }
+   }
+  },
+  "joint_pass": {
+   "agent_r1 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.042,
+    "ci95": [
+     -0.208,
+     0.125
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.25,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": 0.25,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": -0.25
+    }
+   },
+   "agent_r2 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.125,
+    "ci95": [
+     -0.333,
+     0.042
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.5,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": 0.0,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": -0.25
+    }
+   },
+   "agent_r1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.042,
+    "ci95": [
+     -0.167,
+     0.083
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": 0.0,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": 0.0,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": -0.25
+    }
+   },
+   "agent_r2 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.125,
+    "ci95": [
+     -0.25,
+     0.042
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.25,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": -0.25,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": -0.25
+    }
+   },
+   "agent_p6 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.167,
+    "ci95": [
+     -0.333,
+     -0.042
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.5,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": 0.0,
+     "market_purchase": 0.0,
+     "pharmacy_purchase": -0.25
+    }
+   }
+  },
+  "hard_pass": {
+   "agent_r1 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.125,
+    "ci95": [
+     -0.333,
+     0.083
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.5,
+     "hotel_checkin": -0.5,
+     "lost_item_shop": 0.0,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": 0.0
+    }
+   },
+   "agent_r2 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.083,
+    "ci95": [
+     -0.25,
+     0.0
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.5,
+     "hotel_checkin": 0.0,
+     "lost_item_shop": 0.0,
+     "market_purchase": 0.0,
+     "pharmacy_purchase": 0.0
+    }
+   },
+   "agent_r1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.083,
+    "ci95": [
+     -0.375,
+     0.167
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.25,
+     "hotel_checkin": -0.75,
+     "lost_item_shop": 0.0,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": 0.25
+    }
+   },
+   "agent_r2 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.042,
+    "ci95": [
+     -0.167,
+     0.083
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.25,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": 0.0,
+     "market_purchase": 0.0,
+     "pharmacy_purchase": 0.25
+    }
+   },
+   "agent_p6 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.042,
+    "ci95": [
+     -0.25,
+     0.208
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": 0.0,
+     "hotel_checkin": 0.5,
+     "lost_item_shop": 0.0,
+     "market_purchase": -0.5,
+     "pharmacy_purchase": -0.25
+    }
+   }
+  },
+  "morphosyntactic_correctness": {
+   "agent_r1 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.292,
+    "ci95": [
+     -0.667,
+     0.0
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.5,
+     "hotel_checkin": 0.25,
+     "lost_item_shop": -0.5,
+     "market_purchase": 0.0,
+     "pharmacy_purchase": -1.0
+    }
+   },
+   "agent_r2 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.333,
+    "ci95": [
+     -0.792,
+     0.042
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.5,
+     "cafe_order": -1.0,
+     "hotel_checkin": 0.25,
+     "lost_item_shop": 0.0,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": -1.0
+    }
+   },
+   "agent_r1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.083,
+    "ci95": [
+     -0.5,
+     0.333
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.5,
+     "cafe_order": 0.0,
+     "hotel_checkin": 0.0,
+     "lost_item_shop": -1.0,
+     "market_purchase": 0.5,
+     "pharmacy_purchase": -0.5
+    }
+   },
+   "agent_r2 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.125,
+    "ci95": [
+     -0.417,
+     0.208
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.5,
+     "hotel_checkin": 0.0,
+     "lost_item_shop": -0.5,
+     "market_purchase": 0.75,
+     "pharmacy_purchase": -0.5
+    }
+   },
+   "agent_p6 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.792,
+    "ci95": [
+     -1.208,
+     -0.25
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -1.0,
+     "cafe_order": -1.5,
+     "hotel_checkin": 0.5,
+     "lost_item_shop": -0.75,
+     "market_purchase": -1.0,
+     "pharmacy_purchase": -1.0
+    }
+   }
+  },
+  "natural_hebrew": {
+   "agent_r1 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.333,
+    "ci95": [
+     -0.667,
+     -0.042
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -1.0,
+     "hotel_checkin": 0.0,
+     "lost_item_shop": 0.0,
+     "market_purchase": -0.25,
+     "pharmacy_purchase": -0.75
+    }
+   },
+   "agent_r2 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.292,
+    "ci95": [
+     -0.875,
+     0.167
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.25,
+     "cafe_order": -1.5,
+     "hotel_checkin": 0.5,
+     "lost_item_shop": 0.0,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": -0.75
+    }
+   },
+   "agent_r1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.333,
+    "ci95": [
+     -0.417,
+     -0.25
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.25,
+     "cafe_order": -0.25,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": -0.5,
+     "market_purchase": -0.25,
+     "pharmacy_purchase": -0.5
+    }
+   },
+   "agent_r2 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.292,
+    "ci95": [
+     -0.583,
+     0.0
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.5,
+     "cafe_order": -0.75,
+     "hotel_checkin": 0.25,
+     "lost_item_shop": -0.5,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": -0.5
+    }
+   },
+   "agent_p6 - raw_base": {
+    "families": 6,
+    "mean_diff": -1.042,
+    "ci95": [
+     -1.458,
+     -0.625
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.75,
+     "cafe_order": -2.0,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": -0.75,
+     "market_purchase": -1.25,
+     "pharmacy_purchase": -1.25
+    }
+   }
+  },
+  "cefr_suitability": {
+   "agent_r1 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.25,
+    "ci95": [
+     0.083,
+     0.458
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.25,
+     "cafe_order": 0.25,
+     "hotel_checkin": 0.0,
+     "lost_item_shop": 0.25,
+     "market_purchase": 0.75,
+     "pharmacy_purchase": 0.0
+    }
+   },
+   "agent_r2 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.208,
+    "ci95": [
+     -0.042,
+     0.458
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": -0.25,
+     "hotel_checkin": 0.5,
+     "lost_item_shop": 0.25,
+     "market_purchase": 0.75,
+     "pharmacy_purchase": 0.0
+    }
+   },
+   "agent_r1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.333,
+    "ci95": [
+     -0.542,
+     -0.125
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.25,
+     "cafe_order": -0.75,
+     "hotel_checkin": 0.0,
+     "lost_item_shop": -0.5,
+     "market_purchase": 0.0,
+     "pharmacy_purchase": -0.5
+    }
+   },
+   "agent_r2 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.375,
+    "ci95": [
+     -0.792,
+     0.0
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.5,
+     "cafe_order": -1.25,
+     "hotel_checkin": 0.5,
+     "lost_item_shop": -0.5,
+     "market_purchase": 0.0,
+     "pharmacy_purchase": -0.5
+    }
+   },
+   "agent_p6 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.0,
+    "ci95": [
+     -0.292,
+     0.333
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.75,
+     "cafe_order": -0.5,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": -0.25,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": 0.0
+    }
+   }
+  },
+  "multi_turn_coherence": {
+   "agent_r1 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.583,
+    "ci95": [
+     -1.0,
+     -0.25
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.75,
+     "cafe_order": -0.25,
+     "hotel_checkin": -1.5,
+     "lost_item_shop": -0.25,
+     "market_purchase": 0.0,
+     "pharmacy_purchase": -0.75
+    }
+   },
+   "agent_r2 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.583,
+    "ci95": [
+     -0.958,
+     -0.208
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -1.0,
+     "cafe_order": -1.25,
+     "hotel_checkin": -0.75,
+     "lost_item_shop": -0.25,
+     "market_purchase": 0.25,
+     "pharmacy_purchase": -0.5
+    }
+   },
+   "agent_r1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.417,
+    "ci95": [
+     -0.792,
+     -0.042
+    ],
+    "per_family": {
+     "bus_ticket_purchase": 0.0,
+     "cafe_order": 0.25,
+     "hotel_checkin": -1.0,
+     "lost_item_shop": -1.0,
+     "market_purchase": -0.25,
+     "pharmacy_purchase": -0.5
+    }
+   },
+   "agent_r2 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.417,
+    "ci95": [
+     -0.708,
+     -0.167
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.25,
+     "cafe_order": -0.75,
+     "hotel_checkin": -0.25,
+     "lost_item_shop": -1.0,
+     "market_purchase": 0.0,
+     "pharmacy_purchase": -0.25
+    }
+   },
+   "agent_p6 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.708,
+    "ci95": [
+     -0.958,
+     -0.417
+    ],
+    "per_family": {
+     "bus_ticket_purchase": -0.75,
+     "cafe_order": -1.0,
+     "hotel_checkin": -1.0,
+     "lost_item_shop": -0.5,
+     "market_purchase": 0.0,
+     "pharmacy_purchase": -1.0
+    }
+   }
+  }
+ }
+}

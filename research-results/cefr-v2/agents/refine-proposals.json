@@ -1,0 +1,18 @@
+[
+  {
+    "arm": "r1",
+    "type": "instr",
+    "sites": [20, 24, 26],
+    "m": 2.0,
+    "gate": "external",
+    "rationale": "Keep the p6 site set (best control per unit damage, hard pass within bounds) and cut the dose to ~44% (6 total vs 13.5). The norm-matched random_p6 arm alone costs about -0.5 grammar/naturalness, so a large part of the damage comes from perturbation norm, not direction, and is expected to fall faster than linearly at lower m. Control should saturate (A1 is already at the floor of 1.0 at m=4.5), so a low-m dose spread across 3 sites should keep a clear gain (expected ~+1 level over raw) while each layer gets only a small push."
+  },
+  {
+    "arm": "r2",
+    "type": "instr",
+    "sites": [26],
+    "m": 2.5,
+    "gate": "external",
+    "rationale": "Conservative bracket anchored on the only low-dose evidence: single-site layer 26 at m=2 gave +0.41 complexity gap with no hard-pass loss. m=2.5 adds a little strength for a clearer panel gap, at ~19% of p6's total dose, using the latest (least grammar-disruptive) layer. This maximises the chance of staying within the 0.25 grammar/naturalness guardrail, but the CEFR gain will be smaller (expected ~+0.5 to +0.8)."
+  }
+]

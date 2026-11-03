@@ -1,0 +1,94 @@
+{
+ "fit": {
+  "slope_per_log_word": 1.556,
+  "intercept": -0.941,
+  "r2_on_unedited": 0.85,
+  "n": 72
+ },
+ "arms": {
+  "agent_p6": {
+   "observed_gap": 2.42,
+   "gap_predicted_by_length": 2.26,
+   "gap_beyond_length": 0.15,
+   "a1_words": 3.3,
+   "b2_words": 14.2
+  },
+  "agent_p7": {
+   "observed_gap": 3.08,
+   "gap_predicted_by_length": 2.64,
+   "gap_beyond_length": 0.45,
+   "a1_words": 3.1,
+   "b2_words": 17.5
+  },
+  "agent_r1": {
+   "observed_gap": 1.17,
+   "gap_predicted_by_length": 0.88,
+   "gap_beyond_length": 0.29,
+   "a1_words": 4.5,
+   "b2_words": 8.0
+  },
+  "agent_r2": {
+   "observed_gap": 0.83,
+   "gap_predicted_by_length": 0.52,
+   "gap_beyond_length": 0.31,
+   "a1_words": 4.7,
+   "b2_words": 6.8
+  },
+  "best_of_2": {
+   "observed_gap": 2.17,
+   "gap_predicted_by_length": 2.01,
+   "gap_beyond_length": 0.15,
+   "a1_words": 3.9,
+   "b2_words": 14.8
+  },
+  "best_of_2_candidate": {
+   "observed_gap": 2.17,
+   "gap_predicted_by_length": 2.05,
+   "gap_beyond_length": 0.11,
+   "a1_words": 3.9,
+   "b2_words": 15.5
+  },
+  "random_p6": {
+   "observed_gap": -0.42,
+   "gap_predicted_by_length": -0.67,
+   "gap_beyond_length": 0.25,
+   "a1_words": 7.5,
+   "b2_words": 4.8
+  },
+  "random_p7": {
+   "observed_gap": 1.0,
+   "gap_predicted_by_length": 0.75,
+   "gap_beyond_length": 0.25,
+   "a1_words": 5.8,
+   "b2_words": 9.6
+  },
+  "raw_base": {
+   "observed_gap": 0.25,
+   "gap_predicted_by_length": 0.45,
+   "gap_beyond_length": -0.2,
+   "a1_words": 5.0,
+   "b2_words": 7.1
+  },
+  "strong_prompt": {
+   "observed_gap": 2.25,
+   "gap_predicted_by_length": 1.73,
+   "gap_beyond_length": 0.52,
+   "a1_words": 4.2,
+   "b2_words": 13.9
+  },
+  "wrong_level_p6": {
+   "observed_gap": -2.08,
+   "gap_predicted_by_length": -1.78,
+   "gap_beyond_length": -0.3,
+   "a1_words": 11.8,
+   "b2_words": 3.7
+  },
+  "wrong_level_p7": {
+   "observed_gap": -2.33,
+   "gap_predicted_by_length": -2.07,
+   "gap_beyond_length": -0.26,
+   "a1_words": 13.2,
+   "b2_words": 3.3
+  }
+ }
+}

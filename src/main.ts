@@ -800,7 +800,7 @@ app.innerHTML = `
           <label class="field">Patch manifest (JSON)
             <input id="overlay-patch" type="file" accept="application/json,.json">
           </label>
-          <label class="field">Coefficient (gate × alpha)
+          <label class="field">Coefficient (gate × alpha; per-overlay scale applied)
             <input id="overlay-coefficient" type="number" step="0.01" value="0">
           </label>
           <div class="benchmark-command-row">
@@ -1056,7 +1056,8 @@ const overlayCoefficientInput = element<HTMLInputElement>("overlay-coefficient")
 const overlayApplyButton = element<HTMLButtonElement>("overlay-apply");
 const overlayClearButton = element<HTMLButtonElement>("overlay-clear");
 const overlayStatus = element<HTMLParagraphElement>("overlay-status");
-let overlayPatch: { id: string; site: "final" | { layer: number }; a: number[]; b: number[] } | null = null;
+type OverlayPatchItem = { site: "final" | { layer: number }; a: number[]; b: number[]; scale?: number };
+let overlayPatch: { id: string; items: OverlayPatchItem[] } | null = null;
 overlayPatchInput.addEventListener("change", async () => {
   const file = overlayPatchInput.files?.[0];
   overlayPatch = null;
@@ -1064,10 +1065,14 @@ overlayPatchInput.addEventListener("change", async () => {
   if (!file) return;
   try {
     const patch = JSON.parse(await file.text());
-    if (!Array.isArray(patch.a) || !Array.isArray(patch.b) || !(patch.site === "final" || Number.isInteger(patch.site?.layer))) {
-      throw new Error("Patch needs site, a and b");
+    // Single overlays use { site, a, b }; low-rank patches list { site, a, b, scale } in `overlays`.
+    const items: OverlayPatchItem[] = Array.isArray(patch.overlays) ? patch.overlays : [patch];
+    for (const item of items) {
+      if (!Array.isArray(item.a) || !Array.isArray(item.b) || !(item.site === "final" || Number.isInteger(item.site?.layer))) {
+        throw new Error("Each overlay needs site, a and b");
+      }
     }
-    overlayPatch = patch;
+    overlayPatch = { id: patch.id ?? file.name, items };
     overlayApplyButton.disabled = !session || generationController !== null;
     overlayStatus.textContent = `Loaded patch ${patch.id ?? file.name}`;
   } catch (error) {
@@ -1078,12 +1083,12 @@ overlayApplyButton.addEventListener("click", async () => {
   if (!session || !overlayPatch || generationController) return;
   const coefficient = Number(overlayCoefficientInput.value);
   try {
-    await session.setResearchOverlay({
-      site: overlayPatch.site,
-      a: Float32Array.from(overlayPatch.a),
-      b: Float32Array.from(overlayPatch.b),
-      coefficient,
-    });
+    await session.setResearchOverlay(overlayPatch.items.map((item) => ({
+      site: item.site,
+      a: Float32Array.from(item.a),
+      b: Float32Array.from(item.b),
+      coefficient: coefficient * (item.scale ?? 1),
+    })));
     overlayClearButton.disabled = false;
     overlayStatus.textContent = `Overlay ${overlayPatch.id} active · coefficient ${coefficient} · prompt cache reset`;
   } catch (error) {

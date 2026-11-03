@@ -1,0 +1,10 @@
+[
+ {"arm":"p1","type":"instr","sites":[26],"m":3,"gate":"external","rationale":"Single-site dose interpolation at the cleanest site: L26 m2 kept hardPass=raw (0.83, gap 0.41) and m4 broke it (0.58, gap 0.89); m3 probes the guardrail knee."},
+ {"arm":"p2","type":"instr","sites":[24],"m":2.5,"gate":"external","rationale":"L24 is untested yet has the most consistent instr direction (family cosines 0.94-0.97) and a large half-diff (9.2, near L16) on a late, guardrail-friendlier layer."},
+ {"arm":"p3","type":"instr","sites":[24,26],"m":4,"gate":"external","rationale":"Rank-2 late edit: m4 split as 2 per site keeps each per-site push at the L26-m2 level that preserved guardrails, while the cumulative late shift approaches the m4 effect."},
+ {"arm":"p4","type":"instr","sites":[16,26],"m":3,"gate":"external","rationale":"Direct test of combining L16's large gap with L26's clean guardrails: L16 gets 1.5 (between m1 gap 0.41 and m2 gap 0.82), L26 adds 1.5 of late, clean push."},
+ {"arm":"p5","type":"instr","sites":[16,22,24,26],"m":4,"gate":"external","rationale":"Rank-4 distributed edit with only m=1 per site, so no single layer is pushed past its measured guardrail-safe dose while the total strength matches the m4 arms that produced large gaps."},
+ {"arm":"p6","type":"instr","sites":[20,24,26],"m":4.5,"gate":"external","rationale":"Mid-to-late rank-3 edit avoiding L16 (worst hardPass) with 1.5 per site; L20 has a large half-diff (7.7) and is untested."},
+ {"arm":"p7","type":"instr","sites":[22,24,26],"m":6,"gate":"external","rationale":"Upper-dose late distributed arm (2 per site) to test whether splitting lets total strength exceed single-site m4 without the guardrail collapse seen at L22-m4 (0.50)."},
+ {"arm":"p8","type":"instr","sites":[12,16,24,26],"m":5,"gate":"external","rationale":"Early+late rank-4 spread (1.25 per site): L12 contributes a small early nudge (half-diff 2.2) while late sites carry most of the push, checking whether early injection helps the length gap without hurting state checks."}
+]

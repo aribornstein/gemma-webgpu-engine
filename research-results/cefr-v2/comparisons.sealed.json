@@ -1,0 +1,959 @@
+{
+ "unit": "scenario family (paired), percentile cluster bootstrap 2000x",
+ "comparisons": {
+  "cefr_control": {
+   "agent_p6 - raw_base": {
+    "families": 12,
+    "mean_diff": 2.333,
+    "ci95": [
+     2.042,
+     2.625
+    ],
+    "per_family": {
+     "cinema_tickets": 3.0,
+     "flower_shop": 3.0,
+     "hairdresser_booking": 1.5,
+     "hardware_store": 1.5,
+     "ice_cream": 2.5,
+     "laundry_service": 3.0,
+     "parking_payment": 2.0,
+     "phone_shop": 2.5,
+     "plant_nursery": 2.5,
+     "school_registration": 2.0,
+     "shoe_repair": 2.5,
+     "swimming_pool": 2.0
+    }
+   },
+   "agent_p6 - random_p6": {
+    "families": 12,
+    "mean_diff": 3.0,
+    "ci95": [
+     2.667,
+     3.333
+    ],
+    "per_family": {
+     "cinema_tickets": 4.0,
+     "flower_shop": 4.0,
+     "hairdresser_booking": 2.0,
+     "hardware_store": 2.5,
+     "ice_cream": 3.5,
+     "laundry_service": 3.5,
+     "parking_payment": 2.5,
+     "phone_shop": 2.5,
+     "plant_nursery": 3.0,
+     "school_registration": 3.0,
+     "shoe_repair": 3.0,
+     "swimming_pool": 2.5
+    }
+   },
+   "agent_p6 - wrong_level_p6": {
+    "families": 12,
+    "mean_diff": 4.417,
+    "ci95": [
+     4.083,
+     4.75
+    ],
+    "per_family": {
+     "cinema_tickets": 5.5,
+     "flower_shop": 5.0,
+     "hairdresser_booking": 4.0,
+     "hardware_store": 3.5,
+     "ice_cream": 4.5,
+     "laundry_service": 5.5,
+     "parking_payment": 3.5,
+     "phone_shop": 4.5,
+     "plant_nursery": 4.0,
+     "school_registration": 4.5,
+     "shoe_repair": 4.5,
+     "swimming_pool": 4.0
+    }
+   },
+   "agent_p6 - best_of_2": {
+    "families": 12,
+    "mean_diff": 0.292,
+    "ci95": [
+     -0.042,
+     0.625
+    ],
+    "per_family": {
+     "cinema_tickets": 1.0,
+     "flower_shop": 1.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.5,
+     "laundry_service": 1.0,
+     "parking_payment": -0.5,
+     "phone_shop": -0.5,
+     "plant_nursery": 1.0,
+     "school_registration": -0.5,
+     "shoe_repair": 0.5,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - strong_prompt": {
+    "families": 12,
+    "mean_diff": 0.375,
+    "ci95": [
+     0.042,
+     0.708
+    ],
+    "per_family": {
+     "cinema_tickets": 1.0,
+     "flower_shop": 0.5,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.5,
+     "laundry_service": 1.5,
+     "parking_payment": 0.0,
+     "phone_shop": 0.5,
+     "plant_nursery": 1.0,
+     "school_registration": -0.5,
+     "shoe_repair": 0.5,
+     "swimming_pool": -0.5
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 12,
+    "mean_diff": 1.958,
+    "ci95": [
+     1.75,
+     2.167
+    ],
+    "per_family": {
+     "cinema_tickets": 2.0,
+     "flower_shop": 2.5,
+     "hairdresser_booking": 1.5,
+     "hardware_store": 1.5,
+     "ice_cream": 2.0,
+     "laundry_service": 1.5,
+     "parking_payment": 2.0,
+     "phone_shop": 2.0,
+     "plant_nursery": 1.5,
+     "school_registration": 2.5,
+     "shoe_repair": 2.0,
+     "swimming_pool": 2.5
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 12,
+    "mean_diff": 2.042,
+    "ci95": [
+     1.792,
+     2.292
+    ],
+    "per_family": {
+     "cinema_tickets": 2.0,
+     "flower_shop": 2.0,
+     "hairdresser_booking": 1.5,
+     "hardware_store": 1.5,
+     "ice_cream": 2.0,
+     "laundry_service": 2.0,
+     "parking_payment": 2.5,
+     "phone_shop": 3.0,
+     "plant_nursery": 1.5,
+     "school_registration": 2.5,
+     "shoe_repair": 2.0,
+     "swimming_pool": 2.0
+    }
+   }
+  },
+  "complexity_gap": {
+   "agent_p6 - raw_base": {
+    "families": 12,
+    "mean_diff": 2.723,
+    "ci95": [
+     2.094,
+     3.33
+    ],
+    "per_family": {
+     "cinema_tickets": 2.157,
+     "flower_shop": 3.361,
+     "hairdresser_booking": 3.017,
+     "hardware_store": 1.864,
+     "ice_cream": 3.234,
+     "laundry_service": 4.301,
+     "parking_payment": 2.579,
+     "phone_shop": 3.852,
+     "plant_nursery": 4.027,
+     "school_registration": 2.087,
+     "shoe_repair": 1.527,
+     "swimming_pool": 0.664
+    }
+   },
+   "agent_p6 - random_p6": {
+    "families": 12,
+    "mean_diff": 3.502,
+    "ci95": [
+     2.846,
+     4.137
+    ],
+    "per_family": {
+     "cinema_tickets": 2.766,
+     "flower_shop": 4.931,
+     "hairdresser_booking": 3.503,
+     "hardware_store": 3.19,
+     "ice_cream": 4.104,
+     "laundry_service": 5.188,
+     "parking_payment": 2.386,
+     "phone_shop": 4.394,
+     "plant_nursery": 4.55,
+     "school_registration": 3.416,
+     "shoe_repair": 2.273,
+     "swimming_pool": 1.316
+    }
+   },
+   "agent_p6 - wrong_level_p6": {
+    "families": 12,
+    "mean_diff": 4.93,
+    "ci95": [
+     4.088,
+     5.811
+    ],
+    "per_family": {
+     "cinema_tickets": 3.876,
+     "flower_shop": 6.885,
+     "hairdresser_booking": 4.696,
+     "hardware_store": 4.51,
+     "ice_cream": 5.201,
+     "laundry_service": 6.901,
+     "parking_payment": 3.521,
+     "phone_shop": 6.29,
+     "plant_nursery": 7.014,
+     "school_registration": 4.153,
+     "shoe_repair": 3.749,
+     "swimming_pool": 2.36
+    }
+   },
+   "agent_p6 - best_of_2": {
+    "families": 12,
+    "mean_diff": 0.164,
+    "ci95": [
+     -0.314,
+     0.693
+    ],
+    "per_family": {
+     "cinema_tickets": 0.447,
+     "flower_shop": 0.679,
+     "hairdresser_booking": 1.228,
+     "hardware_store": 0.328,
+     "ice_cream": -0.173,
+     "laundry_service": 1.899,
+     "parking_payment": -0.504,
+     "phone_shop": 0.445,
+     "plant_nursery": 0.45,
+     "school_registration": -1.143,
+     "shoe_repair": -0.398,
+     "swimming_pool": -1.293
+    }
+   },
+   "agent_p6 - strong_prompt": {
+    "families": 12,
+    "mean_diff": 0.027,
+    "ci95": [
+     -0.819,
+     0.826
+    ],
+    "per_family": {
+     "cinema_tickets": 0.093,
+     "flower_shop": 0.668,
+     "hairdresser_booking": 1.224,
+     "hardware_store": 0.411,
+     "ice_cream": -0.173,
+     "laundry_service": 2.662,
+     "parking_payment": 0.425,
+     "phone_shop": 0.67,
+     "plant_nursery": 0.358,
+     "school_registration": -2.206,
+     "shoe_repair": -0.992,
+     "swimming_pool": -2.82
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 12,
+    "mean_diff": 2.696,
+    "ci95": [
+     2.189,
+     3.153
+    ],
+    "per_family": {
+     "cinema_tickets": 2.064,
+     "flower_shop": 2.693,
+     "hairdresser_booking": 1.793,
+     "hardware_store": 1.453,
+     "ice_cream": 3.408,
+     "laundry_service": 1.639,
+     "parking_payment": 2.155,
+     "phone_shop": 3.182,
+     "plant_nursery": 3.669,
+     "school_registration": 4.293,
+     "shoe_repair": 2.519,
+     "swimming_pool": 3.484
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 12,
+    "mean_diff": 2.559,
+    "ci95": [
+     2.137,
+     2.968
+    ],
+    "per_family": {
+     "cinema_tickets": 1.71,
+     "flower_shop": 2.682,
+     "hairdresser_booking": 1.789,
+     "hardware_store": 1.536,
+     "ice_cream": 3.408,
+     "laundry_service": 2.403,
+     "parking_payment": 3.083,
+     "phone_shop": 3.406,
+     "plant_nursery": 3.577,
+     "school_registration": 3.23,
+     "shoe_repair": 1.925,
+     "swimming_pool": 1.957
+    }
+   }
+  },
+  "joint_pass": {
+   "agent_p6 - raw_base": {
+    "families": 12,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.0,
+     "laundry_service": 0.0,
+     "parking_payment": 0.0,
+     "phone_shop": 0.0,
+     "plant_nursery": 0.0,
+     "school_registration": 0.0,
+     "shoe_repair": 0.0,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - random_p6": {
+    "families": 12,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.0,
+     "laundry_service": 0.0,
+     "parking_payment": 0.0,
+     "phone_shop": 0.0,
+     "plant_nursery": 0.0,
+     "school_registration": 0.0,
+     "shoe_repair": 0.0,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - wrong_level_p6": {
+    "families": 12,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.0,
+     "laundry_service": 0.0,
+     "parking_payment": 0.0,
+     "phone_shop": 0.0,
+     "plant_nursery": 0.0,
+     "school_registration": 0.0,
+     "shoe_repair": 0.0,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - best_of_2": {
+    "families": 12,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.0,
+     "laundry_service": 0.0,
+     "parking_payment": 0.0,
+     "phone_shop": 0.0,
+     "plant_nursery": 0.0,
+     "school_registration": 0.0,
+     "shoe_repair": 0.0,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - strong_prompt": {
+    "families": 12,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.0,
+     "laundry_service": 0.0,
+     "parking_payment": 0.0,
+     "phone_shop": 0.0,
+     "plant_nursery": 0.0,
+     "school_registration": 0.0,
+     "shoe_repair": 0.0,
+     "swimming_pool": 0.0
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 12,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.0,
+     "laundry_service": 0.0,
+     "parking_payment": 0.0,
+     "phone_shop": 0.0,
+     "plant_nursery": 0.0,
+     "school_registration": 0.0,
+     "shoe_repair": 0.0,
+     "swimming_pool": 0.0
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 12,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.0,
+     "laundry_service": 0.0,
+     "parking_payment": 0.0,
+     "phone_shop": 0.0,
+     "plant_nursery": 0.0,
+     "school_registration": 0.0,
+     "shoe_repair": 0.0,
+     "swimming_pool": 0.0
+    }
+   }
+  },
+  "hard_pass": {
+   "agent_p6 - raw_base": {
+    "families": 12,
+    "mean_diff": -0.042,
+    "ci95": [
+     -0.188,
+     0.104
+    ],
+    "per_family": {
+     "cinema_tickets": 0.5,
+     "flower_shop": -0.25,
+     "hairdresser_booking": 0.0,
+     "hardware_store": -0.25,
+     "ice_cream": 0.0,
+     "laundry_service": 0.0,
+     "parking_payment": 0.25,
+     "phone_shop": 0.0,
+     "plant_nursery": -0.25,
+     "school_registration": -0.5,
+     "shoe_repair": 0.0,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - random_p6": {
+    "families": 12,
+    "mean_diff": 0.167,
+    "ci95": [
+     -0.021,
+     0.354
+    ],
+    "per_family": {
+     "cinema_tickets": 0.5,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": -0.25,
+     "ice_cream": 0.0,
+     "laundry_service": 0.0,
+     "parking_payment": 0.75,
+     "phone_shop": 0.5,
+     "plant_nursery": 0.0,
+     "school_registration": -0.25,
+     "shoe_repair": 0.75,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - wrong_level_p6": {
+    "families": 12,
+    "mean_diff": 0.042,
+    "ci95": [
+     -0.104,
+     0.208
+    ],
+    "per_family": {
+     "cinema_tickets": 0.5,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": -0.25,
+     "ice_cream": 0.0,
+     "laundry_service": -0.25,
+     "parking_payment": 0.75,
+     "phone_shop": 0.0,
+     "plant_nursery": 0.0,
+     "school_registration": -0.25,
+     "shoe_repair": 0.0,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - best_of_2": {
+    "families": 12,
+    "mean_diff": 0.0,
+    "ci95": [
+     -0.167,
+     0.167
+    ],
+    "per_family": {
+     "cinema_tickets": 0.5,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": -0.5,
+     "ice_cream": -0.25,
+     "laundry_service": -0.25,
+     "parking_payment": 0.0,
+     "phone_shop": 0.5,
+     "plant_nursery": -0.25,
+     "school_registration": 0.0,
+     "shoe_repair": 0.25,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - strong_prompt": {
+    "families": 12,
+    "mean_diff": 0.021,
+    "ci95": [
+     -0.167,
+     0.208
+    ],
+    "per_family": {
+     "cinema_tickets": 0.25,
+     "flower_shop": 0.0,
+     "hairdresser_booking": -0.25,
+     "hardware_store": -0.5,
+     "ice_cream": -0.25,
+     "laundry_service": 0.0,
+     "parking_payment": 0.75,
+     "phone_shop": 0.25,
+     "plant_nursery": -0.25,
+     "school_registration": 0.0,
+     "shoe_repair": 0.25,
+     "swimming_pool": 0.0
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 12,
+    "mean_diff": -0.062,
+    "ci95": [
+     -0.229,
+     0.083
+    ],
+    "per_family": {
+     "cinema_tickets": 0.25,
+     "flower_shop": -0.25,
+     "hairdresser_booking": 0.25,
+     "hardware_store": 0.25,
+     "ice_cream": 0.25,
+     "laundry_service": 0.0,
+     "parking_payment": -0.5,
+     "phone_shop": -0.25,
+     "plant_nursery": 0.0,
+     "school_registration": -0.5,
+     "shoe_repair": -0.25,
+     "swimming_pool": 0.0
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 12,
+    "mean_diff": -0.042,
+    "ci95": [
+     -0.188,
+     0.104
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": -0.25,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.25,
+     "ice_cream": 0.25,
+     "laundry_service": 0.25,
+     "parking_payment": 0.25,
+     "phone_shop": -0.5,
+     "plant_nursery": 0.0,
+     "school_registration": -0.5,
+     "shoe_repair": -0.25,
+     "swimming_pool": 0.0
+    }
+   }
+  },
+  "morphosyntactic_correctness": {
+   "agent_p6 - raw_base": {
+    "families": 12,
+    "mean_diff": -0.479,
+    "ci95": [
+     -0.729,
+     -0.271
+    ],
+    "per_family": {
+     "cinema_tickets": -0.5,
+     "flower_shop": -0.5,
+     "hairdresser_booking": 0.0,
+     "hardware_store": -0.25,
+     "ice_cream": -0.75,
+     "laundry_service": -0.75,
+     "parking_payment": 0.0,
+     "phone_shop": -0.25,
+     "plant_nursery": -0.75,
+     "school_registration": 0.0,
+     "shoe_repair": -0.5,
+     "swimming_pool": -1.5
+    }
+   },
+   "agent_p6 - random_p6": {
+    "families": 12,
+    "mean_diff": 0.375,
+    "ci95": [
+     0.125,
+     0.604
+    ],
+    "per_family": {
+     "cinema_tickets": 0.5,
+     "flower_shop": 0.25,
+     "hairdresser_booking": 0.75,
+     "hardware_store": 0.0,
+     "ice_cream": 0.25,
+     "laundry_service": 0.25,
+     "parking_payment": 0.5,
+     "phone_shop": 1.25,
+     "plant_nursery": -0.5,
+     "school_registration": 0.5,
+     "shoe_repair": 0.75,
+     "swimming_pool": 0.0
+    }
+   },
+   "agent_p6 - wrong_level_p6": {
+    "families": 12,
+    "mean_diff": -0.125,
+    "ci95": [
+     -0.354,
+     0.104
+    ],
+    "per_family": {
+     "cinema_tickets": 0.5,
+     "flower_shop": -0.25,
+     "hairdresser_booking": 0.5,
+     "hardware_store": 0.0,
+     "ice_cream": -0.25,
+     "laundry_service": -0.25,
+     "parking_payment": 0.5,
+     "phone_shop": -0.25,
+     "plant_nursery": -0.25,
+     "school_registration": -0.25,
+     "shoe_repair": -0.5,
+     "swimming_pool": -1.0
+    }
+   },
+   "agent_p6 - best_of_2": {
+    "families": 12,
+    "mean_diff": -0.583,
+    "ci95": [
+     -0.812,
+     -0.354
+    ],
+    "per_family": {
+     "cinema_tickets": -1.25,
+     "flower_shop": -0.75,
+     "hairdresser_booking": -0.5,
+     "hardware_store": -0.75,
+     "ice_cream": -1.0,
+     "laundry_service": -0.5,
+     "parking_payment": -0.25,
+     "phone_shop": 0.0,
+     "plant_nursery": -0.5,
+     "school_registration": -1.25,
+     "shoe_repair": 0.0,
+     "swimming_pool": -0.25
+    }
+   },
+   "agent_p6 - strong_prompt": {
+    "families": 12,
+    "mean_diff": -0.104,
+    "ci95": [
+     -0.458,
+     0.271
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": -0.5,
+     "hairdresser_booking": 0.0,
+     "hardware_store": -0.5,
+     "ice_cream": -1.0,
+     "laundry_service": -0.5,
+     "parking_payment": 1.0,
+     "phone_shop": 1.25,
+     "plant_nursery": -0.5,
+     "school_registration": -1.0,
+     "shoe_repair": 0.25,
+     "swimming_pool": 0.25
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 12,
+    "mean_diff": -0.375,
+    "ci95": [
+     -0.812,
+     0.042
+    ],
+    "per_family": {
+     "cinema_tickets": -0.5,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.25,
+     "ice_cream": 0.25,
+     "laundry_service": -0.25,
+     "parking_payment": -1.0,
+     "phone_shop": -1.5,
+     "plant_nursery": -0.25,
+     "school_registration": 1.0,
+     "shoe_repair": -0.75,
+     "swimming_pool": -1.75
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 12,
+    "mean_diff": 0.104,
+    "ci95": [
+     -0.271,
+     0.438
+    ],
+    "per_family": {
+     "cinema_tickets": 0.75,
+     "flower_shop": 0.25,
+     "hairdresser_booking": 0.5,
+     "hardware_store": 0.5,
+     "ice_cream": 0.25,
+     "laundry_service": -0.25,
+     "parking_payment": 0.25,
+     "phone_shop": -0.25,
+     "plant_nursery": -0.25,
+     "school_registration": 1.25,
+     "shoe_repair": -0.5,
+     "swimming_pool": -1.25
+    }
+   }
+  },
+  "natural_hebrew": {
+   "agent_p6 - raw_base": {
+    "families": 12,
+    "mean_diff": -0.75,
+    "ci95": [
+     -1.062,
+     -0.479
+    ],
+    "per_family": {
+     "cinema_tickets": -0.25,
+     "flower_shop": -0.75,
+     "hairdresser_booking": -0.5,
+     "hardware_store": -0.5,
+     "ice_cream": -0.5,
+     "laundry_service": -1.75,
+     "parking_payment": -0.5,
+     "phone_shop": -0.5,
+     "plant_nursery": -1.25,
+     "school_registration": 0.0,
+     "shoe_repair": -0.75,
+     "swimming_pool": -1.75
+    }
+   },
+   "agent_p6 - random_p6": {
+    "families": 12,
+    "mean_diff": 0.042,
+    "ci95": [
+     -0.25,
+     0.292
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": 0.25,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": 0.5,
+     "laundry_service": -0.75,
+     "parking_payment": 0.25,
+     "phone_shop": 0.5,
+     "plant_nursery": -1.0,
+     "school_registration": 0.5,
+     "shoe_repair": 0.5,
+     "swimming_pool": -0.25
+    }
+   },
+   "agent_p6 - wrong_level_p6": {
+    "families": 12,
+    "mean_diff": -0.229,
+    "ci95": [
+     -0.438,
+     0.0
+    ],
+    "per_family": {
+     "cinema_tickets": 0.75,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.0,
+     "hardware_store": 0.0,
+     "ice_cream": -0.25,
+     "laundry_service": -0.75,
+     "parking_payment": -0.5,
+     "phone_shop": -0.5,
+     "plant_nursery": -0.5,
+     "school_registration": 0.0,
+     "shoe_repair": -0.25,
+     "swimming_pool": -0.75
+    }
+   },
+   "agent_p6 - best_of_2": {
+    "families": 12,
+    "mean_diff": -0.688,
+    "ci95": [
+     -0.958,
+     -0.438
+    ],
+    "per_family": {
+     "cinema_tickets": -0.25,
+     "flower_shop": -1.25,
+     "hairdresser_booking": -1.0,
+     "hardware_store": -0.5,
+     "ice_cream": -1.0,
+     "laundry_service": -1.5,
+     "parking_payment": -0.5,
+     "phone_shop": 0.0,
+     "plant_nursery": -1.0,
+     "school_registration": -0.75,
+     "shoe_repair": -0.25,
+     "swimming_pool": -0.25
+    }
+   },
+   "agent_p6 - strong_prompt": {
+    "families": 12,
+    "mean_diff": -0.25,
+    "ci95": [
+     -0.604,
+     0.104
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": -0.75,
+     "hairdresser_booking": -0.75,
+     "hardware_store": -0.25,
+     "ice_cream": -1.0,
+     "laundry_service": -1.25,
+     "parking_payment": 0.75,
+     "phone_shop": 0.5,
+     "plant_nursery": -0.75,
+     "school_registration": -0.25,
+     "shoe_repair": 0.25,
+     "swimming_pool": 0.5
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 12,
+    "mean_diff": -0.5,
+    "ci95": [
+     -0.938,
+     -0.104
+    ],
+    "per_family": {
+     "cinema_tickets": -0.25,
+     "flower_shop": 0.0,
+     "hairdresser_booking": 0.25,
+     "hardware_store": -0.25,
+     "ice_cream": 0.5,
+     "laundry_service": -0.5,
+     "parking_payment": -1.25,
+     "phone_shop": -1.0,
+     "plant_nursery": -0.5,
+     "school_registration": 0.25,
+     "shoe_repair": -1.0,
+     "swimming_pool": -2.25
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 12,
+    "mean_diff": -0.062,
+    "ci95": [
+     -0.417,
+     0.25
+    ],
+    "per_family": {
+     "cinema_tickets": 0.0,
+     "flower_shop": 0.5,
+     "hairdresser_booking": 0.5,
+     "hardware_store": 0.0,
+     "ice_cream": 0.5,
+     "laundry_service": -0.25,
+     "parking_payment": 0.0,
+     "phone_shop": -0.5,
+     "plant_nursery": -0.25,
+     "school_registration": 0.75,
+     "shoe_repair": -0.5,
+     "swimming_pool": -1.5
+    }
+   }
+  },
+  "cefr_suitability": {
+   "agent_p6 - raw_base": null,
+   "agent_p6 - random_p6": null,
+   "agent_p6 - wrong_level_p6": null,
+   "agent_p6 - best_of_2": null,
+   "agent_p6 - strong_prompt": null,
+   "strong_prompt - raw_base": null,
+   "best_of_2 - raw_base": null
+  },
+  "multi_turn_coherence": {
+   "agent_p6 - raw_base": null,
+   "agent_p6 - random_p6": null,
+   "agent_p6 - wrong_level_p6": null,
+   "agent_p6 - best_of_2": null,
+   "agent_p6 - strong_prompt": null,
+   "strong_prompt - raw_base": null,
+   "best_of_2 - raw_base": null
+  }
+ }
+}

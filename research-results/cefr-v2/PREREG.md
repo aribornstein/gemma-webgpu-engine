@@ -36,3 +36,23 @@ Pass iff cefr_control gap (blind level estimator) exceeds raw, random and wrong-
 ## Sealed (one invocation)
 All arms × 12 families × 2 levels × 2 seeds, 5 turns; blind panel plus a reserved second-prompt level judge.
 Primary: cefr_control (agent edit − raw, − random, − best_of_2), paired cluster bootstrap by family.
+
+## Deviation D1 (recorded after the dose sweep, before any control arm was run)
+The sweep showed a monotonic dose-response for `instr` at all three sites, but at the largest dose (m = 4) the hard
+state pass rate falls below raw − 0.10 at every site, so the gate as literally written (criterion 4 evaluated at the
+max-gap m) fails. We record the strict result as **G-steer: FAIL (strict)** and additionally evaluate criteria 2–4 at
+the largest m that keeps the hard-pass and spillover guardrails (`instr` at layer 26, m = 2: gap +0.41, hard pass 0.83
+= raw). Controls (random, permuted, sign flip) are run at m = 2 for layers 16, 22 and 26 and reported for all three.
+Downstream stages proceed under this disclosed reading; the report states both readings.
+
+## G-dev outcome and deviation D2 (recorded before any sealed edit episode)
+G-dev **FAILED** for every configuration: p6/p7 control CEFR level strongly (p6 − raw +2.17 [1.67, 2.50], beating
+norm-matched random and wrong-level controls) but lose 0.8–1.0 grammar/naturalness points; the refined lower doses
+(r1, r2) keep +0.58 to +0.92 control but still miss the 0.25 language guardrails by small margins (grammar −0.29/−0.33,
+naturalness −0.33/−0.29). Per the plan, the *improvement* claim is not taken to the sealed set.
+
+D2: the sealed set is used once for a narrower, separately labeled question — **does the instruction-distilled
+direction causally control CEFR level on unseen scenario families?** Frozen edit: p6 (the configuration with the
+largest dev control among those whose hard-pass rate stayed within raw − 0.10). Sealed arms: raw_base, strong_prompt,
+best_of_2, agent_p6, random_p6, wrong_level_p6; primary metric cefr_control (blind level judge, plus the reserved
+second level judge), secondary grammar/naturalness. The improvement verdict remains "not supported (G-dev fail)".
