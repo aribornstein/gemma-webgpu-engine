@@ -43,6 +43,7 @@ export function getGemmaPrefillRmsPipeline(
   device: GPUDevice,
   dimension: number,
   weighted: boolean,
+  quantizeFeedforwardInput = false,
 ): Promise<GemmaPrefillRmsPipeline> {
   validateDimension(dimension);
   let devicePipelines = pipelineCache.get(device);
@@ -50,10 +51,15 @@ export function getGemmaPrefillRmsPipeline(
     devicePipelines = new Map();
     pipelineCache.set(device, devicePipelines);
   }
-  const key = `${dimension}:${weighted}`;
+  const key = `${dimension}:${weighted}:${quantizeFeedforwardInput}`;
   const cached = devicePipelines.get(key);
   if (cached) return cached;
-  const compiled = compileGemmaPrefillRmsPipeline(device, dimension, weighted).catch(
+  const compiled = compileGemmaPrefillRmsPipeline(
+    device,
+    dimension,
+    weighted,
+    quantizeFeedforwardInput,
+  ).catch(
     (error) => {
       devicePipelines?.delete(key);
       throw error;
@@ -67,14 +73,15 @@ export async function compileGemmaPrefillRmsPipeline(
   device: GPUDevice,
   dimension: number,
   weighted: boolean,
+  quantizeFeedforwardInput = false,
 ): Promise<GemmaPrefillRmsPipeline> {
   validateDimension(dimension);
   const pipeline = await device.createComputePipelineAsync({
-    label: `Gemma prefill exact RMS ${dimension}`,
+    label: `Gemma prefill exact RMS ${dimension}${quantizeFeedforwardInput ? " FFN input" : ""}`,
     layout: "auto",
     compute: {
       module: device.createShaderModule({
-        code: createGemmaPrefillRmsShader(dimension, weighted),
+        code: createGemmaPrefillRmsShader(dimension, weighted, "output", quantizeFeedforwardInput),
       }),
       entryPoint: "main",
     },
@@ -139,7 +146,11 @@ export function createGemmaPrefillRmsResources(
   weight: GemmaPrefillRmsBufferSlice | null,
   output?: GPUBuffer,
   parameterArena?: GemmaPrefillParameterArena,
+  quantScale = 0,
 ): GemmaPrefillRmsResources {
+  if (!Number.isFinite(quantScale) || quantScale < 0) {
+    throw new Error("Gemma prefill RMS quantization scale must be a non-negative finite number");
+  }
   if (!Number.isInteger(rows) || rows < 1 || rows > 65535) {
     throw new Error("Gemma prefill RMS row count must be a positive integer below 65536");
   }
@@ -170,7 +181,7 @@ export function createGemmaPrefillRmsResources(
   writeGemmaPrefillParameter(
     device,
     parameterAllocation.slice,
-    new Uint32Array([rows, rows, 0, 0]),
+    new Uint32Array([rows, rows, 0, new Uint32Array(new Float32Array([quantScale]).buffer)[0]]),
   );
   const entries = [binding(0, input)];
   if (compiled.weighted) entries.push(sliceBinding(1, weight!));
@@ -292,14 +303,24 @@ export function destroyGemmaPrefillRmsResidualResources(
   for (const buffer of resources.ownedBuffers) buffer.destroy();
 }
 
+/**
+ * `quantizeFeedforwardInput` emits the feed-forward input exactly as the decode O-projection
+ * epilogue stores it: f16(srq(f32(f16(normalized * weight)), scale)). Quantizing the unrounded
+ * f32 value instead flips codes that sit on a rounding boundary, and the decode gate/up kernels
+ * multiply the f16-rounded quantized value, not code * scale in f32.
+ */
 export function createGemmaPrefillRmsShader(
   dimension: number,
   weighted: boolean,
   epilogue: "output" | "residual" | "residual-scale" = "output",
+  quantizeFeedforwardInput = false,
 ): string {
   validateDimension(dimension);
   if (!weighted && epilogue !== "output") {
     throw new Error("Gemma prefill RMS residual epilogues require weights");
+  }
+  if (quantizeFeedforwardInput && (!weighted || epilogue !== "output")) {
+    throw new Error("Gemma prefill RMS feed-forward quantization applies only to weighted outputs");
   }
   const inverseDimension = Math.fround(1 / dimension);
   const weightBinding = weighted
@@ -328,14 +349,23 @@ export function createGemmaPrefillRmsShader(
       vec4<f32>(1.0),
       weighted,
     );`
-      : weighted
+      : weighted && quantizeFeedforwardInput
+        ? `    let rounded = vec4<f32>(vec4<f16>(normalized * weight[vector]));
+    let scale = params.quantScale;
+    var quantized = rounded;
+    if (scale != 0.0) {
+      quantized = clamp(round(rounded / scale), vec4<f32>(-128.0), vec4<f32>(127.0)) * scale;
+    }
+    output[base + vector] = vec4<f32>(vec4<f16>(quantized));`
+        : weighted
         ? "    output[base + vector] = normalized * weight[vector];"
         : "    output[base + vector] = normalized;";
 
-  return `struct Params {
+  return `${quantizeFeedforwardInput ? "enable f16;\n\n" : ""}struct Params {
   rows: u32,
   rowStride: u32,
   factorIndex: u32,
+  quantScale: f32,
 }
 
 @group(0) @binding(0) var<storage, read> input: array<vec4<f32>>;

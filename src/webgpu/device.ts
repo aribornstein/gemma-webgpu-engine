@@ -33,6 +33,7 @@ async function createDevice(generation: number): Promise<GPUDevice> {
         maxStorageBuffersPerShaderStage: adapter.limits.maxStorageBuffersPerShaderStage,
         maxBufferSize: adapter.limits.maxBufferSize,
         maxStorageBufferBindingSize: adapter.limits.maxStorageBufferBindingSize,
+        maxComputeWorkgroupStorageSize: adapter.limits.maxComputeWorkgroupStorageSize,
       }
     : undefined;
   const device = await adapter.requestDevice({ requiredFeatures, requiredLimits });

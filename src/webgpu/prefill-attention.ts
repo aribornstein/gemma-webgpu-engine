@@ -68,7 +68,10 @@ export async function compileGemmaPrefillAttentionPipeline(
     layout: "auto",
     compute: {
       module: device.createShaderModule({
-        code: createGemmaPrefillAttentionShader(headDimension),
+        code: createGemmaPrefillAttentionShader(
+          headDimension,
+          prefillAttentionKeyTile(headDimension, device.limits.maxComputeWorkgroupStorageSize),
+        ),
       }),
       entryPoint: "main",
     },
@@ -184,13 +187,26 @@ export function destroyGemmaPrefillAttentionResources(
   for (const buffer of resources.ownedBuffers) buffer.destroy();
 }
 
+/**
+ * K/V tiles are staged in f32 so prefill attention matches decode numerics. Two f32 tiles need
+ * 2 * keyTile * headDimension * 4 bytes: 8 keys fit the default 16 KiB for head dimension 256,
+ * while head dimension 512 needs a 32 KiB device limit for 8 keys and otherwise uses 4.
+ */
+export function prefillAttentionKeyTile(
+  headDimension: 64 | 256 | 512,
+  maxWorkgroupStorageBytes: number,
+): 4 | 8 {
+  return 2 * 8 * headDimension * 4 <= maxWorkgroupStorageBytes ? 8 : 4;
+}
+
 export function createGemmaPrefillAttentionShader(
   headDimension: 64 | 256 | 512,
+  keyTile: 4 | 8 = prefillAttentionKeyTile(headDimension, 16384),
 ): string {
   const queryTile = headDimension === 512 ? 32 : 16;
   const slice = headDimension / 32;
-  const stagedType = headDimension === 512 ? "f16" : "f32";
-  const scores = Array.from({ length: 8 }, (_, key) => `    var score${key}: f32 = NEGATIVE_INFINITY;
+  const stagedType = "f32";
+  const scores = Array.from({ length: keyTile }, (_, key) => `    var score${key}: f32 = NEGATIVE_INFINITY;
     {
       let keyIndex = keyStart + ${key}u;
       var partial: f32 = 0.0;
@@ -205,18 +221,19 @@ export function createGemmaPrefillAttentionShader(
         score${key} = partial;
       }
     }`).join("\n");
-  const tileMax = Array.from({ length: 7 }, (_, index) =>
+  const tileMax = Array.from({ length: keyTile - 1 }, (_, index) =>
     `    tileMaximum = max(tileMaximum, score${index + 1});`).join("\n");
-  const probabilities = Array.from({ length: 8 }, (_, key) =>
+  const probabilities = Array.from({ length: keyTile }, (_, key) =>
     `    let probability${key} = select(0.0, exp(score${key} - newMaximum), ` +
     `score${key} != NEGATIVE_INFINITY);`).join("\n");
-  const probabilitySum = Array.from({ length: 8 }, (_, key) => `probability${key}`).join(" + ");
-  const valueAccumulation = Array.from({ length: 8 }, (_, key) =>
+  const probabilitySum = Array.from({ length: keyTile }, (_, key) => `probability${key}`)
+    .join(" + ");
+  const valueAccumulation = Array.from({ length: keyTile }, (_, key) =>
     `      accumulator = accumulator + probability${key} * vec4<f32>(` +
     `valueTile[${key}u * (HEAD_DIMENSION / 4u) + clusterLane * SLICE + component]);`,
   ).join("\n");
 
-  return `${headDimension === 512 ? "enable f16;\n" : ""}enable subgroups;
+  return `enable subgroups;
 
 struct Parameters {
   sequence: u32,
@@ -239,7 +256,7 @@ const HEAD_DIMENSION: u32 = ${headDimension}u;
 const QUERY_TILE: u32 = ${queryTile}u;
 const LANES_PER_QUERY: u32 = 8u;
 const SLICE: u32 = ${slice}u;
-const KEY_TILE: u32 = 8u;
+const KEY_TILE: u32 = ${keyTile}u;
 const NEGATIVE_INFINITY: f32 = -3.4028234663852886e38;
 
 var<workgroup> keyTile: array<vec4<${stagedType}>, KEY_TILE * (HEAD_DIMENSION / 4u)>;

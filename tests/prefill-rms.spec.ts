@@ -268,3 +268,91 @@ test("fuses RMS residual and layer scale without changing output bits", async ({
     gpuError: null,
   });
 });
+test("emits the decode feed-forward input as f16(srq(f16(normalized)))", async ({ page }) => {
+  await page.goto("/");
+  const webGpuAvailable = await page.evaluate(() => Boolean(navigator.gpu));
+  test.skip(!webGpuAvailable, "Chrome does not expose WebGPU on this machine");
+
+  const result = await page.evaluate(async () => {
+    const rmsModulePath = "/src/webgpu/prefill-rms.ts";
+    const deviceModulePath = "/src/webgpu/device.ts";
+    const {
+      createGemmaPrefillRmsResources,
+      destroyGemmaPrefillRmsResources,
+      encodeGemmaPrefillRms,
+      getGemmaPrefillRmsPipeline,
+    } = await import(rmsModulePath);
+    const { getWebGpuDevice } = await import(deviceModulePath);
+    const device = await getWebGpuDevice();
+    const dimension = 1536;
+    const rows = 4;
+    const scale = 0.9406865835189819;
+    const input = Float32Array.from(
+      { length: rows * dimension },
+      (_, index) => Math.fround(Math.sin(index * 0.37) * 9 + Math.cos(index * 0.011) * 3),
+    );
+    const weight = Float32Array.from(
+      { length: dimension },
+      (_, index) => Math.fround(0.5 + (index % 23) * 0.125),
+    );
+    const upload = (data: Float32Array): GPUBuffer => {
+      const buffer = device.createBuffer({
+        size: data.byteLength,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+      });
+      device.queue.writeBuffer(buffer, 0, data);
+      return buffer;
+    };
+    const inputBuffer = upload(input);
+    const weightBuffer = upload(weight);
+
+    async function run(quantize: boolean): Promise<Float32Array> {
+      const pipeline = await getGemmaPrefillRmsPipeline(device, dimension, true, quantize);
+      const resources = createGemmaPrefillRmsResources(
+        device,
+        pipeline,
+        rows,
+        inputBuffer,
+        weightBuffer,
+        undefined,
+        undefined,
+        quantize ? scale : 0,
+      );
+      const readback = device.createBuffer({
+        size: rows * dimension * 4,
+        usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
+      });
+      try {
+        const encoder = device.createCommandEncoder();
+        encodeGemmaPrefillRms(encoder, pipeline, resources);
+        encoder.copyBufferToBuffer(resources.output, 0, readback, 0, rows * dimension * 4);
+        device.queue.submit([encoder.finish()]);
+        await readback.mapAsync(GPUMapMode.READ);
+        const output = new Float32Array(readback.getMappedRange().slice(0));
+        readback.unmap();
+        return output;
+      } finally {
+        readback.destroy();
+        destroyGemmaPrefillRmsResources(resources);
+      }
+    }
+
+    const plain = await run(false);
+    const quantized = await run(true);
+    const srq = (value: number): number =>
+      Math.fround(Math.min(127, Math.max(-128, Math.round(Math.fround(value / scale)))) * scale);
+    let mismatches = 0;
+    let roundingMatters = 0;
+    for (let index = 0; index < plain.length; index += 1) {
+      const expected = Math.f16round(srq(Math.f16round(plain[index])));
+      if (!Object.is(expected, quantized[index])) mismatches += 1;
+      if (Math.f16round(srq(plain[index])) !== expected) roundingMatters += 1;
+    }
+    inputBuffer.destroy();
+    weightBuffer.destroy();
+    return { mismatches, roundingMatters, count: plain.length };
+  });
+
+  expect(result.mismatches).toBe(0);
+  expect(result.count).toBe(4 * 1536);
+});

@@ -1,4 +1,12 @@
 import type { GemmaRotaryBlock } from "../model/gemma-rope";
+import { encodeGemmaLmHeadPass } from "./decode-lm-head";
+import {
+  createGemmaPrefillLmHeadInputResources,
+  encodeGemmaPrefillLmHeadInputPass,
+  getGemmaPrefillLmHeadInputPipeline,
+  updateGemmaPrefillLmHeadInput,
+  type GemmaPrefillLmHeadInputResources,
+} from "./prefill-lm-head-input";
 import {
   createGemmaDecodeInputResources,
   encodeGemmaDecodeInputPass,
@@ -100,7 +108,6 @@ const QUERY_HEADS = 8;
 const HIDDEN_BYTES = HIDDEN_SIZE * 4;
 const MAX_HEAD_OUTPUT = 4096;
 const MAX_INTERMEDIATE = 12288;
-const VOCAB_SIZE = 262144;
 
 export type GemmaFixedPrefillGpuStage =
   | "input"
@@ -221,9 +228,8 @@ export interface GemmaFixedPrefillResources {
   input: GemmaDecodeInputResources;
   layers: readonly GemmaPrefillLayerResources[];
   finalNorm: GemmaPrefillNorm;
-  lastRow: GPUBuffer;
-  lastRowCopy: GemmaPrefillStridedCopyResources;
-  lmHead: GemmaPrefillProjection;
+  lmHeadInputPipeline: GPUComputePipeline;
+  lmHeadInput: GemmaPrefillLmHeadInputResources;
   stridedCopyPipeline: GPUComputePipeline;
   elementwisePipelines: GemmaPrefillElementwisePipelines;
   decode: GemmaDecodeModelResources;
@@ -361,8 +367,14 @@ export async function createGemmaFixedPrefillResources(
         weight: GemmaPrefillRmsBufferSlice | null,
         output: GPUBuffer,
         rows = GEMMA_FIXED_PREFILL_ROWS,
+        feedforwardInputScale: number | null = null,
       ): Promise<GemmaPrefillNorm> => {
-        const pipeline = await getGemmaPrefillRmsPipeline(device, dimension, weighted);
+        const pipeline = await getGemmaPrefillRmsPipeline(
+          device,
+          dimension,
+          weighted,
+          feedforwardInputScale !== null,
+        );
         return {
           pipeline,
           resources: own(createGemmaPrefillRmsResources(
@@ -373,6 +385,7 @@ export async function createGemmaFixedPrefillResources(
             weight,
             output,
             parameterArena,
+            feedforwardInputScale ?? 0,
           )),
         };
       };
@@ -665,6 +678,8 @@ export async function createGemmaFixedPrefillResources(
       const attentionNormResidual = rmsEpilogueMode === "fused"
         ? await normResidual(scratch.projection, postAttentionWeight, input.hidden)
         : null;
+      // The norm emits the decode-identical quantized feed-forward input, so the gate/up
+      // projections below must not quantize it again.
       const preFeedforwardNorm = await norm(
         HIDDEN_SIZE,
         true,
@@ -675,17 +690,19 @@ export async function createGemmaFixedPrefillResources(
           HIDDEN_BYTES,
         ),
         scratch.hiddenNorm,
+        GEMMA_FIXED_PREFILL_ROWS,
+        mlpScales.gateInput,
       );
       const gateWeights: GemmaPrefillQatLinearWeights = {
         packedWeights: mlpWeights.gatePacked,
         rowScales: mlpWeights.gateRowScales,
-        inputScale: mlpScales.gateInput,
+        inputScale: 0,
         outputScale: mlpScales.gateOutput,
       };
       const upWeights: GemmaPrefillQatLinearWeights = {
         packedWeights: mlpWeights.upPacked,
         rowScales: mlpWeights.upRowScales,
-        inputScale: mlpScales.gateInput,
+        inputScale: 0,
         outputScale: mlpScales.upOutput,
       };
       let gateUpActivation: GemmaPrefillGateUpActivationProjection | null = null;
@@ -971,53 +988,25 @@ export async function createGemmaFixedPrefillResources(
         parameterArena,
       )),
     };
-    const lastRow = allocate("Gemma prefill actual last row", HIDDEN_SIZE);
-    const lastRowCopy = own(createGemmaPrefillStridedCopyResources(
+    // The decode LM head may store its weights block-major, so prefill feeds its final row to
+    // that kernel instead of reading the weights through a row-major projection.
+    const lmHeadInputPipeline = await getGemmaPrefillLmHeadInputPipeline(device);
+    const lmHeadInput = own(createGemmaPrefillLmHeadInputResources(
       device,
-      stridedCopyPipeline,
+      lmHeadInputPipeline,
       scratch.finalNorm,
-      lastRow,
-      {
-        rows: 1,
-        sourceStride: HIDDEN_SIZE,
-        sourceStart: 0,
-        destinationStride: HIDDEN_SIZE,
-        destinationStart: 0,
-        copyColumns: HIDDEN_SIZE,
-      },
+      GEMMA_FIXED_PREFILL_ROWS,
+      decode.stack.finalInput,
+      decode.stack.finalSum,
       parameterArena,
     ));
-    const lmHeadPipelines = await getGemmaPrefillQatLinearPipelines(device, {
-      rows: 1,
-      inFeatures: HIDDEN_SIZE,
-      outFeatures: VOCAB_SIZE,
-      bits: 2,
-    });
-    const lmHead = {
-      pipelines: lmHeadPipelines,
-      resources: own(createGemmaPrefillQatLinearResources(
-        device,
-        lmHeadPipelines,
-        lastRow,
-        {
-          packedWeights: decode.lmHead.modelWeights.packed,
-          rowScales: decode.lmHead.modelWeights.rowScales,
-          inputScale: decode.lmHead.modelWeights.inputScale,
-          outputScale: decode.lmHead.modelWeights.outputScale,
-        },
-        decode.logits,
-        scratch.srq,
-        parameterArena,
-      )),
-    };
     ownedBuffers.push(...parameterArena.buffers);
     return {
       input,
       layers,
       finalNorm,
-      lastRow,
-      lastRowCopy,
-      lmHead,
+      lmHeadInputPipeline,
+      lmHeadInput,
       stridedCopyPipeline,
       elementwisePipelines,
       decode,
@@ -1092,14 +1081,7 @@ export function updateGemmaFixedPrefill(
       },
     );
   }
-  updateGemmaPrefillStridedCopy(device, resources.lastRowCopy, {
-    rows: 1,
-    sourceStride: HIDDEN_SIZE,
-    sourceStart: (validRows - 1) * HIDDEN_SIZE,
-    destinationStride: HIDDEN_SIZE,
-    destinationStart: 0,
-    copyColumns: HIDDEN_SIZE,
-  });
+  updateGemmaPrefillLmHeadInput(device, resources.lmHeadInput, validRows - 1);
 }
 
 export function encodeGemmaFixedPrefill(
@@ -1449,13 +1431,8 @@ function encodeOutputStage(
   outputMode: GemmaModelOutputMode,
 ): void {
   encodeNorm(pass, resources.finalNorm);
-  encodeGemmaPrefillStridedCopyPass(
-    pass,
-    resources.stridedCopyPipeline,
-    resources.lastRowCopy,
-    1,
-  );
-  encodeProjection(pass, resources.lmHead);
+  encodeGemmaPrefillLmHeadInputPass(pass, resources.lmHeadInputPipeline, resources.lmHeadInput);
+  encodeGemmaLmHeadPass(pass, resources.decode.lmHeadPipeline, resources.decode.lmHead);
   if (outputMode === "greedy") {
     encodeGemmaGreedyPass(
       pass,
