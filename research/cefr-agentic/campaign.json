@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "campaign_id": "gemma4-e2b-qat-agentic-hebrew-cefr-rpg-v1",
-  "status": "approved_executing",
+  "status": "executed_pilot_v1",
   "mode": "one_day_exploratory_end_to_end",
   "aim": {
     "name": "agentic_behavioral_compilation",
@@ -372,5 +372,11 @@
     "R7": "sealed set authored by a separate agent outside the repository; only its hash is recorded",
     "R8": "each scenario family instantiated at A1 and B2 with identical world state",
     "R9": "weights loaded from a local hash-checked file via the dev server"
+  },
+  "result": {
+    "report": "research-results/cefr-agentic/REPORT.md",
+    "edit_claim": "contradicted_exploratory",
+    "latent_unexpressed_diagnosis": "inconclusive",
+    "metadata_only_control_gap": "supported_exploratory"
   }
 }

@@ -1,0 +1,278 @@
+{
+ "role": "weight_space_investigator (representation analyst)",
+ "task": "Propose at most 4 candidate rank-1 effective-weight edits to make metadata-only (canonical prompt) Hebrew NPC dialogue follow the requested CEFR level (A1 simpler, B2 richer) without hurting grammar, naturalness or world-state fidelity.",
+ "operator": {
+  "residualL": "after layer L: h <- h + coefficient * b * dot(a, h); next-layer input re-derived; equivalent to W_eff = W + coefficient * b a^T on the layer's residual write",
+  "final": "logits += coefficient * dot(a, h_final) * (W_head b); equivalent to W_head_eff = W_head + coefficient * (W_head b) a^T",
+  "a": "unit mean state direction at the site (dot(a,h) ~ mean_state_norm, so shift magnitude ~ |coefficient| * mean_state_norm)",
+  "b_simplify": "unit direction A1-style minus B2-style reference replies (development families only)",
+  "gates": {
+   "external": "coefficient = +alpha for requested A1, -alpha for B2 (parsed from metadata by code)",
+   "self": "coefficient = alpha * clamp((p.h_meta - t)/s, -1, 1), p = A1-minus-B2 direction of the model's own end-of-metadata state at the site (fit on dev), t,s from dev class means; available where self_gate_train_separation is true"
+  },
+  "alpha_units": "alpha is the fraction of the mean state norm moved along b (e.g. 0.05 moves ~5% of the state norm)"
+ },
+ "evidence_development": {
+  "baseline_panel_dev": {
+   "raw_base": {
+    "episodes": 12,
+    "cefr_control_gap": 0.5,
+    "cefr_control_positive_fraction": 0.5,
+    "complexity_gap": 0.25,
+    "a1_estimated": 1.67,
+    "b2_estimated": 2.17,
+    "joint_pass_rate": 0.17,
+    "hard_pass_rate": 0.67,
+    "morphosyntactic_correctness": 2.42,
+    "natural_hebrew": 2.08,
+    "cefr_suitability": 2.25,
+    "pedagogical_appropriateness": 2,
+    "character_register_fidelity": 2.67,
+    "multi_turn_coherence": 2.75
+   },
+   "strong_prompt": {
+    "episodes": 12,
+    "cefr_control_gap": 2.33,
+    "cefr_control_positive_fraction": 1,
+    "complexity_gap": 1.64,
+    "a1_estimated": 1,
+    "b2_estimated": 3.33,
+    "joint_pass_rate": 0,
+    "hard_pass_rate": 0.58,
+    "morphosyntactic_correctness": 1.67,
+    "natural_hebrew": 1.33,
+    "cefr_suitability": 2.25,
+    "pedagogical_appropriateness": 1.33,
+    "character_register_fidelity": 1.92,
+    "multi_turn_coherence": 2
+   },
+   "best_of_2_candidate": {
+    "episodes": 12,
+    "cefr_control_gap": 2.5,
+    "cefr_control_positive_fraction": 1,
+    "complexity_gap": 2.08,
+    "a1_estimated": 1,
+    "b2_estimated": 3.5,
+    "joint_pass_rate": 0.08,
+    "hard_pass_rate": 0.67,
+    "morphosyntactic_correctness": 1.75,
+    "natural_hebrew": 1.58,
+    "cefr_suitability": 2.75,
+    "pedagogical_appropriateness": 1.58,
+    "character_register_fidelity": 2.33,
+    "multi_turn_coherence": 2.08
+   },
+   "best_of_2": {
+    "episodes": 12,
+    "cefr_control_gap": 2.5,
+    "cefr_control_positive_fraction": 1,
+    "complexity_gap": 1.83,
+    "a1_estimated": 1,
+    "b2_estimated": 3.5,
+    "joint_pass_rate": 0.08,
+    "hard_pass_rate": 0.67,
+    "morphosyntactic_correctness": 2,
+    "natural_hebrew": 1.75,
+    "cefr_suitability": 2.83,
+    "pedagogical_appropriateness": 1.92,
+    "character_register_fidelity": 2.5,
+    "multi_turn_coherence": 2.33
+   }
+  },
+  "probe_summary": {
+   "level_probe_pre_decision": {
+    "last_prompt_token@12": {
+     "name": "requested level last_prompt_token 12",
+     "n_train": 60,
+     "n_test": 30,
+     "mean_difference": {
+      "test_auc": 1,
+      "ci": [
+       1,
+       1
+      ]
+     },
+     "logistic": {
+      "test_auc": 1,
+      "ci": [
+       1,
+       1
+      ]
+     },
+     "shuffled_label_auc": 0.6
+    },
+    "last_prompt_token@20": {
+     "name": "requested level last_prompt_token 20",
+     "n_train": 60,
+     "n_test": 30,
+     "mean_difference": {
+      "test_auc": 1,
+      "ci": [
+       1,
+       1
+      ]
+     },
+     "logistic": {
+      "test_auc": 0.636,
+      "ci": [
+       0.636,
+       0.72
+      ]
+     },
+     "shuffled_label_auc": 0.702
+    },
+    "last_prompt_token@22": {
+     "name": "requested level last_prompt_token 22",
+     "n_train": 60,
+     "n_test": 30,
+     "mean_difference": {
+      "test_auc": 1,
+      "ci": [
+       1,
+       1
+      ]
+     },
+     "logistic": {
+      "test_auc": 0.889,
+      "ci": [
+       0.84,
+       0.96
+      ]
+     },
+     "shuffled_label_auc": 0.582
+    },
+    "last_prompt_token@24": {
+     "name": "requested level last_prompt_token 24",
+     "n_train": 60,
+     "n_test": 30,
+     "mean_difference": {
+      "test_auc": 0.929,
+      "ci": [
+       0.76,
+       1
+      ]
+     },
+     "logistic": {
+      "test_auc": 0.916,
+      "ci": [
+       0.84,
+       0.96
+      ]
+     },
+     "shuffled_label_auc": 0.613
+    },
+    "last_prompt_token@final": {
+     "name": "requested level last_prompt_token final",
+     "n_train": 60,
+     "n_test": 30,
+     "mean_difference": {
+      "test_auc": 0.778,
+      "ci": [
+       0.76,
+       0.84
+      ]
+     },
+     "logistic": {
+      "test_auc": 0.742,
+      "ci": [
+       0.716,
+       0.84
+      ]
+     },
+     "shuffled_label_auc": 0.547
+    }
+   },
+   "likelihood": {
+    "matched_style_preferred_fraction": 0.5,
+    "level_conditioning_interaction_mean": 0.116,
+    "interaction_positive_fraction": 0.889,
+    "families": 9
+   },
+   "agreement_likelihood": {
+    "numeral_noun_agreement": {
+     "n": 12,
+     "prefers_correct": 0.833
+    },
+    "noun_adjective_agreement": {
+     "n": 12,
+     "prefers_correct": 1
+    },
+    "subject_verb_agreement": {
+     "n": 12,
+     "prefers_correct": 0.917
+    },
+    "all": {
+     "n": 36,
+     "prefers_correct": 0.917
+    }
+   }
+  },
+  "site_ingredients": {
+   "residual20": {
+    "mean_state_norm": 52.04,
+    "style_gap_over_state_norm": 0.1441,
+    "family_cosines": [
+     0.664,
+     0.67,
+     0.538,
+     0.448,
+     0.515,
+     0.653
+    ],
+    "self_gate_train_separation": false,
+    "cos_a_b": 0.106
+   },
+   "residual22": {
+    "mean_state_norm": 51.46,
+    "style_gap_over_state_norm": 0.1288,
+    "family_cosines": [
+     0.665,
+     0.662,
+     0.535,
+     0.484,
+     0.473,
+     0.628
+    ],
+    "self_gate_train_separation": true,
+    "cos_a_b": 0.122
+   },
+   "residual24": {
+    "mean_state_norm": 50.63,
+    "style_gap_over_state_norm": 0.1162,
+    "family_cosines": [
+     0.698,
+     0.672,
+     0.516,
+     0.445,
+     0.446,
+     0.658
+    ],
+    "self_gate_train_separation": false,
+    "cos_a_b": 0.048
+   },
+   "final": {
+    "mean_state_norm": 157.94,
+    "style_gap_over_state_norm": 0.1089,
+    "family_cosines": [
+     0.604,
+     0.61,
+     0.539,
+     0.353,
+     0.43,
+     0.54
+    ],
+    "self_gate_train_separation": true,
+    "cos_a_b": 0.186
+   }
+  }
+ },
+ "constraints": [
+  "max 4 candidates",
+  "exactly one site per candidate; sites: final, residual20, residual22, residual24",
+  "gate in {external, self}",
+  "alpha must be finite; style_gap_over_state_norm (~0.11-0.14) indicates the natural size of the style difference",
+  "screening: each candidate runs 3 dev families x 2 levels with the canonical prompt; deterministic complexity gap and hard checks decide which 2 continue to full dev + blind panel",
+  "no access to validation episodes or sealed data"
+ ],
+ "output_format": "JSON array: [{\"id\":\"c1\",\"site\":\"residual22\",\"gate\":\"external\",\"alpha\":0.1,\"rationale\":\"...\"}, ...]"
+}

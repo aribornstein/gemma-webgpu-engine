@@ -1,0 +1,689 @@
+{
+ "unit": "scenario family (paired), percentile cluster bootstrap 2000x",
+ "comparisons": {
+  "cefr_control": {
+   "agent_rank1 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.333,
+    "ci95": [
+     -0.667,
+     0.0
+    ],
+    "per_family": {
+     "bakery": -1.0,
+     "garage": 0.0,
+     "library": -1.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - random_rank1": {
+    "families": 6,
+    "mean_diff": -0.167,
+    "ci95": [
+     -0.5,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": 0.0,
+     "museum": -1.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - wrong_level_gate": {
+    "families": 6,
+    "mean_diff": -0.333,
+    "ci95": [
+     -0.667,
+     0.0
+    ],
+    "per_family": {
+     "bakery": -1.0,
+     "garage": 0.0,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": -1.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -2.833,
+    "ci95": [
+     -3.0,
+     -2.5
+    ],
+    "per_family": {
+     "bakery": -2.0,
+     "garage": -3.0,
+     "library": -3.0,
+     "museum": -3.0,
+     "post_office": -3.0,
+     "taxi": -3.0
+    }
+   },
+   "agent_rank1 - strong_prompt": {
+    "families": 6,
+    "mean_diff": -2.833,
+    "ci95": [
+     -3.0,
+     -2.5
+    ],
+    "per_family": {
+     "bakery": -2.0,
+     "garage": -3.0,
+     "library": -3.0,
+     "museum": -3.0,
+     "post_office": -3.0,
+     "taxi": -3.0
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 6,
+    "mean_diff": 2.5,
+    "ci95": [
+     1.833,
+     3.0
+    ],
+    "per_family": {
+     "bakery": 1.0,
+     "garage": 3.0,
+     "library": 2.0,
+     "museum": 3.0,
+     "post_office": 3.0,
+     "taxi": 3.0
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 6,
+    "mean_diff": 2.5,
+    "ci95": [
+     1.833,
+     3.0
+    ],
+    "per_family": {
+     "bakery": 1.0,
+     "garage": 3.0,
+     "library": 2.0,
+     "museum": 3.0,
+     "post_office": 3.0,
+     "taxi": 3.0
+    }
+   }
+  },
+  "complexity_gap": {
+   "agent_rank1 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.325,
+    "ci95": [
+     -0.588,
+     0.007
+    ],
+    "per_family": {
+     "bakery": -0.77,
+     "garage": -0.084,
+     "library": -0.544,
+     "museum": -0.537,
+     "post_office": -0.355,
+     "taxi": 0.339
+    }
+   },
+   "agent_rank1 - random_rank1": {
+    "families": 6,
+    "mean_diff": -0.464,
+    "ci95": [
+     -0.735,
+     -0.207
+    ],
+    "per_family": {
+     "bakery": -0.481,
+     "garage": -1.062,
+     "library": -0.065,
+     "museum": -0.655,
+     "post_office": -0.087,
+     "taxi": -0.434
+    }
+   },
+   "agent_rank1 - wrong_level_gate": {
+    "families": 6,
+    "mean_diff": -0.146,
+    "ci95": [
+     -0.664,
+     0.355
+    ],
+    "per_family": {
+     "bakery": 0.004,
+     "garage": 0.535,
+     "library": 0.349,
+     "museum": -0.897,
+     "post_office": -1.219,
+     "taxi": 0.353
+    }
+   },
+   "agent_rank1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -3.153,
+    "ci95": [
+     -3.711,
+     -2.553
+    ],
+    "per_family": {
+     "bakery": -2.307,
+     "garage": -3.733,
+     "library": -3.979,
+     "museum": -3.703,
+     "post_office": -3.143,
+     "taxi": -2.055
+    }
+   },
+   "agent_rank1 - strong_prompt": {
+    "families": 6,
+    "mean_diff": -2.964,
+    "ci95": [
+     -3.49,
+     -2.481
+    ],
+    "per_family": {
+     "bakery": -2.375,
+     "garage": -4.108,
+     "library": -2.881,
+     "museum": -3.22,
+     "post_office": -3.143,
+     "taxi": -2.055
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 6,
+    "mean_diff": 2.639,
+    "ci95": [
+     2.103,
+     3.265
+    ],
+    "per_family": {
+     "bakery": 1.605,
+     "garage": 4.024,
+     "library": 2.337,
+     "museum": 2.683,
+     "post_office": 2.788,
+     "taxi": 2.395
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 6,
+    "mean_diff": 2.828,
+    "ci95": [
+     2.24,
+     3.344
+    ],
+    "per_family": {
+     "bakery": 1.537,
+     "garage": 3.648,
+     "library": 3.434,
+     "museum": 3.166,
+     "post_office": 2.788,
+     "taxi": 2.395
+    }
+   }
+  },
+  "joint_pass": {
+   "agent_rank1 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - random_rank1": {
+    "families": 6,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - wrong_level_gate": {
+    "families": 6,
+    "mean_diff": -0.083,
+    "ci95": [
+     -0.25,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": -0.5,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.167,
+    "ci95": [
+     -0.333,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": -0.5,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": -0.5
+    }
+   },
+   "agent_rank1 - strong_prompt": {
+    "families": 6,
+    "mean_diff": -0.083,
+    "ci95": [
+     -0.25,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": -0.5
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 6,
+    "mean_diff": 0.083,
+    "ci95": [
+     0.0,
+     0.25
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.5
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.167,
+    "ci95": [
+     0.0,
+     0.333
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.5,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.5
+    }
+   }
+  },
+  "hard_pass": {
+   "agent_rank1 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.083,
+    "ci95": [
+     -0.25,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": -0.5,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - random_rank1": {
+    "families": 6,
+    "mean_diff": -0.083,
+    "ci95": [
+     -0.25,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": -0.5,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - wrong_level_gate": {
+    "families": 6,
+    "mean_diff": 0.0,
+    "ci95": [
+     0.0,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - best_of_2": {
+    "families": 6,
+    "mean_diff": 0.083,
+    "ci95": [
+     -0.25,
+     0.5
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": -0.5,
+     "library": 1.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - strong_prompt": {
+    "families": 6,
+    "mean_diff": 0.083,
+    "ci95": [
+     -0.25,
+     0.5
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": -0.5,
+     "library": 1.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 6,
+    "mean_diff": -0.167,
+    "ci95": [
+     -0.5,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": -1.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 6,
+    "mean_diff": -0.167,
+    "ci95": [
+     -0.5,
+     0.0
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": -1.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 0.0
+    }
+   }
+  },
+  "morphosyntactic_correctness": {
+   "agent_rank1 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.25,
+    "ci95": [
+     -0.25,
+     0.75
+    ],
+    "per_family": {
+     "bakery": 0.5,
+     "garage": 1.0,
+     "library": -0.5,
+     "museum": -0.5,
+     "post_office": 1.0,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - random_rank1": {
+    "families": 6,
+    "mean_diff": 0.0,
+    "ci95": [
+     -0.5,
+     0.5
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 0.0,
+     "library": -1.0,
+     "museum": 1.0,
+     "post_office": 0.5,
+     "taxi": -0.5
+    }
+   },
+   "agent_rank1 - wrong_level_gate": {
+    "families": 6,
+    "mean_diff": 0.333,
+    "ci95": [
+     -0.083,
+     0.667
+    ],
+    "per_family": {
+     "bakery": 0.5,
+     "garage": 1.0,
+     "library": -0.5,
+     "museum": 0.5,
+     "post_office": 0.5,
+     "taxi": 0.0
+    }
+   },
+   "agent_rank1 - best_of_2": {
+    "families": 6,
+    "mean_diff": -0.25,
+    "ci95": [
+     -0.917,
+     0.5
+    ],
+    "per_family": {
+     "bakery": 1.0,
+     "garage": -0.5,
+     "library": -1.5,
+     "museum": -1.0,
+     "post_office": 1.0,
+     "taxi": -0.5
+    }
+   },
+   "agent_rank1 - strong_prompt": {
+    "families": 6,
+    "mean_diff": 0.583,
+    "ci95": [
+     -0.083,
+     1.333
+    ],
+    "per_family": {
+     "bakery": 1.0,
+     "garage": 2.0,
+     "library": 0.0,
+     "museum": 0.0,
+     "post_office": 1.0,
+     "taxi": -0.5
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 6,
+    "mean_diff": -0.333,
+    "ci95": [
+     -0.667,
+     0.083
+    ],
+    "per_family": {
+     "bakery": -0.5,
+     "garage": -1.0,
+     "library": -0.5,
+     "museum": -0.5,
+     "post_office": 0.0,
+     "taxi": 0.5
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.5,
+    "ci95": [
+     0.0,
+     1.0
+    ],
+    "per_family": {
+     "bakery": -0.5,
+     "garage": 1.5,
+     "library": 1.0,
+     "museum": 0.5,
+     "post_office": 0.0,
+     "taxi": 0.5
+    }
+   }
+  },
+  "natural_hebrew": {
+   "agent_rank1 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.333,
+    "ci95": [
+     -0.083,
+     0.75
+    ],
+    "per_family": {
+     "bakery": 0.0,
+     "garage": 1.0,
+     "library": -0.5,
+     "museum": 0.0,
+     "post_office": 1.0,
+     "taxi": 0.5
+    }
+   },
+   "agent_rank1 - random_rank1": {
+    "families": 6,
+    "mean_diff": 0.083,
+    "ci95": [
+     -0.333,
+     0.583
+    ],
+    "per_family": {
+     "bakery": -0.5,
+     "garage": 0.5,
+     "library": -0.5,
+     "museum": 1.0,
+     "post_office": 0.5,
+     "taxi": -0.5
+    }
+   },
+   "agent_rank1 - wrong_level_gate": {
+    "families": 6,
+    "mean_diff": 0.25,
+    "ci95": [
+     -0.417,
+     0.833
+    ],
+    "per_family": {
+     "bakery": 0.5,
+     "garage": 1.5,
+     "library": -1.0,
+     "museum": 0.5,
+     "post_office": 0.5,
+     "taxi": -0.5
+    }
+   },
+   "agent_rank1 - best_of_2": {
+    "families": 6,
+    "mean_diff": 0.0,
+    "ci95": [
+     -0.667,
+     0.583
+    ],
+    "per_family": {
+     "bakery": 0.5,
+     "garage": 0.5,
+     "library": -1.5,
+     "museum": 0.0,
+     "post_office": 1.0,
+     "taxi": -0.5
+    }
+   },
+   "agent_rank1 - strong_prompt": {
+    "families": 6,
+    "mean_diff": 0.583,
+    "ci95": [
+     0.0,
+     1.25
+    ],
+    "per_family": {
+     "bakery": 0.5,
+     "garage": 2.0,
+     "library": 0.0,
+     "museum": 0.5,
+     "post_office": 1.0,
+     "taxi": -0.5
+    }
+   },
+   "strong_prompt - raw_base": {
+    "families": 6,
+    "mean_diff": -0.25,
+    "ci95": [
+     -0.667,
+     0.333
+    ],
+    "per_family": {
+     "bakery": -0.5,
+     "garage": -1.0,
+     "library": -0.5,
+     "museum": -0.5,
+     "post_office": 0.0,
+     "taxi": 1.0
+    }
+   },
+   "best_of_2 - raw_base": {
+    "families": 6,
+    "mean_diff": 0.333,
+    "ci95": [
+     -0.083,
+     0.75
+    ],
+    "per_family": {
+     "bakery": -0.5,
+     "garage": 0.5,
+     "library": 1.0,
+     "museum": 0.0,
+     "post_office": 0.0,
+     "taxi": 1.0
+    }
+   }
+  }
+ }
+}
