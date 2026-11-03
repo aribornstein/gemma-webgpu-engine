@@ -61,7 +61,11 @@ WebGPU engine from that cache. No model bytes pass through the static host. Cach
 earlier builds remain valid because the IndexedDB cache identity is unchanged, and a cache whose
 download did not complete is refused rather than partially loaded.
 
-To publish with GitHub Pages, deploy the contents of `build/` as the Pages artifact. All generated
+This repository's Pages site publishes the `main` branch root, where `index.html` is Vite's
+development entry. Static hosts cannot execute its `src/main.ts` module (GitHub Pages serves `.ts`
+as `video/mp2t`), so that entry's `onerror` handler redirects visitors to the built console at
+`./build/`; the dev server compiles the module normally, and `vite build` drops the handler.
+Alternatively, deploy the contents of `build/` as the Pages artifact. All generated
 URLs are relative, so both a user site and a repository path such as
 `https://<account>.github.io/gemma-webgpu-engine/` work without a custom base setting. The build
 also emits `.nojekyll`. GitHub Pages supplies the HTTPS secure context required by WebGPU and media
