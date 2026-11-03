@@ -20,6 +20,11 @@ const STATIC_FILES = [
   ],
 ] as const;
 
+// The tokenizer path of @huggingface/transformers never runs ONNX; see src/build-stubs.
+export const ONNX_RUNTIME_STUB_ALIAS = [
+  { find: /^onnxruntime-web\/webgpu$/, replacement: resolve("src/build-stubs/onnxruntime-web.ts") },
+];
+
 function staticDemoAssets(): Plugin {
   const outputRoot = resolve("build");
   return {
@@ -47,6 +52,7 @@ export default defineConfig(({ command }) => ({
     ? { "import.meta.env.VITE_PUBLIC_DEMO": JSON.stringify("true") }
     : {},
   plugins: command === "build" ? [staticDemoAssets()] : [],
+  resolve: command === "build" ? { alias: ONNX_RUNTIME_STUB_ALIAS } : {},
   server: {
     port: 5174,
     strictPort: true,
