@@ -1,0 +1,5 @@
+# Reference-export environment validated in docs/REFERENCE.md (Python 3.12.13).
+numpy==2.5.1
+safetensors==0.8.0
+torch==2.8.0
+transformers @ git+https://github.com/huggingface/transformers@63f32a8782cb70da3365acab16f2b67947737985

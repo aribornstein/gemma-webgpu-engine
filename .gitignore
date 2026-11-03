@@ -42,3 +42,7 @@ reference-output
 *.njsproj
 *.sln
 *.sw?
+
+# Python bytecode
+__pycache__/
+*.pyc
