@@ -132,8 +132,47 @@ test("validates controls and switches constraint editors", async ({ page }) => {
 
   await page.getByRole("button", { name: "Reset" }).click();
   await expect(page.getByRole("radio", { name: "None" })).toBeChecked();
+  // The console defaults to the model card's recommended sampling.
+  await expect(page.getByText("Recommended sampling configuration", { exact: true })).toBeVisible();
+  await expect(page.getByRole("spinbutton", { name: "Temperature" })).toHaveValue("1");
+  await expect(page.getByRole("spinbutton", { name: "Top K" })).toHaveValue("64");
+  await expect(page.getByRole("spinbutton", { name: "Top P" })).toHaveValue("0.95");
+
+  await page.getByRole("spinbutton", { name: "Temperature" }).fill("0");
   await expect(page.getByText("Exact greedy configuration", { exact: true })).toBeVisible();
-  await expect(page.getByRole("spinbutton", { name: "Temperature" })).toHaveValue("0");
+});
+
+test("configures beam search and rejects it with a constraint", async ({ page }) => {
+  await page.goto("/");
+  await page.getByText("Beam search", { exact: true }).click();
+  const beams = page.getByRole("spinbutton", { name: "Beams" });
+  await expect(beams).toHaveValue("1");
+  await expect(page.getByRole("spinbutton", { name: "No-repeat n-gram" })).toHaveValue("0");
+  await beams.fill("3");
+  await expect(page.getByText("Beam search · 3 beams", { exact: true })).toBeVisible();
+  await page.getByRole("radio", { name: "Regex" }).check();
+  await expect(page.getByRole("status").filter({ hasText: "Beam search cannot be combined with a constraint" }))
+    .toBeVisible();
+  await page.getByRole("radio", { name: "None" }).check();
+  await beams.fill("17");
+  await expect(page.getByRole("status").filter({ hasText: /numBeams must be an integer from 1 to 16/ }))
+    .toBeVisible();
+});
+
+test("loads the Gettysburg beam search example", async ({ page }) => {
+  await page.goto("/");
+  await page.getByLabel("Workspace").selectOption("beam-gettysburg");
+  await expect(page.getByRole("textbox", { name: "Message" })).toHaveValue("Recite the gettysburg address by lincoln");
+  await expect(page.getByRole("spinbutton", { name: "Beams" })).toHaveValue("4");
+  await expect(page.getByRole("spinbutton", { name: "No-repeat n-gram" })).toHaveValue("5");
+  await expect(page.getByRole("spinbutton", { name: "Length penalty" })).toHaveValue("1");
+  await expect(page.getByRole("spinbutton", { name: "Max tokens" })).toHaveValue("400");
+  await expect(page.getByRole("spinbutton", { name: "Temperature" })).toBeHidden();
+  await expect(page.getByText("Beam search · 4 beams", { exact: true })).toBeVisible();
+
+  await page.getByLabel("Workspace").selectOption("greedy-colors");
+  await expect(page.getByRole("spinbutton", { name: "Beams" })).toBeHidden();
+  await expect(page.getByText("Exact greedy configuration", { exact: true })).toBeVisible();
 });
 
 test("applies editable generation examples", async ({ page }) => {

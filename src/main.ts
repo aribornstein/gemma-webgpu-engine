@@ -26,6 +26,11 @@ import {
   type GemmaGenerationOptions,
 } from "./runtime/generation-config";
 import { SeededRandom } from "./runtime/sampling";
+import {
+  DEFAULT_BEAM_SEARCH_OPTIONS,
+  MAX_BEAM_SEARCH_BEAMS,
+  resolveBeamSearchOptions,
+} from "./runtime/beam-search";
 import { calculateGemmaGenerationThroughput } from "./runtime/generation-throughput";
 import {
   availableGemmaOutputTokens,
@@ -42,6 +47,7 @@ import {
 } from "./runtime/gemma-conversation";
 import { parseGemmaResponse } from "./runtime/gemma-response";
 import type {
+  GemmaBeamSearchSummary,
   GemmaGenerationSession,
   GemmaGenerationTiming,
 } from "./runtime/gemma-session";
@@ -75,7 +81,19 @@ function appAssetUrl(path: string): string {
   return new URL(path.replace(/^\/+/, ""), document.baseURI).href;
 }
 
+// The console starts from the model card's recommended sampling (generation_config.json:
+// temperature 1, top-k 64, top-p 0.95). The library default stays exact greedy decoding.
+const CONSOLE_DEFAULT_CONFIG = {
+  ...DEFAULT_GENERATION_CONFIG,
+  temperature: 1,
+  topK: 64,
+  topP: 0.95,
+};
+
 type GenerationExampleControl =
+  | "numBeams"
+  | "lengthPenalty"
+  | "noRepeatNgramSize"
   | "temperature"
   | "maxNewTokens"
   | "topK"
@@ -96,6 +114,7 @@ interface ExampleUiProfile {
   audio?: boolean;
   video?: boolean;
   sampling: boolean;
+  beam?: boolean;
   constraint: Exclude<ConstraintEditor, "all">;
 }
 
@@ -105,6 +124,7 @@ interface ConsoleUiProfile {
   audio: boolean;
   video: boolean;
   sampling: boolean;
+  beam: boolean;
   constraint: ConstraintEditor;
 }
 
@@ -136,6 +156,7 @@ interface GenerationExample {
   visionTokenBudget?: GemmaVisionTokenBudget;
   constraint?: GenerationConstraint;
   expandProbabilityControls?: boolean;
+  expandBeamControls?: boolean;
   ui: ExampleUiProfile;
 }
 
@@ -317,6 +338,23 @@ const GENERATION_EXAMPLES: readonly GenerationExample[] = [
     },
     visionTokenBudget: 280,
     ui: { vision: true, sampling: false, constraint: "none" },
+  },
+  {
+    id: "beam-gettysburg",
+    label: "Gettysburg Address · Beam search",
+    prompt: "Recite the gettysburg address by lincoln",
+    // Greedy decoding drifts at a thin-margin fork ("or any nation" vs "acceded") and then loops;
+    // four beams with 5-gram blocking recover the first paragraph and end cleanly. The speech
+    // repeats no 5-token sequence, so the blocking cannot prevent a faithful recitation.
+    controls: {
+      temperature: 0,
+      maxNewTokens: 400,
+      numBeams: 4,
+      lengthPenalty: 1,
+      noRepeatNgramSize: 5,
+    },
+    expandBeamControls: true,
+    ui: { vision: false, sampling: false, beam: true, constraint: "none" },
   },
   {
     id: "greedy-colors",
@@ -573,6 +611,10 @@ app.innerHTML = `
           </div>
         </div>
         <div id="generation-output" class="generation-output" role="log" aria-live="polite">No conversation yet.</div>
+        <details id="beam-hypotheses" class="beam-hypotheses" hidden>
+          <summary id="beam-hypotheses-summary">Beam hypotheses</summary>
+          <ol id="beam-hypothesis-list"></ol>
+        </details>
       </div>
 
       <div class="telemetry" aria-label="Generation telemetry">
@@ -603,16 +645,16 @@ app.innerHTML = `
       <form id="controls-form">
         <div class="control-grid core-controls">
           <label class="field" data-control="sampling">Temperature
-            <input name="temperature" type="number" min="0" step="0.05" value="${DEFAULT_GENERATION_CONFIG.temperature}">
+            <input name="temperature" type="number" min="0" step="0.05" value="${CONSOLE_DEFAULT_CONFIG.temperature}">
           </label>
           <label class="field">Max tokens
             <input name="maxNewTokens" type="number" min="1" max="${GEMMA_VALIDATED_CONTEXT_CAPACITY}" step="1" value="${DEFAULT_GENERATION_CONFIG.maxNewTokens}">
           </label>
           <label class="field" data-control="sampling">Top K
-            <input name="topK" type="number" min="0" step="1" value="${DEFAULT_GENERATION_CONFIG.topK}">
+            <input name="topK" type="number" min="0" step="1" value="${CONSOLE_DEFAULT_CONFIG.topK}">
           </label>
           <label class="field" data-control="sampling">Top P
-            <input name="topP" type="number" min="0" max="1" step="0.01" value="${DEFAULT_GENERATION_CONFIG.topP}">
+            <input name="topP" type="number" min="0" max="1" step="0.01" value="${CONSOLE_DEFAULT_CONFIG.topP}">
           </label>
           <label class="field" data-control="sampling">Seed
             <input name="seed" type="number" step="1" value="${DEFAULT_GENERATION_CONFIG.seed}">
@@ -653,6 +695,22 @@ app.innerHTML = `
               <input name="presencePenalty" type="number" min="0" step="0.05" value="${DEFAULT_GENERATION_CONFIG.presencePenalty}">
             </label>
           </div>
+        </details>
+
+        <details id="beam-controls" class="control-section">
+          <summary>Beam search</summary>
+          <div class="control-grid detail-controls">
+            <label class="field">Beams
+              <input name="numBeams" type="number" min="1" max="${MAX_BEAM_SEARCH_BEAMS}" step="1" value="1">
+            </label>
+            <label class="field">Length penalty
+              <input name="lengthPenalty" type="number" step="0.1" value="${DEFAULT_BEAM_SEARCH_OPTIONS.lengthPenalty}">
+            </label>
+            <label class="field">No-repeat n-gram
+              <input name="noRepeatNgramSize" type="number" min="0" step="1" value="${DEFAULT_BEAM_SEARCH_OPTIONS.noRepeatNgramSize}">
+            </label>
+          </div>
+          <p class="control-note">1 beam turns beam search off. Beam search is deterministic, so temperature, top-k, top-p, min-p, typical-p and seed are ignored; the answer appears when the search ends.</p>
         </details>
 
         <fieldset id="constraint-section" class="constraint-section">
@@ -700,7 +758,7 @@ app.innerHTML = `
           </div>
         </fieldset>
 
-        <p id="config-status" class="config-status" data-valid="true" role="status">Exact greedy configuration</p>
+        <p id="config-status" class="config-status" data-valid="true" role="status">Recommended sampling configuration</p>
       </form>
 
       <details class="diagnostics-section">
@@ -817,6 +875,8 @@ const telemetry = generationPanel.querySelector<HTMLDivElement>(".telemetry");
 if (!telemetry) throw new Error("Missing generation telemetry");
 const ownedTelemetry = telemetry;
 const probabilityControls = element<HTMLDetailsElement>("probability-controls");
+const beamControls = element<HTMLDetailsElement>("beam-controls");
+const beamHypotheses = element<HTMLDetailsElement>("beam-hypotheses");
 const constraintSection = element<HTMLFieldSetElement>("constraint-section");
 const constraintModeSelector = element<HTMLDivElement>("constraint-mode-selector");
 const samplingControls = Array.from(
@@ -1366,11 +1426,19 @@ async function generate(): Promise<void> {
     renderConversation(turn.userMessage, draftText, "streaming", draftReasoning);
     outputTokenCount.textContent = `${update.generatedTokenIds.length} ${pluralize(update.generatedTokenIds.length, "token")}`;
   };
+  if (options.beamSearch) {
+    options.onBeamSearchProgress = (progress) => {
+      renderConversation(turn.userMessage, progress.bestText, "streaming");
+      requestStatus.textContent = `Beam search · step ${progress.step}/${progress.maxSteps} · ` +
+        `${progress.finishedCount} finished`;
+    };
+  }
   setGenerating(true);
   renderConversation(turn.userMessage, "");
+  renderBeamHypotheses(undefined);
   outputTokenCount.textContent = "0 tokens";
   clearTelemetry();
-  requestStatus.textContent = "Generating";
+  requestStatus.textContent = options.beamSearch ? "Beam search" : "Generating";
 
   try {
     const measured = await activeSession.generateMeasured(turn.input, options);
@@ -1415,6 +1483,7 @@ async function generate(): Promise<void> {
       measured.result.stopReason,
       measured.result.generatedTokenIds.length,
     );
+    renderBeamHypotheses(measured.result.beamSearch);
     if (session === activeSession) renderMemory(activeSession.estimateRetainedGpuMemory());
   } catch (error) {
     if (generationController.signal.aborted) {
@@ -1867,8 +1936,14 @@ function readGenerationOptions(): GemmaGenerationOptions {
     .split(/[\s,]+/)
     .filter(Boolean)
     .map(Number);
+  const numBeams = beamControls.hidden ? 1 : numberValue(data, "numBeams");
+  const beamSearch = numBeams === 1 ? undefined : resolveBeamSearchOptions({
+    numBeams,
+    lengthPenalty: numberValue(data, "lengthPenalty"),
+    noRepeatNgramSize: numberValue(data, "noRepeatNgramSize"),
+  });
   const config = resolveGemmaGenerationConfig({
-    temperature: numberValue(data, "temperature"),
+    temperature: beamSearch ? 0 : numberValue(data, "temperature"),
     topK: numberValue(data, "topK"),
     topP: numberValue(data, "topP"),
     minP: numberValue(data, "minP"),
@@ -1883,7 +1958,8 @@ function readGenerationOptions(): GemmaGenerationOptions {
   });
   const constraint = readConstraint(data);
   if (constraint) compileGenerationConstraint(constraint);
-  return { ...config, constraint };
+  if (beamSearch && constraint) throw new Error("Beam search cannot be combined with a constraint");
+  return beamSearch ? { ...config, constraint, beamSearch } : { ...config, constraint };
 }
 
 function visibleGemmaDraft(
@@ -1910,6 +1986,7 @@ function applyGenerationExample(example: GenerationExample): void {
   renderConversation();
   newChatButton.disabled = !hasConversationState();
   promptInput.value = example.prompt;
+  renderBeamHypotheses(undefined);
   if (example.bestOf) {
     bestOfCountInput.value = String(example.bestOf.candidateCount);
     syncBestOfJudgeCountLimit();
@@ -1937,8 +2014,8 @@ function applyGenerationExample(example: GenerationExample): void {
       setControlValue("jsonSchema", JSON.stringify(example.constraint.schema, null, 2));
     }
   }
-  const probabilityControls = controlsForm.querySelector<HTMLDetailsElement>(".control-section");
-  if (probabilityControls) probabilityControls.open = example.expandProbabilityControls ?? false;
+  probabilityControls.open = example.expandProbabilityControls ?? false;
+  beamControls.open = example.expandBeamControls ?? false;
   renderConstraintFields();
   validateControls();
 }
@@ -2087,14 +2164,43 @@ function readVisionTokenBudget(): GemmaVisionTokenBudget {
   return tokenBudget;
 }
 
+function renderBeamHypotheses(summary: GemmaBeamSearchSummary | undefined): void {
+  const list = element<HTMLOListElement>("beam-hypothesis-list");
+  list.replaceChildren();
+  beamHypotheses.hidden = !summary;
+  if (!summary) return;
+  element<HTMLElement>("beam-hypotheses-summary").textContent =
+    `Beam hypotheses · ${summary.hypotheses.length} kept after ${summary.steps} steps`;
+  for (const hypothesis of summary.hypotheses) {
+    const item = document.createElement("li");
+    const score = document.createElement("strong");
+    score.textContent = `score ${hypothesis.score.toFixed(4)} · log p ${hypothesis.sumLogProbability.toFixed(2)} · ` +
+      `${hypothesis.tokenIds.length} tokens · ${hypothesis.stopReason}`;
+    const text = document.createElement("p");
+    text.textContent = hypothesis.text;
+    item.append(score, text);
+    list.append(item);
+  }
+}
+
 function renderValidConfiguration(options: GemmaGenerationOptions): void {
-  const greedy = options.temperature === 0 &&
-    options.repetitionPenalty === 1 &&
+  const neutralPenalties = options.repetitionPenalty === 1 &&
     options.frequencyPenalty === 0 &&
     options.presencePenalty === 0;
-  configStatus.textContent = options.constraint
-    ? `${options.constraint.type} constraint valid`
-    : greedy ? "Exact greedy configuration" : "Sampling configuration valid";
+  const greedy = options.temperature === 0 && neutralPenalties;
+  const recommended = neutralPenalties &&
+    options.temperature === CONSOLE_DEFAULT_CONFIG.temperature &&
+    options.topK === CONSOLE_DEFAULT_CONFIG.topK &&
+    options.topP === CONSOLE_DEFAULT_CONFIG.topP &&
+    options.minP === 0 &&
+    options.typicalP === 1;
+  configStatus.textContent = options.beamSearch
+    ? `Beam search · ${options.beamSearch.numBeams} beams`
+    : options.constraint
+      ? `${options.constraint.type} constraint valid`
+      : greedy
+        ? "Exact greedy configuration"
+        : recommended ? "Recommended sampling configuration" : "Sampling configuration valid";
   configStatus.dataset.valid = "true";
 }
 
@@ -2118,6 +2224,7 @@ function activeConsoleProfile(): ConsoleUiProfile {
       audio: true,
       video: true,
       sampling: true,
+      beam: true,
       constraint: "all",
     };
   }
@@ -2128,11 +2235,12 @@ function activeConsoleProfile(): ConsoleUiProfile {
       audio: true,
       video: true,
       sampling: true,
+      beam: true,
       constraint: "none",
     };
   }
   if (!activeExample) throw new Error("Example workspace is missing its UI profile");
-  return { workspace: "example", audio: false, video: false, ...activeExample.ui };
+  return { workspace: "example", audio: false, video: false, beam: false, ...activeExample.ui };
 }
 
 function renderConsoleProfile(): void {
@@ -2178,6 +2286,7 @@ function renderConsoleProfile(): void {
   thinkingControl.hidden = profile.workspace === "example" && !activeExample?.enableThinking;
   for (const control of samplingControls) control.hidden = !profile.sampling;
   probabilityControls.hidden = !profile.sampling;
+  beamControls.hidden = !profile.beam;
   ownedStopTokenControl.hidden = profile.workspace === "example";
   renderConstraintFields();
 }
@@ -2331,6 +2440,7 @@ function clearTranscript(): void {
   renderConversation();
   outputTokenCount.textContent = "0 tokens";
   clearTelemetry();
+  renderBeamHypotheses(undefined);
   newChatButton.disabled = !hasConversationState();
   requestStatus.textContent = session ? "Transcript cleared · next run starts fresh" : "Waiting for model";
   validateControls();
