@@ -13,6 +13,10 @@ npm install
 npm run dev
 ```
 
+The dev server listens on `http://localhost:5174` (fixed, so Playwright can reuse it) and serves
+`public/`, including an optional local checkpoint at `public/models/gemma-4-e2b/model.safetensors`
+that the console loads directly when present.
+
 Chrome with WebGPU is required for kernel benchmarks. Sampling tests do not require a GPU.
 The first screen is the generation console. Because IndexedDB is origin-scoped, serve it from the
 same scheme, host, and port that owns `safetensors-cache-v1`; the console inventories the origin and
@@ -29,10 +33,15 @@ retained. The status badges report queued recovery, reconstruction, success, or 
 
 ```bash
 npm run typecheck
+npm run test        # full suite; GPU specs need a WebGPU-capable Chrome
+npm run test:cpu    # CPU-only specs (what CI runs on hosted runners)
 npm run test:unit
 npm run test:gpu
 npm run build
 ```
+
+Playwright runs with a single worker: concurrent WebGPU Chrome workers on Apple/Metal
+intermittently fail to exit after their last test and stall the run.
 
 ## Static Demo And Library
 
@@ -41,12 +50,16 @@ npm run build
 - `build/index.html` is the complete generation console for static hosting.
 - `build/library/gemma-webgpu-engine.min.js` is the public ES-module entry.
 
-The build includes the tokenizer, validated runtime fixture, examples, icons, and separately
-cacheable WebAssembly support. It deliberately excludes the 2.46 GB local checkpoint. On a new
-origin, **Download model** range-fetches
+The build includes the tokenizer, validated runtime fixture, examples, and icons. It deliberately
+excludes the 2.46 GB local checkpoint, and it aliases the ONNX Runtime that
+`@huggingface/transformers` imports to a stub (the engine uses only its tokenizer), so no
+WebAssembly binary is shipped. On a new origin, **Download model** range-fetches
 [`google/gemma-4-E2B-it-qat-mobile-transformers`](https://huggingface.co/google/gemma-4-E2B-it-qat-mobile-transformers)
-from `resolve/main/model.safetensors` directly into resumable IndexedDB storage, then loads the
-Owned WebGPU engine from that cache. No model bytes pass through the static host.
+at the pinned revision `9fcec64df66cb1e4d972fc5cdc142afb25b2362c` directly into resumable
+IndexedDB storage, verifies the safetensors header against a pinned SHA-256, then loads the Owned
+WebGPU engine from that cache. No model bytes pass through the static host. Caches created by
+earlier builds remain valid because the IndexedDB cache identity is unchanged, and a cache whose
+download did not complete is refused rather than partially loaded.
 
 To publish with GitHub Pages, deploy the contents of `build/` as the Pages artifact. All generated
 URLs are relative, so both a user site and a repository path such as
@@ -83,6 +96,11 @@ hide a token; access must be granted upstream or supplied by a separate authenti
 ## Generate
 
 The owned runtime exposes a persistent generation session:
+
+`session.destroy()` is safe at any time: during `generate()` it aborts that request with an
+`AbortError` and releases GPU resources once it unwinds. `simulateDeviceLoss()` is an internal
+diagnostic hook that destroys the page's shared WebGPU device and should not be called by
+applications.
 
 ```ts
 import { loadGemmaGenerationSession } from "./src/runtime/gemma-session";
@@ -291,6 +309,11 @@ output under a WebGPU validation scope. This speech-length test also certifies t
 projection for audio geometries above the language prefill graph's 32-row chunk size. The greedy
 live transcription returns “Web GPU audio is working in your browser.”
 
+Known issue: repeated greedy runs on this fixture are not bit-identical; within one session the
+model sometimes emits a trailing newline token before the end token. The text and the first nine
+token IDs are stable, and text-only and vision requests are deterministic, so the variation lies in
+the audio encoder path and needs further investigation.
+
 ## Video
 
 Structured user messages may include a video part paired with a browser video source. Following the
@@ -410,6 +433,27 @@ Markdown, CSV, and HTML reports. `npm run benchmark:suite:smoke` validates the c
 pipeline with labeled synthetic data. Real runs use `benchmark:suite:live-smoke`,
 `benchmark:suite:full`, or `benchmark:suite:full:headed`; headed and headless aggregates are never
 combined.
+
+### Decoding-policy benchmark
+
+The cross-runtime suite is greedy-only because the pinned comparison runtime cannot sample. The
+owned decoding-policy benchmark covers what it cannot: warm greedy, seeded sampling with penalties,
+JSON-Schema-constrained decoding, and fresh-session greedy (cold token-input loads).
+
+```bash
+# Uses public/models/gemma-4-e2b/model.safetensors, or a browser profile that already holds the
+# IndexedDB cache for the origin given in DECODE_POLICY_URL.
+npm run benchmark:decode-policy
+DECODE_POLICY_PROFILE=/path/to/profile DECODE_POLICY_URL=http://127.0.0.1:5190/ \
+  DECODE_POLICY_LABEL=my-device npm run benchmark:decode-policy
+```
+
+[`benchmarks/decode-policy.before-after.chrome.json`](benchmarks/decode-policy.before-after.chrome.json)
+holds two alternating before/after pairs on Apple M4. Sampled inter-token latency fell from
+190-231 ms to 41-42 ms median after the full-vocabulary object sort in sampling was replaced by an
+equivalent stable radix order; fresh-session greedy inter-token latency fell from 46-47 ms to
+22 ms after decoded 8 MiB weight segments were cached for small slice reads; warm greedy p95 fell
+from 56-95 ms to 38-40 ms. Every change was gated on byte-identical generated token IDs.
 
 ### Reliability smoke
 
