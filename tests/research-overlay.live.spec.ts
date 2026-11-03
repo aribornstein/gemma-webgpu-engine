@@ -36,7 +36,19 @@ test("research overlays and probes preserve inference parity", async ({ page }) 
     out.activeFinal = await gen();
     await s.setResearchOverlay(null);
     out.revertFinal = await gen();
-    console.log("RESEARCH 50 teacher forcing");
+    await s.setResearchOverlay([
+    { site: { layer: 16 }, a: vec(1), b: vec(2), coefficient: 0 },
+    { site: { layer: 22 }, a: vec(3), b: vec(4), coefficient: 0 },
+  ]);
+  out.identityMulti = await gen();
+  await s.setResearchOverlay([
+    { site: { layer: 16 }, a: vec(3), b: vec(4), coefficient: 400 },
+    { site: { layer: 22 }, a: vec(3), b: vec(4), coefficient: 400 },
+  ]);
+  out.activeMulti = await gen();
+  await s.setResearchOverlay(null);
+  out.revertMulti = await gen();
+  console.log("RESEARCH 50 teacher forcing");
     const r = await s.generate(prompt, { maxNewTokens: 12, temperature: 0, reusePromptCache: false, captureTokenLogProbabilities: true });
     const sc = await s.researchScoreContinuation(r.promptTokenIds, r.generatedTokenIds);
     out.tfMaxAbsDiff = Math.max(...sc.tokenLogProbs.map((v: number, i: number) => Math.abs(v - r.tokenLogProbabilities[i])));
@@ -79,6 +91,9 @@ test("research overlays and probes preserve inference parity", async ({ page }) 
   expect(report.capturePrefixEqual && report.captureRepeatEqual && report.captureFiniteNonzero).toBe(true);
   expect(report.headLinearMaxRel).toBeLessThan(1e-4);
   expect(report.residualCaptureMatches).toBe(true);
+  expect(report.identityMulti).toBe(report.baseGreedy);
+  expect(report.activeMulti).not.toBe(report.baseGreedy);
+  expect(report.revertMulti).toBe(report.baseGreedy);
   expect(report.finalOverlayChangesLogProb).toBe(true);
   expect(report.afterAllGreedy).toBe(report.baseGreedy);
 });

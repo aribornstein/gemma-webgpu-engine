@@ -9,7 +9,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dirname, "../..");
-const DIR = resolve(ROOT, "research-results/cefr-agentic/judging");
+const DIR = resolve(ROOT, process.env.RESEARCH_OUT ?? "research-results/cefr-agentic", "judging");
 mkdirSync(DIR, { recursive: true });
 const readJsonl = (path) => readFileSync(path, "utf8").split("\n").filter(Boolean).map((line) => JSON.parse(line));
 

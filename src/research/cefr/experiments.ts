@@ -35,13 +35,14 @@ export async function runEpisode(
   level: CefrLevel,
   policy: PromptPolicy,
   seed: number,
+  maxTurns?: number,
 ): Promise<EpisodeResult> {
   const leveled = atLevel(scenario, level);
   const npcTurns: string[] = [];
   const npcTokenCounts: number[] = [];
   const stopReasons: string[] = [];
   const started = performance.now();
-  const turns = leveled.player_policy.player_turns_he.length;
+  const turns = Math.min(maxTurns ?? Infinity, leveled.player_policy.player_turns_he.length);
   for (let turn = 0; turn < turns; turn += 1) {
     const result = await session.generate(episodeMessages(leveled, policy, npcTurns, turn), {
       ...EPISODE_DECODING,
@@ -57,7 +58,7 @@ export async function runEpisode(
     level,
     policy,
     seed,
-    playerTurns: [...leveled.player_policy.player_turns_he],
+    playerTurns: leveled.player_policy.player_turns_he.slice(0, turns),
     npcTurns,
     npcTokenCounts,
     stopReasons,
@@ -246,6 +247,47 @@ export async function meanReplyStates(
     const sum = new Float64Array(rows[0].values.length);
     for (const row of rows) for (let i = 0; i < sum.length; i += 1) sum[i] += row.values[i];
     out[key] = Array.from(sum, (value) => value / rows.length);
+  }
+  return out;
+}
+
+export interface TrajectoryReread {
+  replyTokens: number;
+  /** Per site: mean state over reply positions under each prompt policy, and the paired mean difference. */
+  canonical: Record<string, number[]>;
+  strong: Record<string, number[]>;
+}
+
+/**
+ * Re-reads one NPC reply (from an episode's turn `turn`, with the episode's earlier turns as history)
+ * under the canonical and the level-specific strong system prompt, capturing the residual states that
+ * predict each reply token. The reply tokens are identical in both reads, so states are paired.
+ */
+export async function rereadReply(
+  session: GemmaGenerationSession,
+  scenario: CefrScenario,
+  level: CefrLevel,
+  npcTurns: readonly string[],
+  turn: number,
+  sites: readonly GemmaResearchCaptureSite[],
+): Promise<TrajectoryReread> {
+  const tokenizer = tokenizerOf(session);
+  const leveled = atLevel(scenario, level);
+  const replyIds = tokenizer.encodeText(npcTurns[turn]);
+  const out: TrajectoryReread = { replyTokens: replyIds.length, canonical: {}, strong: {} };
+  for (const policy of ["canonical", "level_specific_strong"] as const) {
+    const promptIds = tokenizer.encodeInput(episodeMessages(leveled, policy, npcTurns, turn));
+    const ids = [...promptIds, ...replyIds];
+    const positions = Array.from({ length: replyIds.length }, (_, index) => promptIds.length - 1 + index);
+    const captures = await session.researchCaptureActivations(ids, positions, sites, 1 << 27);
+    const target = policy === "canonical" ? out.canonical : out.strong;
+    for (const site of sites) {
+      const key = typeof site === "object" ? `residual${site.residual}` : String(site);
+      const rows = captures.filter((capture) => capture.site === site);
+      const sum = new Float64Array(rows[0].values.length);
+      for (const row of rows) for (let i = 0; i < sum.length; i += 1) sum[i] += row.values[i];
+      target[key] = Array.from(sum, (value) => value / rows.length);
+    }
   }
   return out;
 }

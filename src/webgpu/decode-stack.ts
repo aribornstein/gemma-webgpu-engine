@@ -78,7 +78,7 @@ export interface GemmaDecodeStackResources {
   finalSum: GPUBuffer;
   rotaryBuffers: readonly DecodeAttentionRotaryBuffers[];
   /** Research-only residual edit after one layer; absent in normal inference. */
-  researchEdit?: ResearchResidualEditResources | null;
+  researchEdits?: readonly ResearchResidualEditResources[] | null;
   /** Research-only residual copies after layers (taken after any edit at that layer). */
   researchCaptures?: readonly ResearchResidualCapture[] | null;
 }
@@ -349,15 +349,17 @@ export function encodeGemmaDecodeStackPass(
   if (resources.layers.length !== LAYER_COUNT) {
     throw new Error(`Gemma decode stack requires ${LAYER_COUNT} layers`);
   }
-  const researchEdit = resources.researchEdit;
+  const researchEdits = resources.researchEdits;
   for (let layerIndex = 0; layerIndex < LAYER_COUNT; layerIndex += 1) {
     encodeGemmaDecodeLayerPass(
       pass,
       resources.pipelines[layerIndex],
       resources.layers[layerIndex],
     );
-    if (researchEdit && researchEdit.layerIndex === layerIndex) {
-      encodeResearchResidualEditPass(pass, researchEdit);
+    if (researchEdits) {
+      for (const edit of researchEdits) {
+        if (edit.layerIndex === layerIndex) encodeResearchResidualEditPass(pass, edit);
+      }
     }
     if (resources.researchCaptures) {
       for (const capture of resources.researchCaptures) {

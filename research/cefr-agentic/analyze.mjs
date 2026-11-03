@@ -8,7 +8,7 @@ import { checkState, complexityIndex, COMPLEXITY_KEYS, turnFeatures } from "../.
 import { auc, fitLogistic, fitMeanDifference, groupBootstrapAuc, probeScore, rawDirection, shuffledLabels } from "../../src/research/probes.ts";
 
 const ROOT = resolve(import.meta.dirname, "../..");
-const OUT = resolve(ROOT, "research-results/cefr-agentic");
+const OUT = resolve(ROOT, process.env.RESEARCH_OUT ?? "research-results/cefr-agentic");
 const readJsonl = (path) => existsSync(path) ? readFileSync(path, "utf8").split("\n").filter((line) => line.trim().startsWith("{")).map((line) => JSON.parse(line)) : [];
 const LEVELS = { A1: 1, A2: 2, B1: 3, B2: 4, C1: 5, C2: 6 };
 const mean = (values) => values.reduce((sum, value) => sum + value, 0) / Math.max(1, values.length);
@@ -188,9 +188,9 @@ if (command === "calibration") {
   const scenarios = Object.fromEntries([
     ...readJsonl(resolve(ROOT, "research/cefr-agentic/scenarios.dev.jsonl")),
     ...readJsonl(resolve(ROOT, "research/cefr-agentic/scenarios.validation.jsonl")),
-    ...(process.env.SEALED_PATH ? readJsonl(process.env.SEALED_PATH) : []),
+    ...(process.env.SEALED_PATH ? process.env.SEALED_PATH.split(",").flatMap((path) => readJsonl(path)) : []),
   ].map((row) => [row.scenario_id, row]));
-  const statsPath = resolve(OUT, "complexity-stats.json");
+  const statsPath = resolve(ROOT, "research-results/cefr-agentic/complexity-stats.json");
   const episodes = args.flatMap((name) => readJsonl(resolve(OUT, `${name}.jsonl`)));
   if (!existsSync(statsPath)) {
     const features = episodes.filter((row) => row.arm === "raw_base").flatMap((row) => row.npcTurns.map(turnFeatures));

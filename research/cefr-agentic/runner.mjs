@@ -12,7 +12,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } fr
 import { resolve } from "node:path";
 
 const ROOT = resolve(import.meta.dirname, "../..");
-const OUT = resolve(ROOT, "research-results/cefr-agentic");
+const OUT = resolve(ROOT, process.env.RESEARCH_OUT ?? "research-results/cefr-agentic");
 const URL = process.env.RESEARCH_URL ?? "http://127.0.0.1:5190/";
 mkdirSync(resolve(OUT, "activations"), { recursive: true });
 
@@ -64,7 +64,11 @@ async function inBrowser(stage, payload) {
               for (let i = 0; i < state.length; i += 1) projection += direction[i] * state[i];
               gate = Math.max(-1, Math.min(1, (projection - threshold) / scale));
             }
-            if (job.overlay) {
+            if (job.overlays !== undefined) {
+              await session.setResearchOverlay(job.overlays ? job.overlays.map((item) => ({
+                site: item.site, a: Float32Array.from(item.a), b: Float32Array.from(item.b), coefficient: item.coefficient,
+              })) : null);
+            } else if (job.overlay) {
               const coefficient = gate === null ? job.overlay.coefficient : gate * job.overlay.alpha;
               job.overlay.appliedCoefficient = coefficient;
               job.overlay.gateValue = gate;
@@ -77,11 +81,28 @@ async function inBrowser(stage, payload) {
             } else {
               await session.setResearchOverlay(null);
             }
-            const episode = await experiments.runEpisode(session, job.scenario, job.level, job.policy, job.seed);
-            results.push({ ...episode, arm: job.arm, editId: job.overlay?.id ?? null, coefficient: job.overlay?.appliedCoefficient ?? 0, gateValue: job.overlay?.gateValue ?? null, jobKey: job.key });
+            const episode = await experiments.runEpisode(session, job.scenario, job.level, job.policy, job.seed, job.turns);
+            results.push({ ...episode, arm: job.arm, editId: job.overlay?.id ?? job.overlays?.map((item) => item.id).join("+") ?? null, coefficient: job.overlay?.appliedCoefficient ?? job.overlays?.map((item) => item.coefficient) ?? 0, gateValue: job.overlay?.gateValue ?? null, jobKey: job.key });
             progress(index + 1, jobs.length, `${job.arm} ${job.scenario.scenario_id} ${job.level} seed ${job.seed}`);
           }
           await session.setResearchOverlay(null);
+        } else if (stage === "trajectories") {
+          const { scenarios, seeds, turns, sites } = payload;
+          const total = scenarios.length * 2 * seeds.length;
+          let done = 0;
+          for (const scenario of scenarios) {
+            for (const level of ["A1", "B2"]) {
+              for (const seed of seeds) {
+                const episode = await experiments.runEpisode(session, scenario, level, "level_specific_strong", seed, turns);
+                for (let turn = 0; turn < episode.npcTurns.length; turn += 1) {
+                  if (!episode.npcTurns[turn]) continue;
+                  const reread = await experiments.rereadReply(session, scenario, level, episode.npcTurns, turn, sites);
+                  results.push({ scenarioId: scenario.scenario_id, family: scenario.scenario_family, level, seed, turn, reply: episode.npcTurns[turn], ...reread });
+                }
+                progress(++done, total, `trajectories ${scenario.scenario_id} ${level} seed ${seed}`);
+              }
+            }
+          }
         } else if (stage === "directions") {
           const { scenarios, references, sites } = payload;
           const total = references.length * 4 + scenarios.length * 2;
@@ -164,6 +185,14 @@ if (stage === "probes") {
   writeFileSync(resolve(OUT, "activations/probes.json"), JSON.stringify(results));
   appendFileSync(manifestPath, JSON.stringify({ stage, startedAt, finishedAt: new Date().toISOString(), rows: results.length, sites, provenance, artifact: "activations/probes.json" }) + "\n");
   console.log(`wrote ${results.length} probe rows`);
+} else if (stage === "trajectories") {
+  // args: <scenarios.jsonl>... ; direction-building families only (never evaluation or sealed-v2 families).
+  const scenarios = args.flatMap((path) => readJsonl(resolve(path)));
+  const sites = [12, 16, 20, 22, 24, 26].map((layer) => ({ residual: layer }));
+  const { results, provenance } = await inBrowser("trajectories", { scenarios, seeds: [23, 47], turns: 2, sites });
+  writeFileSync(resolve(OUT, "activations/trajectories.json"), JSON.stringify(results));
+  appendFileSync(manifestPath, JSON.stringify({ stage, startedAt, finishedAt: new Date().toISOString(), rows: results.length, families: [...new Set(scenarios.map((s) => s.scenario_family))], provenance, artifact: "activations/trajectories.json" }) + "\n");
+  console.log(`wrote ${results.length} trajectory rows`);
 } else if (stage === "directions") {
   // Development scenarios only: edit directions must never see validation or sealed data.
   const scenarios = fixture("scenarios.dev.jsonl");

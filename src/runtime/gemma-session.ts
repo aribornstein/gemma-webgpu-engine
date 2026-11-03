@@ -531,7 +531,7 @@ export class GemmaGenerationSession {
       ? [GEMMA_START_CHANNEL_TOKEN_ID, ...this.tokenizer.encodeText("thought\n")]
       : [];
     const researchOverlayActive = this.researchFinalOverlay !== null ||
-      Boolean(this.resources.stack.researchEdit);
+      Boolean(this.resources.stack.researchEdits?.length);
     const outputMode: GemmaModelOutputMode = compiledConstraint || requireReasoning ||
       captureTokenLogProbabilities || beamOptions || researchOverlayActive ||
       !usesGemmaGpuGreedy(config)
@@ -698,7 +698,7 @@ export class GemmaGenerationSession {
         this.position,
         pendingPromptTokenIds.length,
         this.cacheCapacity,
-        preparedPrompt.audioInputs.length > 0 || this.resources.stack.researchEdit
+        preparedPrompt.audioInputs.length > 0 || this.resources.stack.researchEdits?.length
           ? "sequential"
           : this.prefillStrategy,
         this.prefill !== null,
@@ -1174,10 +1174,8 @@ export class GemmaGenerationSession {
     if (this.prefill) destroyGemmaFixedPrefillResources(this.prefill);
     this.logitsReadback.destroy();
     this.researchVectorReadback?.destroy();
-    if (this.resources.stack.researchEdit) {
-      destroyResearchResidualEditResources(this.resources.stack.researchEdit);
-      this.resources.stack.researchEdit = null;
-    }
+    for (const edit of this.resources.stack.researchEdits ?? []) destroyResearchResidualEditResources(edit);
+    this.resources.stack.researchEdits = null;
     destroyGemmaDecodeModelResources(this.resources);
     this.tokenInputCache.clear();
     this.visionWeightCache.clear();
@@ -1642,55 +1640,68 @@ export class GemmaGenerationSession {
   }
 
   /**
-   * @internal Research-only. Installs (or clears with null) a rank-1 effective-weight overlay.
+   * @internal Research-only. Installs (or clears with null) one or more rank-1 effective-weight
+   * overlays (several overlays form a low-rank edit; edits at the same layer apply in order).
    * `final` applies `logits += coefficient * dot(a, h_final) * (W_head b)` to every logits readback
    * (h_final is the LM head input); `residual` applies `h += coefficient * b * dot(a, h)` after the
    * given layer on the GPU and re-derives the next layer's input. Packed weights are never changed.
    * Any overlay forces full-logit selection, and a residual overlay forces sequential prefill.
    * Changing the overlay invalidates the prompt cache.
    */
-  async setResearchOverlay(overlay: GemmaResearchOverlay | null): Promise<void> {
+  async setResearchOverlay(
+    overlay: GemmaResearchOverlay | readonly GemmaResearchOverlay[] | null,
+  ): Promise<void> {
     this.assertAlive();
     if (this.generating) throw new Error("Cannot change the research overlay during generation");
-    if (this.resources.stack.researchEdit) {
+    if (this.resources.stack.researchEdits?.length) {
       await this.device.queue.onSubmittedWorkDone();
-      destroyResearchResidualEditResources(this.resources.stack.researchEdit);
-      this.resources.stack.researchEdit = null;
+      for (const edit of this.resources.stack.researchEdits) destroyResearchResidualEditResources(edit);
     }
+    this.resources.stack.researchEdits = null;
     this.researchFinalOverlay = null;
     this.invalidatePromptCache();
     if (!overlay) return;
+    const overlays = Array.isArray(overlay) ? overlay as readonly GemmaResearchOverlay[] : [overlay as GemmaResearchOverlay];
+    if (overlays.filter((item) => item.site === "final").length > 1) {
+      throw new Error("At most one final-site research overlay is supported");
+    }
     const hidden = this.resources.stack.layers[0].mlp.nextInput.size / 4;
-    if (overlay.a.length !== hidden || overlay.b.length !== hidden) {
-      throw new Error(`Research overlay vectors must have ${hidden} elements`);
+    for (const item of overlays) {
+      if (item.a.length !== hidden || item.b.length !== hidden) {
+        throw new Error(`Research overlay vectors must have ${hidden} elements`);
+      }
+      if (!Number.isFinite(item.coefficient)) throw new Error("Research overlay coefficient must be finite");
+      if (item.site !== "final" && (!Number.isInteger(item.site.layer) || !this.resources.stack.layers[item.site.layer])) {
+        throw new Error(`Research overlay layer ${item.site.layer} is out of range`);
+      }
     }
-    if (!Number.isFinite(overlay.coefficient)) throw new Error("Research overlay coefficient must be finite");
-    if (overlay.site === "final") {
-      if (overlay.coefficient === 0) return;
-      const u = await this.researchHeadProjection(overlay.b);
-      this.researchFinalOverlay = { a: Float32Array.from(overlay.a), u, coefficient: overlay.coefficient };
-      return;
+    const edits = [];
+    for (const item of overlays) {
+      if (item.site === "final") {
+        if (item.coefficient === 0) continue;
+        const u = await this.researchHeadProjection(item.b);
+        this.researchFinalOverlay = { a: Float32Array.from(item.a), u, coefficient: item.coefficient };
+        continue;
+      }
+      const layer = this.resources.stack.layers[item.site.layer];
+      const pipeline = await getResearchResidualEditPipeline(this.device);
+      edits.push(createResearchResidualEditResources(
+        this.device,
+        pipeline,
+        item.site.layer,
+        {
+          hidden: layer.mlp.hidden,
+          normWeightsAndScale: layer.mlp.modelWeights.postPleNextInputNormAndLayerScale,
+          nextInput: layer.mlp.nextInput,
+          nextSum: layer.mlp.nextSum,
+          inScale: layer.mlp.modelScales.nextInput,
+        },
+        item.a,
+        item.b,
+        item.coefficient,
+      ));
     }
-    const layer = this.resources.stack.layers[overlay.site.layer];
-    if (!layer || !Number.isInteger(overlay.site.layer)) {
-      throw new Error(`Research overlay layer ${overlay.site.layer} is out of range`);
-    }
-    const pipeline = await getResearchResidualEditPipeline(this.device);
-    this.resources.stack.researchEdit = createResearchResidualEditResources(
-      this.device,
-      pipeline,
-      overlay.site.layer,
-      {
-        hidden: layer.mlp.hidden,
-        normWeightsAndScale: layer.mlp.modelWeights.postPleNextInputNormAndLayerScale,
-        nextInput: layer.mlp.nextInput,
-        nextSum: layer.mlp.nextSum,
-        inScale: layer.mlp.modelScales.nextInput,
-      },
-      overlay.a,
-      overlay.b,
-      overlay.coefficient,
-    );
+    this.resources.stack.researchEdits = edits.length ? edits : null;
   }
 
   /**
