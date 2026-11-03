@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      # build/ is committed for static hosting; flag drift without failing on platform differences.
+      - name: Check committed build output
+        continue-on-error: true
+        run: git diff --stat --exit-code -- build
+      # Hosted runners have no WebGPU, so only CPU-side specs run here. GPU and model-backed
+      # specs run locally with `npm test` on a WebGPU-capable Chrome.
+      - run: npm run test:cpu

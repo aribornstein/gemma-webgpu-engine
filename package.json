@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test": "playwright test",
     "test:unit": "playwright test tests/sampling.spec.ts tests/qat-linear.spec.ts tests/cached-safetensors.spec.ts tests/gemma-layer-plan.spec.ts tests/gemma-layer-weights.spec.ts tests/gemma-layer-materializer.spec.ts",
+    "test:cpu": "playwright test tests/benchmark-suite.spec.ts tests/best-of-audit.spec.ts tests/constraints.spec.ts tests/decode-attention-chunks.spec.ts tests/decode-attention.spec.ts tests/decode-kv-cache-policy.spec.ts tests/gemma-audio-input.spec.ts tests/gemma-context.spec.ts tests/gemma-layer-materializer.spec.ts tests/gemma-layer-plan.spec.ts tests/gemma-layer-weights.spec.ts tests/gemma-prefill-plan.spec.ts tests/gemma-prompt-cache.spec.ts tests/gemma-vision-rope.spec.ts tests/gemma-vision-weight-cache.spec.ts tests/prefill-parameter-arena.spec.ts tests/qat-linear.spec.ts tests/sampling-equivalence.spec.ts tests/sampling.spec.ts",
     "test:gpu": "playwright test tests/qat-linear-gpu.spec.ts",
     "benchmark:e2b": "E2B_PERFORMANCE_PROOF=1 playwright test tests/e2b-performance-proof.live.spec.ts --workers=1",
     "benchmark:e2b:report": "node --experimental-strip-types tools/render_e2b_performance_report.mjs",
