@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "task_id": "he.cefr_npc_rpg.v1",
+  "domain": "Hebrew as a second language",
+  "objective": "Generate natural, grammatically accurate Hebrew NPC turns in a multi-turn RPG using English-only structured scenario metadata and a requested A1-B2 learner level. Adapt linguistic complexity without changing game state, task facts or the NPC goal.",
+  "input_contract": {
+    "metadata_schema": "proposal_appendix_B_english_metadata_v1",
+    "metadata_keys_and_values_ascii_english_only": true,
+    "required_metadata": [
+      "language",
+      "cefr_level",
+      "scenario",
+      "character",
+      "entities",
+      "topics",
+      "quest",
+      "dialogue"
+    ],
+    "additional_input": "player_turns_hebrew_separate_from_metadata",
+    "world_state_oracle": "deterministic_external",
+    "prompt_serialization": "fixed_across_arms_except_explicit_prompt_baseline",
+    "level_field": "cefr_level",
+    "allowed_levels": [
+      "A1",
+      "A2",
+      "B1",
+      "B2"
+    ],
+    "independent_variables": [
+      "requested_cefr_level",
+      "candidate_weight_overlay"
+    ],
+    "nuisance_variables_to_control": [
+      "scenario",
+      "character",
+      "entities",
+      "price",
+      "quest_state",
+      "player_script",
+      "seed",
+      "output_token_budget"
+    ]
+  },
+  "output_contract": {
+    "language": "Hebrew",
+    "role": "NPC",
+    "format": "natural_dialogue_turns",
+    "allow_english_only_when_entity_explicitly_authorized": true,
+    "target_npc_turns": 5,
+    "follow_existing_chat_template": true,
+    "preserve_metadata_facts": true,
+    "player_corrections": "optional_recast_not_automatic_tutoring"
+  },
+  "scientific_tasks": [
+    {
+      "id": "hebrew_agreement",
+      "purpose": "diagnostic_representation_and_likelihood_probe",
+      "contrasts": [
+        "numeral_noun_agreement",
+        "subject_verb_agreement",
+        "noun_adjective_agreement"
+      ],
+      "label_source": "human_linguistic_review_required",
+      "capture": "before_first_decisive_token",
+      "holdout": "disjoint_nouns_and_templates"
+    },
+    {
+      "id": "cefr_crossed_suitability",
+      "purpose": "distinguish_cefr_task_information_from_literal_level_token",
+      "design": "crossed_level_by_response_candidate_with_invariant_facts",
+      "contrast_levels": [
+        "A1",
+        "B2"
+      ],
+      "controls": [
+        "metadata_only_probe",
+        "response_only_probe",
+        "joint_probe",
+        "prompt_order_swap"
+      ],
+      "label_source": "native_hebrew_expert_review_required"
+    },
+    {
+      "id": "episode_cefr_control",
+      "purpose": "end_to_end_edit_effect",
+      "same_scenario_for_all_levels": true,
+      "separate_scenario_families_for_validation": true,
+      "evaluate_unedited_vs_edited_vs_best_of_2": true,
+      "unit": "whole_episode"
+    }
+  ],
+  "simulation": {
+    "primary_mode": "scripted_player_replay",
+    "scripted_player_utterances_source": "scenarios_jsonl_player_turns_he",
+    "turns_per_episode": 5,
+    "adaptive_player_mode": {
+      "enabled_for_exploration_only": true,
+      "policy": "respond_with_mistakes_or_clarification_based_on_npc_output",
+      "record_policy_id": true,
+      "do_not_use_as_paired_primary_outcome": true
+    },
+    "state_invariants": [
+      "prices_never_change_without_authoritative_state_update",
+      "quantities_match_metadata",
+      "npc_does_not_invent_completed_payment",
+      "npc_does_not_invent_quest_completion",
+      "no_unapproved_places_or_items"
+    ]
+  },
+  "rubric": {
+    "version": "hebrew-cefr-1.0",
+    "scale": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "abstention_value": null,
+    "requires_observable_evidence_spans": true,
+    "axes": {
+      "morphosyntactic_correctness": {
+        "description": "grammatical_formation_and_agreement",
+        "pass_score": 3
+      },
+      "natural_hebrew": {
+        "description": "idiomatic_hebrew_for_character_and_situation",
+        "pass_score": 3
+      },
+      "cefr_suitability": {
+        "description": "learner_appropriateness_using_communicative_descriptors_not_length_alone",
+        "pass_score": 3
+      },
+      "cefr_control": {
+        "description": "ordinal_response_to_target_level_over_matched_scenario_pairs",
+        "paired_metric": true
+      },
+      "entity_semantic_fidelity": {
+        "description": "exact_critical_facts_and_world_state",
+        "requires_hard_gate": true
+      },
+      "character_register_fidelity": {
+        "description": "npc_identity_register_and_goal"
+      },
+      "multi_turn_coherence": {
+        "description": "references_repairs_and_goal_across_turns"
+      },
+      "pedagogical_appropriateness": {
+        "description": "useful_and_comprehensible_without_misleading_feedback"
+      }
+    },
+    "judge_roles": [
+      {
+        "id": "deterministic_state_validator",
+        "mode": "code",
+        "criteria": [
+          "entity_semantic_fidelity"
+        ]
+      },
+      {
+        "id": "hebrew_language_judge",
+        "mode": "external_or_human",
+        "criteria": [
+          "morphosyntactic_correctness",
+          "natural_hebrew"
+        ]
+      },
+      {
+        "id": "cefr_judge",
+        "mode": "external_or_human",
+        "criteria": [
+          "cefr_suitability",
+          "cefr_control",
+          "pedagogical_appropriateness"
+        ]
+      },
+      {
+        "id": "conversation_judge",
+        "mode": "external_or_human",
+        "criteria": [
+          "character_register_fidelity",
+          "multi_turn_coherence"
+        ]
+      }
+    ],
+    "constraints": [
+      "independent_from_proposing_agent",
+      "blinded_to_baseline_or_edit_identity",
+      "candidate_order_reversed",
+      "no_judge_internals_or_adapter_id",
+      "abstain_when_insufficient_evidence",
+      "same_judge_model_multiple_prompts_not_independent_raters",
+      "separate_dev_feedback_from_sealed_confirmation"
+    ]
+  },
+  "level_profiles": {
+    "A1": {
+      "communicative_target": "simple_concrete_exchanges_and_basic_needs",
+      "avoid": "unnecessary_complex_sentences_and_unexplained_figurative_language"
+    },
+    "A2": {
+      "communicative_target": "routine_transactions_and_simple_connected_language",
+      "avoid": "dense_discourse_or_unexplained_specialist_vocabulary"
+    },
+    "B1": {
+      "communicative_target": "connected_everyday_explanations_and_repairs",
+      "avoid": "disproportionate_complexity_for_task"
+    },
+    "B2": {
+      "communicative_target": "flexible_precise_dialogue_and_reasoned_alternatives",
+      "avoid": "artificial_complexity_for_its_own_sake"
+    },
+    "note": "profiles_are_research_heuristics_not_official_hebrew_cefr_certifications"
+  },
+  "required_controls": [
+    "same_english_metadata_and_world_state_for_candidate_arms",
+    "level_changes_only_for_crossed_cefr_comparisons",
+    "random_norm_matched_edit",
+    "identity_edit",
+    "wrong_level_gate",
+    "strong_prompt",
+    "best_of_two",
+    "unseen_scenario_family",
+    "blind_judge_order_reversal"
+  ]
+}
