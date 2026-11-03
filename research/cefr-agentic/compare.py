@@ -56,13 +56,16 @@ def paired(arm, reference, metric, replicates=2000):
 
 
 report = {"unit": "scenario family (paired), percentile cluster bootstrap 2000x", "comparisons": {}}
-for metric in ["cefr_control", "complexity_gap", "joint_pass", "hard_pass", "morphosyntactic_correctness", "natural_hebrew"]:
+for metric in ["cefr_control", "complexity_gap", "joint_pass", "hard_pass", "morphosyntactic_correctness", "natural_hebrew", "cefr_suitability", "multi_turn_coherence"]:
     report["comparisons"][metric] = {}
-    for arm, reference in [
+    import os
+    default_pairs = [
         ("agent_rank1", "raw_base"), ("agent_rank1", "random_rank1"), ("agent_rank1", "wrong_level_gate"),
         ("agent_rank1", "best_of_2"), ("agent_rank1", "strong_prompt"),
         ("strong_prompt", "raw_base"), ("best_of_2", "raw_base"),
-    ]:
+    ]
+    pairs = [tuple(p.split(":")) for p in os.environ["COMPARE_PAIRS"].split(",")] if os.environ.get("COMPARE_PAIRS") else default_pairs
+    for arm, reference in pairs:
         if any(e["arm"] == arm for e in episodes) and any(e["arm"] == reference for e in episodes):
             report["comparisons"][metric][f"{arm} - {reference}"] = paired(arm, reference, metric)
 json.dump(report, open(out_path, "w"), indent=1)

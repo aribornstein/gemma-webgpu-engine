@@ -130,18 +130,20 @@ if (command === "calibration") {
   const [prefix, analysisName] = args;
   const analysis = JSON.parse(readFileSync(resolve(OUT, `episodes-${analysisName}.analysis.json`), "utf8")).episodes;
   const byKey = Object.fromEntries(analysis.map((row) => [row.key, { ...row }]));
-  for (const role of ["language", "cefr", "level", "conversation"]) {
+  for (const role of ["language", "cefr", "level", "conversation", "level2"]) {
     for (const row of prefix.split(",").flatMap((p) => collected(`${p}-${role}`))) {
       const target = byKey[row.item_id];
       if (!target) continue;
       for (const rating of row.ratings ?? []) target[rating.criterion] = rating.score;
       if (role === "level") target.estimated_level = row.estimated_level;
+      if (role === "level2") target.estimated_level_reserved = row.estimated_level;
       target.critical = [...(target.critical ?? []), ...(row.critical_violation_codes ?? [])];
     }
   }
   const rows = Object.values(byKey);
   for (const row of rows) {
     row.estimated_level_value = LEVELS[row.estimated_level] ?? null;
+    row.estimated_level_reserved_value = LEVELS[row.estimated_level_reserved] ?? null;
     row.joint_pass = (row.cefr_suitability ?? 0) >= 3 && (row.morphosyntactic_correctness ?? 0) >= 3 &&
       (row.natural_hebrew ?? 0) >= 3 && row.hard_pass;
   }
@@ -175,7 +177,8 @@ if (command === "calibration") {
   // between the strong-prompt episodes with seeds 23 and 47.
   const selected = [];
   for (const row of rows.filter((r) => r.arm === "strong_prompt")) {
-    const other = rows.find((r) => r.arm === "best_of_2_candidate" && r.scenarioId === row.scenarioId && r.level === row.level);
+    const other = rows.find((r) => r.arm === "best_of_2_candidate" && r.scenarioId === row.scenarioId && r.level === row.level && r.seed === row.seed + 1000) ??
+      rows.find((r) => r.arm === "best_of_2_candidate" && r.scenarioId === row.scenarioId && r.level === row.level);
     if (!other) continue;
     const value = (r) => (r.cefr_suitability ?? 0) * 10 + ((r.morphosyntactic_correctness ?? 0) + (r.natural_hebrew ?? 0)) / 2;
     selected.push({ ...(value(other) > value(row) ? other : row), arm: "best_of_2" });

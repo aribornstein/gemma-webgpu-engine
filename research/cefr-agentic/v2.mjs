@@ -115,19 +115,21 @@ if (command === "directions") {
       return config.sites.map((layer) => {
         const site = directions[`residual${layer}`];
         const direction = site[config.type];
+        // Random controls borrow the magnitude of the direction type they control for.
+        const magnitude = config.type === "random" || config.type === "permuted" ? site[config.controlFor ?? "instr"].magnitude : direction.magnitude;
         return {
           id: `${config.arm}@${layer}`,
           site: { layer },
           a: site.a,
           b: direction.b,
-          coefficient: (gate * config.m * direction.magnitude) / site.s / config.sites.length,
+          coefficient: (gate * config.m * magnitude) / site.s / config.sites.length,
         };
       });
     };
     for (const scenario of scenarios) {
       for (const level of ["A1", "B2"]) {
         for (const seed of seeds) {
-          const job = { scenario, level, arm: config.arm, policy: config.policy ?? "canonical", seed, turns, overlays: overlays(level) };
+          const job = { scenario, level, arm: config.arm, policy: config.policy ?? "canonical", seed: seed + (config.seedOffset ?? 0), turns, overlays: overlays(level) };
           job.key = `${config.arm}|${scenario.scenario_id}|${level}|${seed}`;
           jobs.push(job);
         }

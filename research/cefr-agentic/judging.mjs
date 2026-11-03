@@ -32,6 +32,12 @@ export const ROLES = {
     instructions:
       "Estimate the CEFR level (A1, A2, B1, B2, C1 or C2) of the NPC's Hebrew language: vocabulary range, sentence length and structure, subordinate clauses, connectives, abstraction. Judge the language actually produced, not the topic. Use null only if there is too little Hebrew to tell.",
   },
+  level2: {
+    criteria: [],
+    showTargetLevel: false,
+    instructions:
+      "Reserved second level rater. Read only the NPC turns and decide which CEFR band (A1, A2, B1, B2, C1, C2) a learner would need to understand them comfortably. Consider word frequency, morphology, sentence length, clause embedding and discourse connectives. Ignore content correctness. Use null only if there is almost no Hebrew.",
+  },
   conversation: {
     criteria: ["character_register_fidelity", "multi_turn_coherence"],
     showTargetLevel: false,
@@ -75,7 +81,7 @@ if (command === "prepare") {
     spec.criteria.length ? ANCHORS : "",
     `Rubric version: hebrew-cefr-1.0. Criteria to rate: ${spec.criteria.join(", ") || "(none; estimate level only)"}.`,
     "Output exactly one JSON object per item, one per line (JSONL), in the same order, each with keys:",
-    `episode_id (the item_id), judge_model_id (your model name if known, else "unknown"), rubric_version "hebrew-cefr-1.0", ratings (array of {criterion, score (0-4 integer or null), insufficient_evidence (bool), hard_violation (bool), evidence: [{span, finding}] up to 3}), estimated_level (A1/A2/B1/B2/C1/C2 or null)${role === "level" ? " (required)" : " (null)"}, critical_violation_codes (array of short codes), overall_abstain (bool), short_summary (one sentence).`,
+    `episode_id (the item_id), judge_model_id (your model name if known, else "unknown"), rubric_version "hebrew-cefr-1.0", ratings (array of {criterion, score (0-4 integer or null), insufficient_evidence (bool), hard_violation (bool), evidence: [{span, finding}] up to 3}), estimated_level (A1/A2/B1/B2/C1/C2 or null)${role === "level" || role === "level2" ? " (required)" : " (null)"}, critical_violation_codes (array of short codes), overall_abstain (bool), short_summary (one sentence).`,
   ].filter(Boolean).join("\n");
   writeFileSync(resolve(DIR, `${name}.prompt.txt`), prompt);
   writeFileSync(resolve(DIR, `${name}.items.json`), JSON.stringify({ role, criteria: spec.criteria, items: shown }, null, 1));
