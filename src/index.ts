@@ -1,6 +1,8 @@
 export {
   GemmaGenerationSession,
   loadGemmaGenerationSession,
+  type GemmaBeamSearchHypothesis,
+  type GemmaBeamSearchSummary,
   type GemmaGenerationResult,
   type GemmaGenerationStopReason,
   type GemmaGenerationTiming,
@@ -11,8 +13,14 @@ export {
 export {
   DEFAULT_GENERATION_CONFIG,
   resolveGemmaGenerationConfig,
+  type GemmaBeamSearchProgress,
   type GemmaGenerationOptions,
 } from "./runtime/generation-config";
+export {
+  DEFAULT_BEAM_SEARCH_OPTIONS,
+  MAX_BEAM_SEARCH_BEAMS,
+  type BeamSearchOptions,
+} from "./runtime/beam-search";
 export {
   compileGenerationConstraint,
   type GenerationConstraint,

@@ -58,31 +58,47 @@ function scratchFor(length: number): SamplingScratch {
 }
 
 /**
+ * Applies `cap * tanh(logit / cap)` in f64. Non-finite values (constraint masks) pass through so
+ * masked tokens stay impossible. The transform is strictly monotonic, so it never changes an
+ * argmax of distinct values.
+ */
+export function softcapLogit(value: number, cap: number | undefined): number {
+  if (cap === undefined || !Number.isFinite(value)) return value;
+  return cap * Math.tanh(value / cap);
+}
+
+function validateSoftcap(cap: number | undefined): void {
+  if (cap !== undefined && (!Number.isFinite(cap) || cap <= 0)) {
+    throw new Error("Logit softcap must be a positive finite number");
+  }
+}
+
+/**
  * Selects the next token. Results are identical to a stable descending sort of every scaled
  * logit followed by top-k, min-p, typical-p, and top-p filtering in that order; the ordering is
  * produced by a stable radix sort and probabilities are accumulated in the same rank order.
+ * `logitSoftcap` applies the model's final-logit softcap before penalties and temperature, matching
+ * where the reference model applies it (inside the forward pass).
  */
-export function sampleToken(rawLogits: ArrayLike<number>, history: readonly number[], config: DecodingConfig, random: () => number): number {
+export function sampleToken(
+  rawLogits: ArrayLike<number>,
+  history: readonly number[],
+  config: DecodingConfig,
+  random: () => number,
+  logitSoftcap?: number,
+): number {
   if (rawLogits.length === 0) throw new Error("Cannot sample empty logits");
+  validateSoftcap(logitSoftcap);
   const length = rawLogits.length;
   const buffers = scratchFor(length);
   const logits = buffers.logits;
   let hasNaN = false;
   for (let index = 0; index < length; index += 1) {
     const value = rawLogits[index];
-    logits[index] = value;
+    logits[index] = softcapLogit(value, logitSoftcap);
     if (value !== value) hasNaN = true;
   }
-  const counts = new Map<number, number>();
-  const recentHistory = config.repetitionWindow === 0
-    ? []
-    : history.slice(-config.repetitionWindow);
-  for (const token of recentHistory) counts.set(token, (counts.get(token) ?? 0) + 1);
-  for (const [token, count] of counts) {
-    if (token < 0 || token >= length) continue;
-    logits[token] = logits[token] < 0 ? logits[token] * config.repetitionPenalty : logits[token] / config.repetitionPenalty;
-    logits[token] -= config.presencePenalty + count * config.frequencyPenalty;
-  }
+  applyHistoryPenalties(logits, length, history, config);
   if (config.temperature === 0) return argmax(logits);
 
   const scaled = buffers.scaled;
@@ -108,8 +124,22 @@ export function sampleToken(rawLogits: ArrayLike<number>, history: readonly numb
   }
   for (let rank = 0; rank < length; rank += 1) probabilities[rank] /= total;
 
+  return selectRankedCandidate(order, probabilities, length, config, random, buffers.candidates);
+}
+
+/**
+ * Applies top-k, min-p, typical-p, and top-p to rank-ordered tokens and draws one. `order[rank]`
+ * is the token at `rank` and `probabilities[rank]` its full-vocabulary probability.
+ */
+function selectRankedCandidate(
+  order: ArrayLike<number>,
+  probabilities: ArrayLike<number>,
+  length: number,
+  config: DecodingConfig,
+  random: () => number,
+  candidates: Uint32Array,
+): number {
   // Candidates are ranks into `order`/`probabilities`, kept in descending-probability order.
-  const candidates = buffers.candidates;
   let candidateCount = config.topK > 0 ? Math.min(config.topK, length) : length;
   for (let rank = 0; rank < candidateCount; rank += 1) candidates[rank] = rank;
   if (config.minP > 0) {
@@ -152,19 +182,61 @@ export function sampleToken(rawLogits: ArrayLike<number>, history: readonly numb
   return order[candidates[candidateCount - 1]];
 }
 
-export function tokenLogProbability(rawLogits: ArrayLike<number>, token: number): number {
+/**
+ * Samples from GPU-selected top candidates. `tokenIds`/`rawLogits` must be the first ranks of a
+ * stable descending order of the raw logits (ties by lower token ID), at least `config.topK` long,
+ * and `tailMass` must be `sum(exp(scaled - scaledMax))` over every token ranked after
+ * `config.topK`. Softcap and temperature are strictly monotonic, so this is the same candidate
+ * set and order `sampleToken` builds; only the softmax normalizer's tail term comes from the
+ * caller, which can move a top-p cutoff that sits within that term's rounding error.
+ */
+export function sampleTopCandidates(
+  tokenIds: ArrayLike<number>,
+  rawLogits: ArrayLike<number>,
+  tailMass: number,
+  config: DecodingConfig,
+  random: () => number,
+  logitSoftcap?: number,
+): number {
+  validateSoftcap(logitSoftcap);
+  if (!(config.temperature > 0)) throw new Error("Top-candidate sampling requires a positive temperature");
+  const count = config.topK;
+  if (!Number.isInteger(count) || count < 1 || count > tokenIds.length || count > rawLogits.length) {
+    throw new Error("Top-candidate sampling needs at least topK ranked candidates");
+  }
+  if (!Number.isFinite(tailMass) || tailMass < 0) throw new Error("Top-candidate tail mass must be finite");
+  const probabilities = new Float64Array(count);
+  const maximum = softcapLogit(rawLogits[0], logitSoftcap) / config.temperature;
+  if (!Number.isFinite(maximum)) throw new Error("Top-candidate sampling needs a finite maximum");
+  let total = 0;
+  for (let rank = 0; rank < count; rank += 1) {
+    const probability = Math.exp(softcapLogit(rawLogits[rank], logitSoftcap) / config.temperature - maximum);
+    probabilities[rank] = probability;
+    total += probability;
+  }
+  total += tailMass;
+  for (let rank = 0; rank < count; rank += 1) probabilities[rank] /= total;
+  return selectRankedCandidate(tokenIds, probabilities, count, config, random, new Uint32Array(count));
+}
+
+export function tokenLogProbability(
+  rawLogits: ArrayLike<number>,
+  token: number,
+  logitSoftcap?: number,
+): number {
   if (!Number.isInteger(token) || token < 0 || token >= rawLogits.length) {
     throw new Error(`Token ${token} is outside logits length ${rawLogits.length}`);
   }
+  validateSoftcap(logitSoftcap);
   let maximum = Number.NEGATIVE_INFINITY;
   for (let index = 0; index < rawLogits.length; index += 1) {
-    maximum = Math.max(maximum, rawLogits[index]);
+    maximum = Math.max(maximum, softcapLogit(rawLogits[index], logitSoftcap));
   }
   let denominator = 0;
   for (let index = 0; index < rawLogits.length; index += 1) {
-    denominator += Math.exp(rawLogits[index] - maximum);
+    denominator += Math.exp(softcapLogit(rawLogits[index], logitSoftcap) - maximum);
   }
-  return rawLogits[token] - maximum - Math.log(denominator);
+  return softcapLogit(rawLogits[token], logitSoftcap) - maximum - Math.log(denominator);
 }
 
 function sortCandidatesByComparator(scaledLogits: Float64Array): SamplingCandidate[] {
@@ -275,6 +347,54 @@ function descendingStableOrder(values: Float64Array, buffers: SamplingScratch): 
   }
   // After an even number of passes the result is back in `buffers.order`.
   return order;
+}
+
+function applyHistoryPenalties(
+  logits: Float64Array,
+  length: number,
+  history: readonly number[],
+  config: DecodingConfig,
+): void {
+  const counts = new Map<number, number>();
+  const recentHistory = config.repetitionWindow === 0
+    ? []
+    : history.slice(-config.repetitionWindow);
+  for (const token of recentHistory) counts.set(token, (counts.get(token) ?? 0) + 1);
+  for (const [token, count] of counts) {
+    if (token < 0 || token >= length) continue;
+    logits[token] = logits[token] < 0 ? logits[token] * config.repetitionPenalty : logits[token] / config.repetitionPenalty;
+    logits[token] -= config.presencePenalty + count * config.frequencyPenalty;
+  }
+}
+
+/**
+ * Log-softmax of the logits after the softcap and history penalties that `sampleToken` applies.
+ * Temperature and truncation filters are not applied; beam search scores the full distribution.
+ * The returned array is owned by the caller.
+ */
+export function processedLogProbabilities(
+  rawLogits: ArrayLike<number>,
+  history: readonly number[],
+  config: DecodingConfig,
+  logitSoftcap?: number,
+): Float64Array {
+  validateSoftcap(logitSoftcap);
+  const length = rawLogits.length;
+  const values = new Float64Array(length);
+  for (let index = 0; index < length; index += 1) {
+    values[index] = softcapLogit(rawLogits[index], logitSoftcap);
+  }
+  applyHistoryPenalties(values, length, history, config);
+  let maximum = Number.NEGATIVE_INFINITY;
+  for (let index = 0; index < length; index += 1) {
+    if (values[index] > maximum) maximum = values[index];
+  }
+  if (!Number.isFinite(maximum)) throw new Error("Cannot normalize logits without a finite maximum");
+  let denominator = 0;
+  for (let index = 0; index < length; index += 1) denominator += Math.exp(values[index] - maximum);
+  const normalizer = maximum + Math.log(denominator);
+  for (let index = 0; index < length; index += 1) values[index] -= normalizer;
+  return values;
 }
 
 function argmax(values: Float64Array): number {

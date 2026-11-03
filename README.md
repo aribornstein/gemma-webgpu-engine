@@ -218,11 +218,12 @@ decoding: the first step permits either a schema-valid answer prefix or Gemma's 
 opener. If reasoning begins, its channel remains unconstrained and the grammar resumes immediately
 after `<channel|>`; otherwise the direct final answer is constrained from its first token.
 
-The console owns one persistent session and exposes exact greedy or seeded sampling, every penalty
-and probability control, custom stop IDs, regex/JSON/closed-schema constraints, streamed output,
-and cancellation. Editable examples populate the prompt and matching controls for greedy, sampling,
-regex, bounded JSON, closed JSON Schema, two Hebrew best-of-N methods, and reasoning-backed Schema
-generation. Both best-of-N examples accept any safe integer of at least 2 seed-diverse Hebrew
+The console owns one persistent session and exposes exact greedy or seeded sampling (defaulting to
+the model card's recommended temperature 1, top-k 64, top-p 0.95), every penalty and probability
+control, beam search, custom stop IDs, regex/JSON/closed-schema constraints, streamed output, and
+cancellation. Editable examples populate the prompt and matching controls for greedy, sampling,
+beam search, regex, bounded JSON, closed JSON Schema, two Hebrew best-of-N methods, and
+reasoning-backed Schema generation. Both best-of-N examples accept any safe integer of at least 2 seed-diverse Hebrew
 candidates from A1 through official CEFR C2 plus an experimental C3 stress test. The comparative
 judge method exposes separate editable generation and judge prompts. Configure 1–4 judge rounds;
 every judge evaluates all candidates together in one call, with its ordering sampled without
@@ -268,13 +269,62 @@ differences from sequential prefill come from accumulation order and rarely chan
 `npm run test:prefill-parity` checks next-token agreement against sequential prefill with a real
 model cache.
 Temperature, top-k, top-p, min-p, typical-p, repetition, frequency, and presence controls are
-available directly on `generate()`, with one seeded PRNG per request. The implicit default remains
-exact greedy generation for backward compatibility. Neutral greedy requests retain the existing
-eight-byte GPU argmax readback; sampling and penalty requests reuse one persistent full-logit GPU
-readback buffer and perform deterministic CPU token selection without per-token GPU allocation.
-Constrained requests use that same resident readback, mask it to tokenizer-byte-trie candidates,
-and then run the configured deterministic selection pipeline. Unconstrained greedy routing is
-unchanged.
+available directly on `generate()`, with one seeded PRNG per request. The implicit library default
+remains exact greedy generation for backward compatibility; the console instead starts from the
+model card's recommended sampling (`generation_config.json`: temperature 1, top-k 64, top-p 0.95).
+Every CPU selection path applies the model's final-logit softcap, `30 * tanh(logit / 30)`
+(`final_logit_softcapping`), before penalties, temperature, constraint masking, and log
+probabilities, matching where the reference model applies it. Earlier builds skipped it, which left
+greedy output unchanged (tanh is monotonic) but made sampled distributions, penalties, and log
+probabilities sharper than the reference. Neutral greedy requests retain the existing eight-byte GPU
+argmax readback. Plain top-k sampling (top-k 1–256 without active history penalties, constraints,
+reasoning masks, or log-probability capture) ranks candidates on the GPU and reads back only the
+top-k list plus the softmax tail mass; because softcap and temperature are monotonic this is the
+CPU sampler's exact candidate set and order, and only the tail term of the softmax normalizer comes
+from an f32 GPU sum. That route brings recommended-sampling decode to within about 2 ms per token of
+greedy (about 16.5 ms versus 25–27 ms with full-logit readback on an M-series GPU). Other sampling
+and penalty requests reuse one persistent full-logit GPU readback buffer and perform deterministic
+CPU token selection without per-token GPU allocation. Constrained requests use that same resident
+readback, mask it to tokenizer-byte-trie candidates, and then run the configured deterministic
+selection pipeline. Unconstrained greedy routing is unchanged.
+
+### Beam search
+
+`beamSearch` enables deterministic beam search on the same session:
+
+```ts
+const result = await session.generate("Recite the gettysburg address by lincoln", {
+	temperature: 0,
+	maxNewTokens: 400,
+	beamSearch: { numBeams: 4, lengthPenalty: 1, noRepeatNgramSize: 5, earlyStopping: false },
+	onBeamSearchProgress: ({ step, maxSteps, bestText }) => console.log(step, maxSteps, bestText),
+});
+console.log(result.text);
+console.log(result.beamSearch?.hypotheses); // kept hypotheses, best first, with scores
+```
+
+Each step expands every beam by its `2 * numBeams` most likely tokens (softcapped log
+probabilities after history penalties), keeps the best `numBeams` continuations, and finishes a
+hypothesis when an end or stop token ranks inside the first `numBeams` candidates. Hypotheses are
+ranked by `sumLogProbability / length ** lengthPenalty`; `earlyStopping: false` uses the Hugging Face
+`early_stopping=False` stopping heuristic. `noRepeatNgramSize` (Hugging Face `no_repeat_ngram_size`,
+applied to generated tokens) bans any repeated n-gram, which blocks the repetition loops beam
+search is prone to. Every beam attends to exactly its own history: generated K/V rows live in
+per-beam GPU slots and are restored into the shared caches before that beam's token is evaluated
+(sliding-window caches only receive rows still inside the window), and the caches are truncated back
+to the prompt afterwards so prompt-cache reuse stays valid. Beam search requires `temperature: 0`,
+cannot be combined with constraints or required reasoning, emits its tokens once the search ends,
+and costs one decode per beam per step (the slots need `2 * numBeams * maxNewTokens * 36 KiB`, capped
+at 1 GiB). One beam reproduces greedy decoding token for token.
+
+On "Recite the gettysburg address by lincoln", greedy decoding takes the thin-margin fork "testing
+whether that nation, acceded…" (the model's own top choice there) and then loops. Four or eight
+beams with 5-gram blocking recite "…or any nation so conceived and so dedicated, can long endure.
+We are met on a great battlefield of that war…" through "It is altogether fitting and proper that
+we should do this," then paraphrase the rest and stop on the end token (precision against the real
+text 82–87% versus 31% greedy). Without n-gram blocking the beams loop like greedy. The console's
+`Gettysburg Address · Beam search` example runs this configuration and lists every kept hypothesis
+with its score.
 Accepted tokens stream through an awaited `onToken` callback with the token ID, token index, a
 snapshot of all generated IDs, and the authoritative accumulated decoded text. Awaiting the handler
 provides backpressure. `AbortSignal` cancellation is cooperative at safe runtime boundaries:

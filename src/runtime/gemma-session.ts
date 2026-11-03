@@ -20,12 +20,20 @@ import {
 import {
   destroyGemmaDecodeModelResources,
   loadGemmaDecodeModelResources,
+  prepareGemmaTopCandidates,
+  readGemmaCurrentLogits,
   submitGemmaDecodeModel,
   type GemmaDecodeModelResources,
   type GemmaModelOutput,
   type GemmaModelOutputMode,
 } from "../webgpu/decode-model";
 import { updateGemmaDecodeStackToken } from "../webgpu/decode-stack";
+import {
+  GEMMA_MAX_GPU_TOP_K,
+  gemmaTopCandidateListLength,
+  updateGemmaTopCandidates,
+  type GemmaTopCandidateResources,
+} from "../webgpu/decode-top-candidates";
 import {
   destroyGemmaVisionImageResources,
   encodeGemmaVisionImage,
@@ -54,6 +62,7 @@ import {
 import {
   resolveGemmaGenerationConfig,
   usesGemmaGpuGreedy,
+  type GemmaBeamSearchProgress,
   type GemmaGenerationOptions,
 } from "./generation-config";
 import type { DecodingConfig } from "./decoding";
@@ -92,7 +101,21 @@ import {
   GEMMA_VIDEO_MAX_FRAMES,
   prepareGemmaVideo,
 } from "./gemma-video-input";
-import { sampleToken, SeededRandom, tokenLogProbability } from "./sampling";
+import {
+  processedLogProbabilities,
+  sampleTopCandidates,
+  sampleToken,
+  SeededRandom,
+  tokenLogProbability,
+} from "./sampling";
+import {
+  resolveBeamSearchOptions,
+  runBeamSearch,
+  type BeamHypothesis,
+  type BeamSearchOptions,
+  type BeamSearchResult,
+} from "./beam-search";
+import { DecodeKvBeamSlots } from "../webgpu/decode-kv-beam-slots";
 import {
   countGemmaReasoningTokens,
   parseGemmaResponse,
@@ -116,13 +139,30 @@ import {
   sameGemmaMultimodalIdentity,
 } from "./gemma-prompt-cache";
 
-export type { GemmaGenerationOptions } from "./generation-config";
+export type { GemmaBeamSearchProgress, GemmaGenerationOptions } from "./generation-config";
+export type { BeamSearchOptions } from "./beam-search";
 export type { GemmaGenerationUpdate } from "./generation-control";
 export type { GemmaPrefillMode, GemmaPrefillStrategy } from "./gemma-prefill-plan";
 
 export type GemmaGenerationStopReason = "end-token" | "stop-token" | "length";
 const GEMMA_REQUIRED_REASONING_TOKENS = 16;
 const GEMMA_MAX_REQUIRED_REASONING_TOKENS = 64;
+
+export interface GemmaBeamSearchHypothesis {
+  text: string;
+  tokenIds: readonly number[];
+  /** Length-normalized score used to rank hypotheses. */
+  score: number;
+  sumLogProbability: number;
+  stopReason: GemmaGenerationStopReason;
+}
+
+export interface GemmaBeamSearchSummary {
+  options: BeamSearchOptions;
+  steps: number;
+  /** Kept hypotheses, best first; the first one is the returned generation. */
+  hypotheses: readonly GemmaBeamSearchHypothesis[];
+}
 
 export interface GemmaGenerationResult {
   text: string;
@@ -141,6 +181,7 @@ export interface GemmaGenerationResult {
   stoppedOnEndToken: boolean;
   stoppedOnStopToken: boolean;
   stopReason: GemmaGenerationStopReason;
+  beamSearch?: GemmaBeamSearchSummary;
 }
 
 export interface GemmaGenerationTiming {
@@ -247,6 +288,9 @@ interface GemmaSoftTokenSource {
 }
 
 const GEMMA_PAD_TOKEN_ID = 0;
+// `text_config.final_logit_softcapping`; the GPU greedy path is unaffected because tanh is monotonic.
+const GEMMA_FINAL_LOGIT_SOFTCAP = 30;
+const GEMMA_BEAM_SEARCH_MAX_SLOT_BYTES = 1024 * 2 ** 20;
 const GEMMA_TEXT_HIDDEN_SIZE = 1536;
 const GEMMA_TOKEN_INPUT_CACHE_CAPACITY = 256;
 const GEMMA_DEFAULT_MAX_IN_FLIGHT_PREFILL_BLOCKS = 4;
@@ -429,6 +473,8 @@ export class GemmaGenerationSession {
       requireReasoning = false,
       reusePromptCache = true,
       captureTokenLogProbabilities = false,
+      beamSearch,
+      onBeamSearchProgress,
       ...decodingOptions
     } = options;
     throwIfGemmaGenerationAborted(callerSignal);
@@ -440,6 +486,22 @@ export class GemmaGenerationSession {
     const config = resolveGemmaGenerationConfig(decodingOptions);
     if (requireReasoning && !usesGemmaThinking(input)) {
       throw new Error("Required reasoning needs enableThinking");
+    }
+    const beamOptions = beamSearch === undefined ? null : resolveBeamSearchOptions(beamSearch);
+    if (beamOptions) {
+      if (config.temperature !== 0) {
+        throw new Error("Beam search is deterministic and requires temperature 0");
+      }
+      if (constraint) throw new Error("Beam search cannot be combined with a generation constraint");
+      if (requireReasoning) throw new Error("Beam search cannot be combined with required reasoning");
+      const slotBytes = this.beamSlotBytes(beamOptions.numBeams, config.maxNewTokens);
+      if (slotBytes > GEMMA_BEAM_SEARCH_MAX_SLOT_BYTES) {
+        throw new Error(
+          `Beam search with ${beamOptions.numBeams} beams and ${config.maxNewTokens} new tokens needs ` +
+          `${Math.ceil(slotBytes / 2 ** 20)} MiB of K/V slots, above the ` +
+          `${GEMMA_BEAM_SEARCH_MAX_SLOT_BYTES / 2 ** 20} MiB limit; reduce numBeams or maxNewTokens`,
+        );
+      }
     }
     const compiledConstraint = constraint
       ? compileGenerationConstraint(constraint)
@@ -453,10 +515,18 @@ export class GemmaGenerationSession {
       ? [GEMMA_START_CHANNEL_TOKEN_ID, ...this.tokenizer.encodeText("thought\n")]
       : [];
     const outputMode: GemmaModelOutputMode = compiledConstraint || requireReasoning ||
-      captureTokenLogProbabilities ||
+      captureTokenLogProbabilities || beamOptions ||
       !usesGemmaGpuGreedy(config)
       ? "logits"
       : "greedy";
+    // Plain top-k sampling selects candidates on the GPU and reads back only those; the ranked
+    // candidates are exactly the CPU sampler's (softcap and temperature are monotonic).
+    const usesGpuCandidates = outputMode === "logits" && !compiledConstraint && !requireReasoning &&
+      !captureTokenLogProbabilities && !beamOptions && config.temperature > 0 &&
+      config.topK >= 1 && config.topK <= GEMMA_MAX_GPU_TOP_K &&
+      (config.repetitionWindow === 0 || (
+        config.repetitionPenalty === 1 && config.frequencyPenalty === 0 && config.presencePenalty === 0
+      ));
     const maxNewTokens = config.maxNewTokens;
     this.generating = true;
     this.activeGeneration = lifecycle;
@@ -464,6 +534,22 @@ export class GemmaGenerationSession {
     const visionResources: GemmaVisionImageResources[] = [];
     const audioResources: GemmaAudioEncodingResources[] = [];
     try {
+      let topCandidates: GemmaTopCandidateResources | undefined;
+      if (usesGpuCandidates) {
+        topCandidates = await prepareGemmaTopCandidates(
+          this.device,
+          this.resources,
+          gemmaTopCandidateListLength(config.topK),
+        );
+        updateGemmaTopCandidates(
+          this.device,
+          topCandidates,
+          config.topK,
+          GEMMA_FINAL_LOGIT_SOFTCAP,
+          config.temperature,
+        );
+      }
+      const decodeOutputMode: GemmaModelOutputMode = topCandidates ? "candidates" : outputMode;
       const preparedPrompt = await this.prepareGenerationInput(
         input,
         signal,
@@ -684,113 +770,183 @@ export class GemmaGenerationSession {
       const customStopTokens = new Set(config.stopTokenIds);
       let stoppedOnEndToken = false;
       let stoppedOnStopToken = false;
-      for (let index = 0; index < maxNewTokens; index += 1) {
-        throwIfGemmaGenerationAborted(signal);
-        let token = modelOutput.prediction?.token ?? 0;
-        if (outputMode === "greedy" && !modelOutput.prediction) {
-          throw new Error("Gemma greedy mode produced no prediction");
-        }
-        if (index < forcedReasoningPrefix.length) {
-          token = forcedReasoningPrefix[index];
-        } else if (requireReasoning && inReasoningChannel) {
-          if (reasoningContentTokens >= GEMMA_MAX_REQUIRED_REASONING_TOKENS) {
-            token = GEMMA_END_CHANNEL_TOKEN_ID;
-          } else {
-            const logits = this.maskReasoningLogits(
-              requiredGemmaLogits(modelOutput),
-              reasoningContentTokens >= GEMMA_REQUIRED_REASONING_TOKENS,
-            );
-            token = sampleToken(logits, history, config, () => random.next());
-          }
-        } else if (compiledConstraint && tokenByteTrie && constraintActive) {
-          const logits = requiredGemmaLogits(modelOutput);
-          throwIfGemmaGenerationAborted(signal);
-          token = this.selectConstrainedToken(
-            logits,
-            history,
-            config,
-            random,
-            compiledConstraint,
-            tokenByteTrie,
-            customStopTokens,
-            allowReasoningChannel ? [GEMMA_START_CHANNEL_TOKEN_ID] : [],
-          );
-        } else if (!modelOutput.prediction) {
-          // Logits mode without a GPU prediction (sampling, penalties, reasoning, released
-          // constraints, or greedy with log-probability capture) selects on the CPU.
-          const logits = requiredGemmaLogits(modelOutput);
-          throwIfGemmaGenerationAborted(signal);
-          token = sampleToken(logits, history, config, () => random.next());
-        }
-        if (this.activeTiming && this.activeTiming.timeToFirstTokenMs === null) {
-          this.activeTiming.timeToFirstTokenMs = performance.now() - this.activeTiming.startedAt;
-        }
-        if (this.tokenizer.isEndToken(token)) {
-          stoppedOnEndToken = true;
-          break;
-        }
-        if (customStopTokens.has(token)) {
-          stoppedOnStopToken = true;
-          break;
-        }
-        const logProbability = captureTokenLogProbabilities
-          ? tokenLogProbability(requiredGemmaLogits(modelOutput), token)
-          : null;
-        const startsReasoningChannel = allowReasoningChannel &&
-          token === GEMMA_START_CHANNEL_TOKEN_ID;
-        allowReasoningChannel = false;
-        if (startsReasoningChannel) {
-          constraintActive = false;
-          inReasoningChannel = true;
-        } else if (compiledConstraint && constraintActive) {
-          const bytes = this.tokenizer.tokenBytes(token);
-          if (!bytes) throw new Error(`Constraint selected non-text token ${token}`);
-          compiledConstraint.acceptToken(bytes);
-        }
-        generatedTokenIds.push(token);
-        if (logProbability !== null) {
-          tokenLogProbabilities.push(logProbability);
-          if (inReasoningChannel && token !== GEMMA_END_CHANNEL_TOKEN_ID) {
-            reasoningLogProbability += logProbability;
-            confidenceReasoningTokenCount += 1;
-          } else if (!startsReasoningChannel && token !== GEMMA_END_CHANNEL_TOKEN_ID) {
-            answerLogProbability += logProbability;
-            confidenceAnswerTokenCount += 1;
-          }
-        }
-        history.push(token);
-        if (inReasoningChannel && token === GEMMA_END_CHANNEL_TOKEN_ID) {
-          inReasoningChannel = false;
-          if (compiledConstraint) constraintActive = true;
-        } else if (inReasoningChannel && index >= forcedReasoningPrefix.length) {
-          reasoningContentTokens += 1;
-        }
-        const tokenEmittedAt = performance.now();
-        if (this.activeTiming?.lastTokenEmittedAt !== null && this.activeTiming) {
-          this.activeTiming.interTokenLatencyMs.push(
-            tokenEmittedAt - this.activeTiming.lastTokenEmittedAt,
-          );
-        }
-        if (this.activeTiming) this.activeTiming.lastTokenEmittedAt = tokenEmittedAt;
-        const callbackStartedAt = performance.now();
-        await emitGemmaGenerationUpdate(
-          token,
-          generatedTokenIds,
-          (tokenIds) => this.tokenizer.decodeTokens(tokenIds),
-          onToken,
-          (tokenIds) => this.tokenizer.decodeRawTokens(tokenIds),
+      let beamSearchSummary: GemmaBeamSearchSummary | undefined;
+      if (beamOptions) {
+        const searched = await this.generateWithBeamSearch(
+          requiredGemmaLogits(modelOutput),
+          promptTokenIds,
+          config,
+          beamOptions,
+          customStopTokens,
+          signal,
+          onBeamSearchProgress,
         );
-        if (this.activeTiming) {
-          this.activeTiming.callbackMs += performance.now() - callbackStartedAt;
+        beamSearchSummary = {
+          options: beamOptions,
+          steps: searched.steps,
+          hypotheses: Object.freeze(searched.hypotheses.map((hypothesis) =>
+            this.describeBeamHypothesis(hypothesis))),
+        };
+        const best = searched.best;
+        let inReasoning = false;
+        for (let index = 0; index < best.tokenIds.length; index += 1) {
+          throwIfGemmaGenerationAborted(signal);
+          const token = best.tokenIds[index];
+          if (this.activeTiming && this.activeTiming.timeToFirstTokenMs === null) {
+            this.activeTiming.timeToFirstTokenMs = performance.now() - this.activeTiming.startedAt;
+          }
+          const startsReasoningChannel = index === 0 && allowReasoningChannel &&
+            token === GEMMA_START_CHANNEL_TOKEN_ID;
+          if (startsReasoningChannel) inReasoning = true;
+          generatedTokenIds.push(token);
+          history.push(token);
+          if (captureTokenLogProbabilities) {
+            const logProbability = best.tokenLogProbabilities[index];
+            tokenLogProbabilities.push(logProbability);
+            if (inReasoning && !startsReasoningChannel && token !== GEMMA_END_CHANNEL_TOKEN_ID) {
+              reasoningLogProbability += logProbability;
+              confidenceReasoningTokenCount += 1;
+            } else if (!inReasoning && token !== GEMMA_END_CHANNEL_TOKEN_ID) {
+              answerLogProbability += logProbability;
+              confidenceAnswerTokenCount += 1;
+            }
+          }
+          if (inReasoning && token === GEMMA_END_CHANNEL_TOKEN_ID) inReasoning = false;
+          const callbackStartedAt = performance.now();
+          await emitGemmaGenerationUpdate(
+            token,
+            generatedTokenIds,
+            (tokenIds) => this.tokenizer.decodeTokens(tokenIds),
+            onToken,
+            (tokenIds) => this.tokenizer.decodeRawTokens(tokenIds),
+          );
+          if (this.activeTiming) this.activeTiming.callbackMs += performance.now() - callbackStartedAt;
         }
-        throwIfGemmaGenerationAborted(signal);
-        if (index + 1 < maxNewTokens) {
-          const decodeStartedAt = performance.now();
-          modelOutput = await this.evaluateToken(token, undefined, outputMode);
+        stoppedOnEndToken = best.terminalTokenId !== null &&
+          this.tokenizer.isEndToken(best.terminalTokenId);
+        stoppedOnStopToken = best.terminalTokenId !== null && !stoppedOnEndToken;
+      } else {
+        for (let index = 0; index < maxNewTokens; index += 1) {
+          throwIfGemmaGenerationAborted(signal);
+          let token = modelOutput.prediction?.token ?? 0;
+          if (outputMode === "greedy" && !modelOutput.prediction) {
+            throw new Error("Gemma greedy mode produced no prediction");
+          }
+          if (index < forcedReasoningPrefix.length) {
+            token = forcedReasoningPrefix[index];
+          } else if (requireReasoning && inReasoningChannel) {
+            if (reasoningContentTokens >= GEMMA_MAX_REQUIRED_REASONING_TOKENS) {
+              token = GEMMA_END_CHANNEL_TOKEN_ID;
+            } else {
+              const logits = this.maskReasoningLogits(
+                requiredGemmaLogits(modelOutput),
+                reasoningContentTokens >= GEMMA_REQUIRED_REASONING_TOKENS,
+              );
+              token = sampleToken(logits, history, config, () => random.next(), GEMMA_FINAL_LOGIT_SOFTCAP);
+            }
+          } else if (compiledConstraint && tokenByteTrie && constraintActive) {
+            const logits = requiredGemmaLogits(modelOutput);
+            throwIfGemmaGenerationAborted(signal);
+            token = this.selectConstrainedToken(
+              logits,
+              history,
+              config,
+              random,
+              compiledConstraint,
+              tokenByteTrie,
+              customStopTokens,
+              allowReasoningChannel ? [GEMMA_START_CHANNEL_TOKEN_ID] : [],
+            );
+          } else if (modelOutput.candidates && modelOutput.candidates.nonFiniteCount === 0) {
+            const { tokenIds, logits, tailMass } = modelOutput.candidates;
+            token = sampleTopCandidates(
+              tokenIds,
+              logits,
+              tailMass,
+              config,
+              () => random.next(),
+              GEMMA_FINAL_LOGIT_SOFTCAP,
+            );
+          } else if (!modelOutput.prediction) {
+            // Logits mode without a GPU prediction (sampling, penalties, reasoning, released
+            // constraints, or greedy with log-probability capture) selects on the CPU, as does a
+            // candidates result that saw non-finite logits.
+            const logits = modelOutput.candidates
+              ? await readGemmaCurrentLogits(this.device, this.resources, this.logitsReadback)
+              : requiredGemmaLogits(modelOutput);
+            throwIfGemmaGenerationAborted(signal);
+            token = sampleToken(logits, history, config, () => random.next(), GEMMA_FINAL_LOGIT_SOFTCAP);
+          }
+          if (this.activeTiming && this.activeTiming.timeToFirstTokenMs === null) {
+            this.activeTiming.timeToFirstTokenMs = performance.now() - this.activeTiming.startedAt;
+          }
+          if (this.tokenizer.isEndToken(token)) {
+            stoppedOnEndToken = true;
+            break;
+          }
+          if (customStopTokens.has(token)) {
+            stoppedOnStopToken = true;
+            break;
+          }
+          const logProbability = captureTokenLogProbabilities
+            ? tokenLogProbability(requiredGemmaLogits(modelOutput), token, GEMMA_FINAL_LOGIT_SOFTCAP)
+            : null;
+          const startsReasoningChannel = allowReasoningChannel &&
+            token === GEMMA_START_CHANNEL_TOKEN_ID;
+          allowReasoningChannel = false;
+          if (startsReasoningChannel) {
+            constraintActive = false;
+            inReasoningChannel = true;
+          } else if (compiledConstraint && constraintActive) {
+            const bytes = this.tokenizer.tokenBytes(token);
+            if (!bytes) throw new Error(`Constraint selected non-text token ${token}`);
+            compiledConstraint.acceptToken(bytes);
+          }
+          generatedTokenIds.push(token);
+          if (logProbability !== null) {
+            tokenLogProbabilities.push(logProbability);
+            if (inReasoningChannel && token !== GEMMA_END_CHANNEL_TOKEN_ID) {
+              reasoningLogProbability += logProbability;
+              confidenceReasoningTokenCount += 1;
+            } else if (!startsReasoningChannel && token !== GEMMA_END_CHANNEL_TOKEN_ID) {
+              answerLogProbability += logProbability;
+              confidenceAnswerTokenCount += 1;
+            }
+          }
+          history.push(token);
+          if (inReasoningChannel && token === GEMMA_END_CHANNEL_TOKEN_ID) {
+            inReasoningChannel = false;
+            if (compiledConstraint) constraintActive = true;
+          } else if (inReasoningChannel && index >= forcedReasoningPrefix.length) {
+            reasoningContentTokens += 1;
+          }
+          const tokenEmittedAt = performance.now();
+          if (this.activeTiming?.lastTokenEmittedAt !== null && this.activeTiming) {
+            this.activeTiming.interTokenLatencyMs.push(
+              tokenEmittedAt - this.activeTiming.lastTokenEmittedAt,
+            );
+          }
+          if (this.activeTiming) this.activeTiming.lastTokenEmittedAt = tokenEmittedAt;
+          const callbackStartedAt = performance.now();
+          await emitGemmaGenerationUpdate(
+            token,
+            generatedTokenIds,
+            (tokenIds) => this.tokenizer.decodeTokens(tokenIds),
+            onToken,
+            (tokenIds) => this.tokenizer.decodeRawTokens(tokenIds),
+          );
           if (this.activeTiming) {
-            this.activeTiming.decodeTokenMs.push(performance.now() - decodeStartedAt);
+            this.activeTiming.callbackMs += performance.now() - callbackStartedAt;
           }
           throwIfGemmaGenerationAborted(signal);
+          if (index + 1 < maxNewTokens) {
+            const decodeStartedAt = performance.now();
+            modelOutput = await this.evaluateToken(token, undefined, decodeOutputMode, topCandidates);
+            if (this.activeTiming) {
+              this.activeTiming.decodeTokenMs.push(performance.now() - decodeStartedAt);
+            }
+            throwIfGemmaGenerationAborted(signal);
+          }
         }
       }
       if (compiledConstraint && !compiledConstraint.accepting) {
@@ -827,6 +983,7 @@ export class GemmaGenerationSession {
         stopReason: stoppedOnEndToken
           ? "end-token"
           : stoppedOnStopToken ? "stop-token" : "length",
+        ...(beamSearchSummary ? { beamSearch: beamSearchSummary } : {}),
       };
       completed = true;
       return result;
@@ -1062,6 +1219,7 @@ export class GemmaGenerationSession {
     tokenId: number,
     softToken?: GemmaSoftTokenSource,
     outputMode: GemmaModelOutputMode = "greedy",
+    topCandidates?: GemmaTopCandidateResources,
   ) {
     const inputs = await this.loadTokenInputs(softToken ? GEMMA_PAD_TOKEN_ID : tokenId);
     uploadGemmaTokenInputs(this.device, this.resources.input, inputs);
@@ -1079,6 +1237,7 @@ export class GemmaGenerationSession {
       this.resources,
       outputMode,
       outputMode === "logits" ? this.logitsReadback : undefined,
+      topCandidates,
     );
     if (this.activeTiming) this.activeTiming.logitsReadbackMs += output.logitsReadbackMs;
     this.position += 1;
@@ -1335,6 +1494,125 @@ export class GemmaGenerationSession {
     };
   }
 
+  private beamSlotBytes(numBeams: number, maxNewTokens: number): number {
+    let rowBytes = 0;
+    for (const cache of this.resources.stack.ownerCaches.values()) {
+      rowBytes += 2 * cache.tokenElements * Float32Array.BYTES_PER_ELEMENT;
+    }
+    return 2 * numBeams * maxNewTokens * rowBytes;
+  }
+
+  /**
+   * Runs beam search from the prompt's final logits. Each beam's generated K/V rows live in
+   * per-beam slots and are restored into the shared caches before that beam's next token is
+   * evaluated, so every beam attends to exactly its own history. Afterwards the caches are
+   * truncated back to the prompt so prompt-cache reuse stays valid.
+   */
+  private async generateWithBeamSearch(
+    initialLogits: Float32Array,
+    promptTokenIds: readonly number[],
+    config: DecodingConfig,
+    options: BeamSearchOptions,
+    customStopTokens: ReadonlySet<number>,
+    signal: AbortSignal,
+    onProgress?: (progress: GemmaBeamSearchProgress) => void,
+  ): Promise<BeamSearchResult> {
+    const basePosition = this.position;
+    const caches = Array.from(this.resources.stack.ownerCaches.values());
+    const slots = new DecodeKvBeamSlots(
+      this.device,
+      caches,
+      options.numBeams,
+      config.maxNewTokens,
+      basePosition,
+    );
+    const usesHistory = config.repetitionWindow > 0 && (
+      config.repetitionPenalty !== 1 || config.frequencyPenalty !== 0 || config.presencePenalty !== 0
+    );
+    let storedRows = 0;
+    try {
+      return await runBeamSearch({
+        options,
+        maxNewTokens: config.maxNewTokens,
+        initialLogits,
+        isTerminal: (tokenId) => this.tokenizer.isEndToken(tokenId) || customStopTokens.has(tokenId),
+        logProbabilities: (logits, generatedTokenIds) => processedLogProbabilities(
+          logits,
+          usesHistory ? [...promptTokenIds, ...generatedTokenIds] : [],
+          config,
+          GEMMA_FINAL_LOGIT_SOFTCAP,
+        ),
+        advance: async (parents, tokenIds) => {
+          const reorder = this.device.createCommandEncoder({ label: "Reorder Gemma beam K/V slots" });
+          slots.encodeReorder(reorder, parents, storedRows);
+          this.device.queue.submit([reorder.finish()]);
+          const logits: Float32Array[] = [];
+          for (let beam = 0; beam < tokenIds.length; beam += 1) {
+            throwIfGemmaGenerationAborted(signal);
+            const restore = this.device.createCommandEncoder({ label: "Restore Gemma beam K/V rows" });
+            slots.encodeRestore(restore, beam, storedRows);
+            this.device.queue.submit([restore.finish()]);
+            this.position = basePosition + storedRows;
+            this.evaluatedTokenIds.length = basePosition;
+            const decodeStartedAt = performance.now();
+            const output = await this.evaluateToken(tokenIds[beam], undefined, "logits");
+            if (this.activeTiming) {
+              this.activeTiming.decodeTokenMs.push(performance.now() - decodeStartedAt);
+            }
+            const save = this.device.createCommandEncoder({ label: "Save Gemma beam K/V row" });
+            slots.encodeSave(save, beam, storedRows);
+            this.device.queue.submit([save.finish()]);
+            logits.push(requiredGemmaLogits(output));
+          }
+          storedRows += 1;
+          return logits;
+        },
+        onStep: onProgress
+          ? ({ step, maxSteps, runningBeams, finishedCount }) => onProgress({
+            step: step + 1,
+            maxSteps,
+            finishedCount,
+            bestText: this.tokenizer.decodeTokens([...(runningBeams[0]?.tokenIds ?? [])]),
+            bestLogProbability: runningBeams[0]?.sumLogProbability ?? Number.NEGATIVE_INFINITY,
+          })
+          : undefined,
+        throwIfAborted: () => throwIfGemmaGenerationAborted(signal),
+      });
+    } finally {
+      await this.device.queue.onSubmittedWorkDone();
+      slots.destroy();
+      // A wrapped circular cache has overwritten prompt rows with beam rows, so later prefix
+      // reuse (which may step back one more position) could read them; rebuild instead.
+      const promptRowsIntact = caches.every((cache) =>
+        cache.mode === "linear" || cache.length <= cache.capacity);
+      if (promptRowsIntact && caches.every((cache) => cache.canRetainPrefix(basePosition))) {
+        for (const cache of caches) cache.truncate(basePosition);
+        this.position = basePosition;
+        this.evaluatedTokenIds.length = basePosition;
+      } else {
+        this.invalidatePromptCache();
+      }
+    }
+  }
+
+  private describeBeamHypothesis(hypothesis: BeamHypothesis): GemmaBeamSearchHypothesis {
+    const tokenIds = [...hypothesis.tokenIds];
+    const parsed = parseGemmaResponse(
+      this.tokenizer.decodeRawTokens(tokenIds),
+      this.tokenizer.decodeTokens(tokenIds),
+    );
+    const terminal = hypothesis.terminalTokenId;
+    return {
+      text: parsed.text,
+      tokenIds: Object.freeze(tokenIds),
+      score: hypothesis.score,
+      sumLogProbability: hypothesis.sumLogProbability,
+      stopReason: terminal === null
+        ? "length"
+        : this.tokenizer.isEndToken(terminal) ? "end-token" : "stop-token",
+    };
+  }
+
   private getTokenByteTrie(): TokenByteTrie {
     this.tokenByteTrie ??= new TokenByteTrie(this.tokenizer);
     return this.tokenByteTrie;
@@ -1363,7 +1641,7 @@ export class GemmaGenerationSession {
       throw new Error("Generation constraint reached a tokenization dead end");
     }
     const masked = maskConstraintLogits(logits, legalTokens, legalTerminationTokens);
-    return sampleToken(masked, history, config, () => random.next());
+    return sampleToken(masked, history, config, () => random.next(), GEMMA_FINAL_LOGIT_SOFTCAP);
   }
 
   private maskReasoningLogits(

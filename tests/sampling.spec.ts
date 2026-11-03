@@ -8,7 +8,13 @@ import {
   emitGemmaGenerationUpdate,
   throwIfGemmaGenerationAborted,
 } from "../src/runtime/generation-control";
-import { sampleToken, SeededRandom, tokenLogProbability } from "../src/runtime/sampling";
+import {
+  processedLogProbabilities,
+  sampleToken,
+  SeededRandom,
+  softcapLogit,
+  tokenLogProbability,
+} from "../src/runtime/sampling";
 
 test("temperature zero performs greedy decoding", () => {
   expect(sampleToken([0.2, 4, 1], [], { ...DEFAULT_DECODING_CONFIG, temperature: 0 }, () => 0.5)).toBe(1);
@@ -174,4 +180,41 @@ test("throws the AbortSignal reason when generation is cancelled", () => {
   controller.abort(reason);
   expect(() => throwIfGemmaGenerationAborted(controller.signal)).toThrow(reason);
   expect(() => throwIfGemmaGenerationAborted()).not.toThrow();
+});
+
+test("softcap preserves the greedy argmax and masked tokens", () => {
+  const logits = [12, 45.5, 45.49999, Number.NEGATIVE_INFINITY, -80];
+  const greedy = { ...DEFAULT_DECODING_CONFIG, temperature: 0 };
+  expect(sampleToken(logits, [], greedy, () => 0, 30)).toBe(sampleToken(logits, [], greedy, () => 0));
+  expect(softcapLogit(Number.NEGATIVE_INFINITY, 30)).toBe(Number.NEGATIVE_INFINITY);
+  expect(softcapLogit(60, 30)).toBeCloseTo(30 * Math.tanh(2), 12);
+  expect(softcapLogit(7, undefined)).toBe(7);
+  expect(() => sampleToken(logits, [], greedy, () => 0, 0)).toThrow("softcap");
+});
+
+test("softcap flattens sampling and log probabilities like the reference model", () => {
+  const logits = [40, 30, 0];
+  const capped = logits.map((value) => 30 * Math.tanh(value / 30));
+  const logSumExp = (values: number[]) => {
+    const maximum = Math.max(...values);
+    return maximum + Math.log(values.reduce((sum, value) => sum + Math.exp(value - maximum), 0));
+  };
+  expect(tokenLogProbability(logits, 1, 30)).toBeCloseTo(capped[1] - logSumExp(capped), 12);
+  expect(tokenLogProbability(logits, 1, 30)).toBeGreaterThan(tokenLogProbability(logits, 1));
+  // Without the cap token 1 is ~e^-10 likely; capped it keeps several percent of the mass.
+  const config = { ...DEFAULT_DECODING_CONFIG, temperature: 1, topK: 0, topP: 1, repetitionPenalty: 1 };
+  const draw = 0.97;
+  expect(sampleToken(logits, [], config, () => draw)).toBe(0);
+  expect(sampleToken(logits, [], config, () => draw, 30)).toBe(1);
+});
+
+test("processed log probabilities apply softcap and history penalties", () => {
+  const config = { ...DEFAULT_DECODING_CONFIG, repetitionPenalty: 2, repetitionWindow: 4 };
+  const values = processedLogProbabilities([4, 2, 1], [0], config, 30);
+  const capped = [4, 2, 1].map((value) => 30 * Math.tanh(value / 30));
+  capped[0] /= 2;
+  const maximum = Math.max(...capped);
+  const normalizer = maximum + Math.log(capped.reduce((sum, value) => sum + Math.exp(value - maximum), 0));
+  expect(Array.from(values)).toEqual(capped.map((value) => value - normalizer));
+  expect(Array.from(values).reduce((sum, value) => sum + Math.exp(value), 0)).toBeCloseTo(1, 12);
 });

@@ -5,6 +5,7 @@ import {
 } from "./decoding";
 import type { GemmaGenerationTokenHandler } from "./generation-control";
 import type { GenerationConstraint } from "./constraints";
+import type { BeamSearchOptions } from "./beam-search";
 
 const DEFAULT_MAX_NEW_TOKENS = 256;
 const VOCAB_SIZE = 262144;
@@ -32,6 +33,15 @@ export interface GemmaPrefillGenerationProgress {
   mode: "sequential" | "fixed-32" | "chunked-32";
 }
 
+export interface GemmaBeamSearchProgress {
+  step: number;
+  maxSteps: number;
+  finishedCount: number;
+  /** Decoded text of the highest cumulative-probability running beam. */
+  bestText: string;
+  bestLogProbability: number;
+}
+
 export type GemmaGenerationOptions = Partial<DecodingConfig> & {
   signal?: AbortSignal;
   onToken?: GemmaGenerationTokenHandler;
@@ -42,6 +52,13 @@ export type GemmaGenerationOptions = Partial<DecodingConfig> & {
   requireReasoning?: boolean;
   reusePromptCache?: boolean;
   captureTokenLogProbabilities?: boolean;
+  /**
+   * Enables deterministic beam search. Requires `temperature: 0` and cannot be combined with
+   * constraints or required reasoning. Tokens are emitted through `onToken` once the search ends;
+   * `onBeamSearchProgress` reports the running beams.
+   */
+  beamSearch?: Partial<BeamSearchOptions>;
+  onBeamSearchProgress?: (progress: GemmaBeamSearchProgress) => void;
 };
 
 export const DEFAULT_GENERATION_CONFIG: DecodingConfig = {
