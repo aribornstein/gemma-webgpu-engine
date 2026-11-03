@@ -257,6 +257,16 @@ configured stop token, or the requested limit. Automatic prefill uses sequential
 most 32 pending prompt tokens and repeats the exact fixed-32 graph as `chunked-32` for longer
 prompts. Explicit `fixed-32`, `chunked-32`, and `sequential` strategies remain available for
 validation and equivalent benchmarking.
+
+Batched (`fixed-32`/`chunked-32`) prefill reuses the decode LM head kernel for the final row, because
+the decode head may store its weights block-major. Earlier builds read those weights row-major, so
+every prompt longer than 32 tokens (including most image prompts) produced unrelated next-token
+logits. The batched path also mirrors decode numerics where they differ from plain f32: the
+feed-forward input is `f16(srq(f16(normalized)))`, and K/V tiles for attention are staged in f32
+(using 8-key tiles where the device grants 32 KiB of workgroup storage, otherwise 4). Remaining
+differences from sequential prefill come from accumulation order and rarely change a token;
+`npm run test:prefill-parity` checks next-token agreement against sequential prefill with a real
+model cache.
 Temperature, top-k, top-p, min-p, typical-p, repetition, frequency, and presence controls are
 available directly on `generate()`, with one seeded PRNG per request. The implicit default remains
 exact greedy generation for backward compatibility. Neutral greedy requests retain the existing
