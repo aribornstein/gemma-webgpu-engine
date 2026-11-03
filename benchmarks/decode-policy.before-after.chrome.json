@@ -1,0 +1,427 @@
+{
+  "schemaVersion": 1,
+  "status": "decode-policy-before-after",
+  "method": "Alternating after/before pairs from one origin and one IndexedDB weight cache on Apple M4 / headless Chrome. \"before\" serves commit b49184f with only src/benchmark/decode-policy-benchmark.ts added; \"after\" is the optimized branch. Inter-token latency pools every interval from 5 iterations (3 for fresh-session).",
+  "runs": [
+    {
+      "label": "after",
+      "revision": "25c39cf",
+      "runOrder": 1,
+      "schemaVersion": 1,
+      "capturedAt": "2026-11-03T09:42:52.111Z",
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "adapterInfo": {
+          "vendor": "apple",
+          "architecture": "metal-3",
+          "device": "",
+          "description": ""
+        }
+      },
+      "configuration": {
+        "cacheCapacity": 4096,
+        "iterations": 5,
+        "maxNewTokens": 64
+      },
+      "workloads": [
+        {
+          "id": "greedy-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            64,
+            64,
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 477.1,
+            "p95Ms": 602.7,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 31.7,
+            "p95Ms": 40.32,
+            "samples": 315
+          }
+        },
+        {
+          "id": "sampled-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            64,
+            64,
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 365.9,
+            "p95Ms": 533.32,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 42.2,
+            "p95Ms": 55.45,
+            "samples": 315
+          }
+        },
+        {
+          "id": "json-schema-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            25,
+            25,
+            25,
+            25,
+            25
+          ],
+          "timeToFirstToken": {
+            "medianMs": 467,
+            "p95Ms": 1014.38,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 23.5,
+            "p95Ms": 74.925,
+            "samples": 120
+          }
+        },
+        {
+          "id": "greedy-fresh-session",
+          "iterations": 3,
+          "generatedTokens": [
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 633.3,
+            "p95Ms": 649.14,
+            "samples": 3
+          },
+          "interTokenLatency": {
+            "medianMs": 22.1,
+            "p95Ms": 146.44,
+            "samples": 189
+          }
+        }
+      ]
+    },
+    {
+      "label": "before",
+      "revision": "b49184f",
+      "runOrder": 2,
+      "schemaVersion": 1,
+      "capturedAt": "2026-11-03T09:50:33.004Z",
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "adapterInfo": {
+          "vendor": "apple",
+          "architecture": "metal-3",
+          "device": "",
+          "description": ""
+        }
+      },
+      "configuration": {
+        "cacheCapacity": 4096,
+        "iterations": 5,
+        "maxNewTokens": 64
+      },
+      "workloads": [
+        {
+          "id": "greedy-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            64,
+            64,
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 392.1,
+            "p95Ms": 451.96,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 26.1,
+            "p95Ms": 55.83,
+            "samples": 315
+          }
+        },
+        {
+          "id": "sampled-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            64,
+            64,
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 492.7,
+            "p95Ms": 817.8,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 190.1,
+            "p95Ms": 227.64,
+            "samples": 315
+          }
+        },
+        {
+          "id": "json-schema-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            25,
+            25,
+            25,
+            25,
+            25
+          ],
+          "timeToFirstToken": {
+            "medianMs": 417,
+            "p95Ms": 870.52,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 28,
+            "p95Ms": 104.6,
+            "samples": 120
+          }
+        },
+        {
+          "id": "greedy-fresh-session",
+          "iterations": 3,
+          "generatedTokens": [
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 965.9,
+            "p95Ms": 1147.61,
+            "samples": 3
+          },
+          "interTokenLatency": {
+            "medianMs": 47.4,
+            "p95Ms": 140.46,
+            "samples": 189
+          }
+        }
+      ]
+    },
+    {
+      "label": "after2",
+      "revision": "25c39cf",
+      "runOrder": 3,
+      "schemaVersion": 1,
+      "capturedAt": "2026-11-03T09:56:14.852Z",
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "adapterInfo": {
+          "vendor": "apple",
+          "architecture": "metal-3",
+          "device": "",
+          "description": ""
+        }
+      },
+      "configuration": {
+        "cacheCapacity": 4096,
+        "iterations": 5,
+        "maxNewTokens": 64
+      },
+      "workloads": [
+        {
+          "id": "greedy-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            64,
+            64,
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 353.5,
+            "p95Ms": 404,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 21.1,
+            "p95Ms": 38.49,
+            "samples": 315
+          }
+        },
+        {
+          "id": "sampled-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            64,
+            64,
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 342,
+            "p95Ms": 446.74,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 40.6,
+            "p95Ms": 54.42,
+            "samples": 315
+          }
+        },
+        {
+          "id": "json-schema-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            25,
+            25,
+            25,
+            25,
+            25
+          ],
+          "timeToFirstToken": {
+            "medianMs": 433.7,
+            "p95Ms": 1088.32,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 21.7,
+            "p95Ms": 64.345,
+            "samples": 120
+          }
+        },
+        {
+          "id": "greedy-fresh-session",
+          "iterations": 3,
+          "generatedTokens": [
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 582.6,
+            "p95Ms": 643.53,
+            "samples": 3
+          },
+          "interTokenLatency": {
+            "medianMs": 21.5,
+            "p95Ms": 135.38,
+            "samples": 189
+          }
+        }
+      ]
+    },
+    {
+      "label": "before2",
+      "revision": "b49184f",
+      "runOrder": 4,
+      "schemaVersion": 1,
+      "capturedAt": "2026-11-03T10:03:53.759Z",
+      "environment": {
+        "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "adapterInfo": {
+          "vendor": "apple",
+          "architecture": "metal-3",
+          "device": "",
+          "description": ""
+        }
+      },
+      "configuration": {
+        "cacheCapacity": 4096,
+        "iterations": 5,
+        "maxNewTokens": 64
+      },
+      "workloads": [
+        {
+          "id": "greedy-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            64,
+            64,
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 522.6,
+            "p95Ms": 620.4,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 34.9,
+            "p95Ms": 94.9,
+            "samples": 315
+          }
+        },
+        {
+          "id": "sampled-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            64,
+            64,
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 546.8,
+            "p95Ms": 1101.5,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 230.6,
+            "p95Ms": 297.09,
+            "samples": 315
+          }
+        },
+        {
+          "id": "json-schema-warm",
+          "iterations": 5,
+          "generatedTokens": [
+            25,
+            25,
+            25,
+            25,
+            25
+          ],
+          "timeToFirstToken": {
+            "medianMs": 443.5,
+            "p95Ms": 1075.54,
+            "samples": 5
+          },
+          "interTokenLatency": {
+            "medianMs": 32.8,
+            "p95Ms": 146.255,
+            "samples": 120
+          }
+        },
+        {
+          "id": "greedy-fresh-session",
+          "iterations": 3,
+          "generatedTokens": [
+            64,
+            64,
+            64
+          ],
+          "timeToFirstToken": {
+            "medianMs": 1147,
+            "p95Ms": 1529.23,
+            "samples": 3
+          },
+          "interTokenLatency": {
+            "medianMs": 46,
+            "p95Ms": 215.4,
+            "samples": 189
+          }
+        }
+      ]
+    }
+  ]
+}
