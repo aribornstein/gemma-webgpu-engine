@@ -4,20 +4,43 @@ import { measureGpuDispatches } from "./gpu-timestamp";
 
 const WORKGROUP_SIZE = 256;
 const OUT_FEATURES = 1536;
-const WORKGROUP_COUNT = 192;
+const SUBGROUPS_PER_WORKGROUP = 8;
 
-export type DecodeOprojNormMode = "subgroup-rows" | "cooperative-rows";
+/**
+ * `subgroup-rows` assigns one output row per 32-lane subgroup. The `-x2`/`-x4` variants let each
+ * subgroup reuse one activation load for two or four rows while keeping every row's lane mapping,
+ * accumulation order, and subgroup reduction identical, so results are bit-identical.
+ */
+export type DecodeOprojNormMode =
+  | "subgroup-rows"
+  | "subgroup-rows-x2"
+  | "subgroup-rows-x4"
+  | "cooperative-rows";
+
+function subgroupRowsPerSubgroup(mode: DecodeOprojNormMode): number {
+  if (mode === "subgroup-rows-x2") return 2;
+  if (mode === "subgroup-rows-x4") return 4;
+  return 1;
+}
+
+export function decodeOprojNormWorkgroupCount(mode: DecodeOprojNormMode): number {
+  return OUT_FEATURES / (SUBGROUPS_PER_WORKGROUP * subgroupRowsPerSubgroup(mode));
+}
 
 export interface DecodeOprojNormBenchmarkResult {
   sourceOperator: "com.xenova.gemma4.DecodeOprojNorm";
-  sourceVariant: "fused-fixed-subgroup-32" | "fused-row-cooperative-32";
+  sourceVariant:
+    | "fused-fixed-subgroup-32"
+    | "fused-fixed-subgroup-32-x2"
+    | "fused-fixed-subgroup-32-x4"
+    | "fused-row-cooperative-32";
   artifactSha256: string;
   sourceMetadataSha256: string;
   sourceTensorsSha256: string;
   inFeatures: 2048;
   outFeatures: 1536;
   workgroupSize: 256;
-  workgroupCount: 192;
+  workgroupCount: number;
   iterations: number;
   dispatchMedianMs: number;
   dispatchP95Ms: number;
@@ -86,17 +109,17 @@ export async function benchmarkDecodeOprojNorm(
 
   const resources = createResources(device, compiled.pipeline, fixture);
   try {
-    await resetAndDispatch(device, compiled.pipeline, resources, fixture.hiddenBefore);
+    await resetAndDispatch(device, compiled.pipeline, resources, fixture.hiddenBefore, mode);
     const samples: number[] = [];
     for (let iteration = 0; iteration < iterations; iteration += 1) {
       device.queue.writeBuffer(resources.hiddenBuffer, 0, fixture.hiddenBefore);
       const started = performance.now();
-      await dispatch(device, compiled.pipeline, resources.bindGroup);
+      await dispatch(device, compiled.pipeline, resources.bindGroup, mode);
       samples.push(performance.now() - started);
     }
 
     device.queue.writeBuffer(resources.hiddenBuffer, 0, fixture.hiddenBefore);
-    await dispatch(device, compiled.pipeline, resources.bindGroup);
+    await dispatch(device, compiled.pipeline, resources.bindGroup, mode);
     const hiddenBytes = fixture.expectedHidden.byteLength;
     const ffnBytes = fixture.expectedFfnInputBits.byteLength;
     const sumBytes = fixture.expectedFfnInputSum.byteLength;
@@ -133,7 +156,7 @@ export async function benchmarkDecodeOprojNorm(
       (pass) => {
         pass.setPipeline(compiled.pipeline);
         pass.setBindGroup(0, resources.bindGroup);
-        pass.dispatchWorkgroups(WORKGROUP_COUNT);
+        pass.dispatchWorkgroups(decodeOprojNormWorkgroupCount(mode));
       },
       10,
       () => device.queue.writeBuffer(resources.hiddenBuffer, 0, fixture.hiddenBefore),
@@ -143,14 +166,18 @@ export async function benchmarkDecodeOprojNorm(
       sourceOperator: "com.xenova.gemma4.DecodeOprojNorm",
       sourceVariant: mode === "cooperative-rows"
         ? "fused-row-cooperative-32"
-        : "fused-fixed-subgroup-32",
+        : mode === "subgroup-rows-x2"
+          ? "fused-fixed-subgroup-32-x2"
+          : mode === "subgroup-rows-x4"
+            ? "fused-fixed-subgroup-32-x4"
+            : "fused-fixed-subgroup-32",
       artifactSha256: fixture.artifactSha256,
       sourceMetadataSha256: fixture.sourceMetadataSha256,
       sourceTensorsSha256: fixture.sourceTensorsSha256,
       inFeatures: fixture.inFeatures,
       outFeatures: fixture.outFeatures,
       workgroupSize: WORKGROUP_SIZE,
-      workgroupCount: WORKGROUP_COUNT,
+      workgroupCount: decodeOprojNormWorkgroupCount(mode),
       iterations,
       dispatchMedianMs: round(percentile(sortedSamples, 0.5)),
       dispatchP95Ms: round(percentile(sortedSamples, 0.95)),
@@ -197,7 +224,7 @@ var<workgroup> projectionActivationSums: array<f32, 8>;`
     : "";
   const projectionBody = mode === "cooperative-rows"
     ? createCooperativeProjectionBody()
-    : createSubgroupProjectionBody();
+    : createSubgroupProjectionBody(subgroupRowsPerSubgroup(mode));
   return `enable f16;
 enable subgroups;
 
@@ -220,9 +247,9 @@ const IN_FEATURES: u32 = ${inFeatures}u;
 const OUT_F: u32 = 1536u;
 const WORDS_PER_ROW: u32 = ${wordsPerRow}u;
 const WG: u32 = 256u;
-const SG_ROWS: u32 = 1u;
-const ROWS_PER_WG: u32 = 8u;
-const TOTAL_WGS: u32 = 192u;
+const SG_ROWS: u32 = ${subgroupRowsPerSubgroup(mode)}u;
+const ROWS_PER_WG: u32 = ${SUBGROUPS_PER_WORKGROUP * subgroupRowsPerSubgroup(mode)}u;
+const TOTAL_WGS: u32 = ${decodeOprojNormWorkgroupCount(mode)}u;
 const EPS: f32 = 0.000001;
 const ELEMS: u32 = 6u;
 const ZP: f32 = 8.0;
@@ -313,8 +340,9 @@ ${projectionBody}
 }`;
 }
 
-function createSubgroupProjectionBody(): string {
-  return `  let row_base = workgroup_id.x * ROWS_PER_WG + subgroup_id * SG_ROWS;
+function createSubgroupProjectionBody(rowsPerSubgroup = 1): string {
+  if (rowsPerSubgroup === 1) {
+    return `  let row_base = workgroup_id.x * ROWS_PER_WG + subgroup_id * SG_ROWS;
   var sum_qa = 0.0;
   var sum_a = 0.0;
   var word = lane;
@@ -341,6 +369,38 @@ function createSubgroupProjectionBody(): string {
       scale[row_base] * (reduced_qa - ZP * reduced_a),
       params.outScale,
     )));
+  }`;
+  }
+  return `  let row_base = workgroup_id.x * ROWS_PER_WG + subgroup_id * SG_ROWS;
+  var sum_qa: array<f32, ${rowsPerSubgroup}>;
+  for (var row = 0u; row < SG_ROWS; row = row + 1u) { sum_qa[row] = 0.0; }
+  var sum_a = 0.0;
+  var word = lane;
+  loop {
+    if (word >= WORDS_PER_ROW) { break; }
+    let activation0 = a[word * 2u];
+    let activation1 = a[word * 2u + 1u];
+    sum_a = sum_a + activation0.x + activation0.y + activation0.z + activation0.w;
+    sum_a = sum_a + activation1.x + activation1.y + activation1.z + activation1.w;
+    for (var row = 0u; row < SG_ROWS; row = row + 1u) {
+      let packed = bits_buf[(row_base + row) * WORDS_PER_ROW + word];
+      let lo = vec4<f32>(unpack4xU8(packed & 0x0f0f0f0fu));
+      let hi = vec4<f32>(unpack4xU8((packed >> 4u) & 0x0f0f0f0fu));
+      sum_qa[row] = sum_qa[row] +
+        dot(vec4<f32>(lo.x, hi.x, lo.y, hi.y), activation0) +
+        dot(vec4<f32>(lo.z, hi.z, lo.w, hi.w), activation1);
+    }
+    word = word + 32u;
+  }
+  let reduced_a = sg_sum(sum_a);
+  for (var row = 0u; row < SG_ROWS; row = row + 1u) {
+    let reduced_qa = sg_sum(sum_qa[row]);
+    if (lane == 0u) {
+      atomicStore(&pp[row_base + row], bitcast<u32>(srq(
+        scale[row_base + row] * (reduced_qa - ZP * reduced_a),
+        params.outScale,
+      )));
+    }
   }`;
 }
 
@@ -487,21 +547,23 @@ async function resetAndDispatch(
   pipeline: GPUComputePipeline,
   resources: Resources,
   hidden: Float32Array,
+  mode: DecodeOprojNormMode,
 ): Promise<void> {
   device.queue.writeBuffer(resources.hiddenBuffer, 0, hidden);
-  await dispatch(device, pipeline, resources.bindGroup);
+  await dispatch(device, pipeline, resources.bindGroup, mode);
 }
 
 async function dispatch(
   device: GPUDevice,
   pipeline: GPUComputePipeline,
   bindGroup: GPUBindGroup,
+  mode: DecodeOprojNormMode,
 ): Promise<void> {
   const encoder = device.createCommandEncoder({ label: "DecodeOprojNorm dispatch" });
   const pass = encoder.beginComputePass({ label: "DecodeOprojNorm" });
   pass.setPipeline(pipeline);
   pass.setBindGroup(0, bindGroup);
-  pass.dispatchWorkgroups(WORKGROUP_COUNT, 1, 1);
+  pass.dispatchWorkgroups(decodeOprojNormWorkgroupCount(mode), 1, 1);
   pass.end();
   device.queue.submit([encoder.finish()]);
   await device.queue.onSubmittedWorkDone();

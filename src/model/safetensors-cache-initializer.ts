@@ -10,7 +10,10 @@ import {
 const CHUNKS_STORE = "chunks";
 const META_STORE = "meta";
 const CACHE_VERSION = 2;
-const DEFAULT_CONCURRENCY = 1;
+// Each worker buffers up to one 128 MiB range group. Two workers downloaded the pinned
+// checkpoint in 294 s versus 431 s with one, matching four workers (262-298 s) at half the
+// transient memory.
+const DEFAULT_CONCURRENCY = 2;
 const CACHE_FORMAT = "gemma-webgpu-engine-v5-segmented-buffer";
 const OWNED_BLOB_CACHE_FORMAT = "gemma-webgpu-engine-v2-owned-blob";
 const SEGMENTED_BLOB_CACHE_FORMAT = "gemma-webgpu-engine-v3-segmented-blob";
@@ -287,13 +290,21 @@ async function fetchMetadata(
       `Safetensors data offset does not match the pinned manifest: ${dataStart}`,
     );
   }
-  const headerBytes = (await fetchRange(
+  const prefixBytes = await fetchRange(
     fetcher,
     source,
     0,
     dataStart - 1,
     spec.fileSize,
-  )).subarray(8);
+  );
+  if (spec.headerSha256 !== undefined) {
+    const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", prefixBytes));
+    const actual = Array.from(digest, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    if (actual !== spec.headerSha256) {
+      throw new Error(`Safetensors header does not match the pinned manifest: ${actual}`);
+    }
+  }
+  const headerBytes = prefixBytes.subarray(8);
   const parsed: unknown = JSON.parse(new TextDecoder().decode(headerBytes));
   if (!isRecord(parsed)) throw new Error("Safetensors header is not an object");
   const tensorCount = Object.keys(parsed).filter((name) => name !== "__metadata__").length;

@@ -74,7 +74,8 @@ export async function loadGemmaDecodeModelResources(
   fixture: DecodeMlpPleFixture,
   runtime: GemmaDecodeModelRuntime,
   lmHeadMode: GemmaLmHeadMode = "block-major-columns",
-  oprojMode: DecodeOprojNormMode = "subgroup-rows",
+  // subgroup-rows-x4 is bit-identical to subgroup-rows and measured faster (median and p95).
+  oprojMode: DecodeOprojNormMode = "subgroup-rows-x4",
 ): Promise<GemmaDecodeModelResources> {
   const [inputWeights, outputWeights, inputPipeline, lmHeadPipeline, greedyPipelines] =
     await Promise.all([

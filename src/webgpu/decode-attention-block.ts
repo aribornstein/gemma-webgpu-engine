@@ -11,6 +11,7 @@ import { createDecodeKNormRopeShader } from "./decode-k-norm-rope";
 import { DecodeKvCache, resolveDecodeKvCacheAllocation } from "./decode-kv-cache";
 import {
   createDecodeOprojNormShader,
+  decodeOprojNormWorkgroupCount,
   type DecodeOprojNormMode,
 } from "./decode-oproj-norm";
 import { createDecodeRmsSrqShader } from "./decode-rms-srq";
@@ -21,7 +22,6 @@ import { createDecodeQkvPresrqCacheShader } from "./qat-qkv-presrq";
 const Q_OUT = 2048;
 const KV_OUT = 256;
 const ATTENTION_CHUNK_COUNT = 32;
-const OPROJ_WORKGROUP_COUNT = 192;
 const QKV_PARAMS_OFFSET = 0;
 const K_NORM_PARAMS_OFFSET = 256;
 const V_NORM_PARAMS_OFFSET = 512;
@@ -73,7 +73,7 @@ export interface DecodeAttentionBlockPipelines {
   qOutFeatures: 2048 | 4096;
   kvOutFeatures: 256 | 512;
   qkvWorkgroupCount: 1280 | 2560;
-  oprojWorkgroupCount: 192;
+  oprojWorkgroupCount: number;
   rms: GPUComputePipeline;
   qkv: GPUComputePipeline;
   kNormRope: GPUComputePipeline;
@@ -442,7 +442,7 @@ export async function compileDecodeAttentionBlockPipelines(
     qOutFeatures,
     kvOutFeatures,
     qkvWorkgroupCount: fullAttention ? 2560 : 1280,
-    oprojWorkgroupCount: OPROJ_WORKGROUP_COUNT,
+    oprojWorkgroupCount: decodeOprojNormWorkgroupCount(oprojMode),
     rms,
     qkv,
     kNormRope,

@@ -527,6 +527,8 @@ test("matches Hugging Face fused layer-0 DecodeOprojNorm modes", async ({ page }
       results: await Promise.all([
         benchmarkDecodeOprojNorm(2, "subgroup-rows"),
         benchmarkDecodeOprojNorm(2, "cooperative-rows"),
+        benchmarkDecodeOprojNorm(2, "subgroup-rows-x2"),
+        benchmarkDecodeOprojNorm(2, "subgroup-rows-x4"),
       ]),
       timestampQuerySupported: adapter?.features.has("timestamp-query") ?? false,
     };
@@ -535,7 +537,10 @@ test("matches Hugging Face fused layer-0 DecodeOprojNorm modes", async ({ page }
   expect(results.map((result) => result.sourceVariant)).toEqual([
     "fused-fixed-subgroup-32",
     "fused-row-cooperative-32",
+    "fused-fixed-subgroup-32-x2",
+    "fused-fixed-subgroup-32-x4",
   ]);
+  expect(results.map((result) => result.workgroupCount)).toEqual([192, 192, 96, 48]);
   for (const result of results) {
     expect(result.sourceOperator).toBe("com.xenova.gemma4.DecodeOprojNorm");
     expect(result.artifactSha256).toBe(
@@ -550,7 +555,6 @@ test("matches Hugging Face fused layer-0 DecodeOprojNorm modes", async ({ page }
     expect(result.inFeatures).toBe(2048);
     expect(result.outFeatures).toBe(1536);
     expect(result.workgroupSize).toBe(256);
-    expect(result.workgroupCount).toBe(192);
     expect(result.hiddenMaximumAbsoluteError).toBe(0);
     expect(result.hiddenMaximumRelativeError).toBe(0);
     expect(result.ffnInputBitMismatches).toBe(0);
@@ -973,6 +977,37 @@ test("compiles all four generic Gemma layer profiles", async ({ page }) => {
       mlpBits: 2,
       intermediateFeatures: 12288,
     },
+  ]);
+});
+
+test("compiles multi-row O-projection pipelines for every decode layer profile", async ({ page }) => {
+  await page.goto("/");
+  const webGpuAvailable = await page.evaluate(() => Boolean(navigator.gpu));
+  test.skip(!webGpuAvailable, "Chrome does not expose WebGPU on this machine");
+
+  const counts = await page.evaluate(async () => {
+    const layerModulePath = "/src/webgpu/decode-layer.ts";
+    const deviceModulePath = "/src/webgpu/device.ts";
+    const { getGemmaDecodeLayerPipelines } = await import(layerModulePath);
+    const { getWebGpuDevice } = await import(deviceModulePath);
+    const device = await getWebGpuDevice();
+    const names = ["sliding-int4", "full-int4", "sliding-int2", "full-int2"] as const;
+    const modes = ["subgroup-rows-x2", "subgroup-rows-x4"] as const;
+    return Promise.all(names.flatMap((profile) => modes.map(async (oprojMode) => {
+      const pipelines = await getGemmaDecodeLayerPipelines(device, profile, oprojMode);
+      return `${profile}:${oprojMode}:${pipelines.attention.oprojWorkgroupCount}`;
+    })));
+  });
+
+  expect(counts).toEqual([
+    "sliding-int4:subgroup-rows-x2:96",
+    "sliding-int4:subgroup-rows-x4:48",
+    "full-int4:subgroup-rows-x2:96",
+    "full-int4:subgroup-rows-x4:48",
+    "sliding-int2:subgroup-rows-x2:96",
+    "sliding-int2:subgroup-rows-x4:48",
+    "full-int2:subgroup-rows-x2:96",
+    "full-int2:subgroup-rows-x4:48",
   ]);
 });
 

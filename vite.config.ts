@@ -20,6 +20,11 @@ const STATIC_FILES = [
   ],
 ] as const;
 
+// The tokenizer path of @huggingface/transformers never runs ONNX; see src/build-stubs.
+export const ONNX_RUNTIME_STUB_ALIAS = [
+  { find: /^onnxruntime-web\/webgpu$/, replacement: resolve("src/build-stubs/onnxruntime-web.ts") },
+];
+
 function staticDemoAssets(): Plugin {
   const outputRoot = resolve("build");
   return {
@@ -38,17 +43,24 @@ function staticDemoAssets(): Plugin {
   };
 }
 
-export default defineConfig({
+// The dev server serves public/ (including an optional local model.safetensors). Production
+// builds copy only the allow-listed assets above so the 2.46 GB checkpoint is never bundled.
+export default defineConfig(({ command }) => ({
   base: "./",
-  publicDir: false,
-  define: {
-    "import.meta.env.VITE_PUBLIC_DEMO": JSON.stringify("true"),
+  publicDir: command === "serve" ? "public" : false,
+  define: command === "build"
+    ? { "import.meta.env.VITE_PUBLIC_DEMO": JSON.stringify("true") }
+    : {},
+  plugins: command === "build" ? [staticDemoAssets()] : [],
+  resolve: command === "build" ? { alias: ONNX_RUNTIME_STUB_ALIAS } : {},
+  server: {
+    port: 5174,
+    strictPort: true,
   },
-  plugins: [staticDemoAssets()],
   build: {
     outDir: "build",
     emptyOutDir: true,
     minify: "oxc",
     target: "es2022",
   },
-});
+}));

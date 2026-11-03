@@ -1,8 +1,10 @@
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
+import { ONNX_RUNTIME_STUB_ALIAS } from "./vite.config";
 
 export default defineConfig({
   publicDir: false,
+  resolve: { alias: ONNX_RUNTIME_STUB_ALIAS },
   build: {
     outDir: "build/library",
     emptyOutDir: false,

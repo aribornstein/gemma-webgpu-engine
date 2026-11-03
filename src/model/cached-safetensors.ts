@@ -7,6 +7,8 @@ export interface SafetensorsCacheSpec {
   fileSize: number;
   dataStart: number;
   tensorCount: number;
+  /** SHA-256 of the complete safetensors prefix (length word plus JSON header). */
+  headerSha256?: string;
 }
 
 export interface CachedTensorDescriptor {
@@ -43,13 +45,71 @@ export const GEMMA_4_E2B_CACHE_SPEC: Readonly<SafetensorsCacheSpec> = {
   fileSize: 2_458_111_846,
   dataStart: 375_400,
   tensorCount: 2_780,
+  headerSha256: "ab25de27861de1a3f39de9e8b8c645143597a867ddefde4415c15bf4ad13d2fc",
 };
+
+// Decoded 8 MiB segment parts retained for small slice reads such as per-token embedding rows.
+const SEGMENT_PART_CACHE_BYTES = 64 * 1024 * 1024;
+
+class SegmentPartCache {
+  private readonly parts = new Map<string, Promise<Uint8Array | null>>();
+  private readonly sizes = new Map<string, number>();
+  private bytes = 0;
+  private readonly maximumBytes: number;
+
+  constructor(maximumBytes: number) {
+    this.maximumBytes = maximumBytes;
+  }
+
+  read(key: string, load: () => Promise<Uint8Array | null>): Promise<Uint8Array | null> {
+    const cached = this.parts.get(key);
+    if (cached) {
+      this.parts.delete(key);
+      this.parts.set(key, cached);
+      return cached;
+    }
+    const pending = load().then((bytes) => {
+      if (this.parts.get(key) !== pending) return bytes;
+      if (!bytes) {
+        this.parts.delete(key);
+        return bytes;
+      }
+      this.sizes.set(key, bytes.byteLength);
+      this.bytes += bytes.byteLength;
+      this.evict();
+      return bytes;
+    }, (error: unknown) => {
+      if (this.parts.get(key) === pending) this.parts.delete(key);
+      throw error;
+    });
+    this.parts.set(key, pending);
+    return pending;
+  }
+
+  clear(): void {
+    this.parts.clear();
+    this.sizes.clear();
+    this.bytes = 0;
+  }
+
+  private evict(): void {
+    for (const key of this.parts.keys()) {
+      if (this.bytes <= this.maximumBytes) return;
+      const size = this.sizes.get(key);
+      if (size === undefined) continue;
+      this.parts.delete(key);
+      this.sizes.delete(key);
+      this.bytes -= size;
+    }
+  }
+}
 
 export class ReadonlySafetensorsCache {
   readonly spec: Readonly<SafetensorsCacheSpec>;
   readonly descriptors: ReadonlyMap<string, CachedTensorDescriptor>;
   private readonly database: IDBDatabase;
   private readonly blobValues = new Map<string, Blob | Blob[] | SegmentedTensorValue>();
+  private readonly segmentParts = new SegmentPartCache(SEGMENT_PART_CACHE_BYTES);
 
   private constructor(
     database: IDBDatabase,
@@ -83,6 +143,13 @@ export class ReadonlySafetensorsCache {
         throw new Error(`IndexedDB ${spec.databaseName} does not match the safetensors schema`);
       }
       const metadata = await readStoreValue(database, META_STORE, spec.sourceKey);
+      // Downloads written by this engine record completion explicitly; legacy caches without
+      // the flag are verified by reading tensors instead.
+      if (isRecord(metadata) && metadata.complete === false) {
+        throw new Error(
+          `IndexedDB ${spec.databaseName} download is incomplete; resume cache initialization`,
+        );
+      }
       const descriptors = parseMetadata(metadata, spec);
       return new ReadonlySafetensorsCache(database, spec, descriptors);
     } catch (error) {
@@ -133,6 +200,7 @@ export class ReadonlySafetensorsCache {
           value,
           byteOffset,
           byteLength,
+          this.segmentParts,
         )
       : await copyBinarySlice(value, byteOffset, byteLength);
     if (!bytes) {
@@ -185,6 +253,7 @@ export class ReadonlySafetensorsCache {
             value,
             byteOffset,
             byteLength,
+            this.segmentParts,
           )
         : await copyBinarySlice(value, byteOffset, byteLength);
       if (!bytes) throw new Error(`Tensor ${name} is not present in the readonly cache`);
@@ -230,6 +299,7 @@ export class ReadonlySafetensorsCache {
 
   close(): void {
     this.blobValues.clear();
+    this.segmentParts.clear();
     this.database.close();
   }
 }
@@ -371,6 +441,15 @@ async function copyBinary(value: unknown): Promise<Uint8Array | null> {
   return copy;
 }
 
+/** Returns the stored bytes without copying; IndexedDB reads already yield an owned clone. */
+async function binaryView(value: unknown): Promise<Uint8Array | null> {
+  if (value instanceof ArrayBuffer) return new Uint8Array(value);
+  if (ArrayBuffer.isView(value)) {
+    return new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
+  }
+  return copyBinary(value);
+}
+
 async function copyBinarySlice(
   value: unknown,
   byteOffset: number,
@@ -445,6 +524,7 @@ async function copySegmentedTensorSlice(
   value: SegmentedTensorValue,
   byteOffset: number,
   byteLength: number,
+  partCache?: SegmentPartCache,
 ): Promise<Uint8Array | null> {
   if (value.byteLength !== descriptor.byteLength ||
       value.partCount !== Math.ceil(value.byteLength / value.partBytes)) {
@@ -456,14 +536,16 @@ async function copySegmentedTensorSlice(
   const lastPart = Math.floor((requestedEnd - 1) / value.partBytes);
   let outputOffset = 0;
   for (let partIndex = firstPart; partIndex <= lastPart; partIndex++) {
-    const part = await readStoreValue(
+    const loadPart = async (): Promise<Uint8Array | null> => binaryView(await readStoreValue(
       database,
       CHUNKS_STORE,
       [sourceKey, descriptor.begin, descriptor.end, partIndex],
-    );
+    ));
     const partBegin = partIndex * value.partBytes;
     const expectedPartBytes = Math.min(value.partBytes, value.byteLength - partBegin);
-    const bytes = await copyBinary(part);
+    const bytes = partCache
+      ? await partCache.read(`${descriptor.begin}:${descriptor.end}:${partIndex}`, loadPart)
+      : await loadPart();
     if (!bytes || bytes.byteLength !== expectedPartBytes) return null;
     const overlapBegin = Math.max(byteOffset, partBegin);
     const overlapEnd = Math.min(requestedEnd, partBegin + bytes.byteLength);
