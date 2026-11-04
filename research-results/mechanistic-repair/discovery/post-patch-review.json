@@ -1,0 +1,375 @@
+{
+  "schemaVersion": 1,
+  "status": "exploratory_post_patch_review",
+  "sourcesReadThisTurn": [
+    "research-results/mechanistic-repair/causal-v2/patch-effects.json",
+    "research-results/mechanistic-repair/discovery/diagnosis.json",
+    "research-results/mechanistic-repair/discovery/hypotheses.json"
+  ],
+  "evidencePolicy": {
+    "invalidatedData": "All earlier discovery op=patch records are excluded entirely, including apparent null results. They cannot establish layer specificity, lack of competence, or failure of an intervention.",
+    "correctedGate": "Accept the user's report that a nonzero sentinel changes logits and sham/revert preserves output. The allowed patch-effects file independently shows 12 token-identical sham outputs; it does not contain the sentinel or revert records, which were not reopened.",
+    "humanCalibration": false,
+    "claimBoundary": "Observed fork sensitivity and same-case donor rescue are activation diagnostics. Neither constitutes discovery of a transferable native repair computation, pretrained weight defect, or successful weight repair.",
+    "notDone": "No new model runs, weight inspection, runtime edits, final-data access, or other source reads were performed for this review."
+  },
+  "alignment": {
+    "assistantPrefix": "ש",
+    "prefixTokenIds": [237331],
+    "position": "Process the actual common first assistant token ש; intervene on its post-layer state before predicting the differing next token. Do not patch the assistant header instead, and do not capture after the differing token.",
+    "shirt": {
+      "correctNextToken": {"text": "תי", "id": 37750},
+      "incorrectNextToken": {"text": "ני", "id": 12712},
+      "resultingWords": ["שתי", "שני"]
+    },
+    "book": {
+      "correctNextToken": {"text": "ני", "id": 12712},
+      "incorrectNextToken": {"text": "תי", "id": 37750},
+      "resultingWords": ["שני", "שתי"]
+    },
+    "indexInterpretation": "The original discovery firstDifference=1 follows the shared first token. The corrected patch records' fork=0 is relative to the continuation after the fixed prefix, not evidence that the first emitted token differs.",
+    "futureBoundaryRule": "Keep these actual token IDs and exact serialization. For longer prefixes, verify that tokenization preserves the stated prefix IDs; do not insert a separately tokenized trailing space."
+  },
+  "validResults": {
+    "recordCount": 48,
+    "design": "Two cases, six sites, four control types, all holding the actual common prefix ש fixed. Site counts are descriptive, not independent samples or statistical significance.",
+    "shams": {
+      "tokenIdenticalOutputs": 12,
+      "shirtMaximumAbsoluteForkDeviationFromDiscovery": 0.0000007013639589104059,
+      "bookMaximumAbsoluteForkDeviationFromDiscovery": 0.00000260073866820143,
+      "interpretation": "Shams preserve the recorded outputs with small numerical fork-score differences. Exact floating-point equality is not required."
+    },
+    "shirt-order-numeral": {
+      "cleanForkLogOdds": 7.121635652414046,
+      "errorForkLogOdds": -0.1933836560444817,
+      "learnerInducedForkShift": -7.3150193084585275,
+      "donorTargetRescueSites": ["L0", "L4", "L20", "L28", "L34"],
+      "donorFailureSites": ["L12"],
+      "randomDeltaTargetRescueSites": ["L4", "L12", "L20", "L28"],
+      "reverseNumeralErrorSites": ["L34"],
+      "L34": {
+        "donorForkLogOdds": 7.121635652414046,
+        "reverseForkLogOdds": -0.1933829546805228,
+        "randomDeltaForkLogOdds": 0.0953740201520965,
+        "randomDeltaText": "שניים של חולצות יעלו בסך הכל 110 שקלים.",
+        "randomDeltaAssessment": "Not a rescue of שתי חולצות. A positive contrast between two nominated tokens does not imply either is the global argmax or that the full output is grammatical."
+      },
+      "interpretation": "The error fork is near a two-candidate tie. Five donor rescues versus four random-delta rescues do not identify a special correction direction; random rescue even occurs at L12 where the donor fails. Only terminal tested transfer reverses the numeral on the clean context.",
+      "limitation": "The supplied summary does not give perturbation norms or a distribution over random directions. Do not infer norm-matched statistical selectivity from one random-delta condition per site."
+    },
+    "book-order-numeral": {
+      "cleanForkLogOdds": 3.783356186061006,
+      "errorForkLogOdds": -1.90058375789485,
+      "learnerInducedForkShift": -5.683939943955856,
+      "donorNumeralRescueSites": ["L34"],
+      "randomDeltaNumeralRescueSites": [],
+      "donorNounRestoredButNumeralWrongSites": ["L0", "L4", "L12"],
+      "randomDeltaNounRestoredButNumeralWrongSites": ["L4", "L12"],
+      "L34": {
+        "donorForkLogOdds": 3.783356186061006,
+        "donorText": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+        "reverseForkLogOdds": -1.900586358633518,
+        "reverseText": "שתי ספרים. המחיר הכולל יהיה 48 שקלים.",
+        "shamText": "שתי גילידים. המחיר הכולל יהיה 48 שקלים."
+      },
+      "interpretation": "L34 transfers the clean/error numeral preference bidirectionally. Reverse34 recreates the numeral error, NOT the original noun corruption. Earlier donors and some random deltas recover ספרים while leaving שתי. Numeral correctness and item recovery are therefore separable intervention outcomes, though they need not be causally independent.",
+      "simpleChainRejected": "The categorical claim that generating שתי necessarily causes גילידים is contradicted by valid outputs containing שתי ספרים. A probabilistic numeral-to-noun influence remains possible."
+    },
+    "sequenceVersusFork": {
+      "bookErrorSpecifiedSequenceLogProbabilityMargin": 0.6878673361746053,
+      "bookErrorActualNumeralForkLogOdds": -1.90058375789485,
+      "bookSpecifiedCorrectContinuation": "שני ספרים עולים יחד 48 שקלים. עדיין לא שילמת.",
+      "bookSpecifiedIncorrectContinuation": "שתי ספרים עולים יחד 48 שקלים. עדיין לא שילמת.",
+      "interpretation": "The specified complete correct book sentence scores above its incorrect counterpart, yet the actual numeral decision favors the wrong token and free output corrupts the noun. Full-sequence likelihood includes different conditioned suffixes and is not the greedy next-token decision or an explicit recognition test. This is consistent with a generation-level mismatch, not proof of available grammatical knowledge in the original failing state."
+    },
+    "preservation": {
+      "observed": "The target patch texts retain the numerical totals 110 and 48.",
+      "notEstablished": "Retaining a total does not establish all facts, payment status, role, goal, or language preservation. No patched library preservation case or cross-case transferable rule is present in the allowed corrected patch summary."
+    }
+  },
+  "conclusions": [
+    "The corrected instrumentation supports real local intervention effects; invalid earlier patch outcomes have no evidential role.",
+    "L34 donor and reverse fork scores reproduce the corresponding source-context margins to numerical tolerance in both cases. This is expected of transporting a late answer-bearing state and is not evidence that L34 computes a native grammar correction.",
+    "The shirt sweep mostly demonstrates sensitivity of a close decision. It does not isolate a donor-specific repair mechanism.",
+    "The book sweep distinguishes numeral choice from lexical identity recovery. It motivates a prefix-controlled dependency test, not a claim that the noun and numeral errors share one repair circuit.",
+    "Nothing here supports training, editing pretrained weights, a low-rank repair, all-criteria quality thresholds, or promotion."
+  ],
+  "revisedHypotheses": [
+    {
+      "id": "H1",
+      "priorId": "M1_RECENT_NUMERAL_SURFACE_RETENTION",
+      "status": "learner_conditioning_supported_specific_native_repair_unlocated",
+      "supported": "Changing only the learner numeral shifts the actual aligned fork toward that surface form in both cases. L34 transfer can swap that choice.",
+      "weakened": "A localized donor-specific correction signal is not established by broad shirt rescue, because random deltas often rescue as well. Terminal state substitution can import the desired answer.",
+      "revisedClaim": "Learner-conditioned opening selection is susceptible to contextual and generic perturbations. The model's ability to explicitly recognize or repair the same agreement relation without a correct donor remains to be tested.",
+      "nextDiscriminator": "Independent, no-option minimal editing plus order-counterbalanced recognition probes; distinguish successful task-conditioned knowledge elicitation from original-context generation.",
+      "falsifierOrLimit": "If explicit probes also fail, do not claim hidden competence. If recognition succeeds but editing fails, only candidate recognition is supported. If both succeed, report task-conditioned availability, not that the original RPG computation already represented the answer correctly."
+    },
+    {
+      "id": "H2",
+      "priorId": "M2_NUMERAL_CONDITIONED_NOUN_DERAILMENT",
+      "status": "deterministic_chain_rejected_probabilistic_dependency_open",
+      "supported": "Lexical book identity can be recovered while the numeral remains wrong. Reverse34 also changes the numeral without reproducing lexical corruption.",
+      "revisedClaim": "Generated numeral tokens and learner-conditioned hidden context may both influence noun selection. A correct numeral is not necessary for noun recovery under the observed interventions, and the wrong numeral is not sufficient for noun corruption.",
+      "nextDiscriminator": "An unpatched 2-by-2 factorial: clean/error learner transcript crossed with forced assistant numeral שני/שתי, with identical noun alternatives and four conditional free continuations at most.",
+      "prediction": "If numeral-mediated influence is substantial, forcing שני improves the ספרים-versus-corruption margin within the error learner transcript; if learner context dominates, the difference persists with the generated numeral held fixed.",
+      "falsifierOrLimit": "No within-transcript noun-margin or free-noun change when the numeral is switched weakens the numeral-mediated account. A strong interaction warrants a mixed account, not a single-chain explanation. Forcing a correct numeral supplies an answer component and is not a native grammar rescue."
+    },
+    {
+      "id": "H3",
+      "priorId": "M3_DELAYED_GENDER_FEATURE_INTERFERENCE",
+      "status": "untested_deferred",
+      "caseId": "book-length-adjective",
+      "reason": "The corrected patches concern the two opening-numeral cases, not this later numeral. Discovery scores for קצרים versus קצרות concern the adjective, not the actual later שלוש ספרים failure.",
+      "retainedObservation": "The error arm already produces קצרים before later using שלוש ספרים, and later still uses שלושה correctly. This is not literal copying of קצרות.",
+      "deferredExactAssistantPrefix": "אני מבין שאתה מחפש ספרים קצרים. אני מציע לך ",
+      "deferredCandidates": ["שלושה ספרים קצרים", "שלוש ספרים קצרים"],
+      "execution": "No runs allocated in this follow-up. Do not transfer conclusions about L34 in the opening-numeral cases to this later decision."
+    }
+  ],
+  "nextDiagnosticDecision": {
+    "primary": "Recognition and no-option repair, before additional activation or weight work.",
+    "whyCheapest": "These directly test whether the same numeral-noun relation can be elicited without a correct donor, using short texts and no capture hooks. More terminal swaps would mostly repeat the answer-import confound.",
+    "secondaryConditional": "A score-first, unpatched book numeral-to-noun factorial directly tests the residual H2 ambiguity. It requires at most four additional conditional free continuations.",
+    "notSelected": "No new six-site sweep, narrow two-layer patch sweep, weight slice, or parameter update in this batch.",
+    "epistemicBoundary": "Recognition presents the alternatives and changes task; repair changes task but does not present the correct alternative in an error-input run. Success shows elicitable behavior under those conditions, not latent competence at the original failing RPG prefix.",
+    "separateTaskRequired": "Use the explicit diagnostic system messages below for recognition/repair, rather than appending a grammar request under the original instruction to answer shopping requests instead of grammar exercises. Do not count diagnostic-mode outputs as NPC-role preservation."
+  },
+  "requestContract": {
+    "notation": "The following is a semantic experiment manifest, not an asserted runtime API schema. No runtime source was inspected.",
+    "execution": "Use the corrected, matched inference/scoring path, one GPU run at a time, temperature zero for free generation, ordinary full-vocabulary probability normalization after raw model softcap, and no sampling penalties or transforms.",
+    "scoring": "Return specified-continuation total and per-token conditional log probabilities, token IDs, and serialized-prefix hash. Recognition label margins and noun margins are not probabilities renormalized over only the nominated alternatives.",
+    "isolation": "Each request starts a fresh independent transcript/cache. Never carry recognition options, previous repairs, donor activations, or hidden state into another request.",
+    "originalTranscriptResolution": "Book factorial requests reference the exact original replay transcript IDs from diagnosis.json and repeat the final learner text as a check. Those files do not contain the complete serialized histories; do not reconstruct a history from metadata. Execute only if the authorized runner can supply the exact original transcript. Otherwise mark that branch blocked.",
+    "boundaries": "Original book prefixes are the two known generated tokens, with no trailing space. Noun candidates include their leading space. Verify this exact token prefix rather than retokenizing the prefix into a different sequence.",
+    "freeLimit": "At most 10 free continuations are allocated below, within the user's cap of 12. Do not spend the remaining two on retries or new prompts without a separately bounded decision. Scored continuations do not count as free generation.",
+    "tokenLimitPerFreeRun": 96,
+    "truncation": "If a run reaches the token cap, record it as truncated/inconclusive for full-text behavior; do not infer an agreement defect from the cutoff or automatically retry."
+  },
+  "recognitionRequests": {
+    "mode": "score_only",
+    "freeContinuations": 0,
+    "system": "זהו מבחן לשון, לא שיחה בחנות. בחר את הצירוף התקין מבחינת התאמת שם המספר לשם העצם. השב רק באות A או B, ללא הסבר.",
+    "assistantPrefix": "",
+    "scoreContinuations": ["A", "B"],
+    "requests": [
+      {
+        "id": "R_SHIRT_AB",
+        "caseId": "shirt-order-numeral",
+        "user": "A: שתי חולצות\nB: שני חולצות",
+        "expectedLabel": "A"
+      },
+      {
+        "id": "R_SHIRT_BA",
+        "caseId": "shirt-order-numeral",
+        "user": "A: שני חולצות\nB: שתי חולצות",
+        "expectedLabel": "B"
+      },
+      {
+        "id": "R_BOOK_AB",
+        "caseId": "book-order-numeral",
+        "user": "A: שני ספרים\nB: שתי ספרים",
+        "expectedLabel": "A"
+      },
+      {
+        "id": "R_BOOK_BA",
+        "caseId": "book-order-numeral",
+        "user": "A: שתי ספרים\nB: שני ספרים",
+        "expectedLabel": "B"
+      },
+      {
+        "id": "R_LIBRARY_AB",
+        "caseId": "library-operation-verb",
+        "user": "A: שתי עמדות\nB: שני עמדות",
+        "expectedLabel": "A"
+      },
+      {
+        "id": "R_LIBRARY_BA",
+        "caseId": "library-operation-verb",
+        "user": "A: שני עמדות\nB: שתי עמדות",
+        "expectedLabel": "B"
+      }
+    ],
+    "interpretation": "Require preference for the grammatical phrase under both option orders before calling recognition directionally consistent. Near-ties or order-dependent answers are inconclusive. A fixed A/B preference is not grammatical recognition. Candidate text itself supplies the correct answer, so recognition alone is weak availability evidence."
+  },
+  "repairRequests": {
+    "mode": "free_continuation",
+    "freeContinuations": 6,
+    "system": "זהו מבחן עריכה בעברית, לא שיחה בחנות. החזר רק את הטקסט הנתון. אם יש בו שגיאת התאמה בין שם המספר לשם העצם, תקן רק אותה. אם אין שגיאה כזאת, השאר את הטקסט ללא שינוי. אל תשנה פריטים, כמויות, מחירים או מצב תשלום, ואל תוסיף הסבר.",
+    "assistantPrefix": "",
+    "requests": [
+      {
+        "id": "E_SHIRT_ERROR",
+        "caseId": "shirt-order-numeral",
+        "user": "שני חולצות יהיו בסך 110 ש\"ח.",
+        "expectedMinimalOutput": "שתי חולצות יהיו בסך 110 ש\"ח.",
+        "inputProvenance": "Actual error-arm free reply."
+      },
+      {
+        "id": "E_SHIRT_CLEAN",
+        "caseId": "shirt-order-numeral",
+        "user": "שתי חולצות יהיו בסך 110 ש\"ח.",
+        "expectedMinimalOutput": "שתי חולצות יהיו בסך 110 ש\"ח.",
+        "inputProvenance": "Constructed minimal correct counterpart; not claimed to be the original clean free reply.",
+        "purpose": "No-op control: do not reward blanket rewriting or flipping a numeral regardless of correctness."
+      },
+      {
+        "id": "E_BOOK_ERROR",
+        "caseId": "book-order-numeral",
+        "user": "שתי ספרים. המחיר הכולל יהיה 48 שקלים.",
+        "expectedMinimalOutput": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+        "inputProvenance": "Constructed isolated-numeral probe, also observed in valid patch outputs. It supplies the authoritative book noun rather than asking the editor to infer the meaning or gender of גילידים.",
+        "limit": "Success does not demonstrate autonomous repair of the original combined numeral-plus-noun corruption."
+      },
+      {
+        "id": "E_BOOK_CLEAN",
+        "caseId": "book-order-numeral",
+        "user": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+        "expectedMinimalOutput": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+        "inputProvenance": "Actual clean free reply.",
+        "purpose": "No-op control with the opposite required numeral gender from shirts."
+      },
+      {
+        "id": "E_LIBRARY_ERROR",
+        "caseId": "library-operation-verb",
+        "user": "שני עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+        "expectedMinimalOutput": "שתי עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+        "inputProvenance": "Constructed cross-item agreement probe using protected library facts, not an error observed in the original library reply.",
+        "purpose": "Check the task on a preserved feminine noun without supplying the correct numeral."
+      },
+      {
+        "id": "E_LIBRARY_CLEAN",
+        "caseId": "library-operation-verb",
+        "user": "שתי עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+        "expectedMinimalOutput": "שתי עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+        "inputProvenance": "Constructed correct counterpart using protected library facts.",
+        "purpose": "Preserve correct agreement, availability now, one-hour scope, total 20, and unpaid status under the same editing instruction."
+      }
+    ],
+    "evaluation": "Record exact minimal-edit success after trimming exterior whitespace, grammatical numeral choice, item identity, and protected facts separately. Other rewriting can fail the editing instruction without proving absence of agreement knowledge. Expected outputs are evaluator metadata only and must never be appended to the request.",
+    "availabilityCriterion": "The two error targets corrected without alternatives, their clean counterparts unchanged, and the library control intact would support elicitable task-conditioned agreement behavior. Opposite required shirt/book genders rule out a blanket numeral substitution. It is not a universal or human-calibrated competence result."
+  },
+  "bookDependencyRequests": {
+    "execution": "Conditional secondary stage: score all four conditions first. Generate the four conditional continuations only if scores discriminate the hypotheses or show a decision-relevant interaction. Keep all four cells if this free stage runs; do not cherry-pick only the favorable prefix.",
+    "scoreContinuations": [" ספרים", " גילידים", " גיליונות"],
+    "candidateRationale": "ספרים is the authoritative item. גילידים is the observed corrupted surface, with no assumed grammatical gender. גיליונות is a real but wrong-item surface observed in the L0 random-delta output. None of their model scores is a grammar label.",
+    "scoreOnlyCandidateEvaluations": 12,
+    "maximumFreeContinuations": 4,
+    "patch": "none",
+    "requests": [
+      {
+        "id": "N_CLEAN_SHNEI",
+        "baseTranscriptRef": "discovery:book-order-numeral.clean.replay",
+        "caseId": "book-order-numeral",
+        "variant": "clean",
+        "finalLearnerCheck": "אני רוצה שני ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?",
+        "assistantPrefix": "שני",
+        "assistantPrefixTokenIds": [237331, 12712],
+        "prefixStatus": "actual observed prefix"
+      },
+      {
+        "id": "N_CLEAN_SHTEI",
+        "baseTranscriptRef": "discovery:book-order-numeral.clean.replay",
+        "caseId": "book-order-numeral",
+        "variant": "clean",
+        "finalLearnerCheck": "אני רוצה שני ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?",
+        "assistantPrefix": "שתי",
+        "assistantPrefixTokenIds": [237331, 37750],
+        "prefixStatus": "teacher-forced counterfactual numeral"
+      },
+      {
+        "id": "N_ERROR_SHNEI",
+        "baseTranscriptRef": "discovery:book-order-numeral.error.replay",
+        "caseId": "book-order-numeral",
+        "variant": "error",
+        "finalLearnerCheck": "אני רוצה שתי ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?",
+        "assistantPrefix": "שני",
+        "assistantPrefixTokenIds": [237331, 12712],
+        "prefixStatus": "teacher-forced counterfactual numeral"
+      },
+      {
+        "id": "N_ERROR_SHTEI",
+        "baseTranscriptRef": "discovery:book-order-numeral.error.replay",
+        "caseId": "book-order-numeral",
+        "variant": "error",
+        "finalLearnerCheck": "אני רוצה שתי ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?",
+        "assistantPrefix": "שתי",
+        "assistantPrefixTokenIds": [237331, 37750],
+        "prefixStatus": "actual observed prefix"
+      }
+    ],
+    "estimands": {
+      "nounMargin": "M(learner,numeral) = logP(' ספרים' | exact transcript,numeral) - logP(' גילידים' | exact transcript,numeral). Also report the separate contrast against ' גיליונות', with full-span and per-token scores.",
+      "numeralEffect": "Within each learner transcript, compare M(learner,שני) minus M(learner,שתי).",
+      "learnerEffect": "For each fixed numeral, compare M(clean,numeral) minus M(error,numeral).",
+      "interaction": "Compare the numeral effect in the error transcript with that in the clean transcript. Report all four cells; do not force a single-cause explanation.",
+      "freeReadout": "From each exact prefix, let the noun and all following text generate freely. Preserve two books, 24 ILS per book, 48 ILS total, and unpaid status; omissions and contradictions remain distinct."
+    },
+    "triggerForFreeStage": "Run the four free cells if the candidate winner changes across numerals within an arm or across learner arms at a fixed numeral, or if a contrast changes by at least 0.5 natural-log units. This is a fixed exploratory triage threshold, not a significance or quality gate. If no trigger occurs, stop this branch after scoring rather than spending generation budget.",
+    "interpretationLimit": "The correct numeral is supplied in two cells. Any noun recovery after that prefix is evidence about conditional generation, not evidence that the model can choose the correct numeral unassisted. A teacher-forced grammaticality failure must not be attributed to free selection of its forced numeral."
+  },
+  "budget": {
+    "recognitionCandidateScores": 12,
+    "bookDependencyCandidateScoresIfRun": 12,
+    "primaryFreeContinuations": 6,
+    "conditionalFreeContinuations": 4,
+    "maximumPlannedFreeContinuations": 10,
+    "userMaximumFreeContinuations": 12,
+    "maximumPlannedGeneratedTokens": 960,
+    "unusedFreeContinuations": 2,
+    "newPatchRuns": 0,
+    "weightInspectionBytes": 0,
+    "retries": "None automatically. Repeats are not independent evidence at temperature zero and must not silently expand this budget."
+  },
+  "weightSliceRecommendation": {
+    "requestNow": [],
+    "inspectionBytesNow": 0,
+    "reason": "The evidence locates a manipulable late state, not an implicated linear operator, head, MLP feature, or PLE component. Shirt random-delta rescue lacks specificity, and book L34 transplantation is compatible with direct output-state transfer. Broad q/k/v/o or MLP dumps would be uninformative fishing.",
+    "pretrainedRepairAuthorized": false,
+    "conditionalFuture": "Only after the behavioral diagnostic, if native-computation localization remains warranted, consider a separately bounded L33/L34 follow-up at the same actual ש token with matched controls and within-block attribution. Do not assume a post-L34 effect was computed by layer 34.",
+    "requirementsBeforeAnySlice": [
+      "Demonstrate an effect tied to a particular sublayer or component rather than replacing the entire late residual.",
+      "Identify the relevant tensor and indexed rows/columns from activation evidence; do not choose coordinates merely because their weights look large.",
+      "Request only that component's bounded slice: o if an attention output contribution is implicated, or corresponding gate/up/down indices if an MLP contribution is implicated; q/k/v only if routing evidence calls for them, PLE only if specifically implicated.",
+      "Include shape, orientation, indices, quantization codes, scales, and an explicit byte cap in the later request. No tensor slices or coordinates are justified by the current files.",
+      "Establish a transferable, context-appropriate effect and preservation before considering any weight correction. Inspecting weights alone is not causal evidence."
+    ]
+  },
+  "stopConditions": [
+    "If exact original transcript resolution or token-prefix verification fails, stop the book factorial branch; do not approximate its history or move the intervention position.",
+    "If corrected sentinel/sham/revert validity is contradicted in future execution, stop causal attribution. Do not revive the invalid earlier discovery patch records.",
+    "If recognition is order-dependent or repair changes correct inputs indiscriminately, report ambiguity or instruction-following confounding, not hidden grammatical competence.",
+    "If explicit recognition and no-option repair both fail on the target relation, stop competence and pretrained-repair claims. These probes cannot distinguish missing knowledge from all possible elicitation failures.",
+    "If explicit editing succeeds, stop at task-conditioned availability unless an independent original-context experiment establishes a transferable native computation. Do not reinterpret a successful editor as a deployed RPG repair.",
+    "If book factorial margins lack the stated triage signal, omit its four free continuations. If they track learner state rather than numeral, revise H2 toward upstream or mixed contextual effects.",
+    "If candidate log-odds improve but free output selects another malformed phrase, record no target rescue; the shirt L34 random-delta output is the existing warning case.",
+    "Any item, quantity, unit/total, timing, or unpaid-status regression blocks a preservation claim even if agreement improves. Diagnostic task-switching is not original-role preservation.",
+    "Stop after the allocated 10 free continuations at most, with no automatic retries, expanded layer search, weight dumps, training, runtime edits, final-data access, or promotion."
+  ],
+  "resultInterpretationTable": [
+    {
+      "outcome": "Order-stable recognition, successful no-option target repair, clean controls unchanged",
+      "conclusion": "Evidence that correct agreement behavior is elicitable under an explicit diagnostic task despite the RPG generation failure; not proof of a latent correct representation at the original fork."
+    },
+    {
+      "outcome": "Recognition succeeds but no-option repair fails",
+      "conclusion": "Candidate recognition may be available; autonomous correction is not demonstrated. Option exposure and task format remain confounds."
+    },
+    {
+      "outcome": "Repair succeeds but recognition is order-dependent",
+      "conclusion": "Observed editing capability with an unreliable multiple-choice assay; do not collapse the two readouts."
+    },
+    {
+      "outcome": "Book noun tracks forced numeral within the same learner transcript",
+      "conclusion": "Supports a conditional numeral-to-noun influence, while the existing patches already rule out an inevitable numeral-to-corruption chain."
+    },
+    {
+      "outcome": "Book noun tracks learner arm at a fixed numeral",
+      "conclusion": "Supports remaining contextual or hidden-state influence beyond the generated numeral; no operator has yet been localized."
+    },
+    {
+      "outcome": "Only L34 answer-bearing donor swaps continue to work",
+      "conclusion": "Activation-only answer-state transfer; no native repair mechanism or pretrained weight correction established."
+    }
+  ]
+}

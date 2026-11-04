@@ -600,6 +600,18 @@ Diagnostics panel can load a patch manifest and apply or clear an overlay.
 The first campaign (Hebrew CEFR RPG NPC, English metadata) lives in [research/cefr-agentic](research/cefr-agentic)
 with results and the full report in [research-results/cefr-agentic/REPORT.md](research-results/cefr-agentic/REPORT.md).
 
+### Mechanism-first workbench
+
+Open [research.html](research.html) to replay failures, inspect token decisions and
+bounded weight slices, capture residuals, and run token-local activation diagnostics.
+The page and `npm run research:workbench -- <requests.json> <run-id>` share the same
+typed runner. Saved evidence can be viewed without loading a model.
+
+See the [workbench guide](research/mechanistic-repair/README.md) and
+[bounded investigation report](research-results/mechanistic-repair/REPORT.md).
+The investigation did not establish a transferable weight repair or meet the
+all-criteria 9/10 promotion gate; no intervention is enabled in production.
+
 ## Roadmap
 
 The current-browser four-runtime run is recorded in

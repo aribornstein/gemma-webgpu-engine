@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "scope": "Engineering verification, not a model-quality promotion",
+  "sourceBaseline": "cc3b1ad015d4016c3b22efe3ac007a07e6069dd4",
+  "checks": [
+    {"command": "npm run typecheck", "result": "passed after final reliability fixes"},
+    {"command": "GEMMA_RESEARCH_RUN=1 npx playwright test --workers=1 --reporter=line", "result": "246 passed, 10 skipped before final CLI/lifecycle hardening"},
+    {"command": "npm run test:cpu -- --workers=1 --reporter=line", "result": "95 passed"},
+    {"command": "MECHANISTIC_LIVE=1 GEMMA_RESEARCH_RUN=1 npx playwright test tests/research-workbench.spec.ts tests/research-workbench.live.spec.ts tests/generation-ui.spec.ts tests/research-residual-edit.spec.ts tests/research-probes.spec.ts --workers=1 --reporter=line", "result": "32 passed after final hardening"},
+    {"command": "npm run build", "result": "passed, demo/workbench/library regenerated; existing bundle-size and extensionless Vite config warnings remain"},
+    {"command": "npm run research:workbench -- <delivery-smoke.json> delivery-smoke", "result": "2 real-checkpoint jobs passed; Hi! golden exact; both running reservations persisted to disk before model evaluation"},
+    {"command": "Integrated browser: built /build/research.html and review-example.json", "result": "13 saved artifacts imported without a model; corrected book donor output and 12 next-token rows displayed"}
+  ],
+  "activityAndParity": [
+    "Nonzero sentinel changes model logits",
+    "Same-state sham and zero patch are token-identical to baseline",
+    "Revert and cancellation recovery preserve baseline output",
+    "Bounded weight inspection returns real signed int2 codes and dequantized values",
+    "Fresh sequential/full-logit execution shared by UI and CLI"
+  ],
+  "reviewFindingsResolved": [
+    {
+      "finding": "CLI crash discarded budget reservations held only in ephemeral browser IndexedDB",
+      "fix": "Await durable external store acknowledgment before evaluation; conservative reservations survive simulated browser loss and cannot be silently retried under the same ID",
+      "tests": ["Durable store restart reconciliation", "Disk failure prevents model evaluation", "Real CLI checkpoint events"]
+    },
+    {
+      "finding": "Cancelling active work resumed an explicitly paused queue",
+      "fix": "Cancellation preserves pause state; close explicitly releases waiters to reject as closed",
+      "tests": ["Cancel A while B is queued and paused; B never evaluates until resumed"]
+    },
+    {
+      "finding": "Closing while checkpoint loading could install the late session",
+      "fix": "Load epoch invalidated on close; late session destroyed and execution remains disabled",
+      "tests": ["Delayed-loader browser regression"]
+    }
+  ],
+  "invalidatedScientificAttempts": "discovery/INVALIDATION.json; never interpreted as null intervention effects",
+  "qualityGate": "not passed; no candidate promoted or deployed"
+}

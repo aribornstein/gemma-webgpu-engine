@@ -1,0 +1,508 @@
+[
+  {
+    "episodeId": "0ca1167acc7a0c3c",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 9,
+        "evidence": ["כן, שני תיקים יחד עולים 120 שקלים.", "האם תרצה להמשיך עם התשלום?"]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["כן, שני תיקים יחד עולים 120 שקלים.", "האם תרצה להמשיך עם התשלום?"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Clear, grammatical A1 price confirmation; the payment invitation is slightly less direct than a simple invitation to pay. It resolves the combined-price question and advances naturally toward payment. Exploratory and not human-calibrated; this turn cannot establish overall proficiency or completed transaction progress."
+  },
+  {
+    "episodeId": "1719df8edb9829b0",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 9,
+        "evidence": ["אני מבין שאתה מחפש ספרים קצרים. אני מציע לך שלושה ספרים קצרים.", "המחיר הכולל עבור שלושת הספרים יהיה 72 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 8,
+        "evidence": ["אני מציע לך שלושה ספרים קצרים.", "המחיר הכולל עבור שלושת הספרים יהיה 72 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Grammatical and suitable for a B2 interaction, with mildly mechanical repetition. Presenting the already selected books as a fresh recommendation misses the requested order-summary framing, although quantity, length and total are clear. Exploratory and not human-calibrated; one turn cannot establish proficiency or completion of the purchase."
+  },
+  {
+    "episodeId": "331ef11fc1e3c4a3",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 7,
+        "evidence": ["שני חולצות", "יהיו בסך 110 ש\"ח."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 9,
+        "evidence": ["שני חולצות יהיו בסך 110 ש\"ח."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "The numeral has incorrect gender agreement, and the pricing construction is awkward; brevity itself is appropriate for B2. Despite these defects, the reply clearly supplies the combined shirt price. Exploratory and not human-calibrated; this short sample cannot establish overall proficiency or completed payment."
+  },
+  {
+    "episodeId": "351d7a0b34a48872",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 9,
+        "evidence": ["שני ספרים.", "המחיר הכולל יהיה 48 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["שני ספרים. המחיר הכולל יהיה 48 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "The opening is a clipped conversational echo rather than a full confirmation sentence, but the complete price sentence keeps the reply intelligible and suitable for A1. It answers the immediate request without distraction. Exploratory and not human-calibrated; one turn cannot establish proficiency or purchase completion."
+  },
+  {
+    "episodeId": "4c162f4ed491a05c",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 9,
+        "evidence": ["שתי חולצות יהיו 110 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["שתי חולצות יהיו 110 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Correct agreement and an appropriately concise B2 transaction reply. The future copula is a slightly less idiomatic pricing choice than an explicit cost verb, but the total is unambiguous in context. Exploratory and not human-calibrated; this single sentence cannot demonstrate broader proficiency or completed payment."
+  },
+  {
+    "episodeId": "4ca6393acb433f32",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 8,
+        "evidence": ["העמדות יהיו זמינות בשש בערב.", "המחיר עבור שלושה עמדות לשעה הוא 30 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 9,
+        "evidence": ["העמדות יהיו זמינות בשש בערב.", "המחיר עבור שלושה עמדות לשעה הוא 30 שקלים.", "האם תרצה להמשיך עם ההזמנה?"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "The otherwise fluent B2 response has a substantive numeral-gender error. It answers availability and price; the generic invitation to continue is mildly redundant after an existing booking and a payment question. Exploratory and not human-calibrated; overall proficiency and actual booking completion remain uncertain."
+  },
+  {
+    "episodeId": "4f0fcb05fece729d",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 10,
+        "evidence": ["כן, העמדות פועלות כרגע.", "אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 9,
+        "evidence": ["כן, העמדות פועלות כרגע.", "אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות.", "המחיר הכולל יהיה 20 שקלים. האם תרצה להמשיך?"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Natural, grammatical B2 language with no need for greater complexity. Current operation, duration, quantity and total are covered; saying confirmation is possible and asking again leaves a minor ambiguity about whether the requested confirmation has occurred. Exploratory and not human-calibrated; one turn does not establish proficiency or a completed booking."
+  },
+  {
+    "episodeId": "5405b93e67f8dd56",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 2,
+        "evidence": ["שתי גילידים.", "המחיר הכולל יהיה 48 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 4,
+        "evidence": ["שתי גילידים.", "המחיר הכולל יהיה 48 שקלים."]
+      }
+    ],
+    "criticalViolations": [
+      "The item confirmation \"שתי גילידים\" is unintelligible in this book-purchase context and does not provide usable grammatical A1 language."
+    ],
+    "notes": "The opening substitutes an unrecognizable item expression for the selected books and also has an apparent agreement mismatch. The correct, intelligible price sentence only partially rescues the answer. Exploratory and not human-calibrated; neither overall proficiency nor successful goal completion can be inferred from this turn."
+  },
+  {
+    "episodeId": "551dbfef0ba82634",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 5,
+        "evidence": ["החדרים שאתם בוחרים הם חדרי קטנים.", "עבור שתי חדרים"]
+      },
+      {
+        "criterion": "coherence",
+        "score": 8,
+        "evidence": ["החדרים שאתם בוחרים הם חדרי קטנים.", "המחיר לחדר אחד ללילה הוא 240 שקלים.", "הסכום הכולל הוא 480 שקלים.", "האם תרצו להזמין"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "The malformed room description and wrong numeral agreement are significant defects in language intended for A1, not acceptable simplification. Size and total remain recoverable, but ongoing-choice wording and an invitation to book partially reopen the existing selection. Exploratory and not human-calibrated; broader proficiency and booking completion cannot be established."
+  },
+  {
+    "episodeId": "552a3986c80a5287",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 10,
+        "evidence": ["כן, התיקים חדשים.", "יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["כן, התיקים חדשים. יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "A concise, grammatical reply is fully appropriate to this B2 exchange. Both the condition question and combined-price question receive direct answers; the earlier vocabulary detour is not unnecessarily reopened. Exploratory and not human-calibrated; this narrow success does not establish overall proficiency or completed purchase progress."
+  },
+  {
+    "episodeId": "58737d919a042516",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 7,
+        "evidence": ["שלושה עמדות", "שלושת העמדות"]
+      },
+      {
+        "criterion": "coherence",
+        "score": 8,
+        "evidence": ["העמדות יהיו זמינות בשש בערב.", "המחיר עבור שלושה עמדות לשעה הוא 30 שקלים.", "האם תרצה להזמין את שלושת העמדות?"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Repeated masculine numeral forms with a feminine noun weaken the otherwise understandable B2 language. The time and total answer the question, but asking whether to book again loses some continuity with the already established booking. Exploratory and not human-calibrated; a single response cannot establish proficiency or booking completion."
+  },
+  {
+    "episodeId": "5a5997ef36519a49",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 6,
+        "evidence": ["החדרים שהזמנת הם חדרי גודל קטן.", "עבור שתי חדרים"]
+      },
+      {
+        "criterion": "coherence",
+        "score": 9,
+        "evidence": ["החדרים שהזמנת הם חדרי גודל קטן.", "המחיר לחדר אחד בלילה הוא 240 שקלים.", "הסכום הכולל הוא 480 שקלים.", "האם תרצה להמשיך"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "The cumbersome size construction and incorrect numeral gender make this a weak grammatical model for A1 despite recoverable meaning. It retains the existing reservation and answers size and total; the closing question is understandable despite missing terminal punctuation. Exploratory and not human-calibrated; proficiency and actual booking completion remain uncertain."
+  },
+  {
+    "episodeId": "8447b9230c135ba6",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 5,
+        "evidence": ["אני מציע לך שלוש ספרים קצרים.", "הסכום הכולל יהיה 72 שקלים. האם"]
+      },
+      {
+        "criterion": "coherence",
+        "score": 6,
+        "evidence": ["אני מציע לך שלוש ספרים קצרים.", "אם תרצה שלושה, הסכום הכולל יהיה 72 שקלים.", "האם"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Incorrect numeral agreement and a genuinely unfinished question are significant B2 presentation problems. The response reverts to a proposal and makes the chosen quantity conditional instead of summarizing the existing selection, although the relevant total is present. Exploratory and not human-calibrated; overall proficiency and completed goal progress cannot be inferred."
+  },
+  {
+    "episodeId": "8cbfbe3638c41c54",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 9,
+        "evidence": ["כן, שני תיקים יחד הם 120 שקלים.", "האם תרצה להמשיך עם התשלום?"]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["כן, שני תיקים יחד הם 120 שקלים.", "האם תרצה להמשיך עם התשלום?"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Understandable, largely simple A1 language; using a copula rather than a cost verb is a minor idiomatic concern. The combined amount is explicitly confirmed and the payment invitation follows naturally. Exploratory and not human-calibrated; one turn cannot establish overall proficiency or completed payment."
+  },
+  {
+    "episodeId": "90a7bccb02d45b6a",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 10,
+        "evidence": ["כן, התיקים חדשים.", "יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["כן, התיקים חדשים. יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Natural agreement and concise complete sentences suit this B2 transaction without added complexity. The reply directly confirms new bags and the whole-order price without turning the exchange into grammar instruction. Exploratory and not human-calibrated; this single-turn success cannot establish broader proficiency or purchase completion."
+  },
+  {
+    "episodeId": "9d2dc70395827bfd",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 10,
+        "evidence": ["כן, העמדות פועלות כרגע.", "אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 9,
+        "evidence": ["כן, העמדות פועלות כרגע.", "אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות.", "המחיר הכולל יהיה 20 שקלים. האם תרצה להמשיך?"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Grammatical, natural B2 wording supplies the operational status and booking details. The ability-to-confirm wording followed by another invitation leaves a minor uncertainty about whether confirmation itself has occurred. Exploratory and not human-calibrated; neither overall proficiency nor a completed booking is established by this response."
+  },
+  {
+    "episodeId": "a4f03f5e680f43b0",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 10,
+        "evidence": ["כן, החולצות שלך מגיעות היום.", "הסכום הכולל הוא 110 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["כן, החולצות שלך מגיעות היום. הסכום הכולל הוא 110 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Two simple, grammatical sentences provide accessible A1 language and directly answer arrival day and amount due. No unsupported arrival time or irrelevant digression is introduced. Exploratory and not human-calibrated; this turn does not establish overall proficiency or completed purchase progress."
+  },
+  {
+    "episodeId": "aad4ace19aeae9a9",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 9,
+        "evidence": ["החולצות שלך מגיעות היום.", "הסכום הכולל הוא 110 ש\"ח.", "האם תרצי לשלם עכשיו?"]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["החולצות שלך מגיעות היום.", "הסכום הכולל הוא 110 ש\"ח. האם תרצי לשלם עכשיו?"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Clear, grammatical A1 transaction language and an appropriately feminine payment invitation. The unexplained currency abbreviation is a minor beginner-accessibility concern, not a substantive coherence issue. Exploratory and not human-calibrated; one reply cannot establish broader proficiency or completion of payment."
+  },
+  {
+    "episodeId": "afdcdbaa702bc7aa",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 7,
+        "evidence": ["אז את רוצה של שלוש מחברות.", "המחיר עבור שלוש מחברות הוא 18 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 9,
+        "evidence": ["אז את רוצה של שלוש מחברות.", "המחיר עבור שלוש מחברות הוא 18 שקלים. האם תרצי לשלם?"]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "The extra preposition makes the opening ungrammatical and is a substantive defect in an A1 model, although the following sentence is clear. Quantity, total and a relevant payment invitation keep the exchange coherent with a minor fluency disruption. Exploratory and not human-calibrated; proficiency and completed payment cannot be inferred."
+  },
+  {
+    "episodeId": "b22273fecbf4aee7",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 10,
+        "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה אחד הוא 720 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה אחד הוא 720 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "An economical, grammatical B2 answer is appropriate here. It retains the three-room, one-night booking and answers the amount-still-due question in context without reviving the ticket detour or mistaken prior claim. Exploratory and not human-calibrated; this turn cannot establish general proficiency or completed payment."
+  },
+  {
+    "episodeId": "b35116bedfd08769",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 8,
+        "evidence": ["כן, המחברות הכחולות.", "יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 9,
+        "evidence": ["כן, המחברות הכחולות.", "יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "The opening uses a definite noun phrase rather than directly predicating that the notebooks are blue, a substantive weakness as an A1 sentence model. Its affirmative meaning is still inferable in context, and the quantity and total are explicit. Exploratory and not human-calibrated; broader proficiency and completed purchase progress remain uncertain."
+  },
+  {
+    "episodeId": "cbf594d597fb014e",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 10,
+        "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה הוא 720 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה הוא 720 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "The concise, well-formed answer suits a B2 interaction and does not need elaboration for its own sake. The whole-booking amount naturally answers what remains payable for the established one-night stay. Exploratory and not human-calibrated; one sentence cannot establish overall proficiency or actual transaction completion."
+  },
+  {
+    "episodeId": "f63688a63f79b0e1",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 7,
+        "evidence": ["את רוצה של שלוש מחברות.", "המחיר עבור שלוש מחברות הוא 18 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 9,
+        "evidence": ["את רוצה של שלוש מחברות.", "המחיר עבור שלוש מחברות הוא 18 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "An intrusive preposition makes the first sentence ungrammatical rather than simply beginner-friendly. The complete second sentence clearly gives the requested quantity and price, preserving conversational continuity despite the malformed opening. Exploratory and not human-calibrated; the sample cannot establish proficiency or successful purchase completion."
+  },
+  {
+    "episodeId": "ff47560e46a4c464",
+    "judgeId": "m-level-judge",
+    "role": "level-conversation",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {
+        "criterion": "levelSuitability",
+        "score": 10,
+        "evidence": ["כן, המחברות האלה כחולות.", "יש לך שתי מחברות.", "הסכום הכולל הוא 12 שקלים."]
+      },
+      {
+        "criterion": "coherence",
+        "score": 10,
+        "evidence": ["כן, המחברות האלה כחולות. יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים."]
+      }
+    ],
+    "criticalViolations": [],
+    "notes": "Short, complete, grammatical sentences provide a clear A1 model. The response confirms the selected color and quantity and states the total without revisiting the resolved vocabulary question. Exploratory and not human-calibrated; this turn cannot establish overall proficiency or completed payment."
+  }
+]

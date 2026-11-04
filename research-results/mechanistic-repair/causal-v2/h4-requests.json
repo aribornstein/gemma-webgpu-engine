@@ -1,0 +1,230 @@
+[
+  {
+    "id": "H4_E_SHIRT_ERROR",
+    "op": "replay",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a Hebrew editing test, not a conversation in a shop. Return only the supplied text. If it contains a numeral-noun agreement error, correct only that error. If there is no such error, leave the text unchanged. Do not change items, quantities, prices, or payment status, and do not add an explanation."
+      },
+      {
+        "role": "user",
+        "content": "שני חולצות יהיו בסך 110 ש\"ח."
+      }
+    ],
+    "assistantPrefix": "",
+    "maxNewTokens": 96,
+    "temperature": 0,
+    "seed": 23
+  },
+  {
+    "id": "H4_E_BOOK_ERROR",
+    "op": "replay",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a Hebrew editing test, not a conversation in a shop. Return only the supplied text. If it contains a numeral-noun agreement error, correct only that error. If there is no such error, leave the text unchanged. Do not change items, quantities, prices, or payment status, and do not add an explanation."
+      },
+      {
+        "role": "user",
+        "content": "שתי ספרים. המחיר הכולל יהיה 48 שקלים."
+      }
+    ],
+    "assistantPrefix": "",
+    "maxNewTokens": 96,
+    "temperature": 0,
+    "seed": 23
+  },
+  {
+    "id": "H4_R_SHIRT_AB_A",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שתי חולצות\nB: שני חולצות"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "A"
+  },
+  {
+    "id": "H4_R_SHIRT_AB_B",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שתי חולצות\nB: שני חולצות"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "B"
+  },
+  {
+    "id": "H4_R_SHIRT_BA_A",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שני חולצות\nB: שתי חולצות"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "A"
+  },
+  {
+    "id": "H4_R_SHIRT_BA_B",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שני חולצות\nB: שתי חולצות"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "B"
+  },
+  {
+    "id": "H4_R_BOOK_AB_A",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שני ספרים\nB: שתי ספרים"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "A"
+  },
+  {
+    "id": "H4_R_BOOK_AB_B",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שני ספרים\nB: שתי ספרים"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "B"
+  },
+  {
+    "id": "H4_R_BOOK_BA_A",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שתי ספרים\nB: שני ספרים"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "A"
+  },
+  {
+    "id": "H4_R_BOOK_BA_B",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שתי ספרים\nB: שני ספרים"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "B"
+  },
+  {
+    "id": "H4_R_LIBRARY_AB_A",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שתי עמדות\nB: שני עמדות"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "A"
+  },
+  {
+    "id": "H4_R_LIBRARY_AB_B",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שתי עמדות\nB: שני עמדות"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "B"
+  },
+  {
+    "id": "H4_R_LIBRARY_BA_A",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שני עמדות\nB: שתי עמדות"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "A"
+  },
+  {
+    "id": "H4_R_LIBRARY_BA_B",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+      },
+      {
+        "role": "user",
+        "content": "A: שני עמדות\nB: שתי עמדות"
+      }
+    ],
+    "assistantPrefix": "",
+    "continuation": "B"
+  }
+]

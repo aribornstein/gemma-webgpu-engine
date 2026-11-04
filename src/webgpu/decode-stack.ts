@@ -1,4 +1,5 @@
 import type { DecodeMlpPleFixture } from "../model/decode-mlp-ple-fixture";
+import { encodeResearchActivationPatch, type ResearchActivationPatch } from "./research-activation-patch";
 import {
   encodeResearchResidualCapturePass,
   encodeResearchResidualEditPass,
@@ -79,6 +80,7 @@ export interface GemmaDecodeStackResources {
   rotaryBuffers: readonly DecodeAttentionRotaryBuffers[];
   /** Research-only residual edit after one layer; absent in normal inference. */
   researchEdits?: readonly ResearchResidualEditResources[] | null;
+  researchPatch?: ResearchActivationPatch | null;
   /** Research-only residual copies after layers (taken after any edit at that layer). */
   researchCaptures?: readonly ResearchResidualCapture[] | null;
 }
@@ -360,6 +362,9 @@ export function encodeGemmaDecodeStackPass(
       for (const edit of researchEdits) {
         if (edit.layerIndex === layerIndex) encodeResearchResidualEditPass(pass, edit);
       }
+    }
+    if (resources.researchPatch?.layerIndex === layerIndex) {
+      encodeResearchActivationPatch(pass, resources.researchPatch);
     }
     if (resources.researchCaptures) {
       for (const capture of resources.researchCaptures) {

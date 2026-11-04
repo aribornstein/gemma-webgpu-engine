@@ -1,0 +1,356 @@
+{
+  "schemaVersion": 1,
+  "status": "bounded_instruction_language_control_justified_not_executed",
+  "evidenceSource": "research-results/mechanistic-repair/causal-v2/behavioral-summary.json",
+  "requestType": "ExperimentRequest[] from src/research/workbench/runner.ts",
+  "schemaVerification": "The workbench request type and a score-request test example were inspected solely to emit valid typed requests. No additional experimental results were read and no runtime files were edited.",
+  "decision": {
+    "justified": true,
+    "reason": "The explicit diagnostic instructions were in Hebrew whereas the product instructions are in English. One semantically matched English translation is a cheap remaining task-interpretation control. It does not justify a search over prompts or a presumption that English will reveal hidden competence.",
+    "scope": "Change only the system-instruction language. Keep Hebrew user text, candidate ordering, A/B output labels, empty assistant prefix, inference path, and editing token limit unchanged.",
+    "reservationUse": "Use exactly the two previously unallocated free-continuation slots. The four already-running noun-factorial continuations are not repeated or included as new requests."
+  },
+  "baselineAssessment": {
+    "recognition": {
+      "preferredLabel": "B in all six requests",
+      "orderStableCorrectPairs": 0,
+      "pairCount": 3,
+      "interpretation": "The three nominally correct B responses are consistent with a fixed-label or second-option bias, not order-stable recognition. A+B probability mass is approximately 0.990 to 0.996, so the model largely followed the label-only output format; this is not evidence that it failed to understand every part of the Hebrew instruction."
+    },
+    "editing": {
+      "erroneousInputsCorrected": 0,
+      "erroneousInputs": 3,
+      "cleanInputsPreserved": 3,
+      "cleanInputs": 3,
+      "allInputsCopiedUnchanged": true,
+      "allStopReasons": "end-token",
+      "interpretation": "All-copy behavior can reflect conservative task interpretation, agreement failure, or both. Clean-input preservation alone is trivial under an all-copy policy. These completed outputs are not truncation failures."
+    },
+    "nounFactorial": {
+      "numeralEffectCleanNats": 12.236845205669328,
+      "numeralEffectErrorNats": 14.876698639277201,
+      "conditionalFreeRuns": "Four runs are executing, per the user; their outputs have not been read or inferred.",
+      "interpretation": "Strong conditional noun-score effects justify the already-authorized factorial continuations, but supplying a numeral is not evidence that the model can autonomously choose or edit that numeral."
+    }
+  },
+  "hypothesisCard": {
+    "id": "H4_INSTRUCTION_LANGUAGE",
+    "label": "H4",
+    "hypothesis": "For these prompts, Hebrew diagnostic system instructions induce a less useful recognition/editing task interpretation than semantically matched English instructions, contributing to the observed B-only and copy-only behavior.",
+    "observation": "The Hebrew instruction probes produce no order-stable recognition pair and correct none of the erroneous editing inputs, while the product uses English instructions.",
+    "competingExplanation": "Language-independent second-option bias, an editing copy bias caused by the directive to return the supplied text, or unreliable numeral agreement could produce the same results. Recognition already follows the A/B output format, so wholesale Hebrew-instruction incomprehension is not established.",
+    "experiment": "Translate only the two diagnostic system messages into English. Score A and B for the same six ordered candidate lists, and freely edit only the exact prior E_SHIRT_ERROR and E_BOOK_ERROR inputs. Use independent fresh transcripts without donor states, examples, corrected answers, grammar rules, or prior probe outputs in the editing requests.",
+    "prediction": "If instruction language materially caused the diagnostic failure, the English recognition preferences should track the grammatical candidate across both orders rather than always selecting B, and one or both English editing runs should correct the erroneous numeral without changing the remainder.",
+    "falsifier": "Continued B-only recognition and unchanged copying of both error inputs would leave no observed support for this English-instruction rescue in the bounded control. Stop this branch; it would not prove grammatical knowledge is absent under every possible elicitation.",
+    "partialResults": "A label switch alone is not support unless it follows correctness across both orders. Editing improvement without order-stable recognition supports only editing-task sensitivity; recognition improvement without editing supports only candidate recognition. Item-specific improvement is not a general language effect.",
+    "limitations": "One translation changes wording and tokenization as well as instruction language, so a positive result supports sensitivity to this instruction version, not a language-wide causal law. Recognition supplies the correct candidate. Editing does not. No English clean-input free controls fit the remaining budget, so broad English editing preservation cannot be established.",
+    "preservation": "Maintain the original shirt and book item identity, quantity two, totals 110 and 48 respectively, and currency meaning. Do not invent payment or other world facts. Keep role switching explicitly confined to the diagnostic task, not a deployed NPC repair."
+  },
+  "executionContract": {
+    "typedRequests": "Only the objects in requests are submitted to ResearchWorkbench.run as ExperimentRequest values. Metadata, expected recognition labels, and this hypothesis card are never appended to model messages.",
+    "scoreMode": "Use the corrected raw model softcap scoring path with ordinary full-vocabulary probability normalization. No temperature, penalties, candidate-only renormalization, or sampling transforms for scoring.",
+    "freeMode": "op=replay, temperature=0, seed=23, maxNewTokens=96, matching the prior diagnostic defaults and limit.",
+    "isolation": "Each request uses only its two listed messages and an empty assistant prefix. Reset per-request generation state; never concatenate the recognition alternatives or previous outputs into an editing transcript.",
+    "translationConstraint": "The English messages preserve the original task and constraints. They add no gender rules, demonstrations, examples, or emphasis on particular tokens.",
+    "inputProvenance": "The two editing user messages are exact behavioral-summary.json inputs for E_SHIRT_ERROR and E_BOOK_ERROR. The book input here is the prior isolated-numeral editing probe containing ספרים, not the discovery free reply containing גילידים.",
+    "ordering": "The two editing requests are listed first so no recognition alternatives need be supplied before them. Isolation is required regardless of execution order.",
+    "noExtraOperations": "No capture, patch, weight inspection, comparison request, judge call, new layer search, model training, checkpoint write, or runtime edit is authorized by this manifest."
+  },
+  "recognitionPairs": [
+    {
+      "id": "H4_PAIR_SHIRT_AB",
+      "baselineId": "R_SHIRT_AB",
+      "scoreRequestIds": ["H4_R_SHIRT_AB_A", "H4_R_SHIRT_AB_B"],
+      "expectedLabel": "A"
+    },
+    {
+      "id": "H4_PAIR_SHIRT_BA",
+      "baselineId": "R_SHIRT_BA",
+      "scoreRequestIds": ["H4_R_SHIRT_BA_A", "H4_R_SHIRT_BA_B"],
+      "expectedLabel": "B"
+    },
+    {
+      "id": "H4_PAIR_BOOK_AB",
+      "baselineId": "R_BOOK_AB",
+      "scoreRequestIds": ["H4_R_BOOK_AB_A", "H4_R_BOOK_AB_B"],
+      "expectedLabel": "A"
+    },
+    {
+      "id": "H4_PAIR_BOOK_BA",
+      "baselineId": "R_BOOK_BA",
+      "scoreRequestIds": ["H4_R_BOOK_BA_A", "H4_R_BOOK_BA_B"],
+      "expectedLabel": "B"
+    },
+    {
+      "id": "H4_PAIR_LIBRARY_AB",
+      "baselineId": "R_LIBRARY_AB",
+      "scoreRequestIds": ["H4_R_LIBRARY_AB_A", "H4_R_LIBRARY_AB_B"],
+      "expectedLabel": "A"
+    },
+    {
+      "id": "H4_PAIR_LIBRARY_BA",
+      "baselineId": "R_LIBRARY_BA",
+      "scoreRequestIds": ["H4_R_LIBRARY_BA_A", "H4_R_LIBRARY_BA_B"],
+      "expectedLabel": "B"
+    }
+  ],
+  "requests": [
+    {
+      "id": "H4_E_SHIRT_ERROR",
+      "op": "replay",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a Hebrew editing test, not a conversation in a shop. Return only the supplied text. If it contains a numeral-noun agreement error, correct only that error. If there is no such error, leave the text unchanged. Do not change items, quantities, prices, or payment status, and do not add an explanation."
+        },
+        {
+          "role": "user",
+          "content": "שני חולצות יהיו בסך 110 ש\"ח."
+        }
+      ],
+      "assistantPrefix": "",
+      "maxNewTokens": 96,
+      "temperature": 0,
+      "seed": 23
+    },
+    {
+      "id": "H4_E_BOOK_ERROR",
+      "op": "replay",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a Hebrew editing test, not a conversation in a shop. Return only the supplied text. If it contains a numeral-noun agreement error, correct only that error. If there is no such error, leave the text unchanged. Do not change items, quantities, prices, or payment status, and do not add an explanation."
+        },
+        {
+          "role": "user",
+          "content": "שתי ספרים. המחיר הכולל יהיה 48 שקלים."
+        }
+      ],
+      "assistantPrefix": "",
+      "maxNewTokens": 96,
+      "temperature": 0,
+      "seed": 23
+    },
+    {
+      "id": "H4_R_SHIRT_AB_A",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שתי חולצות\nB: שני חולצות"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "A"
+    },
+    {
+      "id": "H4_R_SHIRT_AB_B",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שתי חולצות\nB: שני חולצות"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "B"
+    },
+    {
+      "id": "H4_R_SHIRT_BA_A",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שני חולצות\nB: שתי חולצות"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "A"
+    },
+    {
+      "id": "H4_R_SHIRT_BA_B",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שני חולצות\nB: שתי חולצות"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "B"
+    },
+    {
+      "id": "H4_R_BOOK_AB_A",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שני ספרים\nB: שתי ספרים"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "A"
+    },
+    {
+      "id": "H4_R_BOOK_AB_B",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שני ספרים\nB: שתי ספרים"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "B"
+    },
+    {
+      "id": "H4_R_BOOK_BA_A",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שתי ספרים\nB: שני ספרים"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "A"
+    },
+    {
+      "id": "H4_R_BOOK_BA_B",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שתי ספרים\nB: שני ספרים"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "B"
+    },
+    {
+      "id": "H4_R_LIBRARY_AB_A",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שתי עמדות\nB: שני עמדות"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "A"
+    },
+    {
+      "id": "H4_R_LIBRARY_AB_B",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שתי עמדות\nB: שני עמדות"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "B"
+    },
+    {
+      "id": "H4_R_LIBRARY_BA_A",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שני עמדות\nB: שתי עמדות"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "A"
+    },
+    {
+      "id": "H4_R_LIBRARY_BA_B",
+      "op": "score",
+      "messages": [
+        {
+          "role": "system",
+          "content": "This is a language test, not a conversation in a shop. Choose the phrase that is correct with respect to numeral-noun agreement. Reply only with the letter A or B, without explanation."
+        },
+        {
+          "role": "user",
+          "content": "A: שני עמדות\nB: שתי עמדות"
+        }
+      ],
+      "assistantPrefix": "",
+      "continuation": "B"
+    }
+  ],
+  "readouts": {
+    "recognition": "For each matched order, report logP(A), logP(B), expected-label-minus-other-label margin, and A+B probability mass. Compare with the corresponding Hebrew baseline. Assess correctness across BOTH orders per noun, not aggregate 3/6 success or a changed fixed-label bias.",
+    "editing": "Compare each output with its input: unchanged copying, numeral-only correction, other rewriting, facts retained, and stop reason. Correctness is evaluated after generation; no expected output is included in either editing request.",
+    "precision": "Treat numerical ties or tiny margin changes cautiously, not as evidence of comprehension. No new promotion thresholds, human-calibration claims, or quality scores are introduced.",
+    "interpretation": "A successful English edit demonstrates an elicited behavior under this diagnostic instruction. It does not establish a correct native computation at the original RPG prefix or a deployed repair. An unsuccessful edit leaves available knowledge unestablished by these probes, not disproved."
+  },
+  "budget": {
+    "newScoreAlternatives": 12,
+    "newRecognitionPrompts": 6,
+    "newFreeEditingContinuations": 2,
+    "newMaximumGeneratedTokens": 192,
+    "previousFreeEditingContinuations": 6,
+    "alreadyRunningNounFactorialContinuations": 4,
+    "totalFreeContinuationMaximum": 12,
+    "remainingUnallocatedFreeContinuationsAfterThis": 0,
+    "retries": 0,
+    "newLayerOperations": 0,
+    "weightInspectionBytes": 0
+  },
+  "stopConditions": [
+    "Submit only the 14 typed requests listed here: 12 score alternatives and two replay requests. Do not rerun or expand the four already-running noun-factorial continuations.",
+    "If the workbench cannot run these requests on the corrected matched path with independent transcripts, stop and report blocked rather than changing the experiment or runtime.",
+    "If English still yields B-only recognition and copy-only editing, close H4 as unsupported in this bounded control. Do not search additional languages, formulations, examples, or answer hints.",
+    "If results are mixed, report the specific task and item sensitivity and stop. A switch to always A is no better evidence than always B.",
+    "If English improves behavior, report instruction-version sensitivity only. No English clean-edit control was allocated, so do not claim broad preservation or rewrite safety.",
+    "Any item, quantity, total, currency, or payment-status corruption prevents counting an editing output as a successful minimal repair.",
+    "A token-limit stop is inconclusive, not permission to increase the limit or retry. A formatting violation is not by itself evidence that agreement knowledge is absent.",
+    "After these two free edits, the 12-continuation ceiling is exhausted, including the four pending factorial runs. No further layer tests, weight dumps, requests, parameter changes, gate changes, final evaluation, or pretrained repair follow from this control."
+  ]
+}

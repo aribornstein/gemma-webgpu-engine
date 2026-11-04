@@ -1,0 +1,166 @@
+{
+  "recognition": [
+    {
+      "id": "R_SHIRT_AB",
+      "expected": "A",
+      "preferred": "B",
+      "logA": -1.6326709627973794,
+      "logB": -0.22514131140739732,
+      "nominatedLabelMass": 0.9938103390676747,
+      "correct": false
+    },
+    {
+      "id": "R_SHIRT_BA",
+      "expected": "B",
+      "preferred": "B",
+      "logA": -3.7045555340752516,
+      "logB": -0.03489628607779318,
+      "nominatedLabelMass": 0.9903167219323208,
+      "correct": true
+    },
+    {
+      "id": "R_BOOK_AB",
+      "expected": "A",
+      "preferred": "B",
+      "logA": -4.837784493326085,
+      "logB": -0.011935383205360505,
+      "nominatedLabelMass": 0.9960601525544198,
+      "correct": false
+    },
+    {
+      "id": "R_BOOK_BA",
+      "expected": "B",
+      "preferred": "B",
+      "logA": -3.0248608344107835,
+      "logB": -0.057224214941150126,
+      "nominatedLabelMass": 0.9929468803226031,
+      "correct": true
+    },
+    {
+      "id": "R_LIBRARY_AB",
+      "expected": "A",
+      "preferred": "B",
+      "logA": -2.708154890348293,
+      "logB": -0.07368536918522711,
+      "nominatedLabelMass": 0.9956236162924972,
+      "correct": false
+    },
+    {
+      "id": "R_LIBRARY_BA",
+      "expected": "B",
+      "preferred": "B",
+      "logA": -3.7420377575980854,
+      "logB": -0.03113849695207635,
+      "nominatedLabelMass": 0.9930470602741802,
+      "correct": true
+    }
+  ],
+  "repairs": [
+    {
+      "id": "E_SHIRT_ERROR",
+      "input": "שני חולצות יהיו בסך 110 ש\"ח.",
+      "expected": "שתי חולצות יהיו בסך 110 ש\"ח.",
+      "actual": "שני חולצות יהיו בסך 110 ש\"ח.",
+      "stopReason": "end-token",
+      "exactMinimalEdit": false,
+      "exactIgnoringOuterWhitespace": false,
+      "changedInput": false
+    },
+    {
+      "id": "E_SHIRT_CLEAN",
+      "input": "שתי חולצות יהיו בסך 110 ש\"ח.",
+      "expected": "שתי חולצות יהיו בסך 110 ש\"ח.",
+      "actual": "שתי חולצות יהיו בסך 110 ש\"ח.",
+      "stopReason": "end-token",
+      "exactMinimalEdit": true,
+      "exactIgnoringOuterWhitespace": true,
+      "changedInput": false
+    },
+    {
+      "id": "E_BOOK_ERROR",
+      "input": "שתי ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "expected": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "actual": "שתי ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "stopReason": "end-token",
+      "exactMinimalEdit": false,
+      "exactIgnoringOuterWhitespace": false,
+      "changedInput": false
+    },
+    {
+      "id": "E_BOOK_CLEAN",
+      "input": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "expected": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "actual": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "stopReason": "end-token",
+      "exactMinimalEdit": true,
+      "exactIgnoringOuterWhitespace": true,
+      "changedInput": false
+    },
+    {
+      "id": "E_LIBRARY_ERROR",
+      "input": "שני עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+      "expected": "שתי עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+      "actual": "שני עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+      "stopReason": "end-token",
+      "exactMinimalEdit": false,
+      "exactIgnoringOuterWhitespace": false,
+      "changedInput": false
+    },
+    {
+      "id": "E_LIBRARY_CLEAN",
+      "input": "שתי עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+      "expected": "שתי עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+      "actual": "שתי עמדות פועלות עכשיו. המחיר הכולל לשעה אחת הוא 20 שקלים. התשלום עדיין לא התקבל.",
+      "stopReason": "end-token",
+      "exactMinimalEdit": true,
+      "exactIgnoringOuterWhitespace": true,
+      "changedInput": false
+    }
+  ],
+  "nounScores": [
+    {
+      "id": "N_CLEAN_SHNEI",
+      "variant": "clean",
+      "prefix": "שני",
+      "booksLogP": -0.08176319818176005,
+      "corruptNounLogP": -15.48243399060184,
+      "sheetsLogP": -14.70114196339834,
+      "margin": 15.40067079242008
+    },
+    {
+      "id": "N_CLEAN_SHTEI",
+      "variant": "clean",
+      "prefix": "שתי",
+      "booksLogP": -0.9763621329551941,
+      "corruptNounLogP": -4.1401877197059465,
+      "sheetsLogP": -2.628420400269456,
+      "margin": 3.163825586750752
+    },
+    {
+      "id": "N_ERROR_SHNEI",
+      "variant": "error",
+      "prefix": "שני",
+      "booksLogP": -0.0885374130247569,
+      "corruptNounLogP": -15.459834547091155,
+      "sheetsLogP": -12.859300082517787,
+      "margin": 15.371297134066399
+    },
+    {
+      "id": "N_ERROR_SHTEI",
+      "variant": "error",
+      "prefix": "שתי",
+      "booksLogP": -1.851296608784371,
+      "corruptNounLogP": -2.345895103573568,
+      "sheetsLogP": -2.5669643852748862,
+      "margin": 0.49459849478919704
+    }
+  ],
+  "effects": {
+    "numeralEffectClean": 12.236845205669328,
+    "numeralEffectError": 14.876698639277201,
+    "learnerEffectMasculine": 0.029373658353680554,
+    "learnerEffectFeminine": 2.669227091961555
+  },
+  "freeStageTriggered": true,
+  "interpretation": "Recognition provides candidate answers; editing and forced numeral prefixes change the task/context. These are availability diagnostics, not a deployed NPC repair or evidence of an original-context native circuit."
+}

@@ -1,0 +1,9 @@
+{
+  "scope": "All 144 requests with op=patch in this run",
+  "status": "invalid_for_causal_inference",
+  "reason": "The token-local patch dispatch was accidentally nested under the persistent-overlay guard. These diagnostic calls explicitly prohibit persistent overlays, so no patch was dispatched. Identical logits were an instrumentation failure, not a negative scientific result.",
+  "unaffected": ["Unpatched replays", "Unpatched continuation scores", "Residual captures"],
+  "response": "Stop interpretation, fix the dispatch guard, add a nonzero intervention activity assertion to the live gate, and rerun matched baselines and diagnostics under a new source revision and run ID. Keep these records as failed attempts.",
+  "technicalRepairAttempt": 1,
+  "gateChanges": "No acceptance threshold changed. Numerical validation reopened."
+}

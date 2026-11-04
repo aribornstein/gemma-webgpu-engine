@@ -1,0 +1,79 @@
+{
+  "totalAttempted": {
+    "evaluatedPositions": 132583,
+    "generatedTokens": 3063,
+    "diagnostics": 438,
+    "episodes": 138
+  },
+  "invalidatedDispatchAttempts": {
+    "evaluatedPositions": 44646,
+    "generatedTokens": 870,
+    "diagnostics": 144,
+    "episodes": 48
+  },
+  "validDiscovery": {
+    "evaluatedPositions": 87937,
+    "generatedTokens": 2193,
+    "diagnostics": 294,
+    "episodes": 90
+  },
+  "modelJobs": 438,
+  "judgeRequests": 3,
+  "criterionAssessments": 72,
+  "fixtureAuthorCalls": 1,
+  "scientificScopes": [
+    "discovery",
+    "conditional activation diagnostic",
+    "task-switched availability control"
+  ],
+  "withheldScopes": [
+    "pretrained weight repair",
+    "all-criteria quality promotion",
+    "fresh final evaluation"
+  ],
+  "rawEvidence": [
+    {
+      "run": "discovery",
+      "file": "discovery/artifacts.json",
+      "bytes": 7440254,
+      "sha256": "1e5c09c6957955475d2dce3f50d85005c5ac8e08a3d78b21bd987b3ff0302ed9",
+      "version": "ea4643d25c04302cc60c125e818044662da943039274571fa052ec0352fc6b1f",
+      "gitPolicy": "Raw evidence retained locally, not committed; compact review bundle committed separately"
+    },
+    {
+      "run": "causal-v2",
+      "file": "causal-v2/artifacts.json",
+      "bytes": 7203017,
+      "sha256": "4017760b34e2b7dd5ec2d77c75ac87ca3739aff3bae957660f1fe896652e5473",
+      "version": "aa6b0e575b5ed17c789b5b17c5c3ec2858b16409184afdeda95e945dfda39291",
+      "gitPolicy": "Raw evidence retained locally, not committed; compact review bundle committed separately"
+    }
+  ],
+  "rawSupportingFiles": [
+    {
+      "file": "discovery/patch-requests.json",
+      "bytes": 6249266,
+      "sha256": "9ec8d629933ca3475ec84f5b95d3f62721148b65b5f4dd863591f7257a5ccd75",
+      "gitPolicy": "Retained locally with raw evidence archive"
+    },
+    {
+      "file": "discovery/events.jsonl",
+      "bytes": 4853783,
+      "sha256": "7a63b98393f8a67c30e989b0cb7069e9418c008414ed86a1da7dd2efd76ef1ca",
+      "gitPolicy": "Retained locally with raw evidence archive"
+    },
+    {
+      "file": "causal-v2/patch-requests.json",
+      "bytes": 6235670,
+      "sha256": "06b27a81eccaaeb4a08017628ac6dfe5753ed85f6757e6b1b765a66d99c7edb6",
+      "gitPolicy": "Retained locally with raw evidence archive"
+    },
+    {
+      "file": "causal-v2/events.jsonl",
+      "bytes": 4790679,
+      "sha256": "bce1c840f187a85208ad0b857310b60eecc3cd1f45b7bf90cb39abe82f66bb43",
+      "gitPolicy": "Retained locally with raw evidence archive"
+    }
+  ],
+  "invalidation": "discovery/INVALIDATION.json; invalid artifacts are retained and excluded from scientific conclusions"
+}

@@ -1,0 +1,509 @@
+[
+  {
+    "episodeId": "0ca1167acc7a0c3c",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["שני תיקים יחד עולים 120 שקלים"]},
+      {"criterion": "goal", "score": 10, "evidence": ["כן, שני תיקים יחד עולים 120 שקלים.", "האם תרצה להמשיך עם התשלום?"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שני תיקים"},
+      {"field": "item", "value": "bag", "quote": "תיקים"},
+      {"field": "totalPrice", "value": 120, "quote": "שני תיקים יחד עולים 120 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "120 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Directly confirms the combined price and returns to payment. The payment invitation is not an assertion of payment status; no paid or unitPrice claim is extracted."
+  },
+  {
+    "episodeId": "1719df8edb9829b0",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 9, "evidence": ["אני מציע לך שלושה ספרים קצרים.", "המחיר הכולל עבור שלושת הספרים יהיה 72 שקלים."]},
+      {"criterion": "goal", "score": 8, "evidence": ["אני מציע לך שלושה ספרים קצרים.", "האם תרצה להמשיך עם ההזמנה?"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 3, "quote": "שלושה ספרים קצרים"},
+      {"field": "item", "value": "short book", "quote": "ספרים קצרים"},
+      {"field": "totalPrice", "value": 72, "quote": "המחיר הכולל עבור שלושת הספרים יהיה 72 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "72 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correctly names short, not abridged, books and the total. However, proposing books weakens continuity with the already selected order and falls short of directly summarizing that selection. Quantity and price are claims about the proposal. Payment status is not asserted."
+  },
+  {
+    "episodeId": "331ef11fc1e3c4a3",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["שני חולצות יהיו בסך 110 ש\"ח."]},
+      {"criterion": "goal", "score": 9, "evidence": ["שני חולצות יהיו בסך 110 ש\"ח."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שני חולצות"},
+      {"field": "item", "value": "shirt", "quote": "חולצות"},
+      {"field": "totalPrice", "value": 110, "quote": "שני חולצות יהיו בסך 110 ש\"ח"},
+      {"field": "currency", "value": "ILS", "quote": "ש\"ח"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correctly gives the two-shirt total rather than the unit price. Masculine שני with feminine חולצות is a minor natural-Hebrew defect, not a wrong quantity. No unitPrice or paid claim is made."
+  },
+  {
+    "episodeId": "351d7a0b34a48872",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["שני ספרים. המחיר הכולל יהיה 48 שקלים."]},
+      {"criterion": "goal", "score": 10, "evidence": ["שני ספרים. המחיר הכולל יהיה 48 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שני ספרים"},
+      {"field": "item", "value": "book", "quote": "ספרים"},
+      {"field": "totalPrice", "value": 48, "quote": "המחיר הכולל יהיה 48 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "48 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Concisely confirms the selected two books and answers the amount-to-pay question. The future total is not a completed-payment claim. Payment status and unit price are unasserted, not independently verified."
+  },
+  {
+    "episodeId": "4c162f4ed491a05c",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["שתי חולצות יהיו 110 שקלים."]},
+      {"criterion": "goal", "score": 10, "evidence": ["שתי חולצות יהיו 110 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שתי חולצות"},
+      {"field": "item", "value": "shirt", "quote": "חולצות"},
+      {"field": "totalPrice", "value": 110, "quote": "שתי חולצות יהיו 110 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "110 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. The price is explicitly for two shirts, so it answers the full-order question without confusing the unit price. No payment-status claim is made; payment state is not independently established by this reply."
+  },
+  {
+    "episodeId": "4ca6393acb433f32",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["העמדות יהיו זמינות בשש בערב.", "המחיר עבור שלושה עמדות לשעה הוא 30 שקלים."]},
+      {"criterion": "goal", "score": 9, "evidence": ["העמדות יהיו זמינות בשש בערב.", "המחיר עבור שלושה עמדות לשעה הוא 30 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 3, "quote": "שלושה עמדות"},
+      {"field": "item", "value": "library computer workstation for one hour starting at 18:00", "quote": "העמדות יהיו זמינות בשש בערב. המחיר עבור שלושה עמדות לשעה הוא 30 שקלים."},
+      {"field": "totalPrice", "value": 30, "quote": "המחיר עבור שלושה עמדות לשעה הוא 30 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "30 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correct evening availability and three-workstation, one-hour total. העמדות refers to the library computer workstations established in history; the reply supplies the evening time and hour duration. שלושה עמדות has incorrect gender agreement but the number is three. No paid claim is extracted; the previous payment correction is not newly restated."
+  },
+  {
+    "episodeId": "4f0fcb05fece729d",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["כן, העמדות פועלות כרגע.", "אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות. המחיר הכולל יהיה 20 שקלים."]},
+      {"criterion": "goal", "score": 9, "evidence": ["אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות.", "האם תרצה להמשיך?"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שתי עמדות"},
+      {"field": "item", "value": "library computer workstation for one hour", "quote": "ההזמנה לשעה אחת עבור שתי עמדות"},
+      {"field": "totalPrice", "value": 20, "quote": "המחיר הכולל יהיה 20 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "20 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correctly answers that the established library computer workstations operate now and gives the two-workstation one-hour total. Minor task concern: says it can confirm and asks whether to continue instead of directly confirming the requested booking. No completed booking or payment is inferred from this offer; paid is unasserted."
+  },
+  {
+    "episodeId": "5405b93e67f8dd56",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 5, "evidence": ["שתי גילידים.", "המחיר הכולל יהיה 48 שקלים."]},
+      {"criterion": "goal", "score": 5, "evidence": ["שתי גילידים.", "המחיר הכולל יהיה 48 שקלים."]}
+    ],
+    "criticalViolations": [
+      "The selected item is not intelligibly identified: גילידים does not correctly name the authoritative books and cannot be normalized to book."
+    ],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שתי גילידים"},
+      {"field": "item", "value": "גילידים", "quote": "גילידים"},
+      {"field": "totalPrice", "value": 48, "quote": "המחיר הכולל יהיה 48 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "48 שקלים"}
+    ],
+    "extractionComplete": false,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correct numeral, total and currency do not repair the failure to identify the selected books. The item value preserves only the literal, unintelligible noun, not a known product or a forced book label. Semantic item extraction remains uncertain, hence extractionComplete=false. No paid claim is made."
+  },
+  {
+    "episodeId": "551dbfef0ba82634",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["החדרים שאתם בוחרים הם חדרי קטנים.", "המחיר לחדר אחד ללילה הוא 240 שקלים.", "עבור שתי חדרים, הסכום הכולל הוא 480 שקלים."]},
+      {"criterion": "goal", "score": 8, "evidence": ["החדרים שאתם בוחרים הם חדרי קטנים.", "עבור שתי חדרים, הסכום הכולל הוא 480 שקלים.", "האם תרצו להזמין"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "עבור שתי חדרים"},
+      {"field": "item", "value": "small hotel room for one night", "quote": "החדרים שאתם בוחרים הם חדרי קטנים. המחיר לחדר אחד ללילה הוא 240 שקלים."},
+      {"field": "unitPrice", "value": 240, "quote": "המחיר לחדר אחד ללילה הוא 240 שקלים"},
+      {"field": "totalPrice", "value": 480, "quote": "עבור שתי חדרים, הסכום הכולל הוא 480 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "240 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Small rooms, per-room nightly price, quantity and total are intelligible and correct in the one-night hotel context. Malformed חדרי קטנים, incorrect שתי חדרים, and inviting a fresh reservation instead of straightforwardly confirming the selected booking substantially weaken execution. The closing question lacks punctuation but is not assumed to conceal additional content. No paid claim is made."
+  },
+  {
+    "episodeId": "552a3986c80a5287",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["כן, התיקים חדשים.", "יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]},
+      {"criterion": "goal", "score": 10, "evidence": ["כן, התיקים חדשים. יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שני תיקים"},
+      {"field": "item", "value": "new bag", "quote": "התיקים חדשים"},
+      {"field": "totalPrice", "value": 120, "quote": "המחיר הכולל הוא 120 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "120 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Directly confirms new condition, two bags and the order total. יש לך describes the customer's selected bags in context, not proof of completed payment. No paid or unitPrice claim is extracted."
+  },
+  {
+    "episodeId": "58737d919a042516",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["העמדות יהיו זמינות בשש בערב.", "המחיר עבור שלושה עמדות לשעה הוא 30 שקלים."]},
+      {"criterion": "goal", "score": 9, "evidence": ["המחיר עבור שלושה עמדות לשעה הוא 30 שקלים.", "האם תרצה להזמין את שלושת העמדות?"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 3, "quote": "שלושה עמדות"},
+      {"field": "item", "value": "library computer workstation for one hour starting at 18:00", "quote": "העמדות יהיו זמינות בשש בערב. המחיר עבור שלושה עמדות לשעה הוא 30 שקלים."},
+      {"field": "totalPrice", "value": 30, "quote": "המחיר עבור שלושה עמדות לשעה הוא 30 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "30 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correctly identifies the established library workstations, evening availability, one-hour duration and combined price. Minor concerns are masculine agreement with עמדות and unnecessarily asking to reserve an already discussed booking. These are not wrong numerical quantities. Payment status is not newly asserted or verified."
+  },
+  {
+    "episodeId": "5a5997ef36519a49",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["החדרים שהזמנת הם חדרי גודל קטן.", "המחיר לחדר אחד בלילה הוא 240 שקלים.", "עבור שתי חדרים, הסכום הכולל הוא 480 שקלים."]},
+      {"criterion": "goal", "score": 9, "evidence": ["החדרים שהזמנת הם חדרי גודל קטן.", "עבור שתי חדרים, הסכום הכולל הוא 480 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "עבור שתי חדרים"},
+      {"field": "item", "value": "small hotel room for one night", "quote": "החדרים שהזמנת הם חדרי גודל קטן. המחיר לחדר אחד בלילה הוא 240 שקלים."},
+      {"field": "unitPrice", "value": 240, "quote": "המחיר לחדר אחד בלילה הוא 240 שקלים"},
+      {"field": "totalPrice", "value": 480, "quote": "עבור שתי חדרים, הסכום הכולל הוא 480 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "240 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correct small-room confirmation and distinct per-room nightly and total prices in the established one-night booking. Awkward חדרי גודל קטן and incorrect שתי חדרים are minor language concerns; quantity remains two. The unpunctuated closing question can stand as a question to continue. Reservation wording does not assert payment."
+  },
+  {
+    "episodeId": "8447b9230c135ba6",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 9, "evidence": ["אני מציע לך שלוש ספרים קצרים.", "המחיר לספר אחד הוא 24 שקלים.", "אם תרצה שלושה, הסכום הכולל יהיה 72 שקלים."]},
+      {"criterion": "goal", "score": 8, "evidence": ["אני מציע לך שלוש ספרים קצרים.", "אם תרצה שלושה, הסכום הכולל יהיה 72 שקלים. האם"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 3, "quote": "אני מציע לך שלוש ספרים קצרים"},
+      {"field": "item", "value": "short book", "quote": "ספרים קצרים"},
+      {"field": "unitPrice", "value": 24, "quote": "המחיר לספר אחד הוא 24 שקלים"},
+      {"field": "totalPrice", "value": 72, "quote": "אם תרצה שלושה, הסכום הכולל יהיה 72 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "24 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correctly names short books, unit price and conditional three-book total. Quantity describes an offer and total describes that offer's condition, not a new unconditional booking confirmation. Reopening the established selection, incorrect שלוש ספרים agreement and the dangling final האם prevent a clean order summary. No payment claim is made."
+  },
+  {
+    "episodeId": "8cbfbe3638c41c54",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["שני תיקים יחד הם 120 שקלים"]},
+      {"criterion": "goal", "score": 10, "evidence": ["כן, שני תיקים יחד הם 120 שקלים.", "האם תרצה להמשיך עם התשלום?"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שני תיקים"},
+      {"field": "item", "value": "bag", "quote": "תיקים"},
+      {"field": "totalPrice", "value": 120, "quote": "שני תיקים יחד הם 120 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "120 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Directly confirms the combined two-bag price rather than the unit price and moves back toward payment. The payment question is not an assertion of paid=true or paid=false; payment status is not extracted."
+  },
+  {
+    "episodeId": "90a7bccb02d45b6a",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["כן, התיקים חדשים.", "יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]},
+      {"criterion": "goal", "score": 10, "evidence": ["כן, התיקים חדשים. יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שני תיקים"},
+      {"field": "item", "value": "new bag", "quote": "התיקים חדשים"},
+      {"field": "totalPrice", "value": 120, "quote": "המחיר הכולל הוא 120 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "120 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correctly answers new condition and full price for two bags without turning the user's agreement error into a grammar lesson. יש לך is not evidence that payment occurred. Payment status and unit price are not asserted."
+  },
+  {
+    "episodeId": "9d2dc70395827bfd",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["כן, העמדות פועלות כרגע.", "אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות. המחיר הכולל יהיה 20 שקלים."]},
+      {"criterion": "goal", "score": 9, "evidence": ["אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות.", "האם תרצה להמשיך?"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שתי עמדות"},
+      {"field": "item", "value": "library computer workstation for one hour", "quote": "ההזמנה לשעה אחת עבור שתי עמדות"},
+      {"field": "totalPrice", "value": 20, "quote": "המחיר הכולל יהיה 20 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "20 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correct current operation and total for the established library computer workstations for one hour. Minor task concern: offers the ability to confirm and asks again whether to proceed rather than directly confirming the requested booking. Neither completed payment nor a new payment-status assertion follows from that offer."
+  },
+  {
+    "episodeId": "a4f03f5e680f43b0",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["כן, החולצות שלך מגיעות היום.", "הסכום הכולל הוא 110 שקלים."]},
+      {"criterion": "goal", "score": 10, "evidence": ["כן, החולצות שלך מגיעות היום. הסכום הכולל הוא 110 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "item", "value": "shirt arriving today", "quote": "החולצות שלך מגיעות היום"},
+      {"field": "totalPrice", "value": 110, "quote": "הסכום הכולל הוא 110 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "110 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Directly confirms arrival today without inventing a time and states the correct total in answer to the payment question. Plural shirts does not specify quantity two. Quantity, unit price and payment status are unasserted and are not filled from the world contract."
+  },
+  {
+    "episodeId": "aad4ace19aeae9a9",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["החולצות שלך מגיעות היום.", "הסכום הכולל הוא 110 ש\"ח."]},
+      {"criterion": "goal", "score": 10, "evidence": ["החולצות שלך מגיעות היום. הסכום הכולל הוא 110 ש\"ח.", "האם תרצי לשלם עכשיו?"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "item", "value": "shirt arriving today", "quote": "החולצות שלך מגיעות היום"},
+      {"field": "totalPrice", "value": 110, "quote": "הסכום הכולל הוא 110 ש\"ח"},
+      {"field": "currency", "value": "ILS", "quote": "ש\"ח"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correct arrival day and total with an appropriate payment invitation. The invitation does not report completed payment, and no explicit payment-status assertion is extracted. Quantity and unit price are not stated."
+  },
+  {
+    "episodeId": "afdcdbaa702bc7aa",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["המחיר עבור שלוש מחברות הוא 18 שקלים."]},
+      {"criterion": "goal", "score": 9, "evidence": ["אז את רוצה של שלוש מחברות.", "המחיר עבור שלוש מחברות הוא 18 שקלים.", "האם תרצי לשלם?"]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 3, "quote": "שלוש מחברות"},
+      {"field": "item", "value": "notebook", "quote": "מחברות"},
+      {"field": "totalPrice", "value": 18, "quote": "המחיר עבור שלוש מחברות הוא 18 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "18 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correct notebooks, quantity and combined price, followed by a payment invitation. The extraneous של before שלוש is a minor naturalness defect, not a number error. Asking whether the customer wishes to pay is not a report of payment; no paid claim is extracted."
+  },
+  {
+    "episodeId": "b22273fecbf4aee7",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה אחד הוא 720 שקלים."]},
+      {"criterion": "goal", "score": 10, "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה אחד הוא 720 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 3, "quote": "שלושת החדרים"},
+      {"field": "item", "value": "hotel room for one night", "quote": "החדרים ללילה אחד"},
+      {"field": "totalPrice", "value": 720, "quote": "הסכום הכולל עבור שלושת החדרים ללילה אחד הוא 720 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "720 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Retains the authoritative three-room, one-night hotel total and answers the amount-still-due question without importing tickets or the earlier four-room claim. It does not explicitly reassert paid=false; that state is not separately extracted or independently verified from this reply."
+  },
+  {
+    "episodeId": "b35116bedfd08769",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["כן, המחברות הכחולות.", "יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים."]},
+      {"criterion": "goal", "score": 9, "evidence": ["כן, המחברות הכחולות.", "יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שתי מחברות"},
+      {"field": "item", "value": "blue notebook", "quote": "המחברות הכחולות"},
+      {"field": "totalPrice", "value": 12, "quote": "הסכום הכולל הוא 12 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "12 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Confirms blue notebooks, quantity and total. The elliptical opening identifies the blue notebooks but is less natural than a complete color confirmation, a minor concern only. יש לך does not establish completed payment; no paid claim is extracted."
+  },
+  {
+    "episodeId": "cbf594d597fb014e",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה הוא 720 שקלים."]},
+      {"criterion": "goal", "score": 10, "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה הוא 720 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 3, "quote": "שלושת החדרים"},
+      {"field": "item", "value": "hotel room for one night", "quote": "החדרים ללילה"},
+      {"field": "totalPrice", "value": 720, "quote": "הסכום הכולל עבור שלושת החדרים ללילה הוא 720 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "720 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correct three-room total for the night in the explicitly one-night hotel history; 720 is not presented as a per-room price. Answers the amount-still-due question and avoids the ticket distractor. Payment status is not explicitly asserted, so no paid claim is extracted or treated as independently verified."
+  },
+  {
+    "episodeId": "f63688a63f79b0e1",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["המחיר עבור שלוש מחברות הוא 18 שקלים."]},
+      {"criterion": "goal", "score": 9, "evidence": ["את רוצה של שלוש מחברות.", "המחיר עבור שלוש מחברות הוא 18 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 3, "quote": "שלוש מחברות"},
+      {"field": "item", "value": "notebook", "quote": "מחברות"},
+      {"field": "totalPrice", "value": 18, "quote": "המחיר עבור שלוש מחברות הוא 18 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "18 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Correctly identifies three notebooks and their full price. The extra של before שלוש is a minor fluency defect rather than an incorrect quantity. No unit price or payment status is asserted; omitted payment information is not evidence of a verified state."
+  },
+  {
+    "episodeId": "ff47560e46a4c464",
+    "judgeId": "m-task-judge",
+    "role": "task",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": true,
+    "ratings": [
+      {"criterion": "vocabulary", "score": null, "evidence": []},
+      {"criterion": "grounding", "score": 10, "evidence": ["כן, המחברות האלה כחולות.", "יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים."]},
+      {"criterion": "goal", "score": 10, "evidence": ["כן, המחברות האלה כחולות. יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "claims": [
+      {"field": "quantity", "value": 2, "quote": "שתי מחברות"},
+      {"field": "item", "value": "blue notebook", "quote": "המחברות האלה כחולות"},
+      {"field": "totalPrice", "value": 12, "quote": "הסכום הכולל הוא 12 שקלים"},
+      {"field": "currency", "value": "ILS", "quote": "12 שקלים"}
+    ],
+    "extractionComplete": true,
+    "notes": "Exploratory AI judgment only; vocabulary not evaluated under unrestricted-diagnostic. Direct, natural confirmation of blue color, two notebooks and the full price. יש לך refers to the selected notebooks and does not prove payment. No paid or unitPrice claim is extracted."
+  }
+]

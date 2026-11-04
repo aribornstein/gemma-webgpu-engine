@@ -1,0 +1,774 @@
+{
+  "schemaVersion": 1,
+  "campaign": "mechanistic-repair-v1",
+  "status": "exploratory_observational_diagnosis",
+  "sourcesRead": [
+    "research-results/mechanistic-repair/discovery/investigator-packet.json",
+    "research/mechanistic-repair/protocol.json"
+  ],
+  "scope": {
+    "pairedCases": 12,
+    "humanCalibration": false,
+    "judgments": "Provisional AI linguistic assessments of the actual free replies, not gold human judgments or overall quality scores.",
+    "evidence": "Only the supplied paired free replies and their histories. No logits, activations, weights, tokenization, sampling traces, or causal interventions have been inspected.",
+    "excluded": "No runtime files, final data, old sealed data, or other artifacts were read. No runtime or checkpoint changes are proposed here.",
+    "labelPolicy": "The packet's correctContinuation and incorrectContinuation strings were not treated as observed outputs, evidence of competence, or a correctness oracle.",
+    "inferenceLimit": "One supplied reply per arm establishes an observed contrast, not reproducibility, a circuit, latent competence in the failing context, or a promotable repair.",
+    "grammarPolicy": "Pass means no clear grammatical defect identified in the observed reply. Ellipsis, repetition, lexical identity, incomplete endings, grounding, and goal fulfillment are distinguished. A valid numeral in a disfluent phrase is not a numeral-agreement failure."
+  },
+  "prefixContract": {
+    "construction": "Look up the case in investigator-packet.json. Preserve history messages verbatim; append the specified variant's learner as the final user message. Use the same exact chat serialization and assistant-generation header as the replay, then append only assistantPrefixBeforeSpan. This is the transcript prefix BEFORE the inspected span; do not include the span or later reply text.",
+    "emptyPrefix": "An empty assistantPrefixBeforeSpan means the first generated assistant content, not an empty conversation.",
+    "multipleIssues": "Each later issue uses the actual observed earlier reply, including earlier errors. Do not silently substitute earlier corrections.",
+    "tokenAlignment": "The strings identify character-level boundaries, not known token IDs. Before intervention, tokenize the exact serialized transcript and locate the last token strictly before the first differing target token. Verify boundary alignment rather than assuming spaces, words, or the two arms occupy identical token positions.",
+    "counterfactualPrefixes": "Any assistant text not actually generated in that arm must be labeled teacher-forced counterfactual. Score-only counterfactuals are not free-continuation successes."
+  },
+  "sharedProtectedFacts": {
+    "currency": "ILS",
+    "taxInclusive": true,
+    "fees": false,
+    "discounts": false,
+    "paid": false,
+    "authority": "System metadata overrides conflicting learner claims.",
+    "role": "Remain the scenario's clerk or receptionist; respond to the transaction rather than turning it into a grammar lesson.",
+    "vocabularyPolicy": "unrestricted-diagnostic",
+    "omissionPolicy": "A reply that does not repeat the unpaid status has not thereby claimed payment; omission nevertheless does not demonstrate completion of the unpaid-total goal."
+  },
+  "summary": {
+    "cleanGrammaticality": {"pass": 9, "fail": 3, "uncertain": 0},
+    "errorGrammaticality": {"pass": 6, "fail": 5, "uncertain": 1},
+    "strongestContrastCases": [
+      {
+        "id": "shirt-order-numeral",
+        "finding": "Clean output has שתי חולצות; error output has שני חולצות, exactly retaining the erroneous learner numeral with the same noun.",
+        "support": "Strongest observational support for learner-error copying; no causal mechanism yet demonstrated."
+      },
+      {
+        "id": "book-order-numeral",
+        "finding": "Clean output has שני ספרים; error output has שתי גילידים. The error arm retains the learner's שתי and replaces the book noun.",
+        "support": "Clear paired lexical-identity corruption and surface numeral retention. The grammatical gender or lexical status of גילידים is not assumed."
+      }
+    ],
+    "auxiliaryContrast": {
+      "id": "book-length-adjective",
+      "finding": "Clean output uses שלושה ספרים; error output corrects קצרות to קצרים but later says שלוש ספרים and subsequently uses שלושה correctly.",
+      "support": "Error-sensitive cross-category drift, not literal copying of the learner's adjective error."
+    },
+    "bothFailCases": [
+      "notebook-order-numeral",
+      "hotel-size-adjective",
+      "library-availability-verb"
+    ],
+    "bothPassWithoutReproducingTargetError": [
+      "hotel-order-numeral",
+      "notebook-color-adjective",
+      "shirt-arrival-verb",
+      "bag-condition-adjective",
+      "bag-total-verb",
+      "library-operation-verb"
+    ],
+    "interpretation": "These are descriptive categories for these 12 pairs, not calibrated rates. No 9/10 quality, protocol-gate passage, or latent-competence claim follows."
+  },
+  "cases": [
+    {
+      "id": "notebook-order-numeral",
+      "protectedWorldFacts": {
+        "item": "school notebook",
+        "quantity": 3,
+        "unitPrice": 6,
+        "totalPrice": 18,
+        "unitScope": "per notebook",
+        "paid": false,
+        "role": "stationery-shop clerk",
+        "targetLevel": "A1"
+      },
+      "clean": {
+        "grammaticality": "fail",
+        "reason": "An extraneous של interrupts the direct-object phrase after רוצה. שלוש מחברות itself agrees correctly.",
+        "issues": [
+          {
+            "type": "extraneous_preposition",
+            "badSubstring": "של שלוש מחברות",
+            "minimalCorrection": "שלוש מחברות",
+            "assistantPrefixBeforeSpan": "אז את רוצה "
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "fail",
+        "reason": "The same extraneous של occurs, but the learner's שלושה is changed to the correct שלוש.",
+        "issues": [
+          {
+            "type": "extraneous_preposition",
+            "badSubstring": "של שלוש מחברות",
+            "minimalCorrection": "שלוש מחברות",
+            "assistantPrefixBeforeSpan": "את רוצה "
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "both_wrong_independent_of_target_error",
+        "supportsLearnerErrorCopying": "no",
+        "explanation": "Both replies have the same local disfluency; both use correct feminine numeral agreement. The error is not שלוש מחברות.",
+        "groundingObservation": "Both retain quantity 3 and total 18; neither states that payment occurred."
+      }
+    },
+    {
+      "id": "book-order-numeral",
+      "protectedWorldFacts": {
+        "item": "book for a train journey",
+        "quantity": 2,
+        "unitPrice": 24,
+        "totalPrice": 48,
+        "unitScope": "per book",
+        "paid": false,
+        "role": "bookshop clerk",
+        "targetLevel": "A1"
+      },
+      "clean": {
+        "grammaticality": "pass",
+        "reason": "שני ספרים agrees correctly. A short noun-phrase confirmation is acceptable here.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "",
+            "observedSpan": "שני ספרים",
+            "purpose": "Matched start-of-reply baseline."
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "uncertain",
+        "lexicalIdentity": "fail",
+        "reason": "שתי גילידים does not preserve the specified book noun. Do not invent a grammatical gender for גילידים or assert that it cannot be a word in any context.",
+        "issues": [
+          {
+            "type": "lexical_identity_corruption_with_retained_learner_numeral",
+            "badSubstring": "שתי גילידים",
+            "minimalCorrection": "שני ספרים",
+            "assistantPrefixBeforeSpan": "",
+            "correctionRationale": "Restore the authoritative item ספרים and its masculine numeral שני together. Replacing only the noun would leave שתי ספרים."
+          }
+        ],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "שתי ",
+            "observedSpan": "גילידים",
+            "purpose": "Inspect noun selection after the actual retained numeral; lexical-only contrast with ספרים is not a grammatical rescue."
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "clean_correct_error_lexically_corrupted",
+        "supportsLearnerErrorCopying": "partial_observational",
+        "explanation": "The error arm retains the learner's שתי but changes the noun. This supports learner-sensitive surface continuation and lexical drift, not a demonstrated same-noun agreement mechanism.",
+        "groundingObservation": "Both retain total 48; the error arm fails to retain book identity. Payment status is not explicitly affirmed."
+      }
+    },
+    {
+      "id": "shirt-order-numeral",
+      "protectedWorldFacts": {
+        "item": "shirt",
+        "quantity": 2,
+        "unitPrice": 55,
+        "totalPrice": 110,
+        "unitScope": "per shirt, not the whole order",
+        "paid": false,
+        "role": "clothing-shop clerk",
+        "targetLevel": "B2"
+      },
+      "clean": {
+        "grammaticality": "pass",
+        "reason": "שתי חולצות is correct. The price construction with יהיו is not diagnosed as an agreement error.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "",
+            "observedSpan": "שתי חולצות",
+            "purpose": "Matched start-of-reply baseline."
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "fail",
+        "reason": "חולצות is feminine; שני must be שתי in this phrase.",
+        "issues": [
+          {
+            "type": "numeral_gender_agreement",
+            "badSubstring": "שני חולצות",
+            "minimalCorrection": "שתי חולצות",
+            "assistantPrefixBeforeSpan": ""
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "clean_correct_error_repeats_same_error",
+        "supportsLearnerErrorCopying": "yes_observational",
+        "explanation": "The output begins with the learner's exact noun phrase in each arm. The differing numeral is the same error introduced in the learner turn.",
+        "groundingObservation": "Both retain the full total 110, rather than substituting unit price 55. Neither asserts payment."
+      }
+    },
+    {
+      "id": "hotel-order-numeral",
+      "protectedWorldFacts": {
+        "item": "hotel room for one night",
+        "quantity": 3,
+        "unitPrice": 240,
+        "totalPrice": 720,
+        "unitScope": "per room for one night, not per guest",
+        "duration": "one night",
+        "paid": false,
+        "conflictingClaimsToReject": ["four rooms", "already paid"],
+        "outsideScope": "performance tickets",
+        "role": "hotel receptionist",
+        "targetLevel": "B2"
+      },
+      "clean": {
+        "grammaticality": "pass",
+        "reason": "שלושת החדרים is the correct definite masculine construction.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "הסכום הכולל עבור ",
+            "observedSpan": "שלושת החדרים",
+            "purpose": "Correct reformulation rather than literal learner echo."
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "pass",
+        "reason": "The learner's שלוש חדרים is replaced by correct שלושת החדרים.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "הסכום הכולל עבור ",
+            "observedSpan": "שלושת החדרים",
+            "purpose": "Non-copying numeral control."
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "target_error_not_reproduced",
+        "supportsLearnerErrorCopying": "no",
+        "explanation": "Both arms produce the same correct masculine numeral construction.",
+        "groundingObservation": "Both retain three rooms and total 720; error arm explicitly says one night. The earlier paid claim is not repeated, but unpaid status is not reiterated."
+      }
+    },
+    {
+      "id": "notebook-color-adjective",
+      "protectedWorldFacts": {
+        "item": "blue notebook",
+        "quantity": 2,
+        "unitPrice": 6,
+        "totalPrice": 12,
+        "unitScope": "per notebook",
+        "color": "blue",
+        "paid": false,
+        "role": "stationery-shop clerk",
+        "targetLevel": "A1"
+      },
+      "clean": {
+        "grammaticality": "pass",
+        "reason": "כחולות agrees with המחברות; שתי מחברות also agrees.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "כן, המחברות האלה ",
+            "observedSpan": "כחולות",
+            "purpose": "Observed adjective agreement."
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "pass",
+        "reason": "המחברות הכחולות is a well-formed feminine definite noun phrase. Its use as an elliptical confirmation is not a masculine-agreement error.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "כן, המחברות ",
+            "observedSpan": "הכחולות",
+            "purpose": "Correct agreement with a changed syntactic construction."
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "target_error_not_reproduced",
+        "supportsLearnerErrorCopying": "no",
+        "explanation": "The error-arm output does not contain כחולים. It changes to an attributive feminine form rather than reproducing the erroneous predicate.",
+        "groundingObservation": "Both retain blue color, two notebooks, and total 12; payment status is omitted."
+      }
+    },
+    {
+      "id": "book-length-adjective",
+      "protectedWorldFacts": {
+        "item": "short book",
+        "quantity": 3,
+        "unitPrice": 24,
+        "totalPrice": 72,
+        "unitScope": "per book",
+        "length": "short, not an abridged edition",
+        "paid": false,
+        "outsideScope": "train-platform information",
+        "role": "bookshop clerk",
+        "targetLevel": "B2"
+      },
+      "clean": {
+        "grammaticality": "pass",
+        "reason": "קצרים, שלושה ספרים, and שלושת הספרים agree correctly. Repetition of the short-book description is not an agreement defect.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "אני מבין שאתה מחפש ספרים קצרים. אני מציע לך ",
+            "observedSpan": "שלושה ספרים",
+            "purpose": "Shared observed prefix immediately before the numeral contrast."
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "fail",
+        "reason": "שלוש ספרים has wrong numeral gender. The learner's adjective error is nevertheless corrected to קצרים, and a later standalone שלושה is correct.",
+        "issues": [
+          {
+            "type": "numeral_gender_agreement",
+            "badSubstring": "שלוש ספרים",
+            "minimalCorrection": "שלושה ספרים",
+            "assistantPrefixBeforeSpan": "אני מבין שאתה מחפש ספרים קצרים. אני מציע לך "
+          }
+        ],
+        "completionObservation": "The supplied reply ends with האם. This is visibly unfinished; its stopping cause is unknown and is not evidence of copying.",
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "אני מבין שאתה מחפש ספרים ",
+            "observedSpan": "קצרים",
+            "purpose": "The model already avoids the actual learner adjective error before the later numeral failure."
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "clean_correct_error_cross_category_drift",
+        "supportsLearnerErrorCopying": "not_literal_copying",
+        "explanation": "קצרות is not copied. The introduced error is a different feminine form, שלוש, absent from the learner turn. Gender-feature carryover is a hypothesis, not an observed mechanism.",
+        "groundingObservation": "Both retain short books and total 72; the error arm also states unit price 24, but makes the already-selected quantity conditional. Do not count this as full goal preservation."
+      }
+    },
+    {
+      "id": "shirt-arrival-verb",
+      "protectedWorldFacts": {
+        "item": "shirt",
+        "quantity": 2,
+        "unitPrice": 55,
+        "totalPrice": 110,
+        "unitScope": "per shirt",
+        "arrival": "at the shop today",
+        "specificArrivalTime": "not promised",
+        "paid": false,
+        "role": "clothing-shop clerk",
+        "targetLevel": "A1"
+      },
+      "clean": {
+        "grammaticality": "pass",
+        "reason": "מגיעות agrees with החולצות.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "החולצות שלך ",
+            "observedSpan": "מגיעות",
+            "purpose": "Correct verb agreement baseline."
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "pass",
+        "reason": "The learner's מגיעים is replaced with מגיעות.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "כן, החולצות שלך ",
+            "observedSpan": "מגיעות",
+            "purpose": "Non-copying verb control."
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "target_error_not_reproduced",
+        "supportsLearnerErrorCopying": "no",
+        "explanation": "Both produce the correct feminine verb.",
+        "groundingObservation": "Both retain today's arrival and total 110 without promising a specific time or claiming payment."
+      }
+    },
+    {
+      "id": "hotel-size-adjective",
+      "protectedWorldFacts": {
+        "item": "small hotel room",
+        "quantity": 2,
+        "unitPrice": 240,
+        "totalPrice": 480,
+        "unitScope": "per room for one night, not per guest",
+        "duration": "one night",
+        "size": "small",
+        "paid": false,
+        "role": "hotel receptionist",
+        "targetLevel": "A1"
+      },
+      "clean": {
+        "grammaticality": "fail",
+        "reason": "שתי חדרים is wrong because חדרים is masculine. חדרי גודל קטן is awkward, but is not independently asserted to be an agreement error.",
+        "issues": [
+          {
+            "type": "numeral_gender_agreement",
+            "badSubstring": "שתי חדרים",
+            "minimalCorrection": "שני חדרים",
+            "assistantPrefixBeforeSpan": "החדרים שהזמנת הם חדרי גודל קטן. המחיר לחדר אחד בלילה הוא 240 שקלים. עבור "
+          }
+        ],
+        "completionObservation": "The reply ends with האם תרצה להמשיך without final punctuation. Do not infer the stopping cause."
+      },
+      "error": {
+        "grammaticality": "fail",
+        "reason": "The adjective קטנים is masculine, so the learner's קטנות is not copied. However, חדרי קטנים is malformed for the intended small-rooms description, and שתי חדרים repeats the clean arm's numeral failure.",
+        "issues": [
+          {
+            "type": "construct_form_instead_of_absolute_plural",
+            "badSubstring": "חדרי קטנים",
+            "minimalCorrection": "חדרים קטנים",
+            "assistantPrefixBeforeSpan": "החדרים שאתם בוחרים הם ",
+            "correctionRationale": "For the intended small rooms, use absolute plural חדרים before the adjective. This diagnosis is contextual, not a claim that חדרי can never head a construct phrase."
+          },
+          {
+            "type": "numeral_gender_agreement",
+            "badSubstring": "שתי חדרים",
+            "minimalCorrection": "שני חדרים",
+            "assistantPrefixBeforeSpan": "החדרים שאתם בוחרים הם חדרי קטנים. המחיר לחדר אחד ללילה הוא 240 שקלים. עבור "
+          }
+        ],
+        "completionObservation": "The reply ends with האם תרצו להזמין without final punctuation. Do not infer the stopping cause."
+      },
+      "pairedBehavior": {
+        "category": "both_wrong_with_additional_error_arm_defect",
+        "supportsLearnerErrorCopying": "no_direct_support",
+        "explanation": "The shared numeral error cannot be attributed to the changed learner adjective from this pair. The extra construct-form defect is error-arm-specific but is not a copy of קטנות.",
+        "groundingObservation": "Both retain small size, quantity 2, unit price 240, and total 480. Reopening the booking does not establish goal completion; payment is not explicitly addressed."
+      }
+    },
+    {
+      "id": "bag-condition-adjective",
+      "protectedWorldFacts": {
+        "item": "new bag",
+        "quantity": 2,
+        "unitPrice": 60,
+        "totalPrice": 120,
+        "unitScope": "per bag",
+        "condition": "new, not secondhand",
+        "paid": false,
+        "role": "bag-shop clerk",
+        "targetLevel": "B2"
+      },
+      "clean": {
+        "grammaticality": "pass",
+        "reason": "חדשים and שני תיקים agree correctly.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "כן, התיקים ",
+            "observedSpan": "חדשים",
+            "purpose": "Correct adjective baseline."
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "pass",
+        "reason": "The actual reply is identical to the clean reply and uses חדשים, not חדשות.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "כן, התיקים ",
+            "observedSpan": "חדשים",
+            "purpose": "Exact-output invariance control."
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "target_error_not_reproduced_identical_outputs",
+        "supportsLearnerErrorCopying": "no",
+        "explanation": "Changing learner adjective gender does not change this supplied reply.",
+        "groundingObservation": "Both retain new condition, two bags, and total 120; unpaid status is omitted."
+      }
+    },
+    {
+      "id": "bag-total-verb",
+      "protectedWorldFacts": {
+        "item": "bag",
+        "quantity": 2,
+        "unitPrice": 60,
+        "totalPrice": 120,
+        "unitScope": "per bag, not the whole order",
+        "paid": false,
+        "outsideScope": "cafe reservations",
+        "role": "bag-shop clerk",
+        "targetLevel": "A1"
+      },
+      "clean": {
+        "grammaticality": "pass",
+        "reason": "שני תיקים and עולים agree correctly.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "כן, שני תיקים יחד ",
+            "observedSpan": "עולים",
+            "purpose": "Correct price predicate baseline."
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "pass",
+        "reason": "The reply uses masculine הם rather than the learner's feminine עולות. The elliptical price construction is not diagnosed as an agreement error.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "כן, שני תיקים יחד ",
+            "observedSpan": "הם",
+            "purpose": "Different valid construction, not evidence that the same verb was repaired."
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "target_error_avoided_by_rephrasing",
+        "supportsLearnerErrorCopying": "no",
+        "explanation": "Both noun phrases agree. The error arm avoids the disputed verb; this does not establish competence for עולים versus עולות at the identical verb position.",
+        "groundingObservation": "Both retain two bags and combined price 120 and invite payment rather than asserting it has occurred."
+      }
+    },
+    {
+      "id": "library-operation-verb",
+      "protectedWorldFacts": {
+        "item": "library computer workstation",
+        "quantity": 2,
+        "unitPrice": 10,
+        "totalPrice": 20,
+        "unitScope": "per workstation for one hour",
+        "duration": "one hour",
+        "availability": "operational and available now",
+        "fictionalPolicy": "This library charges for workstation use.",
+        "paid": false,
+        "role": "library desk clerk",
+        "targetLevel": "B2"
+      },
+      "clean": {
+        "grammaticality": "pass",
+        "reason": "פועלות and שתי עמדות have correct feminine agreement.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "כן, העמדות ",
+            "observedSpan": "פועלות",
+            "purpose": "Identical-output verb preservation anchor."
+          },
+          {
+            "assistantPrefixBeforeSpan": "כן, העמדות פועלות כרגע. אני יכול לאשר את ההזמנה לשעה אחת עבור ",
+            "observedSpan": "שתי עמדות",
+            "purpose": "Correct feminine numeral preservation anchor."
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "pass",
+        "reason": "The reply is identical to the clean reply; פועלים is not copied.",
+        "issues": [],
+        "inspectionAnchors": [
+          {
+            "assistantPrefixBeforeSpan": "כן, העמדות ",
+            "observedSpan": "פועלות",
+            "purpose": "Non-copying error-arm preservation anchor."
+          },
+          {
+            "assistantPrefixBeforeSpan": "כן, העמדות פועלות כרגע. אני יכול לאשר את ההזמנה לשעה אחת עבור ",
+            "observedSpan": "שתי עמדות",
+            "purpose": "Preserve correct numeral as well as corrected verb."
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "target_error_not_reproduced_identical_outputs",
+        "supportsLearnerErrorCopying": "no",
+        "explanation": "Both arms independently show the same correct verb and numeral surfaces in the supplied outputs.",
+        "groundingObservation": "Both retain operational status now, two workstations, one hour, and total 20. Neither explicitly restates unpaid status."
+      }
+    },
+    {
+      "id": "library-availability-verb",
+      "protectedWorldFacts": {
+        "item": "library computer workstation",
+        "quantity": 3,
+        "unitPrice": 10,
+        "totalPrice": 30,
+        "unitScope": "per workstation for one hour",
+        "availability": "18:00 today, local time",
+        "bookingInterval": "18:00 to 19:00",
+        "fictionalPolicy": "This library charges for workstation use.",
+        "paid": false,
+        "conflictingClaimsToReject": ["already paid"],
+        "role": "library desk clerk",
+        "targetLevel": "B2"
+      },
+      "clean": {
+        "grammaticality": "fail",
+        "reason": "עמדות is feminine, requiring שלוש, including in שלוש העמדות. זמינות is correct.",
+        "issues": [
+          {
+            "type": "numeral_gender_agreement",
+            "badSubstring": "שלושה עמדות",
+            "minimalCorrection": "שלוש עמדות",
+            "assistantPrefixBeforeSpan": "העמדות יהיו זמינות בשש בערב. המחיר עבור "
+          },
+          {
+            "type": "definite_numeral_gender_agreement",
+            "badSubstring": "שלושת העמדות",
+            "minimalCorrection": "שלוש העמדות",
+            "assistantPrefixBeforeSpan": "העמדות יהיו זמינות בשש בערב. המחיר עבור שלושה עמדות לשעה הוא 30 שקלים. האם תרצה להזמין את "
+          }
+        ]
+      },
+      "error": {
+        "grammaticality": "fail",
+        "reason": "The same שלושה עמדות error occurs. The learner's מתפנים is not copied; זמינות agrees correctly.",
+        "issues": [
+          {
+            "type": "numeral_gender_agreement",
+            "badSubstring": "שלושה עמדות",
+            "minimalCorrection": "שלוש עמדות",
+            "assistantPrefixBeforeSpan": "העמדות יהיו זמינות בשש בערב. המחיר עבור "
+          }
+        ]
+      },
+      "pairedBehavior": {
+        "category": "both_wrong_independent_of_target_error",
+        "supportsLearnerErrorCopying": "no",
+        "explanation": "The targeted learner verb error is avoided in both outputs, while both independently have the same numeral error. The clean arm additionally has a definite-numeral error.",
+        "groundingObservation": "Both retain availability at six in the evening, quantity 3, one hour, and total 30. Neither reiterates unpaid status after the earlier mistaken paid claim."
+      }
+    }
+  ],
+  "mechanismCards": [
+    {
+      "id": "M1_RECENT_NUMERAL_SURFACE_RETENTION",
+      "selectedCaseIds": ["shirt-order-numeral", "book-order-numeral"],
+      "observation": "The shirt reply starts with the learner's exact numeral-noun phrase in each arm; the book reply retains the differing numeral but changes the noun in the error arm.",
+      "hypothesis": "At the first assistant-content decision, a recent learner numeral surface competes with noun-conditioned numeral selection. This is a local hypothesis about these prompts, not a general claim that Hebrew agreement is available underneath it.",
+      "competingExplanation": "The prompts select different opening templates, or the model is generally unreliable on these numeral-noun combinations. Whole-state donor replacement could simply transplant an answer-bearing representation rather than isolate copying.",
+      "nextExperiment": [
+        "On both exact shirt transcripts at assistantPrefixBeforeSpan='', score the continuations שתי חולצות and שני חולצות using the model's raw softcapped logits followed only by ordinary probability normalization. Report full-span conditional log probabilities and per-token contributions; no temperature, top-k, penalties, or sampling transforms.",
+        "Report the correct-minus-incorrect span log-probability contrast separately in each arm and its clean-to-error change. Do not infer competence from a nonzero correct-candidate probability.",
+        "Capture actual post-layer residuals at the last input token before first assistant content for both arms at layers 0,4,12,20,28,34. Patch the clean state into the error run at the matched token and layer, one site at a time; include self replacement and reverse error-to-clean replacement.",
+        "For each diagnostic, score both alternatives and also generate a free continuation from the original prefix without forcing the target words. A changed forced score alone is not rescue.",
+        "Narrow adjacent layers only if the initial sweep has a reproducible site-specific effect beyond the self controls. No weight slices or repair proposal are justified by a null sweep."
+      ],
+      "predictedResult": "The erroneous learner reduces the preference for שתי חולצות. If a local residual state carries the relevant interference, one or a few patches restore the correct opening in free continuation while reverse patches bias toward the erroneous form.",
+      "falsifier": "No reproducible learner-conditioned score change, no intervention effect beyond self controls, or changes attributable only to generic opening replacement weaken this mechanism. A correct forced score without corrected free output does not confirm it.",
+      "preservationCases": ["library-operation-verb", "hotel-order-numeral"],
+      "interpretationLimit": "Clean learner text already contains the desired numeral. Even a pre-output clean donor can import the answer. Same-case rescue establishes sensitivity to that state only; it does not locate a transferable native computation."
+    },
+    {
+      "id": "M2_NUMERAL_CONDITIONED_NOUN_DERAILMENT",
+      "selectedCaseIds": ["book-order-numeral"],
+      "observation": "The error reply starts שתי גילידים rather than שני ספרים, while retaining the correct monetary total.",
+      "hypothesis": "The retained numeral changes the subsequent noun-selection distribution enough to displace ספרים. Lexical derailment may be downstream of the numeral decision rather than a separate loss of order facts.",
+      "competingExplanation": "The noun corruption originates in the learner-conditioned state independently of the generated numeral, or the whole opening is selected as a different sequence. The unfamiliar noun's gender is not known and must not be used as evidence for grammatical repair.",
+      "nextExperiment": [
+        "At assistantPrefixBeforeSpan='' in each exact book transcript, score the four specified continuations שני ספרים, שתי ספרים, שני גילידים, and שתי גילידים. The latter three are probes, not certified grammatical alternatives.",
+        "Factor the sequence scores at the numeral/noun boundary. On each learner transcript, score ספרים and גילידים after assistant prefixes שני and שתי with the exact separating space. Label the clean+שתי and error+שני paths teacher-forced counterfactuals; they were not observed replies.",
+        "Compare noun-identity log-probability margins under the same generated numeral across learner arms, and under different numerals within each arm. This separates learner-context influence from generated-prefix influence.",
+        "If the noun margin tracks the numeral, resume free generation after each forced numeral as a prefix intervention, explicitly not an unforced success. If it mainly tracks the learner arm, test a clean-to-error residual replacement at a fixed common numeral prefix so the donor's generated numeral cannot trivially differ.",
+        "At most one informative noun-prefix condition receives a six-layer residual sweep. Compare that conditional diagnostic with a free run from the untouched start; correcting only a teacher-forced noun step does not demonstrate end-to-end rescue."
+      ],
+      "predictedResult": "If numeral-conditioned derailment is responsible, the noun margin favoring ספרים improves after שני versus שתי within the error learner transcript; forcing the correct numeral often restores the book noun without changing the order total.",
+      "falsifier": "A noun margin that is insensitive to the generated numeral but consistently differs by learner arm favors upstream lexical/context interference. Persistent corruption after שני or failure to reproduce the original corruption also weakens the proposed chain.",
+      "preservationCases": ["library-operation-verb", "bag-condition-adjective"],
+      "interpretationLimit": "A numeral prefix can itself supply part of the desired answer. Such a result demonstrates conditional dependence, not native agreement competence or a transferable weight repair. Do not infer a noun's grammatical gender from its model score."
+    },
+    {
+      "id": "M3_DELAYED_GENDER_FEATURE_INTERFERENCE",
+      "selectedCaseIds": ["book-length-adjective"],
+      "observation": "After an erroneous feminine learner adjective, the model produces correct קצרים before later using feminine שלוש with masculine ספרים. The clean arm instead uses שלושה at the same observed assistant prefix. The error arm later uses שלושה correctly.",
+      "hypothesis": "A residual influence of the learner's feminine feature affects a later numeral choice despite locally correct adjective production. This need not be literal token copying.",
+      "competingExplanation": "The two contexts differ in a small next-token preference within an already unstable numeral construction; the model has a generic agreement weakness. Shared clean-arm failures in hotel-size-adjective and library-availability-verb make that explanation plausible.",
+      "nextExperiment": [
+        "Initially score only: use each exact learner transcript plus the shared observed assistant prefix אני מבין שאתה מחפש ספרים קצרים. אני מציע לך , then compare שלושה ספרים קצרים with שלוש ספרים קצרים.",
+        "Check the earlier actual prefix אני מבין שאתה מחפש ספרים  with candidates קצרים and קצרות in both arms. A correct surface adjective does not prove all contextual gender influence has disappeared.",
+        "If the later contrast is reproducibly learner-dependent, a future bounded capture may inspect the six stated layers at the token immediately before the numeral. This is not one of the first two causal sweeps.",
+        "Use the shared numeral errors in hotel-size-adjective and library-availability-verb as negative differential controls, not preservation successes. Do not count notebook-order-numeral's extra של as an agreement failure."
+      ],
+      "predictedResult": "The erroneous learner selectively lowers the masculine-numeral margin at the shared later prefix even while both earlier adjective margins favor קצרים.",
+      "falsifier": "Similar later margins across arms, an unreproducible contrast, or a generic failure equally present with clean learner wording favors baseline instability over delayed learner-feature interference.",
+      "preservationCases": ["library-operation-verb", "bag-condition-adjective"],
+      "interpretationLimit": "A scoring contrast localizes a decision to inspect, not the computation that caused it. No circuit, rank, weight direction, or repair is inferred."
+    }
+  ],
+  "boundedCausalCheck": {
+    "status": "proposed_not_executed",
+    "targetCases": [
+      {
+        "id": "shirt-order-numeral",
+        "why": "The clean/error contrast is an unambiguous same-noun numeral error at the first assistant content, minimizing ambiguity about the failing decision.",
+        "initialAssistantPrefix": "",
+        "targetAlternatives": ["שתי חולצות", "שני חולצות"]
+      },
+      {
+        "id": "book-order-numeral",
+        "why": "This gives a distinct, concrete lexical-identity failure after a retained learner numeral. A small factorial score test can distinguish numeral-mediated noun drift from upstream context drift.",
+        "initialAssistantPrefix": "",
+        "targetAlternatives": ["שני ספרים", "שתי ספרים", "שני גילידים", "שתי גילידים"]
+      }
+    ],
+    "preservationCase": {
+      "id": "library-operation-verb",
+      "why": "Both supplied arms produce exactly the same reply, with correct feminine verb and numeral agreement despite the learner verb error. It also exposes quantity, hourly scope, availability, and price regressions.",
+      "preserve": [
+        "פועלות, not פועלים, for the operational workstations",
+        "שתי עמדות, not שני עמדות",
+        "two workstations, one hour, operational and available now",
+        "10 ILS per workstation-hour and 20 ILS total",
+        "unpaid status; no fabricated payment or timing",
+        "Hebrew library-clerk response, not an imported shirt or book answer"
+      ],
+      "test": "Run both learner variants without intervention and with any intervention rule claimed to transfer. Measure the verb and numeral candidate contrasts at their actual prefixes and inspect free continuation. Leaving this case untouched can provide a baseline but cannot establish preservation under a proposed global intervention."
+    },
+    "initialLayers": [0, 4, 12, 20, 28, 34],
+    "initialTokenSite": "Last serialized input token immediately before first assistant content for both target cases; identify by role/content boundary, not a guessed absolute token index.",
+    "optionalSecondTokenSite": "Book noun boundary after a fixed specified numeral, only if the factorial scores motivate it.",
+    "boundedSchedule": [
+      "Reproduce the two target pairs and the preservation pair once under the matched owned-WebGPU, sequential-prefill, full-logit-CPU, temperature-zero path. If these replies are not reproduced, document the discrepancy before attributing their mechanism.",
+      "Obtain the specified shirt, book, and preservation baseline contrasts and save token IDs, serialized-prefix hashes, raw softcapped scoring settings, and actual residuals. Use only these discovery transcripts.",
+      "For each target and each of six layers, perform clean-to-error replacement, error self replacement, and error-to-clean replacement at the initial token site: at most 36 initial intervention conditions total.",
+      "Only if informative, add one book noun-boundary sweep with clean-to-error and self replacements at six layers: at most 12 additional conditions.",
+      "Choose at most one promising initial layer per target and inspect its immediate neighbors, at most four additional layers total, with the same three controls: at most 12 conditions. Do not broaden an uninformative sweep.",
+      "Reserve at most 12 conditions for preservation and answer-import controls and at most 12 for exact repeats of informative conditions. Maximum 84 intervention conditions in this proposal; also remain within every protocol token, byte, time, and diagnostic budget.",
+      "Run serially with gpuConcurrency=1. Use protocol seeds 23 and 47 for designated repeats, while noting that temperature-zero seed repeats do not establish sampling robustness. No checkpoint writes, training, or gradient descent."
+    ],
+    "controlsAndInterpretation": {
+      "selfReplacement": "The error state reinserted into its own matched location should preserve its logits and free continuation within numerical tolerance. Failure invalidates attribution until the hook is checked.",
+      "reverseReplacement": "Error-to-clean replacement tests bidirectionality but is not required to create a global language failure.",
+      "answerImport": "The primary donors contain the correct numeral in the learner turn, even though no correct assistant output has been generated. Label any successful replacement same-case donor rescue, not discovery of a native correction circuit.",
+      "transferChallenge": "Before claiming transferable computation, predeclare a small same-position additive perturbation derived only from discovery target captures and test it on a second context and the preservation pair, alongside zero and norm-matched control perturbations. Do not tune against preservation outputs, transplant whole unrelated donor states as proof of transfer, or require a low-rank form.",
+      "oppositeGenderConstraint": "The desired numeral is feminine שתי for shirts but masculine שני for books. A blanket bias toward one numeral cannot explain successful context-appropriate rescue of both.",
+      "localizationLimit": "A broad residual replacement can affect many computations. Stronger native-computation evidence requires context-appropriate transfer and eventually operator-level attribution beyond a copied answer representation.",
+      "weights": "Only after an informative causal site should bounded q/k/v/o, MLP gate/up/down, or PLE slices with quantization codes and scales be requested. Merely inspecting a slice cannot identify a causal operator; no weight correction is authorized or established here."
+    },
+    "readouts": [
+      "Full conditional log probability for each specified continuation from the identical prefix, plus per-token log probabilities and tokenization. Account for differing token counts; do not compare a single token's score as if it were the full word or phrase.",
+      "Correct-minus-incorrect or book-identity span margins and their change by learner arm and intervention; labels identify hand-specified probes, not model competence.",
+      "Unforced continuation from the original decision prefix, including whether the target span is repaired and whether later text remains grammatical and preserves the transaction.",
+      "Explicit checks for item identity, quantity, unit versus total, currency, unpaid status, availability/duration where applicable, NPC role, and absence of imported donor content.",
+      "Record omissions separately from contradictions. Neither a preserved total alone nor a corrected numeral alone establishes all quality or goal criteria."
+    ],
+    "stopRule": "If target behavior is not reproducible, self controls fail, no site has a discriminating effect, or rescue destroys protected facts, return inconclusive or a failed activation diagnostic. No expansion into final/old sealed data and no promotion from these observations.",
+    "successLabelIfRescued": "activation_only_same_case_rescue unless separately supported transfer and operator attribution justify a narrower mechanistic claim; never weight_repair on these operations alone"
+  },
+  "protocolDisposition": {
+    "promotion": "not_assessed",
+    "causalGateC": "not_tested",
+    "operatorGateE": "not_tested",
+    "qualityGateQ": "not_tested",
+    "finalEvaluation": "not_authorized_by_this_diagnosis",
+    "note": "The cards propose discovery diagnostics only. A successful donor intervention would still be explicitly activation-only. No scores or qualitative labels here satisfy the protocol's quality, preservation, performance, or final gates."
+  }
+}

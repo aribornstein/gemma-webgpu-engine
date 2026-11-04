@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "campaign": "mechanistic-repair-v1",
+  "status": "approved",
+  "baselineCommit": "cc3b1ad015d4016c3b22efe3ac007a07e6069dd4",
+  "checkpointRevision": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+  "checkpointSha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4",
+  "primaryQuestion": "Is correct Hebrew agreement available in the exact failing conversation context, and can a localized interference mechanism be repaired without language, grounding or goal regressions?",
+  "promotion": {
+    "minimumEveryFinalCriterion": 9,
+    "scale": [0, 10],
+    "abstentionPasses": false,
+    "criticalViolationsAllowed": 0,
+    "requiredCriteria": ["grammar", "naturalness", "levelSuitability", "vocabulary", "grounding", "goal", "coherence"],
+    "secondaryNoninferiorityMargin": 0.25,
+    "maximumDecodeOverheadFraction": 0.05,
+    "humanCalibration": false,
+    "interpretation": "AI-judged exploratory evidence only; no universal guarantee of no regressions"
+  },
+  "execution": {
+    "backend": "owned-webgpu",
+    "prefill": "sequential",
+    "selection": "full-logit CPU path in every matched arm",
+    "checkpointWrites": false,
+    "backboneTraining": false,
+    "gradientDescent": false,
+    "gpuConcurrency": 1,
+    "baselineTemperature": 0,
+    "replicationSeeds": [23, 47],
+    "candidateSelectionUsesFinalScores": false
+  },
+  "budgets": {
+    "hypotheses": 8,
+    "candidatePatches": 8,
+    "refinements": 2,
+    "developmentJudgeRequests": 60,
+    "finalJudgeRequests": 30,
+    "evaluatedPositions": 1000000,
+    "generatedTokens": 180000,
+    "episodes": 640,
+    "developmentEpisodes": 160,
+    "diagnostics": 2000,
+    "maxInspectionBytes": 16777216,
+    "maxResearchGpuBytes": 268435456,
+    "activeMinutes": 240
+  },
+  "gates": [
+    {"id": "M", "requires": "Valid fixtures, measurements, complete evidence-backed judging and matched inference paths"},
+    {"id": "W", "requires": "Shared agent/UI replay, inspect and compare path works with persisted artifacts"},
+    {"id": "D", "requires": "Reproducible failure family with evidence of available correct behavior or a local conflicting computation"},
+    {"id": "C", "requires": "Localized intervention rescues target decisions and free continuation beyond controls while preserving protected cases"},
+    {"id": "E", "requires": "Verified linear-operator weight correction or explicitly labeled activation-only diagnostic"},
+    {"id": "Q", "requires": "Every required development criterion >=9, target gain and preservation/performance gates pass"},
+    {"id": "FINAL", "requires": "Frozen candidate and independent judges satisfy the same gates on fresh families"}
+  ],
+  "stopPolicy": "No post-result relaxation of gates or budgets. Failed C/E/Q prevents promotion and final evaluation; deliver mechanism_found_not_promotable, inconclusive or invalid_or_blocked with evidence.",
+  "finalData": {
+    "generateOnlyAfterDevelopmentPass": true,
+    "minimumFamilies": 20,
+    "onceOnly": true,
+    "investigatorCanRead": false
+  }
+}

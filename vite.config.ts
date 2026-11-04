@@ -56,8 +56,12 @@ export default defineConfig(({ command }) => ({
   server: {
     port: 5174,
     strictPort: true,
+    hmr: process.env.GEMMA_RESEARCH_RUN === "1" ? false : undefined,
   },
   build: {
+    rolldownOptions: {
+      input: { console: resolve("index.html"), research: resolve("research.html") },
+    },
     outDir: "build",
     emptyOutDir: true,
     minify: "oxc",

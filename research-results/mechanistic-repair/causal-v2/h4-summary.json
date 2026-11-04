@@ -1,0 +1,107 @@
+{
+  "hypothesis": "H4_INSTRUCTION_LANGUAGE",
+  "recognition": [
+    {
+      "id": "H4_PAIR_SHIRT_AB",
+      "expected": "A",
+      "preferred": "B",
+      "logA": -1.9803164568024396,
+      "logB": -0.15227631555482732,
+      "correct": false,
+      "nominatedLabelMass": 0.996776512980995
+    },
+    {
+      "id": "H4_PAIR_SHIRT_BA",
+      "expected": "B",
+      "preferred": "B",
+      "logA": -4.788160304559748,
+      "logB": -0.011853189676804607,
+      "correct": true,
+      "nominatedLabelMass": 0.9965445464852118
+    },
+    {
+      "id": "H4_PAIR_BOOK_AB",
+      "expected": "A",
+      "preferred": "B",
+      "logA": -5.109455290885087,
+      "logB": -0.009959307066459823,
+      "correct": false,
+      "nominatedLabelMass": 0.9961294943296106
+    },
+    {
+      "id": "H4_PAIR_BOOK_BA",
+      "expected": "B",
+      "preferred": "B",
+      "logA": -3.0240222897071276,
+      "logB": -0.05245230635962754,
+      "correct": true,
+      "nominatedLabelMass": 0.9975048964196085
+    },
+    {
+      "id": "H4_PAIR_LIBRARY_AB",
+      "expected": "A",
+      "preferred": "B",
+      "logA": -2.8708071767219394,
+      "logB": -0.06089736969640212,
+      "correct": false,
+      "nominatedLabelMass": 0.9975729806975758
+    },
+    {
+      "id": "H4_PAIR_LIBRARY_BA",
+      "expected": "B",
+      "preferred": "B",
+      "logA": -5.647628023233631,
+      "logB": -0.0055343983324450605,
+      "correct": true,
+      "nominatedLabelMass": 0.9980067583824133
+    }
+  ],
+  "edits": [
+    {
+      "id": "H4_E_SHIRT_ERROR",
+      "original": "שני חולצות יהיו בסך 110 ש\"ח.",
+      "reply": "שני חולצות יהיו בסך 110 ש\"ח.",
+      "expected": "שתי חולצות יהיו בסך 110 ש\"ח.",
+      "exactMinimalEdit": false,
+      "copiedInput": true,
+      "stopReason": "end-token"
+    },
+    {
+      "id": "H4_E_BOOK_ERROR",
+      "original": "שתי ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "reply": "שתי ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "expected": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "exactMinimalEdit": false,
+      "copiedInput": true,
+      "stopReason": "end-token"
+    }
+  ],
+  "nounContinuations": [
+    {
+      "id": "causal-v2:N_CLEAN_SHNEI.free",
+      "prefix": "שני",
+      "text": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "stopReason": "end-token"
+    },
+    {
+      "id": "causal-v2:N_CLEAN_SHTEI.free",
+      "prefix": "שתי",
+      "text": "שתי ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "stopReason": "end-token"
+    },
+    {
+      "id": "causal-v2:N_ERROR_SHNEI.free",
+      "prefix": "שני",
+      "text": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "stopReason": "end-token"
+    },
+    {
+      "id": "causal-v2:N_ERROR_SHTEI.free",
+      "prefix": "שתי",
+      "text": "שתי גילידים. המחיר הכולל יהיה 48 שקלים.",
+      "stopReason": "end-token"
+    }
+  ],
+  "conclusion": "The single English translation did not change B-only recognition or copy-only editing. No order-stable recognition or no-option repair was demonstrated; this does not prove that the underlying capability is absent.",
+  "additionalFreeContinuations": 2
+}

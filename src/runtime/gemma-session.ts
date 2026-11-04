@@ -17,7 +17,15 @@ import type {
   GemmaResearchCaptureSite,
   GemmaResearchContinuationScore,
   GemmaResearchOverlay,
+  GemmaResearchEvaluationRequest,
+  GemmaResearchEvaluationResult,
 } from "../research/engine-types";
+import { inspectWeightSlice, type WeightSliceRequest, type WeightSlice } from "../research/workbench/weights";
+import {
+  createResearchActivationPatch,
+  getResearchActivationPatchPipeline,
+  type ResearchActivationPatch,
+} from "../webgpu/research-activation-patch";
 import type { DecodeOprojNormMode } from "../webgpu/decode-oproj-norm";
 import {
   uploadGemmaTokenInputBatch,
@@ -97,6 +105,7 @@ import {
   GEMMA_START_CHANNEL_TOKEN_ID,
   loadGemmaTokenizer,
   type GemmaGenerationInput,
+  type GemmaChatMessage,
   type GemmaMultimodalGenerationInput,
   type GemmaTokenizer,
 } from "./gemma-tokenizer";
@@ -125,6 +134,7 @@ import {
 import {
   resolveBeamSearchOptions,
   runBeamSearch,
+  topLogProbabilityIndices,
   type BeamHypothesis,
   type BeamSearchOptions,
   type BeamSearchResult,
@@ -1900,6 +1910,177 @@ export class GemmaGenerationSession {
     for (let index = 0; index < h.length; index += 1) projection += overlay.a[index] * h[index];
     const scale = overlay.coefficient * projection;
     for (let index = 0; index < logits.length; index += 1) logits[index] += scale * overlay.u[index];
+  }
+
+  /** @internal Tokenize a text-only research continuation, rejecting unstable prefix boundaries. */
+  researchTokenize(
+    messages: readonly GemmaChatMessage[],
+    assistantPrefix = "",
+    continuation = "",
+  ): { promptTokenIds: number[]; continuationTokenIds: number[]; pieces: string[] } {
+    this.assertAlive();
+    const chat = this.tokenizer.encodeInput(messages);
+    const serialized = this.tokenizer.decodeRawTokens(chat);
+    const prefix = this.tokenizer.encodeText(serialized + assistantPrefix);
+    const full = this.tokenizer.encodeText(serialized + assistantPrefix + continuation);
+    if (!chat.every((id, i) => prefix[i] === id) || !prefix.every((id, i) => full[i] === id)) {
+      throw new Error("Unstable tokenizer boundary: choose a complete-token assistant prefix");
+    }
+    return {
+      promptTokenIds: prefix,
+      continuationTokenIds: full.slice(prefix.length),
+      pieces: full.map((id) => this.tokenizer.decodeRawTokens([id])),
+    };
+  }
+
+  /** @internal Read only an allow-listed, bounded weight slice; packed checkpoint bytes never change. */
+  async researchInspectWeights(request: WeightSliceRequest, signal?: AbortSignal): Promise<WeightSlice> {
+    return this.withResearchAccess(signal, async (activeSignal) => {
+      throwIfGemmaGenerationAborted(activeSignal);
+      const slice = await inspectWeightSlice(this.cache, request);
+      throwIfGemmaGenerationAborted(activeSignal);
+      return slice;
+    });
+  }
+
+  /**
+   * @internal Matched-path evaluation with request-local activation patches. All arms use fresh
+   * sequential prefill and full-logit CPU selection. Patches are diagnostic activation transfers,
+   * not weight edits; no intervention survives this call, including after cancellation or failure.
+   */
+  async researchEvaluate(request: GemmaResearchEvaluationRequest): Promise<GemmaResearchEvaluationResult> {
+    const prompt = [...request.promptTokenIds];
+    const forced = [...(request.continuationTokenIds ?? [])];
+    if (!prompt.length || (request.generate && forced.length)) throw new Error("Use a nonempty prompt and either forcing or generation");
+    for (const id of [...prompt, ...forced]) {
+      if (!Number.isInteger(id) || id < 0 || id >= this.tokenizer.vocabularySize) throw new Error(`Invalid research token ${id}`);
+    }
+    const maxNewTokens = request.generate?.maxNewTokens ?? 0;
+    if (request.generate && (!Number.isInteger(maxNewTokens) || maxNewTokens < 1 || maxNewTokens > 512)) {
+      throw new Error("Research generation budget must be 1..512");
+    }
+    const maxPositions = prompt.length + Math.max(0, (request.generate ? maxNewTokens : forced.length) - 1);
+    if (maxPositions > this.cacheCapacity) throw new Error("Research request exceeds cache capacity");
+    const positions = new Set(request.capture?.positions ?? []);
+    const layers = [...new Set(request.capture?.layers ?? [])];
+    if (positions.size * layers.length > 256 || layers.length > 8) throw new Error("Capture limited to 256 vectors and 8 layers per request");
+    for (const position of positions) {
+      if (!Number.isInteger(position) || position < 0 || position >= maxPositions) throw new Error("Invalid capture position");
+    }
+    for (const layer of layers) if (!Number.isInteger(layer) || layer < 0 || layer >= 35) throw new Error("Invalid capture layer");
+    const patch = request.patch;
+    if (patch && (!Number.isInteger(patch.layer) || patch.layer < 0 || patch.layer >= 35 ||
+      !Number.isInteger(patch.tokenPosition) || patch.tokenPosition < 0 || patch.tokenPosition >= maxPositions ||
+      patch.vector.length !== 1536 || !patch.vector.every(Number.isFinite) || !Number.isFinite(patch.amount) ||
+      Math.abs(patch.amount) > 2 || !["replace", "add"].includes(patch.mode))) throw new Error("Invalid token-local patch");
+    const config = resolveGemmaGenerationConfig({
+      temperature: request.generate?.temperature ?? 0,
+      seed: request.generate?.seed ?? 23,
+      topK: 64, topP: 0.95, maxNewTokens: Math.max(1, maxNewTokens),
+    });
+    return this.withResearchAccess(request.signal, async (signal) => {
+      if (this.researchFinalOverlay || this.resources.stack.researchEdits?.length) {
+        throw new Error("Clear persistent overlays before matched research evaluation");
+      }
+      const started = performance.now();
+      const captures: GemmaResearchActivationCapture[] = [];
+      const slots: ReturnType<typeof createResearchResidualCapture>[] = [];
+      let patchResources: ResearchActivationPatch | null = null;
+      let evaluatedPositions = 0;
+      const tokenIds: number[] = [];
+      const tokenLogProbs: number[] = [];
+      try {
+        if (layers.length) {
+          const pipeline = await getResearchResidualCapturePipeline(this.device);
+          for (const layer of layers) slots.push(createResearchResidualCapture(this.device, pipeline, layer, this.resources.stack.layers[layer].mlp.hidden));
+        }
+        if (patch) {
+          const mlp = this.resources.stack.layers[patch.layer].mlp;
+          patchResources = createResearchActivationPatch(this.device, await getResearchActivationPatchPipeline(this.device), {
+            hidden: mlp.hidden, nextInput: mlp.nextInput, nextSum: mlp.nextSum,
+            normWeightsAndScale: mlp.modelWeights.postPleNextInputNormAndLayerScale,
+            inScale: mlp.modelScales.nextInput,
+          }, patch);
+        }
+        this.reset();
+        const evaluate = async (id: number, outputMode: GemmaModelOutputMode): Promise<GemmaModelOutput> => {
+          throwIfGemmaGenerationAborted(signal);
+          this.resources.stack.researchPatch = patch?.tokenPosition === evaluatedPositions ? patchResources : null;
+          this.resources.stack.researchCaptures = positions.has(evaluatedPositions) ? slots : null;
+          const output = await this.evaluateToken(id, undefined, outputMode);
+          if (positions.has(evaluatedPositions)) {
+            for (const slot of slots) captures.push({
+              site: { residual: slot.layerIndex }, tokenPosition: evaluatedPositions,
+              values: await this.readResearchVector(slot.buffer),
+            });
+          }
+          evaluatedPositions += 1;
+          request.onProgress?.({ evaluatedPositions, generatedTokens: request.generate ? tokenIds.length : 0 });
+          throwIfGemmaGenerationAborted(signal);
+          return output;
+        };
+        let output: GemmaModelOutput | null = null;
+        for (let i = 0; i < prompt.length; i += 1) output = await evaluate(prompt[i], i + 1 === prompt.length ? "logits" : "none");
+        if (!output) throw new Error("Research prompt produced no output");
+        const firstLogits = requiredGemmaLogits(output);
+        if (!firstLogits.every(Number.isFinite)) throw new Error("Non-finite research logits");
+        const probabilities = processedLogProbabilities(firstLogits, [], config, GEMMA_FINAL_LOGIT_SOFTCAP);
+        const firstDecision = topLogProbabilityIndices(probabilities, 12).map((id) => ({
+          tokenId: id, text: this.tokenizer.decodeRawTokens([id]),
+          logProbability: probabilities[id], rawLogit: firstLogits[id],
+        }));
+        const random = new SeededRandom(config.seed);
+        let stopReason: GemmaResearchEvaluationResult["stopReason"] = request.generate ? "length" : "forced";
+        const count = request.generate ? maxNewTokens : forced.length;
+        for (let i = 0; i < count; i += 1) {
+          throwIfGemmaGenerationAborted(signal);
+          const logits = requiredGemmaLogits(output);
+          if (!logits.every(Number.isFinite)) throw new Error("Non-finite research logits");
+          const token = request.generate
+            ? sampleToken(logits, [...prompt, ...tokenIds], config, () => random.next(), GEMMA_FINAL_LOGIT_SOFTCAP)
+            : forced[i];
+          if (request.generate && this.tokenizer.isEndToken(token)) {
+            stopReason = "end-token";
+            break;
+          }
+          tokenIds.push(token);
+          tokenLogProbs.push(tokenLogProbability(logits, token, GEMMA_FINAL_LOGIT_SOFTCAP));
+          request.onProgress?.({ evaluatedPositions, generatedTokens: request.generate ? tokenIds.length : 0 });
+          if (i + 1 < count) output = await evaluate(token, "logits");
+        }
+        return {
+          promptTokenIds: prompt, tokenIds, tokenLogProbs, text: this.tokenizer.decodeTokens(tokenIds),
+          stopReason, captures, firstDecision, evaluatedPositions, milliseconds: performance.now() - started,
+        };
+      } finally {
+        this.resources.stack.researchPatch = null;
+        this.resources.stack.researchCaptures = null;
+        try {
+          await this.device.queue.onSubmittedWorkDone();
+        } finally {
+          for (const slot of slots) slot.buffer.destroy();
+          for (const buffer of patchResources?.buffers ?? []) buffer.destroy();
+        }
+      }
+    });
+  }
+
+  private async withResearchAccess<T>(callerSignal: AbortSignal | undefined, operation: (signal: AbortSignal) => Promise<T>): Promise<T> {
+    this.assertAlive();
+    if (this.generating) throw new Error("Gemma generation or research is already in progress");
+    throwIfGemmaGenerationAborted(callerSignal);
+    const controller = new AbortController();
+    const signal = callerSignal ? AbortSignal.any([controller.signal, callerSignal]) : controller.signal;
+    this.generating = true;
+    this.activeGeneration = controller;
+    try {
+      return await operation(signal);
+    } finally {
+      this.invalidatePromptCache();
+      this.activeGeneration = null;
+      this.generating = false;
+      if (this.destroyed) this.releaseResources();
+    }
   }
 
   private getTokenByteTrie(): TokenByteTrie {

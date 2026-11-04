@@ -763,6 +763,7 @@ app.innerHTML = `
 
       <details class="diagnostics-section">
         <summary>Diagnostics</summary>
+        <p><a href="${appAssetUrl("research.html")}">Open mechanism-first research workbench</a></p>
         <section class="benchmark-tool" aria-labelledby="benchmark-heading">
           <div class="benchmark-heading">
             <div>

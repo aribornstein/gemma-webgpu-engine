@@ -1,0 +1,36 @@
+{
+  "campaign": "mechanistic-repair-v1",
+  "outcome": "inconclusive",
+  "deliverable": "Validated diagnostic workbench and bounded failure evidence; no promotable repair",
+  "gates": {
+    "M": {
+      "result": "passed_for_diagnostic_scope",
+      "evidence": "Typed price/fact, complete-score and explicit-unknown tests; unrestricted vocabulary cannot pass"
+    },
+    "W": {
+      "result": "passed",
+      "evidence": "Shared CLI/UI API, live scoring/capture/weight slices, activity sentinel, sham/revert and cancellation recovery"
+    },
+    "D": {
+      "result": "passed_for_investigation",
+      "evidence": "Paired clean/error contexts reproduce two failures and correct behavior in matched contexts"
+    },
+    "C": {
+      "result": "not_established",
+      "evidence": "Terminal donor state imports a correct decision; earlier effects fail specificity or complete rescue. No transferable native obstruction localized."
+    },
+    "E": {
+      "result": "not_attempted_gate_C_not_passed",
+      "evidence": "No packed weight mutation, native matrix update or claim of weight-equivalent repair"
+    },
+    "Q": {
+      "result": "not_passed",
+      "evidence": "No candidate; discovery includes sub-9 judgments and unassessed vocabulary; no full-episode promotion"
+    },
+    "FINAL": {
+      "result": "not_run",
+      "evidence": "No relaxation of C/E/Q; no new final data generated or evaluated"
+    }
+  },
+  "methodsReviewAvailable": true
+}

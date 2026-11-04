@@ -28,7 +28,9 @@
     "reliability:smoke": "RELIABILITY_SMOKE=1 playwright test tests/reliability-smoke.live.spec.ts --workers=1",
     "reliability:smoke:validate": "RELIABILITY_SMOKE=1 RELIABILITY_SMOKE_MINUTES=0 playwright test tests/reliability-smoke.live.spec.ts --workers=1",
     "verify:materializer": "node --experimental-strip-types tools/verify_layer0_materializer.mjs",
-    "test:research-live": "RESEARCH_LIVE=1 playwright test tests/research-overlay.live.spec.ts --workers=1"
+    "test:research-live": "RESEARCH_LIVE=1 playwright test tests/research-overlay.live.spec.ts --workers=1",
+    "research:workbench": "node tools/research/run-workbench.mjs",
+    "test:workbench": "playwright test tests/research-workbench.spec.ts --workers=1"
   },
   "engines": {
     "node": ">=20.19.0"

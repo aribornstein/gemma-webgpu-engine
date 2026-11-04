@@ -1,0 +1,590 @@
+[
+  {
+    "id": "shirt-order-numeral.clean.replay",
+    "op": "replay",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a clothing-shop clerk in a shopping RPG. NPC target level: B2. Metadata: topic=shirt unit versus order price; npcGoal=confirm quantity and full unpaid total; item=shirt; quantity=2; unitPrice=55; totalPrice=110; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per shirt; totalPrice is for the entire order: 2 x 55 = 110. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "שלום, אני רוצה חולצות."
+      },
+      {
+        "role": "assistant",
+        "content": "שלום! המחיר לחולצה הוא 55 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "זה המחיר של הכול?"
+      },
+      {
+        "role": "assistant",
+        "content": "לא, זה המחיר ליחידה. ההזמנה שלך כוללת 2 חולצות."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שתי חולצות. כמה לשלם על הכול?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "maxNewTokens": 64,
+    "temperature": 0,
+    "seed": 23
+  },
+  {
+    "id": "shirt-order-numeral.error.replay",
+    "op": "replay",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a clothing-shop clerk in a shopping RPG. NPC target level: B2. Metadata: topic=shirt unit versus order price; npcGoal=confirm quantity and full unpaid total; item=shirt; quantity=2; unitPrice=55; totalPrice=110; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per shirt; totalPrice is for the entire order: 2 x 55 = 110. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "שלום, אני רוצה חולצות."
+      },
+      {
+        "role": "assistant",
+        "content": "שלום! המחיר לחולצה הוא 55 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "זה המחיר של הכול?"
+      },
+      {
+        "role": "assistant",
+        "content": "לא, זה המחיר ליחידה. ההזמנה שלך כוללת 2 חולצות."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שני חולצות. כמה לשלם על הכול?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "maxNewTokens": 64,
+    "temperature": 0,
+    "seed": 23
+  },
+  {
+    "id": "book-order-numeral.clean.replay",
+    "op": "replay",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a bookshop clerk in a shopping RPG. NPC target level: A1. Metadata: topic=books for a train journey; npcGoal=confirm books and unpaid total; item=book; quantity=2; unitPrice=24; totalPrice=48; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per book; totalPrice is for the entire order: 2 x 24 = 48. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אני מחפש משהו לקרוא ברכבת, ולא רוצה להחליט ברגע האחרון."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר לבחור כאן. המחיר לספר הוא 24 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "מצאתי את מה שחיפשתי. נמשיך עם הבחירה הזאת."
+      },
+      {
+        "role": "assistant",
+        "content": "בסדר. ההזמנה שלך כאן בקופה."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שני ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "maxNewTokens": 64,
+    "temperature": 0,
+    "seed": 23
+  },
+  {
+    "id": "book-order-numeral.error.replay",
+    "op": "replay",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a bookshop clerk in a shopping RPG. NPC target level: A1. Metadata: topic=books for a train journey; npcGoal=confirm books and unpaid total; item=book; quantity=2; unitPrice=24; totalPrice=48; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per book; totalPrice is for the entire order: 2 x 24 = 48. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אני מחפש משהו לקרוא ברכבת, ולא רוצה להחליט ברגע האחרון."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר לבחור כאן. המחיר לספר הוא 24 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "מצאתי את מה שחיפשתי. נמשיך עם הבחירה הזאת."
+      },
+      {
+        "role": "assistant",
+        "content": "בסדר. ההזמנה שלך כאן בקופה."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שתי ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "maxNewTokens": 64,
+    "temperature": 0,
+    "seed": 23
+  },
+  {
+    "id": "library-operation-verb.clean.replay",
+    "op": "replay",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a library desk clerk in a booking RPG. NPC target level: B2. Metadata: topic=computer workstation operation and hourly charges; npcGoal=confirm operational workstations now and unpaid one-hour total; item=library computer workstation for one hour; quantity=2; unitPrice=10; totalPrice=20; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. This fictional library charges for computer workstations. The selected workstations are operational and available now. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per workstation for one hour; totalPrice is for the entire one-hour booking: 2 x 10 = 20. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the library booking request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אנחנו רוצים להשתמש בעמדות המחשב בספרייה למשך שעה."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר להזמין כאן. התעריף הוא 10 שקלים לעמדה לשעה."
+      },
+      {
+        "role": "user",
+        "content": "רק כדי להבין, 10 שקלים הם המחיר לכל ההזמנה או לכל עמדה?"
+      },
+      {
+        "role": "assistant",
+        "content": "זה המחיר לעמדה אחת לשעה אחת; ההזמנה שלך כוללת 2 עמדות."
+      },
+      {
+        "role": "user",
+        "content": "רק לוודא שאין צורך להמתין: העמדות פועלות עכשיו? אפשר לאשר את ההזמנה לשעה אחת?"
+      }
+    ],
+    "assistantPrefix": "העמדות פוע",
+    "maxNewTokens": 64,
+    "temperature": 0,
+    "seed": 23
+  },
+  {
+    "id": "library-operation-verb.error.replay",
+    "op": "replay",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a library desk clerk in a booking RPG. NPC target level: B2. Metadata: topic=computer workstation operation and hourly charges; npcGoal=confirm operational workstations now and unpaid one-hour total; item=library computer workstation for one hour; quantity=2; unitPrice=10; totalPrice=20; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. This fictional library charges for computer workstations. The selected workstations are operational and available now. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per workstation for one hour; totalPrice is for the entire one-hour booking: 2 x 10 = 20. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the library booking request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אנחנו רוצים להשתמש בעמדות המחשב בספרייה למשך שעה."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר להזמין כאן. התעריף הוא 10 שקלים לעמדה לשעה."
+      },
+      {
+        "role": "user",
+        "content": "רק כדי להבין, 10 שקלים הם המחיר לכל ההזמנה או לכל עמדה?"
+      },
+      {
+        "role": "assistant",
+        "content": "זה המחיר לעמדה אחת לשעה אחת; ההזמנה שלך כוללת 2 עמדות."
+      },
+      {
+        "role": "user",
+        "content": "רק לוודא שאין צורך להמתין: העמדות פועלים עכשיו? אפשר לאשר את ההזמנה לשעה אחת?"
+      }
+    ],
+    "assistantPrefix": "העמדות פוע",
+    "maxNewTokens": 64,
+    "temperature": 0,
+    "seed": 23
+  },
+  {
+    "id": "shirt-order-numeral.clean.correct",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a clothing-shop clerk in a shopping RPG. NPC target level: B2. Metadata: topic=shirt unit versus order price; npcGoal=confirm quantity and full unpaid total; item=shirt; quantity=2; unitPrice=55; totalPrice=110; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per shirt; totalPrice is for the entire order: 2 x 55 = 110. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "שלום, אני רוצה חולצות."
+      },
+      {
+        "role": "assistant",
+        "content": "שלום! המחיר לחולצה הוא 55 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "זה המחיר של הכול?"
+      },
+      {
+        "role": "assistant",
+        "content": "לא, זה המחיר ליחידה. ההזמנה שלך כוללת 2 חולצות."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שתי חולצות. כמה לשלם על הכול?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "continuation": "תי חולצות עולות יחד 110 שקלים. זה הסכום הכולל לתשלום, והוא טרם שולם."
+  },
+  {
+    "id": "shirt-order-numeral.clean.incorrect",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a clothing-shop clerk in a shopping RPG. NPC target level: B2. Metadata: topic=shirt unit versus order price; npcGoal=confirm quantity and full unpaid total; item=shirt; quantity=2; unitPrice=55; totalPrice=110; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per shirt; totalPrice is for the entire order: 2 x 55 = 110. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "שלום, אני רוצה חולצות."
+      },
+      {
+        "role": "assistant",
+        "content": "שלום! המחיר לחולצה הוא 55 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "זה המחיר של הכול?"
+      },
+      {
+        "role": "assistant",
+        "content": "לא, זה המחיר ליחידה. ההזמנה שלך כוללת 2 חולצות."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שתי חולצות. כמה לשלם על הכול?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "continuation": "ני חולצות עולות יחד 110 שקלים. זה הסכום הכולל לתשלום, והוא טרם שולם."
+  },
+  {
+    "id": "shirt-order-numeral.error.correct",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a clothing-shop clerk in a shopping RPG. NPC target level: B2. Metadata: topic=shirt unit versus order price; npcGoal=confirm quantity and full unpaid total; item=shirt; quantity=2; unitPrice=55; totalPrice=110; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per shirt; totalPrice is for the entire order: 2 x 55 = 110. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "שלום, אני רוצה חולצות."
+      },
+      {
+        "role": "assistant",
+        "content": "שלום! המחיר לחולצה הוא 55 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "זה המחיר של הכול?"
+      },
+      {
+        "role": "assistant",
+        "content": "לא, זה המחיר ליחידה. ההזמנה שלך כוללת 2 חולצות."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שני חולצות. כמה לשלם על הכול?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "continuation": "תי חולצות עולות יחד 110 שקלים. זה הסכום הכולל לתשלום, והוא טרם שולם."
+  },
+  {
+    "id": "shirt-order-numeral.error.incorrect",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a clothing-shop clerk in a shopping RPG. NPC target level: B2. Metadata: topic=shirt unit versus order price; npcGoal=confirm quantity and full unpaid total; item=shirt; quantity=2; unitPrice=55; totalPrice=110; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per shirt; totalPrice is for the entire order: 2 x 55 = 110. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "שלום, אני רוצה חולצות."
+      },
+      {
+        "role": "assistant",
+        "content": "שלום! המחיר לחולצה הוא 55 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "זה המחיר של הכול?"
+      },
+      {
+        "role": "assistant",
+        "content": "לא, זה המחיר ליחידה. ההזמנה שלך כוללת 2 חולצות."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שני חולצות. כמה לשלם על הכול?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "continuation": "ני חולצות עולות יחד 110 שקלים. זה הסכום הכולל לתשלום, והוא טרם שולם."
+  },
+  {
+    "id": "book-order-numeral.clean.correct",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a bookshop clerk in a shopping RPG. NPC target level: A1. Metadata: topic=books for a train journey; npcGoal=confirm books and unpaid total; item=book; quantity=2; unitPrice=24; totalPrice=48; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per book; totalPrice is for the entire order: 2 x 24 = 48. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אני מחפש משהו לקרוא ברכבת, ולא רוצה להחליט ברגע האחרון."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר לבחור כאן. המחיר לספר הוא 24 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "מצאתי את מה שחיפשתי. נמשיך עם הבחירה הזאת."
+      },
+      {
+        "role": "assistant",
+        "content": "בסדר. ההזמנה שלך כאן בקופה."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שני ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "continuation": "ני ספרים עולים יחד 48 שקלים. עדיין לא שילמת."
+  },
+  {
+    "id": "book-order-numeral.clean.incorrect",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a bookshop clerk in a shopping RPG. NPC target level: A1. Metadata: topic=books for a train journey; npcGoal=confirm books and unpaid total; item=book; quantity=2; unitPrice=24; totalPrice=48; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per book; totalPrice is for the entire order: 2 x 24 = 48. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אני מחפש משהו לקרוא ברכבת, ולא רוצה להחליט ברגע האחרון."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר לבחור כאן. המחיר לספר הוא 24 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "מצאתי את מה שחיפשתי. נמשיך עם הבחירה הזאת."
+      },
+      {
+        "role": "assistant",
+        "content": "בסדר. ההזמנה שלך כאן בקופה."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שני ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "continuation": "תי ספרים עולים יחד 48 שקלים. עדיין לא שילמת."
+  },
+  {
+    "id": "book-order-numeral.error.correct",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a bookshop clerk in a shopping RPG. NPC target level: A1. Metadata: topic=books for a train journey; npcGoal=confirm books and unpaid total; item=book; quantity=2; unitPrice=24; totalPrice=48; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per book; totalPrice is for the entire order: 2 x 24 = 48. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אני מחפש משהו לקרוא ברכבת, ולא רוצה להחליט ברגע האחרון."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר לבחור כאן. המחיר לספר הוא 24 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "מצאתי את מה שחיפשתי. נמשיך עם הבחירה הזאת."
+      },
+      {
+        "role": "assistant",
+        "content": "בסדר. ההזמנה שלך כאן בקופה."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שתי ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "continuation": "ני ספרים עולים יחד 48 שקלים. עדיין לא שילמת."
+  },
+  {
+    "id": "book-order-numeral.error.incorrect",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a bookshop clerk in a shopping RPG. NPC target level: A1. Metadata: topic=books for a train journey; npcGoal=confirm books and unpaid total; item=book; quantity=2; unitPrice=24; totalPrice=48; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per book; totalPrice is for the entire order: 2 x 24 = 48. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the shopping request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אני מחפש משהו לקרוא ברכבת, ולא רוצה להחליט ברגע האחרון."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר לבחור כאן. המחיר לספר הוא 24 שקלים."
+      },
+      {
+        "role": "user",
+        "content": "מצאתי את מה שחיפשתי. נמשיך עם הבחירה הזאת."
+      },
+      {
+        "role": "assistant",
+        "content": "בסדר. ההזמנה שלך כאן בקופה."
+      },
+      {
+        "role": "user",
+        "content": "אני רוצה שתי ספרים, כפי שסיכמנו. אפשר להזכיר לי כמה לשלם?"
+      }
+    ],
+    "assistantPrefix": "ש",
+    "continuation": "תי ספרים עולים יחד 48 שקלים. עדיין לא שילמת."
+  },
+  {
+    "id": "library-operation-verb.clean.correct",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a library desk clerk in a booking RPG. NPC target level: B2. Metadata: topic=computer workstation operation and hourly charges; npcGoal=confirm operational workstations now and unpaid one-hour total; item=library computer workstation for one hour; quantity=2; unitPrice=10; totalPrice=20; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. This fictional library charges for computer workstations. The selected workstations are operational and available now. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per workstation for one hour; totalPrice is for the entire one-hour booking: 2 x 10 = 20. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the library booking request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אנחנו רוצים להשתמש בעמדות המחשב בספרייה למשך שעה."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר להזמין כאן. התעריף הוא 10 שקלים לעמדה לשעה."
+      },
+      {
+        "role": "user",
+        "content": "רק כדי להבין, 10 שקלים הם המחיר לכל ההזמנה או לכל עמדה?"
+      },
+      {
+        "role": "assistant",
+        "content": "זה המחיר לעמדה אחת לשעה אחת; ההזמנה שלך כוללת 2 עמדות."
+      },
+      {
+        "role": "user",
+        "content": "רק לוודא שאין צורך להמתין: העמדות פועלות עכשיו? אפשר לאשר את ההזמנה לשעה אחת?"
+      }
+    ],
+    "assistantPrefix": "העמדות פוע",
+    "continuation": "לות עכשיו. הזמנת 2 עמדות לשעה אחת, בסכום כולל של 20 שקלים. התשלום טרם התקבל."
+  },
+  {
+    "id": "library-operation-verb.clean.incorrect",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a library desk clerk in a booking RPG. NPC target level: B2. Metadata: topic=computer workstation operation and hourly charges; npcGoal=confirm operational workstations now and unpaid one-hour total; item=library computer workstation for one hour; quantity=2; unitPrice=10; totalPrice=20; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. This fictional library charges for computer workstations. The selected workstations are operational and available now. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per workstation for one hour; totalPrice is for the entire one-hour booking: 2 x 10 = 20. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the library booking request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אנחנו רוצים להשתמש בעמדות המחשב בספרייה למשך שעה."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר להזמין כאן. התעריף הוא 10 שקלים לעמדה לשעה."
+      },
+      {
+        "role": "user",
+        "content": "רק כדי להבין, 10 שקלים הם המחיר לכל ההזמנה או לכל עמדה?"
+      },
+      {
+        "role": "assistant",
+        "content": "זה המחיר לעמדה אחת לשעה אחת; ההזמנה שלך כוללת 2 עמדות."
+      },
+      {
+        "role": "user",
+        "content": "רק לוודא שאין צורך להמתין: העמדות פועלות עכשיו? אפשר לאשר את ההזמנה לשעה אחת?"
+      }
+    ],
+    "assistantPrefix": "העמדות פוע",
+    "continuation": "לים עכשיו. הזמנת 2 עמדות לשעה אחת, בסכום כולל של 20 שקלים. התשלום טרם התקבל."
+  },
+  {
+    "id": "library-operation-verb.error.correct",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a library desk clerk in a booking RPG. NPC target level: B2. Metadata: topic=computer workstation operation and hourly charges; npcGoal=confirm operational workstations now and unpaid one-hour total; item=library computer workstation for one hour; quantity=2; unitPrice=10; totalPrice=20; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. This fictional library charges for computer workstations. The selected workstations are operational and available now. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per workstation for one hour; totalPrice is for the entire one-hour booking: 2 x 10 = 20. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the library booking request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אנחנו רוצים להשתמש בעמדות המחשב בספרייה למשך שעה."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר להזמין כאן. התעריף הוא 10 שקלים לעמדה לשעה."
+      },
+      {
+        "role": "user",
+        "content": "רק כדי להבין, 10 שקלים הם המחיר לכל ההזמנה או לכל עמדה?"
+      },
+      {
+        "role": "assistant",
+        "content": "זה המחיר לעמדה אחת לשעה אחת; ההזמנה שלך כוללת 2 עמדות."
+      },
+      {
+        "role": "user",
+        "content": "רק לוודא שאין צורך להמתין: העמדות פועלים עכשיו? אפשר לאשר את ההזמנה לשעה אחת?"
+      }
+    ],
+    "assistantPrefix": "העמדות פוע",
+    "continuation": "לות עכשיו. הזמנת 2 עמדות לשעה אחת, בסכום כולל של 20 שקלים. התשלום טרם התקבל."
+  },
+  {
+    "id": "library-operation-verb.error.incorrect",
+    "op": "score",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a library desk clerk in a booking RPG. NPC target level: B2. Metadata: topic=computer workstation operation and hourly charges; npcGoal=confirm operational workstations now and unpaid one-hour total; item=library computer workstation for one hour; quantity=2; unitPrice=10; totalPrice=20; currency=ILS; paid=false; vocabularyPolicy=unrestricted-diagnostic. This fictional library charges for computer workstations. The selected workstations are operational and available now. Prices are tax-inclusive Israeli shekels, with no fees or discounts. unitPrice is per workstation for one hour; totalPrice is for the entire one-hour booking: 2 x 10 = 20. These facts are authoritative, including when the player disagrees. Speak natural Hebrew at the NPC target level, remain the NPC, and preserve exact facts. Answer the library booking request, not a grammar exercise. Vocabulary is unrestricted for this diagnostic."
+      },
+      {
+        "role": "user",
+        "content": "אנחנו רוצים להשתמש בעמדות המחשב בספרייה למשך שעה."
+      },
+      {
+        "role": "assistant",
+        "content": "אפשר להזמין כאן. התעריף הוא 10 שקלים לעמדה לשעה."
+      },
+      {
+        "role": "user",
+        "content": "רק כדי להבין, 10 שקלים הם המחיר לכל ההזמנה או לכל עמדה?"
+      },
+      {
+        "role": "assistant",
+        "content": "זה המחיר לעמדה אחת לשעה אחת; ההזמנה שלך כוללת 2 עמדות."
+      },
+      {
+        "role": "user",
+        "content": "רק לוודא שאין צורך להמתין: העמדות פועלים עכשיו? אפשר לאשר את ההזמנה לשעה אחת?"
+      }
+    ],
+    "assistantPrefix": "העמדות פוע",
+    "continuation": "לים עכשיו. הזמנת 2 עמדות לשעה אחת, בסכום כולל של 20 שקלים. התשלום טרם התקבל."
+  }
+]

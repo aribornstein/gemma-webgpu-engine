@@ -1,0 +1,422 @@
+{
+  "source": "AI-authored draft",
+  "humanValidated": false,
+  "split": "discovery",
+  "reviewType": "AI-authored linguistic rationale and mechanical fixture checks; not native-speaker review",
+  "fixtureCount": 12,
+  "familyCount": 6,
+  "targetLevelCounts": {
+    "A1": 6,
+    "B2": 6
+  },
+  "phenomenonCounts": {
+    "numeral-noun agreement": 4,
+    "noun-adjective agreement": 4,
+    "subject-verb agreement": 4
+  },
+  "playerProfileCounts": {
+    "cooperative": 2,
+    "agreement-error": 2,
+    "clarification": 2,
+    "distraction": 2,
+    "vocabulary-challenge": 2,
+    "conflicting-state-claim": 2
+  },
+  "design": {
+    "pairing": "For each case, append either cleanUser or errorUser to the same history. They differ in exactly one whitespace-delimited word: the agreement form. No other history, metadata, goal, quantity, price, or payment status changes.",
+    "history": "Every case has one English-only system message and four earlier dialogue messages in user/assistant/user/assistant order. The final learner arm is appended after the last assistant message.",
+    "teacherForcing": "Both complete continuation candidates share all factual content and differ in exactly one agreement word. All assistantPrefix values are empty. Neither the system nor an earlier assistant supplies the target Hebrew contrast phrase.",
+    "freeTask": "This field records the natural, invariant final request already present in both learner arms. It is not an additional system instruction or a requirement to reproduce a contrast phrase.",
+    "blindPresentation": "Arm labels, candidate labels, review explanations, and phenomenon names are authoring data, not dialogue content. A generation or external grading interface should receive only the relevant conversation and generated reply, not these labels.",
+    "prices": "All prices are tax-inclusive ILS, with no extras or discounts. Goods are priced per item, hotel rooms per room for one night, and library workstations per workstation for one hour. All total prices are unpaid full-order totals.",
+    "learnerDifficulty": "Learner difficulty is separately documented in each case and review. It does not derive from the NPC targetLevel or from whether the learner arm contains an agreement error.",
+    "lexicalDivergence": "First divergent word below means the whitespace-delimited surface word, including its punctuation if present. It is not a claim about the deployed model's tokenizer. Actual first divergent token IDs must be computed with that tokenizer and the exact serialized prompt."
+  },
+  "globalLimitations": [
+    "These are AI-authored discovery drafts. No human, native-speaker, teacher, or CEFR assessor has validated them.",
+    "Only newly authored content is used; no old sealed sets were read.",
+    "Standard Modern Hebrew agreement is the intended reference norm. Some numeral-gender mismatches occur in informal speech, so a norm-based error label must not be interpreted as a measured community acceptability judgment.",
+    "All contrasts manipulate grammatical gender while keeping plural number fixed. They do not cover the full range of agreement, singular/plural errors, irregular noun genders, or register variation.",
+    "The four verbal contrasts use present-tense participial predicates, including scheduled-event readings. They do not test gender distinctions in past or future finite verb forms.",
+    "A1 and B2 are intended NPC response levels, not certified level assessments. Diagnostic vocabulary is intentionally unrestricted.",
+    "The continuation candidates are scoring probes, not the only valid NPC replies. A free response may paraphrase, omit the targeted construction, or correct the learner explicitly; such behavior requires separate evaluation.",
+    "A small set with two cases per family and repeated price/closure patterns cannot establish broad generalization or causality. Learner profile, difficulty, and target level are not fully factorial.",
+    "Pure morphological pairs can have different subword segmentations or token counts. Tokenizer-aware likelihood scoring and length handling remain implementation responsibilities.",
+    "Prices and venue policies are fictional scenario facts. Library workstation fees are not a claim about normal public-library practice.",
+    "JSON and structural checks do not demonstrate actual model failures, contamination, repair, pedagogical value, or human acceptability."
+  ],
+  "cases": [
+    {
+      "id": "notebook-order-numeral",
+      "learnerDifficulty": "A1",
+      "npcTargetLevel": "A1",
+      "linguisticContrast": "מחברות is feminine plural. The prenominal cardinal for three is שלוש with a feminine noun; שלושה is its masculine counterpart. In Hebrew numerals three through ten, the visible final vowel is not a reliable feminine marker. Both variants still denote exactly three notebooks.",
+      "firstDivergentWord": {
+        "learner": { "clean": "שלוש", "error": "שלושה" },
+        "continuation": { "correct": "שלוש", "incorrect": "שלושה" }
+      },
+      "agreementOnly": "Only numeral gender changes. The feminine plural verb עולות, the noun, total price, and unpaid statement are unchanged.",
+      "arithmetic": {
+        "quantity": 3,
+        "unitPrice": 6,
+        "computedTotal": 18,
+        "totalPrice": 18,
+        "currency": "ILS",
+        "unit": "one notebook",
+        "equation": "3 * 6 = 18",
+        "valid": true
+      },
+      "colloquialAcceptability": "שלוש מחברות is the unambiguous standard form. Numeral-gender leveling can occur colloquially, but no standard alternative licensing שלושה with this noun is assumed. Informal acceptability has not been measured.",
+      "assumptions": [
+        "The selected order already contains three notebooks, as fixed by system metadata.",
+        "The learner is requesting the order total, not a change of quantity or payment status."
+      ],
+      "limitations": [
+        "The numeral mismatch may be more tolerated in spontaneous speech than the adjective and verb mismatches elsewhere.",
+        "The continuation repeats the learner's noun phrase; this measures susceptibility in a natural confirmation slot, not every reply strategy."
+      ]
+    },
+    {
+      "id": "book-order-numeral",
+      "learnerDifficulty": "B2",
+      "npcTargetLevel": "A1",
+      "linguisticContrast": "ספרים is masculine plural. The prenominal form for two is שני; שתי is feminine. The contrast is between gender forms in the same syntactic position, not between prenominal and standalone numeral forms.",
+      "firstDivergentWord": {
+        "learner": { "clean": "שני", "error": "שתי" },
+        "continuation": { "correct": "שני", "incorrect": "שתי" }
+      },
+      "agreementOnly": "Only the numeral changes gender. The noun, verb עולים, order of two, price, and unpaid statement are identical.",
+      "arithmetic": {
+        "quantity": 2,
+        "unitPrice": 24,
+        "computedTotal": 48,
+        "totalPrice": 48,
+        "currency": "ILS",
+        "unit": "one book",
+        "equation": "2 * 24 = 48",
+        "valid": true
+      },
+      "colloquialAcceptability": "שני ספרים is standard and the lexical gender is not variable here. שתי ספרים is treated as a mismatch, while acknowledging that informal numeral errors occur. No native acceptability judgment is claimed.",
+      "assumptions": [
+        "ספרים denotes books for reading, not another sense of the unpointed word.",
+        "The agreement-error profile still has a grammatical control arm; it does not mandate errors in the shared history.",
+        "A B2 learner can interact with an NPC instructed to respond at A1."
+      ],
+      "limitations": [
+        "The short candidate intentionally targets A1 despite the learner's longer final request.",
+        "This contrast does not test the independent forms שניים and שתיים."
+      ]
+    },
+    {
+      "id": "shirt-order-numeral",
+      "learnerDifficulty": "A1",
+      "npcTargetLevel": "B2",
+      "linguisticContrast": "חולצות is feminine plural. שתי is the feminine prenominal form of two; שני is masculine. Number, definiteness, noun meaning, and requested purchase are unchanged.",
+      "firstDivergentWord": {
+        "learner": { "clean": "שתי", "error": "שני" },
+        "continuation": { "correct": "שתי", "incorrect": "שני" }
+      },
+      "agreementOnly": "Only numeral gender changes. The same feminine verb עולות and the same full unpaid total appear in both candidates.",
+      "arithmetic": {
+        "quantity": 2,
+        "unitPrice": 55,
+        "computedTotal": 110,
+        "totalPrice": 110,
+        "currency": "ILS",
+        "unit": "one shirt",
+        "equation": "2 * 55 = 110",
+        "valid": true
+      },
+      "colloquialAcceptability": "שתי חולצות is standard; the gender of חולצה is not disputed. שני חולצות is not a standard competing construction. Colloquial numeral leveling remains a general caveat.",
+      "assumptions": [
+        "The earlier question seeks price clarification, not a discount.",
+        "The earlier assistant's digit 2 states quantity without supplying the target Hebrew numeral phrase.",
+        "NPC B2 is independent of the learner's A1 wording."
+      ],
+      "limitations": [
+        "The price clarification gives an additional factual test but is identical across arms.",
+        "The formal word טרם is a proposed B2 choice, not a CEFR-certified one."
+      ]
+    },
+    {
+      "id": "hotel-order-numeral",
+      "learnerDifficulty": "B2",
+      "npcTargetLevel": "B2",
+      "linguisticContrast": "חדרים is masculine plural. שלושה is the corresponding prenominal cardinal for three; שלוש is feminine. The final learner wording accepts the authoritative three-room booking in both arms.",
+      "firstDivergentWord": {
+        "learner": { "clean": "שלושה", "error": "שלוש" },
+        "continuation": { "correct": "שלושה", "incorrect": "שלוש" }
+      },
+      "agreementOnly": "Only numeral gender changes. The one-night duration, room count, total, and unpaid state remain the same.",
+      "arithmetic": {
+        "quantity": 3,
+        "unitPrice": 240,
+        "computedTotal": 720,
+        "totalPrice": 720,
+        "currency": "ILS",
+        "unit": "one room for one night, not one guest",
+        "equation": "3 * 240 = 720",
+        "valid": true
+      },
+      "colloquialAcceptability": "שלושה חדרים is standard. שלוש חדרים can resemble informal numeral-gender leveling; it is deliberately labeled against the standard norm, not described as incomprehensible or universally rejected.",
+      "assumptions": [
+        "The shared earlier claim of four paid rooms is false, not a booking update.",
+        "Performance tickets are a shared distractor and do not add charges.",
+        "The room rate includes all taxes and is not multiplied by guest count."
+      ],
+      "limitations": [
+        "State conflict and topic distraction can affect difficulty, although they are controlled within the pair.",
+        "The earlier assistant corrects the order facts but never supplies the target spelled-out three-room phrase."
+      ]
+    },
+    {
+      "id": "notebook-color-adjective",
+      "learnerDifficulty": "A1",
+      "npcTargetLevel": "A1",
+      "linguisticContrast": "The subject המחברות is feminine plural. The predicate color adjective must therefore be כחולות, not masculine plural כחולים. Predicate adjectives do not take a matching definite article, so this is not a definiteness contrast.",
+      "firstDivergentWord": {
+        "learner": { "clean": "כחולות,", "error": "כחולים," },
+        "continuation": { "correct": "כחולות.", "incorrect": "כחולים." }
+      },
+      "agreementOnly": "Only adjective gender changes. Both predicates mean blue, both are plural, and all purchase facts remain fixed.",
+      "arithmetic": {
+        "quantity": 2,
+        "unitPrice": 6,
+        "computedTotal": 12,
+        "totalPrice": 12,
+        "currency": "ILS",
+        "unit": "one blue notebook",
+        "equation": "2 * 6 = 12",
+        "valid": true
+      },
+      "colloquialAcceptability": "No common standard or colloquial alternative is known to license masculine כחולים as the predicate of the explicit feminine noun המחברות in this reading. This is an AI rationale, not native-speaker validation.",
+      "assumptions": [
+        "The notebooks' blue color is an authoritative selected property.",
+        "The earlier cover question is a vocabulary obstacle in shopping, not a request for grammatical analysis.",
+        "Color describes the notebooks as products; no claim about the paper's color is intended."
+      ],
+      "limitations": [
+        "Only one regular color adjective is sampled.",
+        "Unrestricted vocabulary means the cover word is not filtered out for being beyond a presumed A1 list."
+      ]
+    },
+    {
+      "id": "book-length-adjective",
+      "learnerDifficulty": "B2",
+      "npcTargetLevel": "B2",
+      "linguisticContrast": "הספרים is masculine plural. קצרים is the matching predicate adjective; קצרות is feminine plural. The learner uses the adjective after יהיו, while the NPC uses a present nominal sentence. The agreeing noun and intended property are the same.",
+      "firstDivergentWord": {
+        "learner": { "clean": "קצרים", "error": "קצרות" },
+        "continuation": { "correct": "קצרים.", "incorrect": "קצרות." }
+      },
+      "agreementOnly": "Only adjective gender changes. The learner's יהיו is third-person plural in both arms and does not change tense or meaning. Both NPC candidates describe short books and the same unpaid order.",
+      "arithmetic": {
+        "quantity": 3,
+        "unitPrice": 24,
+        "computedTotal": 72,
+        "totalPrice": 72,
+        "currency": "ILS",
+        "unit": "one short book",
+        "equation": "3 * 24 = 72",
+        "valid": true
+      },
+      "colloquialAcceptability": "קצרים is the standard form for explicit masculine הספרים; no common gender-variable reading is intended. Short refers to reading length, not a different kind of abridged edition.",
+      "assumptions": [
+        "The selected books already satisfy the learner's length preference.",
+        "The platform question is a topic distractor, not a request to change the purchase.",
+        "No actual train platform or schedule is supplied or inferred."
+      ],
+      "limitations": [
+        "The learner and NPC use different clause structures, though each clean/error pair is internally identical except for gender.",
+        "The unspecified book length is a qualitative scenario fact, not a measured page count."
+      ]
+    },
+    {
+      "id": "shirt-arrival-verb",
+      "learnerDifficulty": "A1",
+      "npcTargetLevel": "A1",
+      "linguisticContrast": "החולצות is a feminine plural subject. מגיעות is the feminine plural present form of arrive; מגיעים is masculine plural. With היום, both forms describe the same scheduled arrival today.",
+      "firstDivergentWord": {
+        "learner": { "clean": "מגיעות", "error": "מגיעים" },
+        "continuation": { "correct": "מגיעות", "incorrect": "מגיעים" }
+      },
+      "agreementOnly": "Only verb gender changes; plural number, lexical verb, arrival day, quantity, total, and payment state remain fixed.",
+      "arithmetic": {
+        "quantity": 2,
+        "unitPrice": 55,
+        "computedTotal": 110,
+        "totalPrice": 110,
+        "currency": "ILS",
+        "unit": "one ordered shirt",
+        "equation": "2 * 55 = 110",
+        "valid": true
+      },
+      "colloquialAcceptability": "מגיעות is the standard agreement with the explicit feminine subject. The temporal arrival reading avoids the different sense of deserving or being owed something. No common alternative gender agreement is assumed.",
+      "assumptions": [
+        "The shirts arrive at the shop today, rather than at the learner's home.",
+        "No exact arrival time or immediate collection availability is promised.",
+        "The agreement-error profile does not introduce shared prior grammatical errors."
+      ],
+      "limitations": [
+        "This is a present participial verb with scheduled-event use, not a finite future-tense contrast.",
+        "The model may answer with an arrival paraphrase instead of repeating this verb."
+      ]
+    },
+    {
+      "id": "hotel-size-adjective",
+      "learnerDifficulty": "B2",
+      "npcTargetLevel": "A1",
+      "linguisticContrast": "החדרים is masculine plural. קטנים is the agreeing predicate adjective; קטנות is feminine plural. Both variants denote small size, without a change to room type or booking quantity.",
+      "firstDivergentWord": {
+        "learner": { "clean": "קטנים,", "error": "קטנות," },
+        "continuation": { "correct": "קטנים.", "incorrect": "קטנות." }
+      },
+      "agreementOnly": "Only adjective gender changes. The noun, selected size, two-room one-night booking, total, and unpaid state are identical.",
+      "arithmetic": {
+        "quantity": 2,
+        "unitPrice": 240,
+        "computedTotal": 480,
+        "totalPrice": 480,
+        "currency": "ILS",
+        "unit": "one small room for one night, not one guest",
+        "equation": "2 * 240 = 480",
+        "valid": true
+      },
+      "colloquialAcceptability": "קטנים is the standard predicate of the explicit masculine noun חדרים. The incorrect form cannot rely on an omitted feminine noun when חדרים is the stated subject. No common acceptability ambiguity is intended.",
+      "assumptions": [
+        "Small describes the rooms already selected, not a request to replace the booking.",
+        "The learner's B2 clause structure does not change the NPC's A1 instruction.",
+        "No occupancy capacity or dimensions are implied by small."
+      ],
+      "limitations": [
+        "The size property is qualitative and lacks numerical dimensions.",
+        "The simple NPC answer is intended as A1-like, not independently level-validated."
+      ]
+    },
+    {
+      "id": "bag-condition-adjective",
+      "learnerDifficulty": "A1",
+      "npcTargetLevel": "B2",
+      "linguisticContrast": "התיקים is masculine plural. חדשים is the matching predicate adjective for new; חדשות is feminine plural. The explicit bag subject and shopping context exclude a standalone reading of חדשות as news.",
+      "firstDivergentWord": {
+        "learner": { "clean": "חדשים?", "error": "חדשות?" },
+        "continuation": { "correct": "חדשים.", "incorrect": "חדשות." }
+      },
+      "agreementOnly": "Only adjective gender changes. Both candidates describe new bags, not different merchandise, and retain all price and payment facts.",
+      "arithmetic": {
+        "quantity": 2,
+        "unitPrice": 60,
+        "computedTotal": 120,
+        "totalPrice": 120,
+        "currency": "ILS",
+        "unit": "one new bag",
+        "equation": "2 * 60 = 120",
+        "valid": true
+      },
+      "colloquialAcceptability": "חדשים is standard with תיקים. The feminine form is not a normal agreement variant in this sentence. The unpointed form חדשות has other lexical uses, but those do not fit the intended predicate context.",
+      "assumptions": [
+        "תיקים means bags, not administrative or computer files.",
+        "New means not previously used; it does not assert a recently released model.",
+        "The zipper question is an ordinary vocabulary challenge within the same purchase."
+      ],
+      "limitations": [
+        "An isolated word-level scorer could miss the contextual exclusion of other senses of חדשות.",
+        "The earlier vocabulary explanation may affect discourse load but is controlled across arms."
+      ]
+    },
+    {
+      "id": "bag-total-verb",
+      "learnerDifficulty": "B2",
+      "npcTargetLevel": "A1",
+      "linguisticContrast": "התיקים is a masculine plural subject. עולים is its matching present-tense verb in the cost reading; עולות is feminine plural. יחד fixes a combined-price reading in both variants.",
+      "firstDivergentWord": {
+        "learner": { "clean": "עולים", "error": "עולות" },
+        "continuation": { "correct": "עולים", "incorrect": "עולות" }
+      },
+      "agreementOnly": "Only verb gender changes. The stated 120 shekels is explicitly the combined price for the same two bags in both arms and both candidates.",
+      "arithmetic": {
+        "quantity": 2,
+        "unitPrice": 60,
+        "computedTotal": 120,
+        "totalPrice": 120,
+        "currency": "ILS",
+        "unit": "one bag",
+        "equation": "2 * 60 = 120",
+        "valid": true
+      },
+      "colloquialAcceptability": "עולים is standard with the explicit masculine noun. The price complement excludes an ascending or boarding interpretation of the verb. No common gender-alternative construction is intended.",
+      "assumptions": [
+        "The cafe request is an unrelated earlier goal; no cafe reservation is made.",
+        "The learner's correct price estimate is held fixed rather than used as a conflicting-state claim.",
+        "The NPC should keep an A1 response despite the learner's B2 framing."
+      ],
+      "limitations": [
+        "A price-confirmation task strongly invites repetition, so it may overrepresent echo-prone reply situations.",
+        "The present cost predicate does not sample a past/future verbal paradigm."
+      ]
+    },
+    {
+      "id": "library-operation-verb",
+      "learnerDifficulty": "B2",
+      "npcTargetLevel": "B2",
+      "linguisticContrast": "העמדות is feminine plural. פועלות is the agreeing present form of operate; פועלים is masculine plural. The relevant head noun is עמדה, not masculine מחשב, even though the workstations contain computers.",
+      "firstDivergentWord": {
+        "learner": { "clean": "פועלות", "error": "פועלים" },
+        "continuation": { "correct": "פועלות", "incorrect": "פועלים" }
+      },
+      "agreementOnly": "Only predicate gender changes. Operation now, immediate availability, the one-hour duration, order quantity, full total, and unpaid state remain identical.",
+      "arithmetic": {
+        "quantity": 2,
+        "unitPrice": 10,
+        "computedTotal": 20,
+        "totalPrice": 20,
+        "currency": "ILS",
+        "unit": "one computer workstation for one hour",
+        "equation": "2 * 10 = 20",
+        "valid": true
+      },
+      "colloquialAcceptability": "פועלות is standard with עמדות. A semantic shift to the computers would require changing the expressed subject; it does not license masculine agreement with the explicit workstation noun. The unpointed form פועלים can also mean workers elsewhere, but not in this intended predicate reading.",
+      "assumptions": [
+        "These workstations are both operational and available; working equipment alone would not logically guarantee an open booking slot.",
+        "The venue's computer-access fee is a fictional local policy.",
+        "The booking duration is exactly one hour for each workstation."
+      ],
+      "limitations": [
+        "פעל in this present predicate can have an adjective-like operational interpretation; morphologically it is the present participial form used verbally here.",
+        "The fictional paid-access policy needs contextual acceptance and is not a factual statement about Israeli libraries."
+      ]
+    },
+    {
+      "id": "library-availability-verb",
+      "learnerDifficulty": "A1",
+      "npcTargetLevel": "B2",
+      "linguisticContrast": "העמדות is feminine plural. מתפנות is the feminine plural present form of become free or available; מתפנים is masculine plural. The explicit evening time gives both variants the same scheduled-availability reading.",
+      "firstDivergentWord": {
+        "learner": { "clean": "מתפנות", "error": "מתפנים" },
+        "continuation": { "correct": "מתפנות", "incorrect": "מתפנים" }
+      },
+      "agreementOnly": "Only verb gender changes. Availability at six in the evening, three workstations, one hour each, 30 shekels, and the unpaid status are all preserved.",
+      "arithmetic": {
+        "quantity": 3,
+        "unitPrice": 10,
+        "computedTotal": 30,
+        "totalPrice": 30,
+        "currency": "ILS",
+        "unit": "one computer workstation for one hour, 18:00 to 19:00",
+        "equation": "3 * 10 = 30",
+        "valid": true
+      },
+      "colloquialAcceptability": "מתפנות is standard with the feminine workstation noun. In this routine booking context the verb means become available, not evacuate. No common alternate gender agreement is assumed.",
+      "assumptions": [
+        "The earlier payment claim is false and does not update authoritative state.",
+        "Six in the evening means 18:00 local time today in this fictional venue.",
+        "The quoted hourly fee applies separately to each workstation."
+      ],
+      "limitations": [
+        "Availability vocabulary may challenge some A1 learners; vocabulary is intentionally unrestricted and learner difficulty is only an authoring target.",
+        "The verbal contrast is present-tense scheduled usage rather than a finite future-tense form.",
+        "The prior correction of the payment claim makes this a state-retention-plus-agreement case, not an isolated grammar item."
+      ]
+    }
+  ]
+}

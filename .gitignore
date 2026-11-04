@@ -50,3 +50,8 @@ __pycache__/
 # Research campaign bulk artifacts (regenerable; manifests and summaries are committed)
 /research-results/**/activations/
 /research-results/**/jobs/
+
+# Mechanistic workbench raw captures and per-token artifacts remain on disk for replay.
+/research-results/mechanistic-repair/**/artifacts.json
+/research-results/mechanistic-repair/**/patch-requests.json
+/research-results/mechanistic-repair/**/events.jsonl

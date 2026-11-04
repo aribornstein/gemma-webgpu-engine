@@ -1,0 +1,314 @@
+[
+  {
+    "episodeId": "0ca1167acc7a0c3c",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["שני תיקים יחד עולים 120 שקלים.", "האם תרצה להמשיך עם התשלום?"]},
+      {"criterion": "naturalness", "score": 9, "evidence": ["כן, שני תיקים יחד עולים 120 שקלים.", "להמשיך עם התשלום"]}
+    ],
+    "criticalViolations": [],
+    "notes": "Correct agreement and complete sentences. The price confirmation fits the situation; the payment follow-up is slightly formulaic. להמשיך עם התשלום is acceptable conversational wording, not a grammatical error; its stylistic markedness is uncertain."
+  },
+  {
+    "episodeId": "1719df8edb9829b0",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["שלושה ספרים קצרים", "המחיר הכולל עבור שלושת הספרים יהיה 72 שקלים."]},
+      {"criterion": "naturalness", "score": 7, "evidence": ["אני מבין שאתה מחפש ספרים קצרים. אני מציע לך שלושה ספרים קצרים.", "האם תרצה להמשיך עם ההזמנה?"]}
+    ],
+    "criticalViolations": [],
+    "notes": "Grammatically sound, including numeral and adjective agreement. Repeating ספרים קצרים and offering books anew sounds scripted when the customer has already selected them and asks for a summary."
+  },
+  {
+    "episodeId": "331ef11fc1e3c4a3",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 5, "evidence": ["שני חולצות", "יהיו בסך 110 ש\"ח."]},
+      {"criterion": "naturalness", "score": 6, "evidence": ["שני חולצות יהיו בסך 110 ש\"ח."]}
+    ],
+    "criticalViolations": [],
+    "notes": "שני does not agree with feminine חולצות. יהיו בסך awkwardly attaches an amount expression to the shirts themselves. A future-tense price predicate can be valid colloquial Hebrew, so יהיו alone is not the problem; acceptability of this full בסך construction is less certain, but it is conspicuously awkward here."
+  },
+  {
+    "episodeId": "351d7a0b34a48872",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["שני ספרים.", "המחיר הכולל יהיה 48 שקלים."]},
+      {"criterion": "naturalness", "score": 10, "evidence": ["שני ספרים. המחיר הכולל יהיה 48 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "A concise, appropriate confirmation and price answer. The opening noun phrase is acceptable conversational ellipsis, not a defective sentence; the short reply needs no elaboration."
+  },
+  {
+    "episodeId": "4c162f4ed491a05c",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["שתי חולצות יהיו 110 שקלים."]},
+      {"criterion": "naturalness", "score": 9, "evidence": ["שתי חולצות יהיו 110 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "The numeral and verb agree with חולצות. יהיו followed by a price can be a valid colloquial pricing construction; I am uncertain how marked it would sound across speakers. עולות would be more idiomatic here, but the original is clear and complete, with no definite grammatical error."
+  },
+  {
+    "episodeId": "4ca6393acb433f32",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 8, "evidence": ["העמדות יהיו זמינות בשש בערב.", "שלושה עמדות"]},
+      {"criterion": "naturalness", "score": 8, "evidence": ["המחיר עבור שלושה עמדות לשעה הוא 30 שקלים.", "האם תרצה להמשיך עם ההזמנה?"]}
+    ],
+    "criticalViolations": [],
+    "notes": "The response is fluent apart from masculine שלושה with feminine עמדות; standard agreement requires שלוש. Numeral-gender variation occurs in speech, and its perceived naturalness varies, but this form is not standard agreement. The final confirmation question is mildly repetitive."
+  },
+  {
+    "episodeId": "4f0fcb05fece729d",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["העמדות פועלות כרגע.", "אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות."]},
+      {"criterion": "naturalness", "score": 9, "evidence": ["כן, העמדות פועלות כרגע.", "אני יכול לאשר", "האם תרצה להמשיך?"]}
+    ],
+    "criticalViolations": [],
+    "notes": "Correct, readable service Hebrew. Saying that confirmation is possible and then asking again whether to proceed is a minor conversational redundancy after the customer explicitly asks to confirm."
+  },
+  {
+    "episodeId": "5405b93e67f8dd56",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 4, "evidence": ["שתי גילידים.", "המחיר הכולל יהיה 48 שקלים."]},
+      {"criterion": "naturalness", "score": 3, "evidence": ["שתי גילידים.", "המחיר הכולל יהיה 48 שקלים."]}
+    ],
+    "criticalViolations": ["Unintelligible item expression: שתי גילידים."],
+    "notes": "I cannot identify גילידים as an intelligible word for the books in this context; the feminine numeral also clashes with the apparent masculine plural form. The price sentence is intact, so the entire reply is not unusable. The lexical assessment is uncertain without external reference, which was deliberately not consulted."
+  },
+  {
+    "episodeId": "551dbfef0ba82634",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 5, "evidence": ["הם חדרי קטנים", "עבור שתי חדרים", "המחיר לחדר אחד ללילה הוא 240 שקלים."]},
+      {"criterion": "naturalness", "score": 5, "evidence": ["החדרים שאתם בוחרים הם חדרי קטנים.", "עבור שתי חדרים", "האם תרצו להזמין"]}
+    ],
+    "criticalViolations": [],
+    "notes": "חדרי קטנים is not the required noun-adjective construction חדרים קטנים, and שתי does not agree with חדרים. These defects noticeably disrupt an otherwise understandable answer. האם תרצו להזמין can stand alone with an understood object; missing final punctuation does not establish syntactic truncation."
+  },
+  {
+    "episodeId": "552a3986c80a5287",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["התיקים חדשים.", "יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]},
+      {"criterion": "naturalness", "score": 10, "evidence": ["כן, התיקים חדשים. יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "Correct agreement and a natural, direct condition-and-total confirmation. יש לך is ordinary conversational wording for tallying the selected items."
+  },
+  {
+    "episodeId": "58737d919a042516",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 6, "evidence": ["שלושה עמדות", "שלושת העמדות"]},
+      {"criterion": "naturalness", "score": 7, "evidence": ["המחיר עבור שלושה עמדות לשעה הוא 30 שקלים.", "האם תרצה להזמין את שלושת העמדות?"]}
+    ],
+    "criticalViolations": [],
+    "notes": "Both numeral forms incorrectly treat feminine עמדות as masculine: standard Hebrew requires שלוש עמדות and שלוש העמדות. Spoken numeral agreement can vary, so perceived naturalness is somewhat uncertain; the repeated mismatch remains marked. Asking whether to book again is also redundant in this exchange."
+  },
+  {
+    "episodeId": "5a5997ef36519a49",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 7, "evidence": ["הם חדרי גודל קטן.", "עבור שתי חדרים"]},
+      {"criterion": "naturalness", "score": 6, "evidence": ["החדרים שהזמנת הם חדרי גודל קטן.", "המחיר לחדר אחד בלילה", "עבור שתי חדרים"]}
+    ],
+    "criticalViolations": [],
+    "notes": "שתי חדרים is a clear numeral-gender mismatch. חדרי גודל קטן is an awkward size description; it might be parsed as a construct phrase, so I am uncertain that it is categorically ungrammatical, but חדרים קטנים is much more natural. ללילה would express the rate more idiomatically than בלילה. The final האם תרצה להמשיך is a complete contextual question despite absent punctuation."
+  },
+  {
+    "episodeId": "8447b9230c135ba6",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 6, "evidence": ["שלוש ספרים קצרים", "הסכום הכולל יהיה 72 שקלים. האם"]},
+      {"criterion": "naturalness", "score": 5, "evidence": ["אני מבין שאתה מחפש ספרים קצרים. אני מציע לך שלוש ספרים קצרים.", "אם תרצה שלושה", "72 שקלים. האם"]}
+    ],
+    "criticalViolations": [],
+    "notes": "שלוש ספרים is nonstandard numeral agreement; feminine numeral leveling is common colloquially, so its naturalness is uncertain rather than categorically unacceptable. The final האם is unambiguously an unfinished question. Repetition and a renewed conditional offer are awkward when summarizing an existing selection. The main answer remains understandable."
+  },
+  {
+    "episodeId": "8cbfbe3638c41c54",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["שני תיקים יחד הם 120 שקלים.", "האם תרצה להמשיך עם התשלום?"]},
+      {"criterion": "naturalness", "score": 9, "evidence": ["כן, שני תיקים יחד הם 120 שקלים.", "להמשיך עם התשלום"]}
+    ],
+    "criticalViolations": [],
+    "notes": "The monetary predicate can be understood as valid colloquial price ellipsis, with correct agreement. Its acceptability may vary by speaker; עולים is more idiomatic than הם here. The payment follow-up is slightly formulaic, not substantively defective."
+  },
+  {
+    "episodeId": "90a7bccb02d45b6a",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["התיקים חדשים.", "יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]},
+      {"criterion": "naturalness", "score": 10, "evidence": ["כן, התיקים חדשים. יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "Correct agreement and a natural, direct condition-and-total confirmation. Only the generated reply is assessed; the customer's wording does not reduce its score."
+  },
+  {
+    "episodeId": "9d2dc70395827bfd",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["העמדות פועלות כרגע.", "אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות."]},
+      {"criterion": "naturalness", "score": 9, "evidence": ["כן, העמדות פועלות כרגע.", "אני יכול לאשר", "האם תרצה להמשיך?"]}
+    ],
+    "criticalViolations": [],
+    "notes": "Correct, readable service Hebrew. Saying that confirmation is possible and then asking again whether to proceed is a minor conversational redundancy after the customer explicitly asks to confirm."
+  },
+  {
+    "episodeId": "a4f03f5e680f43b0",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["החולצות שלך מגיעות היום.", "הסכום הכולל הוא 110 שקלים."]},
+      {"criterion": "naturalness", "score": 10, "evidence": ["כן, החולצות שלך מגיעות היום. הסכום הכולל הוא 110 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "Correct feminine plural agreement and a fluent, complete answer to both immediate questions. No penalty for brevity."
+  },
+  {
+    "episodeId": "aad4ace19aeae9a9",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["החולצות שלך מגיעות היום.", "האם תרצי לשלם עכשיו?"]},
+      {"criterion": "naturalness", "score": 10, "evidence": ["הסכום הכולל הוא 110 ש\"ח. האם תרצי לשלם עכשיו?"]}
+    ],
+    "criticalViolations": [],
+    "notes": "Fluent confirmation followed by an appropriate payment invitation. תרצי matches the customer's established feminine self-reference. The currency abbreviation is ordinary written Hebrew."
+  },
+  {
+    "episodeId": "afdcdbaa702bc7aa",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 7, "evidence": ["אז את רוצה של שלוש מחברות.", "המחיר עבור שלוש מחברות הוא 18 שקלים."]},
+      {"criterion": "naturalness", "score": 7, "evidence": ["אז את רוצה של שלוש מחברות.", "האם תרצי לשלם?"]}
+    ],
+    "criticalViolations": [],
+    "notes": "The extra של has no grammatical role and interrupts the opening sentence; the rest is correct and appropriate. It could resemble a spoken false start on שלוש, but no repair or hesitation is marked, so that interpretation is uncertain rather than an assumed valid construction."
+  },
+  {
+    "episodeId": "b22273fecbf4aee7",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["עבור שלושת החדרים ללילה אחד", "הסכום הכולל", "הוא 720 שקלים."]},
+      {"criterion": "naturalness", "score": 10, "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה אחד הוא 720 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "Correct construct numeral and noun agreement. This single sentence naturally supplies the requested total; no additional wording is needed for language quality."
+  },
+  {
+    "episodeId": "b35116bedfd08769",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["המחברות הכחולות.", "יש לך שתי מחברות.", "הסכום הכולל הוא 12 שקלים."]},
+      {"criterion": "naturalness", "score": 9, "evidence": ["כן, המחברות הכחולות.", "יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "המחברות הכחולות is a correctly agreed definite noun phrase and may be valid elliptical identification, so I do not label it ungrammatical. Its suitability as an answer to a color-predication question is uncertain: המחברות כחולות would be more direct. The remaining confirmation is natural."
+  },
+  {
+    "episodeId": "cbf594d597fb014e",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["עבור שלושת החדרים ללילה", "הסכום הכולל", "הוא 720 שקלים."]},
+      {"criterion": "naturalness", "score": 10, "evidence": ["הסכום הכולל עבור שלושת החדרים ללילה הוא 720 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "Grammatical, idiomatic, and sufficient for the immediate price question. The one-sentence answer is not penalized for being concise."
+  },
+  {
+    "episodeId": "f63688a63f79b0e1",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 7, "evidence": ["את רוצה של שלוש מחברות.", "המחיר עבור שלוש מחברות הוא 18 שקלים."]},
+      {"criterion": "naturalness", "score": 7, "evidence": ["את רוצה של שלוש מחברות.", "המחיר עבור שלוש מחברות הוא 18 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "The superfluous של disrupts the opening; the amount sentence is grammatical and natural. An unmarked spoken false start on שלוש is a possible but uncertain interpretation, not a reason to ignore the defect in the supplied text."
+  },
+  {
+    "episodeId": "ff47560e46a4c464",
+    "judgeId": "m-language-judge",
+    "role": "language",
+    "rubricVersion": "mechanistic-quality-1",
+    "abstain": false,
+    "ratings": [
+      {"criterion": "grammar", "score": 10, "evidence": ["המחברות האלה כחולות.", "יש לך שתי מחברות.", "הסכום הכולל הוא 12 שקלים."]},
+      {"criterion": "naturalness", "score": 10, "evidence": ["כן, המחברות האלה כחולות. יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים."]}
+    ],
+    "criticalViolations": [],
+    "notes": "Correct demonstrative, adjective, and numeral agreement. The color confirmation and checkout tally are straightforward and natural for this exchange."
+  }
+]

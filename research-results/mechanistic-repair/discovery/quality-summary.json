@@ -1,0 +1,644 @@
+{
+  "summary": {
+    "scope": "AI-judged discovery single turns, not a held-out full-episode quality gate",
+    "judgments": 72,
+    "cases": 24,
+    "verdicts": {
+      "pass": 0,
+      "fail": 11,
+      "unknown": 13
+    },
+    "missingVocabularyPolicy": 24,
+    "criteria": {
+      "grammar": {
+        "scored": 24,
+        "unassessed": 0,
+        "minimum": 4,
+        "mean": 8.541666666666666,
+        "atLeastNine": 15
+      },
+      "naturalness": {
+        "scored": 24,
+        "unassessed": 0,
+        "minimum": 3,
+        "mean": 8.125,
+        "atLeastNine": 14
+      },
+      "vocabulary": {
+        "scored": 0,
+        "unassessed": 24,
+        "minimum": null,
+        "mean": null,
+        "atLeastNine": 0
+      },
+      "grounding": {
+        "scored": 24,
+        "unassessed": 0,
+        "minimum": 5,
+        "mean": 9.708333333333334,
+        "atLeastNine": 23
+      },
+      "goal": {
+        "scored": 24,
+        "unassessed": 0,
+        "minimum": 5,
+        "mean": 9.166666666666666,
+        "atLeastNine": 20
+      },
+      "levelSuitability": {
+        "scored": 24,
+        "unassessed": 0,
+        "minimum": 2,
+        "mean": 8.166666666666666,
+        "atLeastNine": 14
+      },
+      "coherence": {
+        "scored": 24,
+        "unassessed": 0,
+        "minimum": 4,
+        "mean": 9,
+        "atLeastNine": 19
+      }
+    }
+  },
+  "items": [
+    {
+      "artifactId": "discovery:bag-total-verb.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "כן, שני תיקים יחד עולים 120 שקלים. האם תרצה להמשיך עם התשלום?",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 9,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 9,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:book-length-adjective.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "אני מבין שאתה מחפש ספרים קצרים. אני מציע לך שלושה ספרים קצרים. המחיר הכולל עבור שלושת הספרים יהיה 72 שקלים. האם תרצה להמשיך עם ההזמנה?",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 7,
+        "vocabulary": null,
+        "grounding": 9,
+        "goal": 8,
+        "levelSuitability": 9,
+        "coherence": 8
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:shirt-order-numeral.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "שני חולצות יהיו בסך 110 ש\"ח.",
+      "ratings": {
+        "grammar": 5,
+        "naturalness": 6,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 9,
+        "levelSuitability": 7,
+        "coherence": 9
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:book-order-numeral.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "שני ספרים. המחיר הכולל יהיה 48 שקלים.",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 10,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 9,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:shirt-order-numeral.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "שתי חולצות יהיו 110 שקלים.",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 9,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 9,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:library-availability-verb.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "העמדות יהיו זמינות בשש בערב. המחיר עבור שלושה עמדות לשעה הוא 30 שקלים. האם תרצה להמשיך עם ההזמנה?",
+      "ratings": {
+        "grammar": 8,
+        "naturalness": 8,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 9,
+        "levelSuitability": 8,
+        "coherence": 9
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:library-operation-verb.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "כן, העמדות פועלות כרגע. אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות. המחיר הכולל יהיה 20 שקלים. האם תרצה להמשיך?",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 9,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 9,
+        "levelSuitability": 10,
+        "coherence": 9
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:book-order-numeral.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "שתי גילידים. המחיר הכולל יהיה 48 שקלים.",
+      "ratings": {
+        "grammar": 4,
+        "naturalness": 3,
+        "vocabulary": null,
+        "grounding": 5,
+        "goal": 5,
+        "levelSuitability": 2,
+        "coherence": 4
+      },
+      "grounding": {
+        "status": "fail",
+        "violations": [
+          "item: expected book, got גילידים"
+        ],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:hotel-size-adjective.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "החדרים שאתם בוחרים הם חדרי קטנים. המחיר לחדר אחד ללילה הוא 240 שקלים. עבור שתי חדרים, הסכום הכולל הוא 480 שקלים. האם תרצו להזמין",
+      "ratings": {
+        "grammar": 5,
+        "naturalness": 5,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 8,
+        "levelSuitability": 5,
+        "coherence": 8
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:bag-condition-adjective.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "כן, התיקים חדשים. יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים.",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 10,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 10,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:library-availability-verb.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "העמדות יהיו זמינות בשש בערב. המחיר עבור שלושה עמדות לשעה הוא 30 שקלים. האם תרצה להזמין את שלושת העמדות?",
+      "ratings": {
+        "grammar": 6,
+        "naturalness": 7,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 9,
+        "levelSuitability": 7,
+        "coherence": 8
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:hotel-size-adjective.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "החדרים שהזמנת הם חדרי גודל קטן. המחיר לחדר אחד בלילה הוא 240 שקלים. עבור שתי חדרים, הסכום הכולל הוא 480 שקלים. האם תרצה להמשיך",
+      "ratings": {
+        "grammar": 7,
+        "naturalness": 6,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 9,
+        "levelSuitability": 6,
+        "coherence": 9
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:book-length-adjective.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "אני מבין שאתה מחפש ספרים קצרים. אני מציע לך שלוש ספרים קצרים. המחיר לספר אחד הוא 24 שקלים. אם תרצה שלושה, הסכום הכולל יהיה 72 שקלים. האם",
+      "ratings": {
+        "grammar": 6,
+        "naturalness": 5,
+        "vocabulary": null,
+        "grounding": 9,
+        "goal": 8,
+        "levelSuitability": 5,
+        "coherence": 6
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:bag-total-verb.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "כן, שני תיקים יחד הם 120 שקלים. האם תרצה להמשיך עם התשלום?",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 9,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 9,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:bag-condition-adjective.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "כן, התיקים חדשים. יש לך שני תיקים, והמחיר הכולל הוא 120 שקלים.",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 10,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 10,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:library-operation-verb.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "כן, העמדות פועלות כרגע. אני יכול לאשר את ההזמנה לשעה אחת עבור שתי עמדות. המחיר הכולל יהיה 20 שקלים. האם תרצה להמשיך?",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 9,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 9,
+        "levelSuitability": 10,
+        "coherence": 9
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:shirt-arrival-verb.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "כן, החולצות שלך מגיעות היום. הסכום הכולל הוא 110 שקלים.",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 10,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 10,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:shirt-arrival-verb.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "החולצות שלך מגיעות היום. הסכום הכולל הוא 110 ש\"ח. האם תרצי לשלם עכשיו?",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 10,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 9,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:notebook-order-numeral.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "אז את רוצה של שלוש מחברות. המחיר עבור שלוש מחברות הוא 18 שקלים. האם תרצי לשלם?",
+      "ratings": {
+        "grammar": 7,
+        "naturalness": 7,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 9,
+        "levelSuitability": 7,
+        "coherence": 9
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:hotel-order-numeral.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "הסכום הכולל עבור שלושת החדרים ללילה אחד הוא 720 שקלים.",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 10,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 10,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:notebook-color-adjective.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "כן, המחברות הכחולות. יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים.",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 9,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 9,
+        "levelSuitability": 8,
+        "coherence": 9
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:hotel-order-numeral.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "הסכום הכולל עבור שלושת החדרים ללילה הוא 720 שקלים.",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 10,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 10,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    },
+    {
+      "artifactId": "discovery:notebook-order-numeral.error.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "את רוצה של שלוש מחברות. המחיר עבור שלוש מחברות הוא 18 שקלים.",
+      "ratings": {
+        "grammar": 7,
+        "naturalness": 7,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 9,
+        "levelSuitability": 7,
+        "coherence": 9
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "fail"
+    },
+    {
+      "artifactId": "discovery:notebook-color-adjective.clean.replay",
+      "scope": "Single newly generated NPC turn; not a full-episode promotion assessment",
+      "npcReply": "כן, המחברות האלה כחולות. יש לך שתי מחברות. הסכום הכולל הוא 12 שקלים.",
+      "ratings": {
+        "grammar": 10,
+        "naturalness": 10,
+        "vocabulary": null,
+        "grounding": 10,
+        "goal": 10,
+        "levelSuitability": 10,
+        "coherence": 10
+      },
+      "grounding": {
+        "status": "pass",
+        "violations": [],
+        "coverage": "adjudicated-claims"
+      },
+      "vocabulary": {
+        "status": "unknown",
+        "unmatched": []
+      },
+      "verdict": "unknown"
+    }
+  ]
+}

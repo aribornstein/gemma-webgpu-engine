@@ -26,3 +26,34 @@ export interface GemmaResearchActivationCapture {
   tokenPosition: number;
   values: Float32Array;
 }
+
+/** Request-local activation diagnostic, not a pretrained weight repair. */
+export interface GemmaResearchPatch {
+  layer: number;
+  tokenPosition: number;
+  mode: "replace" | "add";
+  amount: number;
+  vector: Float32Array;
+}
+
+export interface GemmaResearchEvaluationRequest {
+  promptTokenIds: readonly number[];
+  continuationTokenIds?: readonly number[];
+  generate?: { maxNewTokens: number; temperature?: number; seed?: number };
+  capture?: { positions: readonly number[]; layers: readonly number[] };
+  patch?: GemmaResearchPatch;
+  signal?: AbortSignal;
+  onProgress?: (progress: { evaluatedPositions: number; generatedTokens: number }) => void;
+}
+
+export interface GemmaResearchEvaluationResult {
+  promptTokenIds: number[];
+  tokenIds: number[];
+  tokenLogProbs: number[];
+  text: string;
+  stopReason: "forced" | "end-token" | "length";
+  captures: GemmaResearchActivationCapture[];
+  firstDecision: { tokenId: number; text: string; logProbability: number; rawLogit: number }[];
+  evaluatedPositions: number;
+  milliseconds: number;
+}
