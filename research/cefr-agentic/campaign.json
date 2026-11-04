@@ -1,0 +1,382 @@
+{
+  "schema_version": 1,
+  "campaign_id": "gemma4-e2b-qat-agentic-hebrew-cefr-rpg-v1",
+  "status": "executed_pilot_v1",
+  "mode": "one_day_exploratory_end_to_end",
+  "aim": {
+    "name": "agentic_behavioral_compilation",
+    "question": "Can an agent, using internal capability evidence and task-specific feedback, discover a small reversible metadata-conditioned effective-weight edit that improves CEFR-targeted Hebrew RPG dialogue over strong prompt-only and best-of-N baselines without unacceptable language or game-state regressions?",
+    "null_hypothesis": "Under the matched evaluation and search budgets, the selected edit does not improve held-out joint CEFR/task success over the strongest non-edit baseline.",
+    "probe_hypothesis": "Some task-relevant Hebrew/CEFR information may be decodable from frozen Gemma activations even when expressed behavior is unreliable.",
+    "required_distinctions": [
+      "decoding_a_literal_cefr_instruction_is_not_hebrew_competence",
+      "probe_decodability_is_not_causal_use",
+      "a_successful_edit_does_not_prove_suppressed_pretraining_knowledge",
+      "a_low_power_pilot_cannot_prove_generalization"
+    ]
+  },
+  "model": {
+    "repository": "aribornstein/gemma-webgpu-engine",
+    "backend": "owned_webgpu",
+    "checkpoint_id": "google/gemma-4-E2B-it-qat-mobile-transformers",
+    "expected_checkpoint_revision_from_proposal": "9fcec64df66cb1e4d972fc5cdc142afb25b2362c",
+    "revision_policy": "verify_against_runtime_manifest_and_record_actual_sha",
+    "base_weights_frozen": true,
+    "tokenizer_and_chat_template": "use_existing_pinned_engine",
+    "require_original_inference_parity": true,
+    "model_storage": "local_hash_checked_file_via_dev_server"
+  },
+  "host": {
+    "device": "apple_macbook_air_m4_32gb",
+    "browser": "chrome_webgpu",
+    "loaded_sessions": 1,
+    "run_gpu_operations_serially": true,
+    "model_storage": "local_hash_checked_file_via_dev_server",
+    "explicit_device_loss_abort_and_cleanup": true
+  },
+  "task": {
+    "manifest": "research/cefr-agentic/task.json",
+    "development_cases": "research/cefr-agentic/scenarios.dev.jsonl",
+    "validation_cases": "research/cefr-agentic/scenarios.validation.jsonl",
+    "sealed_cases": "external_restricted_not_in_repo",
+    "split_group": "scenario_family_and_entity_family",
+    "unit_of_analysis": "scenario_episode",
+    "levels": [
+      "A1",
+      "A2",
+      "B1",
+      "B2"
+    ],
+    "sprint_primary_contrast": [
+      "A1",
+      "B2"
+    ],
+    "metadata_language": "english_only",
+    "npc_output_language": "hebrew",
+    "player_history": "separate_hebrew_field"
+  },
+  "arms": [
+    {
+      "id": "raw_base",
+      "type": "unmodified",
+      "prompt_policy": "canonical"
+    },
+    {
+      "id": "strong_prompt",
+      "type": "unmodified",
+      "prompt_policy": "level_specific_strong"
+    },
+    {
+      "id": "best_of_2",
+      "type": "unmodified",
+      "prompt_policy": "level_specific_strong",
+      "candidate_count": 2,
+      "selection": "independent_dev_judge"
+    },
+    {
+      "id": "no_op_overlay",
+      "type": "weight_overlay",
+      "edit_id": "identity"
+    },
+    {
+      "id": "random_rank1",
+      "type": "weight_overlay",
+      "source": "norm_matched_random"
+    },
+    {
+      "id": "agent_rank1",
+      "type": "weight_overlay",
+      "source": "agent_selected_contrastive"
+    }
+  ],
+  "observation": {
+    "enabled": true,
+    "teacher_forced_raw_log_likelihood": true,
+    "capture_sequential_token_path_only": true,
+    "hook_sites": [
+      {
+        "layer": 12,
+        "site": "mlp_next_input"
+      },
+      {
+        "layer": 20,
+        "site": "mlp_next_input"
+      },
+      {
+        "layer": 22,
+        "site": "mlp_next_input"
+      },
+      {
+        "layer": 24,
+        "site": "mlp_next_input"
+      },
+      {
+        "layer": "final",
+        "site": "final_input"
+      }
+    ],
+    "token_positions": [
+      "end_of_metadata",
+      "last_prompt_token_before_npc_turn",
+      "fixed_candidate_boundary"
+    ],
+    "require_token_alignment": true,
+    "require_held_out_probe_controls": true,
+    "max_readback_bytes_per_probe": 1048576,
+    "probes": [
+      "contrastive_mean_difference",
+      "l2_regularized_linear"
+    ],
+    "controls": [
+      "shuffled_labels",
+      "lexical_template_disjoint",
+      "metadata_only",
+      "text_only"
+    ]
+  },
+  "weight_space_edit": {
+    "enabled": true,
+    "first_operator": "final_input_rank_one_effective_head_overlay",
+    "mathematical_contract": "h_prime = h + gate(metadata) * alpha * b * dot(a,h)",
+    "equivalence": "W_head_effective = W_head + gate(metadata) * alpha * (W_head*b)*a^T",
+    "location": "immediately_before_frozen_lm_head",
+    "rationale": "effective_low_rank_weight_edit_without_touching_packed_codes",
+    "rank": 1,
+    "max_sites": 1,
+    "use_existing_qat_head_for_logits": true,
+    "initial_strengths": [
+      -1.0,
+      0.0,
+      1.0
+    ],
+    "a_initialization": "held_out_safe_contrastive_activation_direction",
+    "b_initialization": "bounded_activation_candidate_or_fixed_basis",
+    "level_gate": {
+      "A1": 1.0,
+      "A2": 0.3333333333,
+      "B1": -0.3333333333,
+      "B2": -1.0
+    },
+    "gate_is_hypothesis_not_expected_truth": true,
+    "immutable_base_weights": true,
+    "patch_artifact_requirements": [
+      "model_sha",
+      "engine_commit",
+      "hook",
+      "rank",
+      "coefficients",
+      "gate",
+      "artifact_hash"
+    ],
+    "require_no_op_parity": true,
+    "require_revert_parity": true,
+    "forbid_direct_packed_weight_mutation": true,
+    "sites": [
+      {
+        "id": "final",
+        "operator": "logit_space_rank_one",
+        "contract": "logits += gate*alpha*dot(a,h_final)*(W_head b)"
+      },
+      {
+        "id": "residual",
+        "operator": "residual_rank_one_after_layer",
+        "layer_choices": [
+          20,
+          22,
+          24
+        ],
+        "contract": "h += gate*alpha*b*dot(a,h); next-layer input re-derived"
+      }
+    ],
+    "gates": [
+      "external_level_gate",
+      "self_gate_from_level_probe"
+    ],
+    "self_gate": "gate = clamp(dot(p, h_end_of_metadata) / s, -1, 1) with p,s fit on development only"
+  },
+  "search": {
+    "strategy": "successive_halving_with_agent_proposals",
+    "primary_agent": "hypothesis_investigator",
+    "agent_roles": [
+      {
+        "id": "hebrew_linguist",
+        "rights": [
+          "suggest_cases",
+          "inspect_development_dialogues",
+          "review_errors"
+        ]
+      },
+      {
+        "id": "representation_analyst",
+        "rights": [
+          "read_development_activations",
+          "propose_hypothesis",
+          "propose_edit"
+        ]
+      },
+      {
+        "id": "player_simulator",
+        "rights": [
+          "simulate_approved_scripted_policy"
+        ]
+      },
+      {
+        "id": "methods_critic",
+        "rights": [
+          "challenge_confounders",
+          "request_negative_controls"
+        ]
+      },
+      {
+        "id": "independent_judge",
+        "rights": [
+          "blind_score_approved_episodes"
+        ]
+      },
+      {
+        "id": "orchestrator",
+        "rights": [
+          "select_experiment",
+          "allocate_budget",
+          "record_result"
+        ]
+      }
+    ],
+    "deny_all_agents": [
+      "mutate_checkpoint",
+      "read_sealed_holdout",
+      "rewrite_rubric_after_freeze",
+      "bypass_quotas"
+    ],
+    "max_analytical_candidates": 4,
+    "max_selected_sites": 1,
+    "max_diagnostic_conversation_batches": 8,
+    "max_activation_probe_batches": 6,
+    "max_judge_requests": {
+      "development": 300,
+      "sealed": 120
+    },
+    "max_model_forward_evaluations": 25000,
+    "max_active_wall_minutes": 360,
+    "paired_seeds": [
+      23,
+      47
+    ],
+    "stop_on": [
+      "numerical_parity_failure",
+      "device_loss",
+      "quota_exhaustion",
+      "invalid_judge_calibration"
+    ],
+    "allow_conclusion": [
+      "supported_exploratory",
+      "contradicted_exploratory",
+      "inconclusive",
+      "invalid"
+    ]
+  },
+  "microtraining": {
+    "enabled": false,
+    "reason": "sprint_focuses_on_gradient_free_rank1_edit",
+    "future_proposal_caps_only": {
+      "max_steps_per_invocation": 24,
+      "hard_max_steps_per_invocation": 30,
+      "max_total_steps": 72
+    }
+  },
+  "evaluation": {
+    "rubric_version": "hebrew-cefr-1.0",
+    "judge_contract": "research/cefr-agentic/judgment.schema.json",
+    "judge_spec": "research/cefr-agentic/task.json",
+    "require_distinct_judge_identity_from_investigator": true,
+    "must_record_judge_model_or_human_identity": true,
+    "calibration_requirement": "human_reviewed_anchor_examples",
+    "if_calibration_unavailable": "exploratory_scores_only",
+    "blind_pairwise_comparison": true,
+    "counterbalance_candidate_order": true,
+    "deterministic_first": [
+      "schema",
+      "english_spillover",
+      "entity_numbers",
+      "quest_state"
+    ],
+    "axes": [
+      "morphosyntactic_correctness",
+      "natural_hebrew",
+      "cefr_suitability",
+      "cefr_control",
+      "entity_semantic_fidelity",
+      "character_register_fidelity",
+      "multi_turn_coherence",
+      "pedagogical_appropriateness"
+    ],
+    "primary_outcome": "cefr_control",
+    "primary_pass_definition": "cefr_suitability>=3 AND morphosyntactic_correctness>=3 AND natural_hebrew>=3 AND hard_entity_pass AND hard_quest_pass AND no_severe_error",
+    "report_component_metrics": true,
+    "regression_checks": [
+      "grammar",
+      "naturalness",
+      "semantic_fidelity",
+      "conversation_coherence"
+    ],
+    "compare_against": "strongest_of_strong_prompt_and_best_of_2",
+    "statistical_method": "paired_cluster_bootstrap_by_scenario_family",
+    "formal_claim_policy": "Require independent calibration, sufficient scenario-family coverage and a prespecified positive 95% cluster confidence interval before claiming validated gain. Sprint cases are too small for this by default; report exploratory evidence only.",
+    "proposal_promotion_thresholds_not_pilot_results": {
+      "min_entity_quest_pass_fraction": 0.95,
+      "max_added_decode_latency_fraction": 0.05,
+      "max_adapter_rank": 4,
+      "require_positive_cluster_95ci": true,
+      "require_no_material_language_quality_regression": true
+    },
+    "sealed_evaluation_invocations_allowed_after_freeze": 1,
+    "primary_definition": "paired A1-vs-B2 separation on matched scenarios: judged estimated_level ordinal gap (B2 minus A1) plus deterministic complexity-feature gap as secondary",
+    "guardrails": [
+      "joint_target_success_rate",
+      "hard_entity_pass",
+      "hard_quest_pass",
+      "morphosyntactic_correctness",
+      "natural_hebrew"
+    ]
+  },
+  "artifacts": {
+    "output_dir": "research-results/cefr-agentic",
+    "formats": [
+      "jsonl",
+      "json",
+      "markdown"
+    ],
+    "required": [
+      "config_snapshot",
+      "checkpoint_and_commit_hashes",
+      "all_candidate_attempts",
+      "experiment_trace",
+      "activation_measurements",
+      "adapter_manifest",
+      "simulated_episode_transcripts",
+      "blind_judgments",
+      "controls",
+      "paired_comparisons",
+      "report"
+    ],
+    "state_in_report_that_results_are_unmeasured_until_executed": true
+  },
+  "revisions_applied": {
+    "plan": "autopilot-cefr-weightspace-plan v2 (approved 2026-11-03)",
+    "R1": "final-site overlay applied exactly in logit space: logits += gate*alpha*dot(a,h_final)*(W_head b); final_input is post-norm SRQ data feeding an integer head",
+    "R2": "added residual_after_mlp site at one layer chosen on dev from {20,22,24}",
+    "R3": "self-gated variant gate=clamp(p.h_meta,-1,1) with p the dev-fit requested-level probe; external gate kept as baseline",
+    "R4": "hook layers {12,20,22,24,final}",
+    "R5": "primary outcome cefr_control; joint pass and hard gates are non-inferiority guardrails",
+    "R6": "judge budget 300 dev + 120 sealed agent judge calls; a call scores a batch of blinded episodes for one judge role",
+    "R7": "sealed set authored by a separate agent outside the repository; only its hash is recorded",
+    "R8": "each scenario family instantiated at A1 and B2 with identical world state",
+    "R9": "weights loaded from a local hash-checked file via the dev server"
+  },
+  "result": {
+    "report": "research-results/cefr-agentic/REPORT.md",
+    "edit_claim": "contradicted_exploratory",
+    "latent_unexpressed_diagnosis": "inconclusive",
+    "metadata_only_control_gap": "supported_exploratory"
+  }
+}

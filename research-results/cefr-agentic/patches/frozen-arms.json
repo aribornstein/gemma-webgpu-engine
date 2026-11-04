@@ -1,0 +1,4 @@
+[{"id":"agent_rank1","arm":"agent_rank1","site":"residual22","gate":"external","alpha":0.06},
+ {"id":"random_rank1","arm":"random_rank1","site":"residual22","gate":"external","alpha":0.06,"b":"random","seed":1234},
+ {"id":"wrong_level_gate","arm":"wrong_level_gate","site":"residual22","gate":"wrong_level","alpha":0.06},
+ {"id":"no_op_overlay","arm":"no_op_overlay","site":"residual22","gate":"none","alpha":0}]

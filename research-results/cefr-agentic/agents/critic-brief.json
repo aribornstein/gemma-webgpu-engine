@@ -1,0 +1,206 @@
+{
+ "role": "methods_critic",
+ "rights": [
+  "challenge_confounders",
+  "request_negative_controls"
+ ],
+ "design": {
+  "model": "frozen Gemma 4 E2B QAT on owned WebGPU engine",
+  "task": "Hebrew NPC RPG, English metadata, CEFR A1 vs B2, 5 scripted learner turns, sampling temp 1 top-k 64 top-p 0.95, seed 23 (best_of_2 adds seed 47)",
+  "arms": "raw_base (canonical prompt), strong_prompt (level-specific instructions), best_of_2 (strong prompt, dev judge picks of seeds 23/47), agent_rank1/random_rank1/wrong_level_gate/no_op_overlay (canonical prompt + residual rank-1 overlay at layer 22, alpha 0.06)",
+  "judges": "4 blind role-specific LLM sub-agent judges (language, cefr with target level, level estimator without target, conversation), same underlying model family as the orchestrator; calibrated only on AI-authored contrasts (level ordering 9/9, agreement 36/36, matched>mismatched suitability 18/18); conversation judge uncalibrated",
+  "n": "6 development scenario families x 2 levels, 1 episode per cell per arm"
+ },
+ "calibration": {
+  "level_estimator": {
+   "pairs": 9,
+   "ordering_accuracy": 1
+  },
+  "language_judge": {
+   "pairs": 36,
+   "correct_over_incorrect": 1
+  },
+  "calib-cefr": {
+   "n": 18,
+   "mean_suitability": 3.944
+  },
+  "calib-cefr-swapped": {
+   "n": 18,
+   "mean_suitability": 1
+  },
+  "cefr_judge": {
+   "pairs": 18,
+   "matched_over_mismatched": 1
+  },
+  "gate_threshold": 0.7
+ },
+ "probe_summary": {
+  "matched_style_preferred_fraction": 0.5,
+  "level_conditioning_interaction_mean": 0.116,
+  "interaction_positive_fraction": 0.889,
+  "families": 9
+ },
+ "probe_level_pre_decision": {
+  "last_prompt_token@12": {
+   "md_auc": 1,
+   "ci": [
+    1,
+    1
+   ],
+   "shuffled": 0.6,
+   "n_test": 30
+  },
+  "last_prompt_token@20": {
+   "md_auc": 1,
+   "ci": [
+    1,
+    1
+   ],
+   "shuffled": 0.702,
+   "n_test": 30
+  },
+  "last_prompt_token@22": {
+   "md_auc": 1,
+   "ci": [
+    1,
+    1
+   ],
+   "shuffled": 0.582,
+   "n_test": 30
+  },
+  "last_prompt_token@24": {
+   "md_auc": 0.929,
+   "ci": [
+    0.76,
+    1
+   ],
+   "shuffled": 0.613,
+   "n_test": 30
+  },
+  "last_prompt_token@final": {
+   "md_auc": 0.778,
+   "ci": [
+    0.76,
+    0.84
+   ],
+   "shuffled": 0.547,
+   "n_test": 30
+  }
+ },
+ "screening": "{\"stage\":\"episodes\",\"outputName\":\"baselines.dev\",\"startedAt\":\"2026-11-03T17:26:09.446Z\",\"finishedAt\":\"2026-11-03T17:30:53.532Z\",\"episodes\":36,\"jobsHash\":\"4b00e39856d0da2b6ee760d9cab3946f4c385d5e3599f478a06812d4e9e93a75\",\"provenance\":{\"browserVersion\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36\",\"gpuAdapter\":\"apple metal-3\"}}\n{\"stage\":\"probes\",\"startedAt\":\"2026-11-03T17:31:01.767Z\",\"finishedAt\":\"2026-11-03T17:49:47.926Z\",\"rows\":1152,\"sites\":[12,20,22,24,\"final\"],\"provenance\":{\"browserVersion\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36\",\"gpuAdapter\":\"apple metal-3\"},\"artifact\":\"activations/probes.json\"}\n{\"stage\":\"diagnose\",\"finding\":\"metadata-only (raw_base) CEFR control is weak: estimated-level gap B2-A1 = 0.5 (positive in 3/6 families); strong prompting reaches 2.33 but lowers grammar 2.42->1.67 and naturalness 2.08->1.33 (blind panel, dev)\",\"source\":\"panel-base.json\"}\n{\"stage\":\"probe_summary\",\"finding\":\"requested level decodable at the pre-decision position on held-out families (mean-difference AUC 1.0 at layers 12/20/22, shuffled 0.58-0.70); teacher-forced likelihood shifts toward the matching reply style under the requested level in 8/9 families (mean +0.116 nats/token); joint level-x-style match not linearly decodable (~0.5); agreement minimal pairs: correct preferred 33/36\",\"source\":\"probes.json\"}\n{\"stage\":\"directions\",\"startedAt\":\"2026-11-03T17:49:58.585Z\",\"finishedAt\":\"2026-11-03T17:53:26.638Z\",\"rows\":120,\"sites\":[{\"residual\":20},{\"residual\":22},{\"residual\":24},\"final\"],\"provenance\":{\"browserVersion\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36\",\"gpuAdapter\":\"apple metal-3\"},\"artifact\":\"activations/directions.json\"}\n{\"stage\":\"episodes\",\"outputName\":\"screen-round1\",\"startedAt\":\"2026-11-03T17:54:25.842Z\",\"finishedAt\":\"2026-11-03T17:58:15.291Z\",\"episodes\":24,\"jobsHash\":\"9b022ba9dc86eaafa8bd311b72fe294b060f1dbd100cb863456dcdca6c858112\",\"provenance\":{\"browserVersion\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36\",\"gpuAdapter\":\"apple metal-3\"}}\n{\"stage\":\"episodes\",\"outputName\":\"screen-round2\",\"startedAt\":\"2026-11-03T17:59:40.197Z\",\"finishedAt\":\"2026-11-03T18:05:33.932Z\",\"episodes\":54,\"jobsHash\":\"3ed5412c0f911c13300d8d17ca03e46449ee2dcbdbe0c2b25f64b74423a53620\",\"provenance\":{\"browserVersion\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36\",\"gpuAdapter\":\"apple metal-3\"}}\n{\"stage\":\"screen_round1\",\"candidates\":[\"c1 residual22 self 0.12\",\"c2 residual20 external 0.10\",\"c3 residual22 external 0.06\",\"c4 final self 0.08\"],\"result\":\"complexity gaps -0.13..+0.18 vs raw_base +0.03 on the same 3 families (1 seed); within noise\",\"source\":\"agents/screening-round1.json\"}\n{\"stage\":\"screen_round2_refine\",\"candidates\":[\"c3 alpha 0.13\",\"c3 alpha 0.20\",\"c2 alpha 0.15\",\"c2 alpha 0.22\"],\"result\":\"gaps +0.02, -0.05, +0.02, -0.22 vs raw_base +0.08 (2 seeds); larger alpha shortened B2 turns and degraded morphology; no dose-response toward CEFR control\",\"decision\":\"search budget (4 analytical candidates + strength refinement) exhausted without a candidate exceeding raw_base; freeze best screening candidate c3 (residual22, external gate, alpha 0.06) for controlled dev evaluation\"}\n{\"stage\":\"episodes\",\"outputName\":\"frozen.dev\",\"startedAt\":\"2026-11-03T18:06:15.775Z\",\"finishedAt\":\"2026-11-03T18:12:49.449Z\",\"episodes\":48,\"jobsHash\":\"941d06c7eb627c8f64907ae1b6d51290162499c63f2b812fb74c9b749d4ff3e7\",\"provenance\":{\"browserVersion\":\"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36\",\"gpuAdapter\":\"apple metal-3\"}}\n{\"stage\":\"freeze\",\"frozen_edit\":\"agent_rank1 = c3 (residual22, external gate, alpha 0.06, b = A1-minus-B2 reply-state direction, a = mean state direction); controls random_rank1 (seed 1234), wrong_level_gate, no_op_overlay\",\"sealed_sha256\":\"8bd6f549c238954369dba1857bb42929f9f26673337ac58721825de217f72d40\",\"sealed_invocations\":1}\n",
+ "dev_panel": {
+  "raw_base": {
+   "episodes": 12,
+   "cefr_control_gap": 0.5,
+   "cefr_control_positive_fraction": 0.5,
+   "complexity_gap": 0.25,
+   "a1_estimated": 1.67,
+   "b2_estimated": 2.17,
+   "joint_pass_rate": 0.17,
+   "hard_pass_rate": 0.67,
+   "morphosyntactic_correctness": 2.42,
+   "natural_hebrew": 2.08,
+   "cefr_suitability": 2.25,
+   "pedagogical_appropriateness": 2,
+   "character_register_fidelity": 2.67,
+   "multi_turn_coherence": 2.75
+  },
+  "strong_prompt": {
+   "episodes": 12,
+   "cefr_control_gap": 2.33,
+   "cefr_control_positive_fraction": 1,
+   "complexity_gap": 1.64,
+   "a1_estimated": 1,
+   "b2_estimated": 3.33,
+   "joint_pass_rate": 0,
+   "hard_pass_rate": 0.58,
+   "morphosyntactic_correctness": 1.67,
+   "natural_hebrew": 1.33,
+   "cefr_suitability": 2.25,
+   "pedagogical_appropriateness": 1.33,
+   "character_register_fidelity": 1.92,
+   "multi_turn_coherence": 2
+  },
+  "best_of_2_candidate": {
+   "episodes": 12,
+   "cefr_control_gap": 2.5,
+   "cefr_control_positive_fraction": 1,
+   "complexity_gap": 2.08,
+   "a1_estimated": 1,
+   "b2_estimated": 3.5,
+   "joint_pass_rate": 0.08,
+   "hard_pass_rate": 0.67,
+   "morphosyntactic_correctness": 1.75,
+   "natural_hebrew": 1.58,
+   "cefr_suitability": 2.75,
+   "pedagogical_appropriateness": 1.58,
+   "character_register_fidelity": 2.33,
+   "multi_turn_coherence": 2.08
+  },
+  "agent_rank1": {
+   "episodes": 12,
+   "cefr_control_gap": 0.17,
+   "cefr_control_positive_fraction": 0.17,
+   "complexity_gap": 0.15,
+   "a1_estimated": 1.67,
+   "b2_estimated": 1.83,
+   "joint_pass_rate": 0.08,
+   "hard_pass_rate": 0.58,
+   "morphosyntactic_correctness": 2.67,
+   "natural_hebrew": 2,
+   "cefr_suitability": 2.42,
+   "pedagogical_appropriateness": 1.5,
+   "character_register_fidelity": 2.08,
+   "multi_turn_coherence": 2.17
+  },
+  "random_rank1": {
+   "episodes": 12,
+   "cefr_control_gap": 1,
+   "cefr_control_positive_fraction": 0.83,
+   "complexity_gap": 0.45,
+   "a1_estimated": 1.33,
+   "b2_estimated": 2.33,
+   "joint_pass_rate": 0.25,
+   "hard_pass_rate": 0.42,
+   "morphosyntactic_correctness": 2.5,
+   "natural_hebrew": 2,
+   "cefr_suitability": 2.5,
+   "pedagogical_appropriateness": 1.75,
+   "character_register_fidelity": 2.33,
+   "multi_turn_coherence": 2.33
+  },
+  "wrong_level_gate": {
+   "episodes": 12,
+   "cefr_control_gap": 0.33,
+   "cefr_control_positive_fraction": 0.33,
+   "complexity_gap": 0.2,
+   "a1_estimated": 1.83,
+   "b2_estimated": 2.17,
+   "joint_pass_rate": 0.17,
+   "hard_pass_rate": 0.5,
+   "morphosyntactic_correctness": 2.5,
+   "natural_hebrew": 2.08,
+   "cefr_suitability": 2.67,
+   "pedagogical_appropriateness": 1.75,
+   "character_register_fidelity": 2.25,
+   "multi_turn_coherence": 2.5
+  },
+  "no_op_overlay": "identical token-for-token to raw_base in 12/12 dev episodes (not separately judged)",
+  "best_of_2": {
+   "episodes": 12,
+   "cefr_control_gap": 2.5,
+   "cefr_control_positive_fraction": 1,
+   "complexity_gap": 1.83,
+   "a1_estimated": 1,
+   "b2_estimated": 3.5,
+   "joint_pass_rate": 0.08,
+   "hard_pass_rate": 0.67,
+   "morphosyntactic_correctness": 2,
+   "natural_hebrew": 1.75,
+   "cefr_suitability": 2.83,
+   "pedagogical_appropriateness": 1.92,
+   "character_register_fidelity": 2.5,
+   "multi_turn_coherence": 2.33
+  }
+ }
+}

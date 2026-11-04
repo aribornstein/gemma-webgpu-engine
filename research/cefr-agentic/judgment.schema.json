@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/research/hebrew/judgment-v1.schema.json",
+  "title": "Blind Hebrew NPC dialogue judgment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "episode_id",
+    "judge_model_id",
+    "rubric_version",
+    "ratings",
+    "critical_violation_codes",
+    "overall_abstain"
+  ],
+  "properties": {
+    "episode_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "judge_model_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rubric_version": {
+      "const": "hebrew-cefr-1.0"
+    },
+    "ratings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "criterion",
+          "score",
+          "insufficient_evidence",
+          "hard_violation",
+          "evidence"
+        ],
+        "properties": {
+          "criterion": {
+            "enum": [
+              "morphosyntactic_correctness",
+              "natural_hebrew",
+              "cefr_suitability",
+              "cefr_control",
+              "entity_semantic_fidelity",
+              "character_register_fidelity",
+              "multi_turn_coherence",
+              "pedagogical_appropriateness"
+            ]
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 4
+          },
+          "insufficient_evidence": {
+            "type": "boolean"
+          },
+          "hard_violation": {
+            "type": "boolean"
+          },
+          "evidence": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "span",
+                "finding"
+              ],
+              "properties": {
+                "span": {
+                  "type": "string"
+                },
+                "finding": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "insufficient_evidence": {
+                  "const": true
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "score": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "insufficient_evidence": {
+                  "const": false
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "score": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "estimated_level": {
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2",
+        "C1",
+        "C2",
+        null
+      ]
+    },
+    "critical_violation_codes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    },
+    "overall_abstain": {
+      "type": "boolean"
+    },
+    "short_summary": {
+      "type": "string"
+    }
+  }
+}

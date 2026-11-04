@@ -1,0 +1,6561 @@
+{
+ "role": "cefr",
+ "criteria": [
+  "cefr_suitability",
+  "pedagogical_appropriateness"
+ ],
+ "items": [
+  {
+   "order": 1,
+   "item_id": "item-b24a7908bc",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, יש חלה. המחיר אחד הוא עשרים שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אוקיי, חלה אחת."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "ושלוש קרואסונים. המחיר הוא 21 שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החלק אחד הוא עשרים שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המשלמים כאן."
+    }
+   ]
+  },
+  {
+   "order": 2,
+   "item_id": "item-d320d012f5",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! אכן, יש לנו חלה טעימה, ואם תרצה, אני יכולה לך גם להציע כמה כרטיסי קרואסון, יש לנו שלושה כרטיסי, כל אחד בסך 21 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "מצוין, אחד של החלה יקרה לך 18 אירו. ואם תרצה, אני יכולה גם להציע לך את שלושת הקרואסונים שלנו במחיר 21 אירו עבורם."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר גמור, החלה תהיה 18 אירו, ושלוש הקרואסונים יהיו 21 אירו בסך הכל."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בכל הנוגע לסכום הכולל, חלה אחת ואת שלושת הקרואסונים, הסכום יגיע למשעים בין 39 אירו לבין 39 אירו, לחשב שכל דבר זמין ומחיר נכון."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ניתן לשלם בפנקס או בלוח שנוצר כאן, ואני אכין לך את המזון מיד."
+    }
+   ]
+  },
+  {
+   "order": 3,
+   "item_id": "item-ddde55cf99",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! אני פנוי. לאן אתה רוצה לנסוע?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "טוב, הנה עליית על 45 אירו (נוסעת יעד). בנוסף, יש עמלת מזוודת אחת של 5 אירו. סך הכל 50 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "50 אירו בסך הכל."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, זה בסדר גמור."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בערך 20 דקות."
+    }
+   ]
+  },
+  {
+   "order": 4,
+   "item_id": "item-68e42ea1d2",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. כרטיס למבוגר אחד עולה 50 אישקלול, וכרטיס לילד אחד עולה 25 אישקלול. המוזיאון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "עבור שני מבוגרים, זה 100 אישקלול, וכרטיס לילד עולה 25 אישקלול."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה\"כ הוא 125 אישקלול."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "תרצה שלוש כרטיסים?"
+    }
+   ]
+  },
+  {
+   "order": 5,
+   "item_id": "item-87dc2c8ee4",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, כמובן, אתה יכול לקחת שני ספרים, וההשכרה שלהם תהיה למשך ארבעה חודשים, אבל זכור שקיימת דרישה שיהיה חיוב של שתי ש\"ש כל יום אם תגשם את המועד האחרון."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "מצוין, עם כרטיס המנוי שלך, אתה יכול להשיב שני ספרים, והם יהיו זמינים לך למשך ארבעה חודשים."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התקופה הזו שהספרים יהיו זמינים לך היא ארבעה חודשים, והם יהיו זמינים לגמישות, אבל חשוב לזכור שכל ספר שאתה מקבל צריך להיות מונוב בהסכמה."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אם תחזיר את הספרים מאוחר, יחול על אותך דמי تأخير בסך שווה לשני שקלים לכל יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, ובהצלחה עם הבחירה שלך."
+    }
+   ]
+  },
+  {
+   "order": 6,
+   "item_id": "item-93b716cf95",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אתה יכול לקחת שני ספרים, והתקופה להשראתם היא 14 ימים."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז אתה מוכן?"
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ניתן לקחת את הספרים למשך 14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אם תחזיר מאוחר, תהיה ישות עמרי 2 אירו תשלום לכל יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 7,
+   "item_id": "item-83e65fec56",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מה קרה בדיוק?"
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך לראות את הכל. תצטרך להגיע אלינו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החלפת פריטי מנועי הקדמי עולה 450 ש\"ח כולל חומרים ועבודה. זה ייקח שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה ייקח לך שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "באיזה חלק בדיוק אתה רוצה שתעבוד?"
+    }
+   ]
+  },
+  {
+   "order": 8,
+   "item_id": "item-447514fe83",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. כרטיס לבוגר עולה 50 אירו, לילד 25 אירו. הסגמנט סגור בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "עבור שני מבוגרים וילד אחד, הכולק עולה 50 אירו פעם לשני המבוגרים ו-25 אירו לילד. הסכום הכולל הוא 125 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסכום כולו הוא 125 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלו שלוש? מה בדיוק אתה צריך?"
+    }
+   ]
+  },
+  {
+   "order": 9,
+   "item_id": "item-11ae299de8",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, מה הבעיה בדיוק?"
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך לבדוק את הרכב. אני אתן לך הערכה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החלפת פטיש הפנורת הבלימה קובעת 450 ש\"ח, כולל חומר ועיבוד כוח. זה ייקח כ-שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה ייקח לך שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "באיזה יום אתה מתכוון לקחת את הרכב?"
+    }
+   ]
+  },
+  {
+   "order": 10,
+   "item_id": "item-14239debf3",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, כרטיס לאישראים עולה 50 אישקלול לשני אנשים, וכמה כרטיס לילד עולה 25 אישקלול. המרחצא צריך להיסגר ב-17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "עבור שני מבוגרים, הכסף יהיה 100 אישקלול, ועוד כרטיס לילד יהיה 25 אישקלול. המחיר הכולל הוא 125 אישקלול."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסכום כולו יהיה 125 אישקלול."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלו כרטיסים יכללו שני כרטיסי מבוגרים וכדאי להוסיף כרטיס ילד?"
+    }
+   ]
+  },
+  {
+   "order": 11,
+   "item_id": "item-478d8cfd6d",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! כן, אני פנוי. למה אתה צריך סיור?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "איזה נסיעה אתה צריך? המחיר הוא 45 ש\"ח לרכב, ועוד 5 ש\"ח עבור תיק."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "סה\"כ 50 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אין בעיה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "משך הנסיעה הוא כ-20 דקות."
+    }
+   ]
+  },
+  {
+   "order": 12,
+   "item_id": "item-f77e2279cb",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מה קרה בדיוק?"
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך לראות את המכונית קודם."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התיקון יהיה 450 ש\"ח, כולל חומרים ועבודה, וזה ייקח שתיים שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתיים שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר, תגיד לי אם אתה רוצה להמשיך."
+    }
+   ]
+  },
+  {
+   "order": 13,
+   "item_id": "item-5528c75e2b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! יש לנו חלה ובשפע גם קרואסונים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "איזו חלה? מחיר להחלה אחת זה 18 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלושה קרואסונים זה 21 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "סה\"כ זה 39 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אנחנו משלמים כאן."
+    }
+   ]
+  },
+  {
+   "order": 14,
+   "item_id": "item-f3dfffb55e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! יש לנו חלה במחלקת החלה, וכן סוגים אחרים. מה תרצה לקחת?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אוקיי, חלה אחת תעלה 18 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז חלה אחת 18 אירו, ושלושה קרואסונים יחד יעלו 21 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "סה\"כ יהיה 39 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "משלמים כאן על הכיסא, אנא תשלם שתי שקלים."
+    }
+   ]
+  },
+  {
+   "order": 15,
+   "item_id": "item-64ec7fc8e0",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. חבילה אחת משקולת 2 ק\"ג לצרפת באמצעות שירות משלוח בינלאומי רגיל עולה 64 ש\"ש ויהיה שם ב-10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מתנצלת, המידע שציינתי היה עבור חבילה אחת במשקל 2 ק\"ג. האם יש לך שאלות נוספות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שירות המשלוח הבינלאומי הרגיל לחבילה משקילה 2 ק\"ג לצרפת עולה 64 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המשלוח ייעשה ב-10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התשלום יכול להיות בכרטיס."
+    }
+   ]
+  },
+  {
+   "order": 16,
+   "item_id": "item-4e7781bf14",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, חבילה אחת במשקל 2 ק\"ג לצרפת, משלוח בינלאומי סטנדרטי, עולה 64 ש\"ש ומגיע תוך 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מתנצלת, אך אני יכולה לשלוח רק חבילה אחת."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "חבילה אחת משקלת 2 ק\"ג לצרפת, משלוח סטנדרטי, עולה 64 ש\"ש."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המשלוח לוקח 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש לנו אפשרות לשלם בכמה דרכים."
+    }
+   ]
+  },
+  {
+   "order": 17,
+   "item_id": "item-422b969a22",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אני יכול לעזור. שירות המשלוח הבינלאומי הסטנדרטי לחבילה משקולת 2 ק\"ג לצרפת עולה 64 ש\"ח ויגיע תוך 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מתנשאת, המידע שנתת מציין חבילה משקולת 2 ק\"ג. האם תרצה להמשיך עם השירות?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שירות המשלוח הבינלאומי הסטנדרטי לחבילה במשקל 2 ק\"ג לצרפת עולה 64 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "השירות הסטנדרטי לוקח 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התשלום בכרטיס מקובל. מה הנהלים לשליחת החבילה?"
+    }
+   ]
+  },
+  {
+   "order": 18,
+   "item_id": "item-876bfa391b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. חבילה אחת משקל 2 ק\"ג לצרפת על משלוח בינלאומי רגיל עולה 64 ש\"ח וזה יגיע תוך 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מצטער/ת, אך המידע שסיפקת אינו משנה את התמחור."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "חבילה אחת במשקל 2 ק\"ג לצרפת על משלוח בינלאומי רגיל עולה 64 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המשלוח לוקח 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ניתן לשלם בכרטיס."
+    }
+   ]
+  },
+  {
+   "order": 19,
+   "item_id": "item-ed41d21c05",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום רב, אני שמחה לעזור לך עם שליחת חבילה לצרפת; עבור חבילה משקל 2 ק\"ג באמצעות שירות הסטנדרטי הבינלאי, העלות היא 64 ש\"ח והיא תישלח לכם בערך 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, אני מוודאת שכל הפרטים מדויקים: חבילה משקלה של 2 ק\"ג לצרפת באמצעות שירות השליחה הסטנדרטי העלות שלהם היא 64 ש\"ח, והתחזית היא שהיא תגיע תוך 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "העלות עבור לשלוח חבילה משקל 2 ק\"ג לצרפת באמצעות השירות הבינלאומי הסטנדרטי היא 64 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שירות השליחה הסטנדרטי אמור להגיע לכם תוך 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בהחלט, עבור השירות הזה, העלות היא 64 ש\"ח, ואנו מקבלים אפשרות לשימוש בכרטיס אשראי בתשלום."
+    }
+   ]
+  },
+  {
+   "order": 20,
+   "item_id": "item-ebd06881f4",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום רב, אשמח לעזור לך עם לשליחת החבילה לצרפת; עבור חבילה משקל 2 ק\"ג, השירות הסטנדרטי הבינלאומי עולה 64 ש\"ח ותקופה השילוח היא כ-10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבינה שאת/ה מתייחס/ת למשקל, ובהתאם למידע שסיפקת, חבילה משקלת 2 ק\"ג, ולכן השירות הסטנדרטי הבינלאומי לצרפת עולה 64 ש\"ח ומשגרת בדרך כלל בתוך 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כפי שציינתי, עבור חבילה משקל 2 ק\"ג לצרפת, התעריף עבור שירות השילוח הבינלאומי הסטנדרטי הוא 64 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הזמן המשוער להגעה הוא כ-10 ימי עסקים, בהתאם לשירות הסטנדרטי."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מצטערת, כרגע אינני יכולה לאשר תשלום בכרטיס, יש לי רק אפשרות לתשלום בכסף."
+    }
+   ]
+  },
+  {
+   "order": 21,
+   "item_id": "item-6e762c1f9c",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. מה הבעיה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבין. אני צריך לבדוק את הרכב."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התיקון עולה 450 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "העבודה לוקחת שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני יכול לעבוד היום."
+    }
+   ]
+  },
+  {
+   "order": 22,
+   "item_id": "item-2c8fb2f3b5",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, יש חלה. המחיר אחד משיעיים שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אחד חלה. שקלים של עשרים ושלוש."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "ושלושה קרואסונים. המחיר הוא 21 שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסכום הוא 41 שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אתה משלם כאן."
+    }
+   ]
+  },
+  {
+   "order": 23,
+   "item_id": "item-1027489e79",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, שני ספרים ניתן לארוך להשראת 14 יום. יש עמלה של 2 אירו ישראלי לכל יום חריגה."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "נשמע טוב. רק תספר לי מה את מעוניינת לקרוא."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ניתן לקחת אותם ל-14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אם אתה חוזר מאוחר, תצטרך לשלם עמלה של 2 אירו ישראלי לכל יום חישוב חריגה."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 24,
+   "item_id": "item-e40ba5bab8",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אתה יכול לקחת שני ספרים, וההלוואה היא למשך 14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז אתה יכול לקחת שני ספרים."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אתה יכול לקחת את הספרים למשך 14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אם מחזירים מאוחר, יש עמדה של 2 ש\"ש לכל יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 25,
+   "item_id": "item-65a8a4ff73",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! כן, אני פנוי. לאן אתה נוסע?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "למחכה. נלך יחד."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "לטיול לתחנת האוטובוס המרכזית, זה 45 אירו עיר, ועוד 5 אירו עבור מזומה אחת. סך הכל 50 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אין בעיה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בערך 20 דקות."
+    }
+   ]
+  },
+  {
+   "order": 26,
+   "item_id": "item-f556b5cfb2",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! כן, אני פנוי עכשיו, מה אצלך?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "איזו התחנה, למה? אני מוכן לקחת אותך, כמה זמן אתה מצפה לקחת?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה לתחנה המרכזית עולה 45 אישורי לישראל, ושיש גם עמלה של 5 אישורי לישראל עבור המזוודה שלך, כלומר המחיר הכולל יהיה חמישים אישורי לישראל."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, זה בסדר גמור, אני יכול להתמודד עם מזוודה אחת בקלות; זה אומר שהמחיר סופי לשישים אישורי לישראל."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה משאר כ-20 דקות בערך, כך שאתה תגיע לאותו המקום בקרוב."
+    }
+   ]
+  },
+  {
+   "order": 27,
+   "item_id": "item-143d3c41fd",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. כרטיס לבוגר עולה 50 אירו וכרטיס לילד עולה 25 אירו. המוסד סגור בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "עבור שני מבוגרים וכטיס לילד, הכסף יהיה 125 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר הכולל הוא 125 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון סוגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "תרצה שלוש כרטיסים? (Wait, there are only two adult tickets and one child ticket available for now.)"
+    }
+   ]
+  },
+  {
+   "order": 28,
+   "item_id": "item-2024a79b24",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! אכן, יש לנו חלה וקרואסונים. כמה אתם רוצים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "חלה אחת עולה 18 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז חלה אחת ושלושה קרואסונים. התמורה שתהיה 18 ש\"ח (חלה) ועוד 63 ש\"ח (שלושה קרואסונים). סך הכמות יהיה 81 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסכום הכולל יהיה 81 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אתם יכול לשלם כאן בחלון, תודה רבה על הביקור!"
+    }
+   ]
+  },
+  {
+   "order": 29,
+   "item_id": "item-9e035264d5",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מה קרה בדיוק?"
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך לבדוק את הרכב. תמחר אשמח לתת לך הערכה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החלפת פונקטים קדמיים של בנקים עולה 450 ש\"ח כולל חומר ועבודה. זה ייקח שעות שתיים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה ייקח שעות שתיים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר, אם תרצה להתקן היום, אני צריך שתמתין עד שאתה מגיע."
+    }
+   ]
+  },
+  {
+   "order": 30,
+   "item_id": "item-d253099f55",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום רב, עבור שני כרטיסי בוגרים עולה 50 אירו כל אחד, וכרטיס ילד עולה 25 אירו, כלומר הסכום הכולל יהיה 125 אירו, ואם תדעו, המוזיאון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז לכל אדם יהיו כרטיסים כפי שציינתי, שני כרטיסים לבוגרים ב-50 אירו כל אחד, כרטיס אחד לילד ב-25 אירו, והסכום כולו הוא 125 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כדי להשלים את הרכישה, סך העלות יהיה 125 אירו, כולל שני כרטיסים לבוגרים וכרטיס אחד לילד."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון פתוח עד השעה 17:00, ולכן מומלץ להגיע לפני הזמן."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מצטער/ת, אבל הנוסח שלנו הוא עבור שני בוגרים וילד אחד. האם תוכל/י לומר לי אם אתה מתכוון לרכוש עוד כרטיסים או שתרצה/י לבדוק את התעריפים שוב?"
+    }
+   ]
+  },
+  {
+   "order": 31,
+   "item_id": "item-96d5794266",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "מה קרה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "איזה בעיה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החלפת פאדים בנתיב הקדמי עולה 450 ש\"ח, כולל חלקי עזר ועבודה. זה ייקח 2 שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "2 שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר, אני מחכה."
+    }
+   ]
+  },
+  {
+   "order": 32,
+   "item_id": "item-2dc353236d",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! כן, יש לנו חלה ומעודדים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אחד זה 18 אישקלול."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "ושלוש קרואסונים זה 63 אישקלול."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "סה\"כ זה 81 אישקלול."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש לנו קופת תשלום כאן."
+    }
+   ]
+  },
+  {
+   "order": 33,
+   "item_id": "item-e5b759eef6",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אני מבין שאתה חווה בעיה עם הבלמים של המכונית שלך; מה בדיוק קורה כרגע כדי שאוכל להעריך כמה זה ייקח?"
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "רעש הוא דבר מאוד חשוב שצריך לאבחן היטב, כדי שאוכל לתת לך הערכה מדויקת; האם אתה יכול לתאר לי את סוג הרעש ואילו תנאים בו מתרחשים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "לכדי לתת לך הצעת מחיר מדויקת, אני צריך לבדוק את המצב, אבל אם מדובר בהחלפת פד פנסים קדמיים, העלות הכוללת, כולל חומרים וכוח העבודה, תהיה 450 ש\"ש, וזה אמור לקחת כשהותם 2 שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התיקון הזה, אם נצטרך רק להחליף את פד הפנסים, אמור לקחת בערך שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "אם אתה מעוניין להתקדם, אני ממליץ שנתקשיב קצת על הציון שאני נתתי לך, ואז נדבר על הצעדים הבאים."
+    }
+   ]
+  },
+  {
+   "order": 34,
+   "item_id": "item-e07d1c9b5e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. שני ספרים יכולים להחזיר ל-14 ימים."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "מעולה. רק ודאתי שיש לך את הכרטיס."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ניתן לקחת ספרים ל-14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אם מחזירים מאוחר, יש דמי עיכוב של 2 אירו ליום."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 35,
+   "item_id": "item-3464c0ccaf",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני טובה. תצטרך כרטיס."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר. אתה לוקח ספרים."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "את יכול לקחת את הספרים ארבעה חודשים."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש עמלה. היא שתיים שקלים ליום."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 36,
+   "item_id": "item-9663c1ef7d",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, עבור חבילה משקולת 2 ק\"ג לצרפת, משלוח בינלאומי סטנדרטי עולה 64 ש\"ח וייגיע תוך 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "החבילה היא במשקל של 2 ק\"ג. המחיר עבור משלוח בינלאומי סטנדרטי לצרפת הוא 64 ש\"ח, וההתביעה היא של 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המשלוח המצופה יהיה 64 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המשלוח ייקח 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ניתן לשלם באמצעות כרטיס."
+    }
+   ]
+  },
+  {
+   "order": 37,
+   "item_id": "item-f55c5fff3a",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! יש לנו חלה בערך 18 ש\"ח לקובייה, ואם תרצה שלושה סלייצים, זה יהיה 21 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר גמור, חלה אחת תזדק."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז חלה אחת ושלושה קרואסונים. התקציב יהיה 18 ש\"ח וחמישה שקלים, כלומר 39 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "39 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "תשלם כאן בסוף העסק."
+    }
+   ]
+  },
+  {
+   "order": 38,
+   "item_id": "item-045b7892cf",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! אכן, אנחנו מוכנים, ויש לנו חלה פראית טעימה במיוחד, ואם תרצה, יש לנו גם קלופים או פרוסות יפות, ואילו קרואסונים – אנחנו מוכנים גם לשלושה, מה שיתקזב ב-[21 ILS] בסך הכל עבורם."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "במצוין, חלה אחת, שזה [18 ILS], ומה תרצה עוד? אולי תרצה את הקרואסונים שלי, למשל, של שלושה, שיתקבלו ב-[21 ILS] אם תרצה."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, חלה אחת ולוש של שלושה קרואסונים. אז הכול יהיה: 18 אג'ילת חלה ו-21 על הקרואסונים, מה שישדרס אותך בסך הכל ב-39 אג'ילת."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המחיר הכולל עבור חלה אחת של [18 ILS] ושלושה קרואסונים הוא בדיוק 39 אג'ילת."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המשלמה אפשר לעשות כאן בסופה, או אם אתה מעדיף, אתה יכול לספק כסף ישירות לכאן."
+    }
+   ]
+  },
+  {
+   "order": 39,
+   "item_id": "item-35654aa3f7",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. שני ספרים ניתן להשכיר למשך 14 יום, והעמלה אחרת היא 2 אירו פילדס למשנה."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז, כדי להחזיר אותם תוך 14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שבוע, בדיוק."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אם תחזיר מאוחר, תצטרך לשלם עמלה של 2 אירו פילדס לכל יום שהם מאוחרים."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 40,
+   "item_id": "item-2b6074980f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, תוכלי לקחת שני ספרים. תקופת ההלוואה היא 14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "מצוין. מה תרצי להשכיר?"
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הספרים מאפשרים להשאילתם למשך 14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אם תחזיר מאוחר, תהיה דמי עיכוב של 2 ש\"ח לשנה."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 41,
+   "item_id": "item-6eee64433b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. חבילה אחת משקל 2 ק\"ג לצרפת, משלוח בינלאומי רגיל, עולה 64 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מתכוון 2 ק\"ג. המחיר הוא 64 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "64 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "השלוח לוקח 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אפשר לשלם בכרטיס."
+    }
+   ]
+  },
+  {
+   "order": 42,
+   "item_id": "item-34de02f56b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! כרטיס לאדם מבוגר עולה 50 י\"לשקלים וכרטיס לילד עולה 25 י\"לשקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי כרטיסים לבוגרים וכרטיס לילד."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה\"כיה הוא 125 י\"לשקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון סגור בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "איזה סוג של כרטיסים ל-3 אנשים?"
+    }
+   ]
+  },
+  {
+   "order": 43,
+   "item_id": "item-6fb699231d",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! יש לנו חלה ואגב, ואז יש לנו גם עוגיות!"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "איזו בחירה נהדרת! החלה הראשונה שלך תכלכן ככה: 18 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז חלה אחת ועוד שלושה קרואסונים. המחיר של הקרואסונים הוא 21 אירו לשלושה. מה התקציב שלך?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "חלה אחת (18 אירו) ועוד שלושה קרואסונים (21 אירו). בסך הכל זה 39 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אתה יכול לשלם כאן בסוף!"
+    }
+   ]
+  },
+  {
+   "order": 44,
+   "item_id": "item-caeafc2cc0",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. מה הבעיה?"
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני אבדוק. כמה דברים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החלף פופלירי. זה מאות ותשון שקול."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה לוקח שתיים שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך אישור."
+    }
+   ]
+  },
+  {
+   "order": 45,
+   "item_id": "item-c7da78db7f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כרטיס מבוגר עולה חמישים שערך."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי כרטיסי מבוגרים וכדורי צעיר."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלו מחד."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון סגור בשבעים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני יכול לעזור."
+    }
+   ]
+  },
+  {
+   "order": 46,
+   "item_id": "item-d28c939fef",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! יש לנו חלה בתמחור 18 ש\"ח לקומה."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "איזה כיף! והלו שלושה קרוסים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז חלה אחת ושלושה קרואסונים. התקרה שלכם תהיה 18 ש\"ח לחלה ו-21 ש\"ח לשלושה קרואסונים, סך הכל 39 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "39 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "תשלמו כאן לי."
+    }
+   ]
+  },
+  {
+   "order": 47,
+   "item_id": "item-892439c9f3",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! אני פנוי. איפה אתה רוצה לנסוע?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "הנה, הנה הנהר המרכזי. המחיר לנהיגה הוא 45 ש\"ח, וכן 5 ש\"ח עבור המזוודה. סהאם לך את הכסף?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "סה\"כ 50 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, זה בסדר גמור."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה לוקחת כ-20 דקות."
+    }
+   ]
+  },
+  {
+   "order": 48,
+   "item_id": "item-1ac26c86c7",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! אני פנוי, מה הולך?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז אתה רוצה טיול או מונית לתחנת האוטובוס המרכזית?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה בתחנה המרכזית תהיה 45 אירויות, וכן 5 אירויות עבור המזוודה. סך הכל יצא 50 אירויות."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אני יכול להכניס לך את המזוודה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה לקחה כ-20 דקות בערך."
+    }
+   ]
+  },
+  {
+   "order": 49,
+   "item_id": "item-ab37acfd78",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Ordering bread and pastries at a neighborhood bakery",
+    "character": {
+     "name": "Avi",
+     "role": "baker",
+     "personality": "cheerful and chatty",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "challah",
+      "type": "product",
+      "name": "challah bread",
+      "quantity": 1,
+      "price_ils": 18
+     },
+     {
+      "id": "croissants",
+      "type": "product",
+      "name": "croissant",
+      "quantity": 3,
+      "price_ils": 21,
+      "notes": "7 ILS each, 21 ILS for three"
+     }
+    ],
+    "topics": [
+     "food",
+     "bakery",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy one challah and three croissants",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed prices and the total of 39 ILS for one challah and three croissants"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "בוקר טוב, יש לך חלה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בוקר טוב! כן, יש לי חלה ומעודales."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני רוצה חלה אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "חלה עולה 18 אג'ה."
+    },
+    {
+     "speaker": "learner",
+     "text": "וגם שלוש קרואסונים, בבקשה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז שלוש קרואסונים זה 63 אג'ה. הכול בסך 81 אג'."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה כולו 99 אג'."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני לוקח. איפה משלמים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אתה יכול לשלם כאן."
+    }
+   ]
+  },
+  {
+   "order": 50,
+   "item_id": "item-a89656b528",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, מה קרה בדיוק? אני יכול לתת לך הערכה."
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך לבדוק את המכשיר. עבור החלפת משטחי בrake pads הקדמיים, המחיר יהיה 450 ש\"ח הכול, וזה ייקח לנו שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התיקון צריך לעלות 450 ש\"ח, כולל החלפת החלקים והעבודה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה ייקח לנו שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "באיזה יום נוח לך?"
+    }
+   ]
+  },
+  {
+   "order": 51,
+   "item_id": "item-5f4c941430",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! כן, אני פה. אני יכול לקחת אותך למרכז העיר, ואז לשדה התעופה, זה зайום של כ20 דקות בערך."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "בסדר גמור, לטובת המסלול המדויק אל תחנת האוטובוס המרכזית, נכניס את הטיול לספר, ואז נסגיר את הדלת."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנה המחיר, זה 45 ש\"ח לטיול הקצר, ונוסף, בגלל שיש לך מטען אחד, יש עליו דמי על מקום, 5 ש\"ח, כלומר הסכום הכולל הוא 50 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, טבעית, המזווה שלך לא קטן מדי עבור הרכב, אבל חשוב לדעת שכל מזוודה דורשת תמורה קטנה, אז המחיר שציינתי שילקח את הסכום הכולל."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה אמורה לקחת בערך 20 דקות, זה תלוי מאוד בתנועה של היום, אבל זהו משך זמן סביר להגעה."
+    }
+   ]
+  },
+  {
+   "order": 52,
+   "item_id": "item-034fd4d9b1",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! כן, אני פנוי. לאן אתה נוסע?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "לאו דווקא, לתחנת האוטובוס המרכזית. המחיר הוא 45 ש\"ח לרכב, ושיעור עבור מזוודת אחת הוא 5 ש\"ח. בסך הכל 50 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "חמישים ש\"ח, בדיוק."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, זה בסדר גמור."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני אגיע תוך כעשר דקות."
+    }
+   ]
+  },
+  {
+   "order": 53,
+   "item_id": "item-e0a3d62330",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, אני יכולה לעזור לך. שתי ספרים אפשר לקחת לתקופה של 14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "מצוין. תצטרך להביא את הכרטיס שלך כדי להתחיל."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הספרים לפרט 14 ימים."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אם תחזיר מאוחר, יש עמלה של 2 אירוע למכל יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 54,
+   "item_id": "item-9be32be8d7",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אני שמחה לעזור לך; ניתן לקחת שני ספרים, ומשך ההיוצאה מהמערכת הוא ארבעה חודשים, עם תקופת השכרה של ארבעה שבועות, וחשוב לדעת שיש עמלה של 2 אירו לכל יום עבר תאריך החזר אם הספרים לא יוחזרו בזמן."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "מעולה, אם יש לך כרטיס ספרייה, הכל פשוט; רק תצטרך להציג אותו כדי להבוצע את ההלוואה של שני הספרים, וזכור שצריך להחזיר אותם בתוך תקופת השכירות המוגדרת."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הספרים מיועדים להשכרה לתקופה של ארבעה שבועות, וההלוואה עצמה תתבצע לאחר אימות הכרטיס שלך, כך שתוכל להתחיל לקרוא אותם בהתאם לתנאים המפורטים ברשימה."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אם החזרה מאוחרת, ייווצר חיוב היומי של 2 אירו, ולכן חשוב מאוד לשמור על מועדי ההחזר כדי להימנע מעמלות נוספות."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, אני שמחה. רק תספק את הכרטיס שלך ואת הספרים, ואתה מוכן להתחיל."
+    }
+   ]
+  },
+  {
+   "order": 55,
+   "item_id": "item-ce91dd6e47",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. אתה צריך כרטיס ספרייה."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני רואה. אתה יכול לקחת שני ספרים."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אתה יכול לקחת אותם לתקופה של ארבעה חודשים."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש תשלום לכל יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 56,
+   "item_id": "item-027752db90",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! כרטיס למבוגר עולה 50 אירו וכרטיס לילד עולה 25 אירו. הסגירה היא בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז, שני כרטיסי מבוגר וכרטיס לילד. המחיר הכולל יהיה 50 אירו + 50 אירו + 25 אירו, כלומר 125 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה\"כ החושי הוא 125 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, שלושה כרטיסים. שני כרטיסי maturation עולים 100 אירו, וכמה כרטיסי ילד עולים 25 אירו לכל אחד."
+    }
+   ]
+  },
+  {
+   "order": 57,
+   "item_id": "item-c257da1dbe",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Borrowing books at a public library desk",
+    "character": {
+     "name": "Rina",
+     "role": "librarian",
+     "personality": "quiet and kind",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "books",
+      "type": "item",
+      "name": "library book",
+      "quantity": 2
+     },
+     {
+      "id": "loan_period",
+      "type": "info",
+      "name": "loan period",
+      "quantity": 14,
+      "notes": "14 days"
+     },
+     {
+      "id": "late_fee",
+      "type": "fee",
+      "name": "late fee per day",
+      "price_ils": 2
+     }
+    ],
+    "topics": [
+     "library",
+     "books",
+     "dates",
+     "rules"
+    ],
+    "quest": {
+     "goal": "borrow two books with a library card",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "explain that two books can be borrowed for 14 days and that the late fee is 2 ILS per day"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לקחת שני ספרים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בטח, תוכלי לקחת שני ספרים. תקופת ההלוואה היא 14 יום."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי כרטיס של הספריה."
+    },
+    {
+     "speaker": "npc",
+     "text": "נכון. רק ודא שהכרטיס שלך פעיל."
+    },
+    {
+     "speaker": "learner",
+     "text": "לכמה זמן אפשר לקחת את הספרים?"
+    },
+    {
+     "speaker": "npc",
+     "text": "14 ימים."
+    },
+    {
+     "speaker": "learner",
+     "text": "ומה קורה אם אני מחזיר מאוחר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש עמול של 2 אירו על כל יום מאוחר."
+    },
+    {
+     "speaker": "learner",
+     "text": "תודה, אני לוקח את השתיים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה."
+    }
+   ]
+  },
+  {
+   "order": 58,
+   "item_id": "item-e8a81e5fa2",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, מה הבעיה? אני יכול לראות את הכל."
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך לבדוק את הדברים. תגיד לי מה בדיוק אתה מרגיש."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "החלפת פוּדים קדמיים עולה 450 אישקלול, כולל חלParts ועבודה. זה ייקח כ-2 שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה ייקח 2 שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "באיזה יום תרצה לבוא?"
+    }
+   ]
+  },
+  {
+   "order": 59,
+   "item_id": "item-b91f106658",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אני פנוי."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה היא לעמדת האוטובוס."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנה המידה."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אין בעיה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה יקח עשר דקות."
+    }
+   ]
+  },
+  {
+   "order": 60,
+   "item_id": "item-22f7134371",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. החבילה היא 2 ק\"ג. השירות הוא סטנדרטי. המחיר הוא 64 אירו. זה לוקח 10 ימים עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "החבילה היא 2 ק\"ג. השירות הוא סטנדרטי. המחיר הוא 64 אירו. זה לוקח 10 ימים עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה זול. זה 64 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה לוקח 10 ימים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "השלום. אפשר לשלם בכרטיס."
+    }
+   ]
+  },
+  {
+   "order": 61,
+   "item_id": "item-0c7f636411",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אני יכול לעזור. משקל של 2 ק\"ג לצרפת באמצעות משלוח בינלאומי רגיל עולה 64 ש\"ח ומשך ההגעה הוא 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבינה, החבילה היא משקל של 2 ק\"ג."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "משלוח בינלאומי רגיל עבור חבילה במשקל 2 ק\"ג לצרפת עולה 64 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המשלוח ייקח 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ניתן לשלם בכרטיס."
+    }
+   ]
+  },
+  {
+   "order": 62,
+   "item_id": "item-a20e1a99a0",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! אני פנוי. לאן אתה נוסע?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "לאת תחנת האוטובוס המרכזית, זה 50 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה פתוכה היא 45 אירו, וקצת פריטים נוספים."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, מזוודה אחת. המחיר כולל 5 אירו עבור המזוודה."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה ייקח לך כ-20 דקות."
+    }
+   ]
+  },
+  {
+   "order": 63,
+   "item_id": "item-3efce7156d",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כרטיס למבוגר עולה 50 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "כרטיס ילד עולה 25 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "ספר הכול זה 100 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון סגור ב-17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלושה כרטיסים עולים 150 אירו."
+    }
+   ]
+  },
+  {
+   "order": 64,
+   "item_id": "item-5c7c6fc881",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, אני מבין שאתה צריך עזרה בגלל בעיה עם הבלמים שלך. כדי שאוכל לתת לך הערכה מדויקת, האם תוכל לתאר לי לא משך בדיוק מה קורה עם המערכת?"
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מבין שאתה שומע רעש. כדי לדעת מה בדיוק קורה, אני צריך לבדוק את הדברים. אם מדובר בכשל בסיסי, ייתכן שיהיה צורך בשיפוץ של הזרועות."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אז, אם מדובר בשיפוץ של פתחי בלימה קדמיים, ההערכה שלי, כולל החלקים והעבודה, היא 450 ש\"ש. התהליך אמור לקחת כ-שתי שעות. האם אתה רוצה שאמשיך עם ההערכה הזו?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התיקון הזה, אם נצטרך להחליף את פד פגמים, אמור להימשך כחתימה שתי שעות, מה שמאפשר לנו לסיים את העבודה באופן מהיר."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "אז, אם אתה מוכן להתחיל את העבודה, אני מוכן להתחיל, אבל חשוב לי שתבין שאני לא מתחיל כל דבר לפני שאתה מסכים לכל הפרטים, כפי שאמרתי – מה אתה רוצה לעשות בהמשך?"
+    }
+   ]
+  },
+  {
+   "order": 65,
+   "item_id": "item-0e26a956fc",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום רב, כרגע, כרטיס לאדם بالغ עולה 50 אירו, כרטיס ילד עולה 25 אירו, ולכן עבור שני בוגרים וילד, הסכום יהיה 125 אירו, ושומרון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "עבור שני בוגרים וכדור, הסכום הכולל יהיה 125 אירו, ואני מוכן לסייע לך בהמשך."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסה\"כ, כרגע, הוא 125 אירו עבור שני כרטיסים לבוגרים וכרטיס אחד לילד."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון נסגר בשעה 17:00, אז ודאי תגיעו לפני הזמן הזה כדי להביטוט."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "בבקשה, כדי שתוכלו לקנות שלוש כרטיסים, תצטרכו להשתמש בכרטיסי פריטים שונים, ועל פי המחירים, שלושה כרטיסים יהיו בעלות של 175 אירו, וזה יכסה שני כרטיסי מבוגר וכרטיס ילד או שילוב דומה אחר."
+    }
+   ]
+  },
+  {
+   "order": 66,
+   "item_id": "item-7be0d72297",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום! כן, אני פנוי. לאן אתה נוסע?"
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "עבור תחנת האוטובוס המרכזית, המחיר יהיה 45 אישקלול לנהיגה, ונוסף, יש עמלה של 5 אישקלים עבור מקבלה אחת. הכול בסך 50 אישקללים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "50 אישקלים הכול."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, זה בסדר גמור."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "בערך 20 דקות."
+    }
+   ]
+  },
+  {
+   "order": 67,
+   "item_id": "item-6c7c4eb9d8",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. החבילה קיימת. העלות היא 64 אירוס. זה לוקח 10 ימים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "הקילוגרמה היא 2 ק\"ג. העלות היא 64 אירוס."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "העלות היא 64 אירוס."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה לוקח 10 ימים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מקבל כסף."
+    }
+   ]
+  },
+  {
+   "order": 68,
+   "item_id": "item-cc5a098c66",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Asking for a repair estimate at a small car garage",
+    "character": {
+     "name": "Yossi",
+     "role": "mechanic",
+     "personality": "honest and direct",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "brake_pads",
+      "type": "repair",
+      "name": "front brake pad replacement",
+      "price_ils": 450,
+      "notes": "parts and labor included"
+     },
+     {
+      "id": "repair_time",
+      "type": "info",
+      "name": "repair duration",
+      "quantity": 2,
+      "notes": "2 hours"
+     }
+    ],
+    "topics": [
+     "car",
+     "repair",
+     "estimate",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "get an estimate for replacing the front brake pads",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "give an estimate of 450 ILS including parts and labor and say the repair takes 2 hours; do not start work without approval"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, יש בעיה עם הבלמים של האוטו שלי."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, מה הבעיה? תספר לי מה קרה."
+    },
+    {
+     "speaker": "learner",
+     "text": "הבלמים עושה רעש."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך לבדוק את הרכב. אני אוכל לתת לך הערכה, אבל צריך לבדוק קודם."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה עולה לתקן?"
+    },
+    {
+     "speaker": "npc",
+     "text": "התיקון לדונג של פד הדיסק הקדמי הוא 450 ש\"ח כולל חומרים ועבודה. זה ייקח לך שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה ייקח לך שתי שעות."
+    },
+    {
+     "speaker": "learner",
+     "text": "אוקיי, אני חושב שאני רוצה לתקן היום."
+    },
+    {
+     "speaker": "npc",
+     "text": "אם תרצה להתחיל, תצטרך לקבוע תור."
+    }
+   ]
+  },
+  {
+   "order": 69,
+   "item_id": "item-f42da2cb7d",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Sending a parcel abroad at the post office counter",
+    "character": {
+     "name": "Miriam",
+     "role": "postal clerk",
+     "personality": "efficient and polite",
+     "register": "formal"
+    },
+    "entities": [
+     {
+      "id": "parcel",
+      "type": "item",
+      "name": "parcel to France",
+      "quantity": 1,
+      "notes": "weight 2 kg"
+     },
+     {
+      "id": "shipping",
+      "type": "service",
+      "name": "standard international shipping",
+      "price_ils": 64,
+      "notes": "arrives in 10 business days"
+     }
+    ],
+    "topics": [
+     "post office",
+     "mail",
+     "weight",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "send one 2 kg parcel to France by standard shipping",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "state that standard shipping for a 2 kg parcel to France costs 64 ILS and takes 10 business days"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אני רוצה לשלוח חבילה לצרפת."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום. עבור חבילה משקל 2 ק\"ג לצרפת לשירות משלוח בינלאומי סטנדרטי, העלות היא 64 ש\"ח והיא תגיע תוך 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "החבילה הוא שני קילו."
+    },
+    {
+     "speaker": "npc",
+     "text": "אני מתנצלת, אמרתי שאת חבילה אחת משקל 2 ק\"ג. האם יש לך עוד פרטים?"
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "עבור חבילה אחת במשקל 2 ק\"ג לצרפת לשירות משלוח בינלאומי סטנדרטי, העלות היא 64 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן זה לוקח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המשלוח ייקח 10 ימי עסקים."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה לשלוח. אפשר לשלם בכרטיס?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, ניתן לשלם בכרטיס. האם תרצה להתחיל בתהליך?"
+    }
+   ]
+  },
+  {
+   "order": 70,
+   "item_id": "item-bfef9cfd09",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, כרטיס לאיש עם שני אנשים עולה 100 אירו, וכרטיס לילד עולה 25 אירו. המוזיאון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי מבוגרים וילד אחד. עבור שני מבוגרים נדרשים שני כרטיסי מבוגר, וכרטיס לילד עולה 25 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "סה\"כ יהיה 50 אירו עבור המבוגר הראשון, 50 אירו עבור המבוגר השני, ו-25 אירו עבור הילד, בסך 125 אירו."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלוש כרטיסים. כמה מבוגרים וכמה ילדים או מבוגרים?"
+    }
+   ]
+  },
+  {
+   "order": 71,
+   "item_id": "item-2db3468331",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "B2",
+    "scenario": "Buying entrance tickets at a history museum ticket desk",
+    "character": {
+     "name": "Daniel",
+     "role": "museum cashier",
+     "personality": "calm and helpful",
+     "register": "neutral"
+    },
+    "entities": [
+     {
+      "id": "adult_ticket",
+      "type": "ticket",
+      "name": "adult ticket",
+      "quantity": 2,
+      "price_ils": 50,
+      "notes": "2 adults, total 100 ILS"
+     },
+     {
+      "id": "child_ticket",
+      "type": "ticket",
+      "name": "child ticket",
+      "quantity": 1,
+      "price_ils": 25
+     },
+     {
+      "id": "closing",
+      "type": "info",
+      "name": "closing time",
+      "notes": "museum closes at 17:00"
+     }
+    ],
+    "topics": [
+     "museum",
+     "tickets",
+     "family",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "buy entrance for two adults and one child",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote 50 ILS per adult and 25 ILS per child, a total of 125 ILS, and mention closing at 17:00"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, כמה עולה כרטיס למוזיאון?"
+    },
+    {
+     "speaker": "npc",
+     "text": "שלום, כרטיס לבוגר עולה 50 ש\"ח וכרטיס לילד עולה 25 ש\"ח. הסגירה היא בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "אנחנו שתיים מבוגרים וילד אחד."
+    },
+    {
+     "speaker": "npc",
+     "text": "עבור שני מבוגרים וכטיס לילד, זה יהיה 50 ש\"ח פלוס 50 ש\"ח ועוד 25 ש\"ח. הכול עולה 125 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה ביחד?"
+    },
+    {
+     "speaker": "npc",
+     "text": "סה\"כ יחד יהיה 125 ש\"ח."
+    },
+    {
+     "speaker": "learner",
+     "text": "עד מתי המוזיאון פתוח?"
+    },
+    {
+     "speaker": "npc",
+     "text": "המוזיאון נסגר בשעה 17:00."
+    },
+    {
+     "speaker": "learner",
+     "text": "טוב, אני רוצה שלוש כרטיסים."
+    },
+    {
+     "speaker": "npc",
+     "text": "שלש כרטיסים? באיזה סוג כרטיסים את רוצה?"
+    }
+   ]
+  },
+  {
+   "order": 72,
+   "item_id": "item-c70cc3e967",
+   "metadata_en": {
+    "language": "Hebrew",
+    "cefr_level": "A1",
+    "scenario": "Agreeing on a taxi fare to the central bus station",
+    "character": {
+     "name": "Moshe",
+     "role": "taxi driver",
+     "personality": "talkative and warm",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "ride",
+      "type": "service",
+      "name": "taxi ride to the central bus station",
+      "price_ils": 45,
+      "notes": "fixed fare, about 20 minutes"
+     },
+     {
+      "id": "luggage",
+      "type": "item",
+      "name": "suitcase",
+      "quantity": 1,
+      "price_ils": 5,
+      "notes": "luggage fee 5 ILS"
+     }
+    ],
+    "topics": [
+     "transport",
+     "taxi",
+     "directions",
+     "prices",
+     "time"
+    ],
+    "quest": {
+     "goal": "take a taxi with one suitcase to the central bus station",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote a fixed fare of 45 ILS plus 5 ILS for one suitcase, total 50 ILS, about 20 minutes"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום, אתה פנוי?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אני פנוי."
+    },
+    {
+     "speaker": "learner",
+     "text": "אני צריך לנסוע לתחנה המרכזית."
+    },
+    {
+     "speaker": "npc",
+     "text": "הנה המחיר. 50 שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זה עולה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה 50 שקלים."
+    },
+    {
+     "speaker": "learner",
+     "text": "יש לי מזוודה אחד. זה בסדר?"
+    },
+    {
+     "speaker": "npc",
+     "text": "כן, אני יודע."
+    },
+    {
+     "speaker": "learner",
+     "text": "כמה זמן הנסיעה?"
+    },
+    {
+     "speaker": "npc",
+     "text": "זה עשרים דקות."
+    }
+   ]
+  }
+ ]
+}

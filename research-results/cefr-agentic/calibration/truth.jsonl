@@ -1,0 +1,90 @@
+{"item_id": "lvl:dev-market-apples-01:A1", "type": "level", "style": "A1", "family": "market_purchase"}
+{"item_id": "lvl:dev-market-apples-01:B2", "type": "level", "style": "B2", "family": "market_purchase"}
+{"item_id": "lvl:dev-cafe-tea-01:A1", "type": "level", "style": "A1", "family": "cafe_order"}
+{"item_id": "lvl:dev-cafe-tea-01:B2", "type": "level", "style": "B2", "family": "cafe_order"}
+{"item_id": "lvl:dev-pharmacy-pills-01:A1", "type": "level", "style": "A1", "family": "pharmacy_purchase"}
+{"item_id": "lvl:dev-pharmacy-pills-01:B2", "type": "level", "style": "B2", "family": "pharmacy_purchase"}
+{"item_id": "lvl:dev-bus-ticket-01:A1", "type": "level", "style": "A1", "family": "bus_ticket_purchase"}
+{"item_id": "lvl:dev-bus-ticket-01:B2", "type": "level", "style": "B2", "family": "bus_ticket_purchase"}
+{"item_id": "lvl:dev-hotel-checkin-01:A1", "type": "level", "style": "A1", "family": "hotel_checkin"}
+{"item_id": "lvl:dev-hotel-checkin-01:B2", "type": "level", "style": "B2", "family": "hotel_checkin"}
+{"item_id": "lvl:dev-lost-wallet-01:A1", "type": "level", "style": "A1", "family": "lost_item_shop"}
+{"item_id": "lvl:dev-lost-wallet-01:B2", "type": "level", "style": "B2", "family": "lost_item_shop"}
+{"item_id": "lvl:val-quest-package-01:A1", "type": "level", "style": "A1", "family": "quest_delivery"}
+{"item_id": "lvl:val-quest-package-01:B2", "type": "level", "style": "B2", "family": "quest_delivery"}
+{"item_id": "lvl:val-clinic-appointment-01:A1", "type": "level", "style": "A1", "family": "doctor_appointment"}
+{"item_id": "lvl:val-clinic-appointment-01:B2", "type": "level", "style": "B2", "family": "doctor_appointment"}
+{"item_id": "lvl:val-bike-rental-01:A1", "type": "level", "style": "A1", "family": "bicycle_rental"}
+{"item_id": "lvl:val-bike-rental-01:B2", "type": "level", "style": "B2", "family": "bicycle_rental"}
+{"item_id": "gram:he-agree-01:ok", "type": "grammar", "correct": true, "pair": "he-agree-01", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-01:bad", "type": "grammar", "correct": false, "pair": "he-agree-01", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-02:ok", "type": "grammar", "correct": true, "pair": "he-agree-02", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-02:bad", "type": "grammar", "correct": false, "pair": "he-agree-02", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-03:ok", "type": "grammar", "correct": true, "pair": "he-agree-03", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-03:bad", "type": "grammar", "correct": false, "pair": "he-agree-03", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-04:ok", "type": "grammar", "correct": true, "pair": "he-agree-04", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-04:bad", "type": "grammar", "correct": false, "pair": "he-agree-04", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-05:ok", "type": "grammar", "correct": true, "pair": "he-agree-05", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-05:bad", "type": "grammar", "correct": false, "pair": "he-agree-05", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-06:ok", "type": "grammar", "correct": true, "pair": "he-agree-06", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-06:bad", "type": "grammar", "correct": false, "pair": "he-agree-06", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-07:ok", "type": "grammar", "correct": true, "pair": "he-agree-07", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-07:bad", "type": "grammar", "correct": false, "pair": "he-agree-07", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-08:ok", "type": "grammar", "correct": true, "pair": "he-agree-08", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-08:bad", "type": "grammar", "correct": false, "pair": "he-agree-08", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-09:ok", "type": "grammar", "correct": true, "pair": "he-agree-09", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-09:bad", "type": "grammar", "correct": false, "pair": "he-agree-09", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-10:ok", "type": "grammar", "correct": true, "pair": "he-agree-10", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-10:bad", "type": "grammar", "correct": false, "pair": "he-agree-10", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-11:ok", "type": "grammar", "correct": true, "pair": "he-agree-11", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-11:bad", "type": "grammar", "correct": false, "pair": "he-agree-11", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-12:ok", "type": "grammar", "correct": true, "pair": "he-agree-12", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-12:bad", "type": "grammar", "correct": false, "pair": "he-agree-12", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-13:ok", "type": "grammar", "correct": true, "pair": "he-agree-13", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-13:bad", "type": "grammar", "correct": false, "pair": "he-agree-13", "phenomenon": "numeral_noun_agreement"}
+{"item_id": "gram:he-agree-14:ok", "type": "grammar", "correct": true, "pair": "he-agree-14", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-14:bad", "type": "grammar", "correct": false, "pair": "he-agree-14", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-15:ok", "type": "grammar", "correct": true, "pair": "he-agree-15", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-15:bad", "type": "grammar", "correct": false, "pair": "he-agree-15", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-16:ok", "type": "grammar", "correct": true, "pair": "he-agree-16", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-16:bad", "type": "grammar", "correct": false, "pair": "he-agree-16", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-17:ok", "type": "grammar", "correct": true, "pair": "he-agree-17", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-17:bad", "type": "grammar", "correct": false, "pair": "he-agree-17", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-18:ok", "type": "grammar", "correct": true, "pair": "he-agree-18", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-18:bad", "type": "grammar", "correct": false, "pair": "he-agree-18", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-19:ok", "type": "grammar", "correct": true, "pair": "he-agree-19", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-19:bad", "type": "grammar", "correct": false, "pair": "he-agree-19", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-20:ok", "type": "grammar", "correct": true, "pair": "he-agree-20", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-20:bad", "type": "grammar", "correct": false, "pair": "he-agree-20", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-21:ok", "type": "grammar", "correct": true, "pair": "he-agree-21", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-21:bad", "type": "grammar", "correct": false, "pair": "he-agree-21", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-22:ok", "type": "grammar", "correct": true, "pair": "he-agree-22", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-22:bad", "type": "grammar", "correct": false, "pair": "he-agree-22", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-23:ok", "type": "grammar", "correct": true, "pair": "he-agree-23", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-23:bad", "type": "grammar", "correct": false, "pair": "he-agree-23", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-24:ok", "type": "grammar", "correct": true, "pair": "he-agree-24", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-24:bad", "type": "grammar", "correct": false, "pair": "he-agree-24", "phenomenon": "noun_adjective_agreement"}
+{"item_id": "gram:he-agree-25:ok", "type": "grammar", "correct": true, "pair": "he-agree-25", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-25:bad", "type": "grammar", "correct": false, "pair": "he-agree-25", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-26:ok", "type": "grammar", "correct": true, "pair": "he-agree-26", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-26:bad", "type": "grammar", "correct": false, "pair": "he-agree-26", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-27:ok", "type": "grammar", "correct": true, "pair": "he-agree-27", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-27:bad", "type": "grammar", "correct": false, "pair": "he-agree-27", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-28:ok", "type": "grammar", "correct": true, "pair": "he-agree-28", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-28:bad", "type": "grammar", "correct": false, "pair": "he-agree-28", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-29:ok", "type": "grammar", "correct": true, "pair": "he-agree-29", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-29:bad", "type": "grammar", "correct": false, "pair": "he-agree-29", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-30:ok", "type": "grammar", "correct": true, "pair": "he-agree-30", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-30:bad", "type": "grammar", "correct": false, "pair": "he-agree-30", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-31:ok", "type": "grammar", "correct": true, "pair": "he-agree-31", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-31:bad", "type": "grammar", "correct": false, "pair": "he-agree-31", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-32:ok", "type": "grammar", "correct": true, "pair": "he-agree-32", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-32:bad", "type": "grammar", "correct": false, "pair": "he-agree-32", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-33:ok", "type": "grammar", "correct": true, "pair": "he-agree-33", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-33:bad", "type": "grammar", "correct": false, "pair": "he-agree-33", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-34:ok", "type": "grammar", "correct": true, "pair": "he-agree-34", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-34:bad", "type": "grammar", "correct": false, "pair": "he-agree-34", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-35:ok", "type": "grammar", "correct": true, "pair": "he-agree-35", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-35:bad", "type": "grammar", "correct": false, "pair": "he-agree-35", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-36:ok", "type": "grammar", "correct": true, "pair": "he-agree-36", "phenomenon": "subject_verb_agreement"}
+{"item_id": "gram:he-agree-36:bad", "type": "grammar", "correct": false, "pair": "he-agree-36", "phenomenon": "subject_verb_agreement"}

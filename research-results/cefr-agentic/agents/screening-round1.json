@@ -1,0 +1,10 @@
+{"design":"3 dev families (market_purchase, cafe_order, pharmacy_purchase) x {A1,B2}, canonical prompt, seed 23 only; metric = deterministic complexity index gap (B2 minus A1, z-units of dev baseline turns); hard_pass = deterministic state checks",
+ "same_families_reference":{"raw_base":{"gap":0.031,"per_family":[-0.1,0.32,-0.12]},"strong_prompt":{"gap":0.842,"per_family":[0.96,0.85,0.71]}},
+ "candidates":{
+  "c1 residual22 self 0.12":{"gap":-0.126,"per_family":[-0.31,-0.07,0.0],"a1_words_per_turn":4.8,"b2_words_per_turn":4.1,"self_gate_values":"A1 ~ +0.74, B2 ~ -1 (gate works)"},
+  "c2 residual20 external 0.10":{"gap":0.170,"per_family":[-0.19,0.51,0.19],"a1_words_per_turn":4.6,"b2_words_per_turn":5.2},
+  "c3 residual22 external 0.06":{"gap":0.181,"per_family":[0.03,0.39,0.12],"a1_words_per_turn":4.1,"b2_words_per_turn":5.1},
+  "c4 final self 0.08":{"gap":0.057,"per_family":[0.31,-0.1,-0.04]}},
+ "hard_pass_rate_all_candidates":0.667,
+ "noise_note":"single sampled seed per cell; raw_base per-family gaps range -0.12..0.32, so effects of ~0.15 are within noise",
+ "observation":"no candidate changed turn length or complexity much; qualitative B2 turns unchanged; strengths appear too small relative to the 0.11-0.14 style gap"}

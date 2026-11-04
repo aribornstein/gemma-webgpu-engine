@@ -1,0 +1,16 @@
+{"call":1,"batch":"calib-level","role":"level","items":18,"phase":"calibration","agent":"general-purpose subagent"}
+{"call":2,"batch":"calib-cefr","role":"cefr","items":18,"phase":"calibration","agent":"general-purpose subagent"}
+{"call":3,"batch":"calib-language","role":"language","items":72,"phase":"calibration","agent":"general-purpose subagent"}
+{"call":4,"batch":"calib-cefr-swapped","role":"cefr","items":18,"phase":"calibration","agent":"general-purpose subagent"}
+{"call":5,"batch":"base-language","role":"language","items":36,"phase":"development","agent":"general-purpose subagent"}
+{"call":6,"batch":"base-cefr","role":"cefr","items":36,"phase":"development","agent":"general-purpose subagent"}
+{"call":7,"batch":"base-level","role":"level","items":36,"phase":"development","agent":"general-purpose subagent"}
+{"call":8,"batch":"base-conversation","role":"conversation","items":36,"phase":"development","agent":"general-purpose subagent"}
+{"call":9,"batch":"frz-language","role":"language","items":36,"phase":"development","agent":"general-purpose subagent"}
+{"call":10,"batch":"frz-cefr","role":"cefr","items":36,"phase":"development","agent":"general-purpose subagent"}
+{"call":11,"batch":"frz-level","role":"level","items":36,"phase":"development","agent":"general-purpose subagent"}
+{"call":12,"batch":"frz-conversation","role":"conversation","items":36,"phase":"development","agent":"general-purpose subagent"}
+{"call":13,"batch":"seal-language","role":"language","items":72,"phase":"sealed","agent":"general-purpose subagent (fresh, not used in search)"}
+{"call":14,"batch":"seal-cefr","role":"cefr","items":72,"phase":"sealed","agent":"general-purpose subagent (fresh, not used in search)"}
+{"call":15,"batch":"seal-level","role":"level","items":72,"phase":"sealed","agent":"general-purpose subagent (fresh, not used in search)"}
+{"call":16,"batch":"seal-conversation","role":"conversation","items":72,"phase":"sealed","agent":"general-purpose subagent (fresh, not used in search)"}

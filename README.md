@@ -579,6 +579,27 @@ materially short, so its 4,096-token rows are excluded from equal-work aggregate
 [complete 2,094-record report](benchmarks/suite/headless/2026-07-18T13-53-16-717Z-full/report.md)
 for every workload, mode, exclusion, correctness result, and limitation.
 
+## Research: probes and rank-1 effective-weight overlays
+
+Research-only session methods (marked `@internal`; normal inference is unchanged when unused):
+
+- `researchScoreContinuation(promptIds, continuationIds)` — teacher-forced, softcapped token log-probabilities on the
+  sequential path from a fresh cache.
+- `researchCaptureActivations(ids, positions, sites)` — bounded readback of a layer's next-layer input, the residual
+  stream after a layer (`{ residual: L }`), the LM head input (`final`) or the final residual.
+- `setResearchOverlay({ site, a, b, coefficient })` — a reversible rank-1 effective-weight edit. `{ layer: L }`
+  applies `h += coefficient * b * dot(a, h)` after layer L on the GPU and re-derives the next layer's SRQ input;
+  `"final"` applies `logits += coefficient * dot(a, h_final) * (W_head b)`. Packed weights are never modified; any
+  overlay forces full-logit selection, a layer overlay forces sequential prefill, and changing it resets the prompt
+  cache. A coefficient of 0 is bit-identical to no overlay.
+
+`npm run test:research-live` (local checkpoint required) checks identity/revert parity of both sites, teacher-forced
+scores against generation log-probabilities, capture alignment, and head-projection linearity. The console's
+Diagnostics panel can load a patch manifest and apply or clear an overlay.
+
+The first campaign (Hebrew CEFR RPG NPC, English metadata) lives in [research/cefr-agentic](research/cefr-agentic)
+with results and the full report in [research-results/cefr-agentic/REPORT.md](research-results/cefr-agentic/REPORT.md).
+
 ## Roadmap
 
 The current-browser four-runtime run is recorded in

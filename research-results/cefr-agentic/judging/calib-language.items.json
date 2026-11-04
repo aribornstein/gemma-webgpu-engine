@@ -1,0 +1,3465 @@
+{
+ "role": "language",
+ "criteria": [
+  "morphosyntactic_correctness",
+  "natural_hebrew"
+ ],
+ "items": [
+  {
+   "order": 1,
+   "item_id": "item-a0531b9165",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי תפוחים."
+    }
+   ]
+  },
+  {
+   "order": 2,
+   "item_id": "item-b90125b827",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "שני עוגות."
+    }
+   ]
+  },
+  {
+   "order": 3,
+   "item_id": "item-4e3d2d0126",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "במטבח יש רק כיסא אחת."
+    }
+   ]
+  },
+  {
+   "order": 4,
+   "item_id": "item-a2dcba76ec",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הבנות רוקדות במסיבה."
+    }
+   ]
+  },
+  {
+   "order": 5,
+   "item_id": "item-b873b8f893",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "היא קנתה שמלה אדום."
+    }
+   ]
+  },
+  {
+   "order": 6,
+   "item_id": "item-15366cb4c0",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "סבתא מבשלת מרק."
+    }
+   ]
+  },
+  {
+   "order": 7,
+   "item_id": "item-1850365125",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך שתי כרטיסים."
+    }
+   ]
+  },
+  {
+   "order": 8,
+   "item_id": "item-df4d592893",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בשכונה הזאת יש רחובות שקטים."
+    }
+   ]
+  },
+  {
+   "order": 9,
+   "item_id": "item-2b233e8008",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש לנו דירה חדשה."
+    }
+   ]
+  },
+  {
+   "order": 10,
+   "item_id": "item-aa3f9eea81",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "השוטר כותבת דוח."
+    }
+   ]
+  },
+  {
+   "order": 11,
+   "item_id": "item-d022191aa5",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בכפר יש רק חנות אחד."
+    }
+   ]
+  },
+  {
+   "order": 12,
+   "item_id": "item-d50a5c7a83",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסטודנטים לומדים בספרייה."
+    }
+   ]
+  },
+  {
+   "order": 13,
+   "item_id": "item-c683419a6b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בחורף אני לובש מעיל חם."
+    }
+   ]
+  },
+  {
+   "order": 14,
+   "item_id": "item-1baf0623d0",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בשוק קניתי שלושה בננות."
+    }
+   ]
+  },
+  {
+   "order": 15,
+   "item_id": "item-975f8a5df0",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "על הקיר יש תמונות יפות."
+    }
+   ]
+  },
+  {
+   "order": 16,
+   "item_id": "item-aa4543e295",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטקסט הזה יש מילים קשים."
+    }
+   ]
+  },
+  {
+   "order": 17,
+   "item_id": "item-897713ce17",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוסים עוצרים כאן."
+    }
+   ]
+  },
+  {
+   "order": 18,
+   "item_id": "item-7e139e1e54",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "למשפחה שלנו יש מכונית אחת."
+    }
+   ]
+  },
+  {
+   "order": 19,
+   "item_id": "item-11ca3911a1",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בחדר יש רק מיטה אחד."
+    }
+   ]
+  },
+  {
+   "order": 20,
+   "item_id": "item-014f1c6796",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "השוטר כותב דוח."
+    }
+   ]
+  },
+  {
+   "order": 21,
+   "item_id": "item-773badb5ff",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הדלתות נפתחים בבוקר."
+    }
+   ]
+  },
+  {
+   "order": 22,
+   "item_id": "item-2abe92baba",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "ליד הים יש מסעדה טוב."
+    }
+   ]
+  },
+  {
+   "order": 23,
+   "item_id": "item-a3ad855200",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הרכבת יוצא בשמונה."
+    }
+   ]
+  },
+  {
+   "order": 24,
+   "item_id": "item-6d9f62b17e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בחצר יש חתולים לבנות."
+    }
+   ]
+  },
+  {
+   "order": 25,
+   "item_id": "item-c0621cfb97",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנהג נוסע לאט."
+    }
+   ]
+  },
+  {
+   "order": 26,
+   "item_id": "item-47345d231a",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "השכן עובדת בלילה."
+    }
+   ]
+  },
+  {
+   "order": 27,
+   "item_id": "item-63259127c9",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "אני צריך שני כרטיסים."
+    }
+   ]
+  },
+  {
+   "order": 28,
+   "item_id": "item-3143501e75",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש לנו דירה חדש."
+    }
+   ]
+  },
+  {
+   "order": 29,
+   "item_id": "item-e0804b3326",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש לנו עכשיו רק שולחן אחת."
+    }
+   ]
+  },
+  {
+   "order": 30,
+   "item_id": "item-df1543eb4f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הסטודנטים לומדות בספרייה."
+    }
+   ]
+  },
+  {
+   "order": 31,
+   "item_id": "item-52a5388802",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בית גדול."
+    }
+   ]
+  },
+  {
+   "order": 32,
+   "item_id": "item-838c520ecc",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בכפר יש רק חנות אחת."
+    }
+   ]
+  },
+  {
+   "order": 33,
+   "item_id": "item-3329d5bc57",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "האחות עוזר לחולה."
+    }
+   ]
+  },
+  {
+   "order": 34,
+   "item_id": "item-06ed2755be",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "למשפחה הזאת יש שלושה ילדים."
+    }
+   ]
+  },
+  {
+   "order": 35,
+   "item_id": "item-be8b95c7c8",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בחורף אני לובש מעיל חמה."
+    }
+   ]
+  },
+  {
+   "order": 36,
+   "item_id": "item-bd3cd14dd7",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בכיתה יש חלונות פתוחות."
+    }
+   ]
+  },
+  {
+   "order": 37,
+   "item_id": "item-8034a3e755",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בגינה יש כלב קטנה."
+    }
+   ]
+  },
+  {
+   "order": 38,
+   "item_id": "item-f8937d3f7e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בכיתה יש חלונות פתוחים."
+    }
+   ]
+  },
+  {
+   "order": 39,
+   "item_id": "item-793e77a051",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא גר כאן שנים רבות."
+    }
+   ]
+  },
+  {
+   "order": 40,
+   "item_id": "item-b1846007ee",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "סבתא מבשל מרק."
+    }
+   ]
+  },
+  {
+   "order": 41,
+   "item_id": "item-04648f4c3f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה לוקחת שני שעות."
+    }
+   ]
+  },
+  {
+   "order": 42,
+   "item_id": "item-aaa3438213",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הציפורים שרות בגינה."
+    }
+   ]
+  },
+  {
+   "order": 43,
+   "item_id": "item-6ac5b124be",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בשכונה הזאת יש רחובות שקטות."
+    }
+   ]
+  },
+  {
+   "order": 44,
+   "item_id": "item-d472ea5b96",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הציפורים שרים בגינה."
+    }
+   ]
+  },
+  {
+   "order": 45,
+   "item_id": "item-75d869ee39",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בחצר יש חתולים לבנים."
+    }
+   ]
+  },
+  {
+   "order": 46,
+   "item_id": "item-8e57801bb0",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "במטבח יש רק כיסא אחד."
+    }
+   ]
+  },
+  {
+   "order": 47,
+   "item_id": "item-b3037a6eb5",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "האוטובוסים עוצרות כאן."
+    }
+   ]
+  },
+  {
+   "order": 48,
+   "item_id": "item-25d39f1627",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנהג נוסעת לאט."
+    }
+   ]
+  },
+  {
+   "order": 49,
+   "item_id": "item-c8cb9bc5d2",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הנסיעה לוקחת שתי שעות."
+    }
+   ]
+  },
+  {
+   "order": 50,
+   "item_id": "item-30f06c4608",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בטקסט הזה יש מילים קשות."
+    }
+   ]
+  },
+  {
+   "order": 51,
+   "item_id": "item-effac7b6ae",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הוא גר כאן שנים רבים."
+    }
+   ]
+  },
+  {
+   "order": 52,
+   "item_id": "item-3a54f3fc89",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הרכבת יוצאת בשמונה."
+    }
+   ]
+  },
+  {
+   "order": 53,
+   "item_id": "item-35222d4f8b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "על הקיר יש תמונות יפים."
+    }
+   ]
+  },
+  {
+   "order": 54,
+   "item_id": "item-95db055ed3",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "שתי עוגות."
+    }
+   ]
+  },
+  {
+   "order": 55,
+   "item_id": "item-32b6fc185e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בתיק שלי יש ספר אחת."
+    }
+   ]
+  },
+  {
+   "order": 56,
+   "item_id": "item-e559f04f4d",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הבנות רוקדים במסיבה."
+    }
+   ]
+  },
+  {
+   "order": 57,
+   "item_id": "item-8da07bca1b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "יש לנו עכשיו רק שולחן אחד."
+    }
+   ]
+  },
+  {
+   "order": 58,
+   "item_id": "item-1e0e9a5aa1",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בגינה יש כלב קטן."
+    }
+   ]
+  },
+  {
+   "order": 59,
+   "item_id": "item-e9939dc2f9",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "החברים מגיעים בערב."
+    }
+   ]
+  },
+  {
+   "order": 60,
+   "item_id": "item-a99938a97b",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "האחות עוזרת לחולה."
+    }
+   ]
+  },
+  {
+   "order": 61,
+   "item_id": "item-9143b88352",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "החברים מגיע בערב."
+    }
+   ]
+  },
+  {
+   "order": 62,
+   "item_id": "item-45d4d26fbc",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "שני תפוחים."
+    }
+   ]
+  },
+  {
+   "order": 63,
+   "item_id": "item-1944e3c5b5",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "למשפחה הזאת יש שלוש ילדים."
+    }
+   ]
+  },
+  {
+   "order": 64,
+   "item_id": "item-b3732b95ab",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "הדלתות נפתחות בבוקר."
+    }
+   ]
+  },
+  {
+   "order": 65,
+   "item_id": "item-5449e1d57f",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "למשפחה שלנו יש מכונית אחד."
+    }
+   ]
+  },
+  {
+   "order": 66,
+   "item_id": "item-35866d99ce",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "ליד הים יש מסעדה טובה."
+    }
+   ]
+  },
+  {
+   "order": 67,
+   "item_id": "item-17aeb3ec6e",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בית גדולה."
+    }
+   ]
+  },
+  {
+   "order": 68,
+   "item_id": "item-7d5ed4b872",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "היא קנתה שמלה אדומה."
+    }
+   ]
+  },
+  {
+   "order": 69,
+   "item_id": "item-7159f32d58",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "השכן עובד בלילה."
+    }
+   ]
+  },
+  {
+   "order": 70,
+   "item_id": "item-16611bc94a",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בחדר יש רק מיטה אחת."
+    }
+   ]
+  },
+  {
+   "order": 71,
+   "item_id": "item-4828d57270",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בתיק שלי יש ספר אחד."
+    }
+   ]
+  },
+  {
+   "order": 72,
+   "item_id": "item-c806d48371",
+   "metadata_en": {
+    "language": "Hebrew",
+    "scenario": "Buying fruit from a merchant at a town street market",
+    "character": {
+     "name": "Noa",
+     "role": "fruit seller",
+     "personality": "friendly and patient",
+     "register": "informal"
+    },
+    "entities": [
+     {
+      "id": "apples",
+      "type": "product",
+      "name": "apple",
+      "quantity": 2,
+      "price_ils": 10
+     }
+    ],
+    "topics": [
+     "shopping",
+     "fruit",
+     "quantities",
+     "prices"
+    ],
+    "quest": {
+     "goal": "buy two apples",
+     "paid": false,
+     "state_note": "No payment has yet occurred"
+    },
+    "dialogue": {
+     "turn_budget": 5,
+     "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+    }
+   },
+   "transcript": [
+    {
+     "speaker": "learner",
+     "text": "שלום"
+    },
+    {
+     "speaker": "npc",
+     "text": "בשוק קניתי שלוש בננות."
+    }
+   ]
+  }
+ ]
+}

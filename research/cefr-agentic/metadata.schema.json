@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/research/hebrew/metadata-v1.schema.json",
+  "title": "English RPG metadata / Hebrew output contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "language",
+    "cefr_level",
+    "scenario",
+    "character",
+    "entities",
+    "topics",
+    "quest",
+    "dialogue"
+  ],
+  "properties": {
+    "language": {
+      "const": "Hebrew"
+    },
+    "cefr_level": {
+      "enum": [
+        "A1",
+        "A2",
+        "B1",
+        "B2"
+      ]
+    },
+    "scenario": {
+      "$ref": "#/$defs/englishString"
+    },
+    "character": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "role",
+        "personality",
+        "register"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/englishString"
+        },
+        "role": {
+          "$ref": "#/$defs/englishString"
+        },
+        "personality": {
+          "$ref": "#/$defs/englishString"
+        },
+        "register": {
+          "enum": [
+            "informal",
+            "neutral",
+            "formal"
+          ]
+        }
+      }
+    },
+    "entities": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "type",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z_][a-zA-Z0-9_-]{0,63}$"
+          },
+          "type": {
+            "$ref": "#/$defs/englishString"
+          },
+          "name": {
+            "$ref": "#/$defs/englishString"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 0
+          },
+          "price_ils": {
+            "type": "number",
+            "minimum": 0
+          },
+          "notes": {
+            "$ref": "#/$defs/englishString"
+          }
+        }
+      }
+    },
+    "topics": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {
+        "$ref": "#/$defs/englishString"
+      }
+    },
+    "quest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "goal",
+        "paid"
+      ],
+      "properties": {
+        "goal": {
+          "$ref": "#/$defs/englishString"
+        },
+        "paid": {
+          "type": "boolean"
+        },
+        "state_note": {
+          "$ref": "#/$defs/englishString"
+        }
+      }
+    },
+    "dialogue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "turn_budget",
+        "npc_goal"
+      ],
+      "properties": {
+        "turn_budget": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "npc_goal": {
+          "$ref": "#/$defs/englishString"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "englishString": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^[\\u0020-\\u007E]+$"
+    }
+  }
+}

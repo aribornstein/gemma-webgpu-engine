@@ -1,0 +1,23 @@
+{
+ "level_estimator": {
+  "pairs": 9,
+  "ordering_accuracy": 1
+ },
+ "language_judge": {
+  "pairs": 36,
+  "correct_over_incorrect": 1
+ },
+ "calib-cefr": {
+  "n": 18,
+  "mean_suitability": 3.944
+ },
+ "calib-cefr-swapped": {
+  "n": 18,
+  "mean_suitability": 1
+ },
+ "cefr_judge": {
+  "pairs": 18,
+  "matched_over_mismatched": 1
+ },
+ "gate_threshold": 0.7
+}

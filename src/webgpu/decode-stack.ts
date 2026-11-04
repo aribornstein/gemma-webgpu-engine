@@ -1,5 +1,11 @@
 import type { DecodeMlpPleFixture } from "../model/decode-mlp-ple-fixture";
 import {
+  encodeResearchResidualCapturePass,
+  encodeResearchResidualEditPass,
+  type ResearchResidualCapture,
+  type ResearchResidualEditResources,
+} from "./research-residual-edit";
+import {
   createPleNormWeights,
   materializeGemmaLayerWeights,
   type MaterializedGemmaLayer,
@@ -71,6 +77,10 @@ export interface GemmaDecodeStackResources {
   finalInput: GPUBuffer;
   finalSum: GPUBuffer;
   rotaryBuffers: readonly DecodeAttentionRotaryBuffers[];
+  /** Research-only residual edit after one layer; absent in normal inference. */
+  researchEdit?: ResearchResidualEditResources | null;
+  /** Research-only residual copies after layers (taken after any edit at that layer). */
+  researchCaptures?: readonly ResearchResidualCapture[] | null;
 }
 
 export interface GemmaDecodeStackScheduleEntry {
@@ -339,12 +349,21 @@ export function encodeGemmaDecodeStackPass(
   if (resources.layers.length !== LAYER_COUNT) {
     throw new Error(`Gemma decode stack requires ${LAYER_COUNT} layers`);
   }
+  const researchEdit = resources.researchEdit;
   for (let layerIndex = 0; layerIndex < LAYER_COUNT; layerIndex += 1) {
     encodeGemmaDecodeLayerPass(
       pass,
       resources.pipelines[layerIndex],
       resources.layers[layerIndex],
     );
+    if (researchEdit && researchEdit.layerIndex === layerIndex) {
+      encodeResearchResidualEditPass(pass, researchEdit);
+    }
+    if (resources.researchCaptures) {
+      for (const capture of resources.researchCaptures) {
+        if (capture.layerIndex === layerIndex) encodeResearchResidualCapturePass(pass, capture);
+      }
+    }
   }
 }
 
