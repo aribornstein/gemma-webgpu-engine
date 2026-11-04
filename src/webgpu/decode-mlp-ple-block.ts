@@ -352,6 +352,7 @@ export function encodeDecodeMlpPleBlockPass(
   pass: GPUComputePassEncoder,
   pipelines: DecodeMlpPleBlockPipelines,
   resources: DecodeMlpPleBlockResources,
+  afterDown?: () => void,
 ): void {
   pass.setPipeline(pipelines.gateUp);
   pass.setBindGroup(0, resources.gateUpBindGroup);
@@ -359,6 +360,7 @@ export function encodeDecodeMlpPleBlockPass(
   pass.setPipeline(pipelines.down);
   pass.setBindGroup(0, resources.downBindGroup);
   pass.dispatchWorkgroups(384);
+  afterDown?.();
   pass.setPipeline(pipelines.pleGate);
   pass.setBindGroup(0, resources.pleGateBindGroup);
   pass.dispatchWorkgroups(256);

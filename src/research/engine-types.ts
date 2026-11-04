@@ -25,7 +25,11 @@ export interface GemmaResearchActivationCapture {
   site: GemmaResearchCaptureSite;
   tokenPosition: number;
   values: Float32Array;
+  stage?: GemmaResearchStage;
 }
+
+export const GEMMA_RESEARCH_STAGES = ["layer-input", "attention", "mlp", "layer-output"] as const;
+export type GemmaResearchStage = typeof GEMMA_RESEARCH_STAGES[number];
 
 /** Request-local activation diagnostic, not a pretrained weight repair. */
 export interface GemmaResearchPatch {
@@ -34,14 +38,17 @@ export interface GemmaResearchPatch {
   mode: "replace" | "add";
   amount: number;
   vector: Float32Array;
+  stage?: Exclude<GemmaResearchStage, "layer-input">;
 }
 
 export interface GemmaResearchEvaluationRequest {
   promptTokenIds: readonly number[];
   continuationTokenIds?: readonly number[];
   generate?: { maxNewTokens: number; temperature?: number; seed?: number };
-  capture?: { positions: readonly number[]; layers: readonly number[] };
+  capture?: { positions: readonly number[]; layers: readonly number[]; stages?: readonly GemmaResearchStage[] };
   patch?: GemmaResearchPatch;
+  /** Historical residual steering, run request-locally and never treated as a native weight repair. */
+  overlays?: readonly GemmaResearchOverlay[];
   signal?: AbortSignal;
   onProgress?: (progress: { evaluatedPositions: number; generatedTokens: number }) => void;
 }

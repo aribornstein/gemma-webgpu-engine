@@ -1,6 +1,6 @@
 import type { GemmaGenerationSession } from "../../runtime/gemma-session";
 import type { GemmaChatMessage } from "../../runtime/gemma-tokenizer";
-import type { GemmaResearchEvaluationRequest } from "../engine-types";
+import type { GemmaResearchEvaluationRequest, GemmaResearchStage, GemmaResearchOverlay } from "../engine-types";
 import { validateWeightSliceRequest, type WeightSliceRequest } from "./weights";
 import { checkGrounding, checkVocabulary, promotionVerdict, type GroundingClaim, type JudgeAssessment, type WorldContract } from "./contracts";
 
@@ -10,14 +10,30 @@ interface ConversationRequest {
   messages: GemmaChatMessage[];
   assistantPrefix?: string;
 }
+export interface ReplayArm {
+  id: string;
+  label: string;
+  overlays?: { layer: number; a: number[]; b: number[]; coefficient: number }[];
+}
+export interface PairedReplayRequest extends ConversationRequest {
+  op: "pairedReplay";
+  protocol: "fixed-prefix" | "conversation";
+  playerTurns: string[];
+  arms: ReplayArm[];
+  maxNewTokens: number;
+  temperature?: number;
+  seed?: number;
+}
 export type ExperimentRequest =
+  | PairedReplayRequest
   | (ConversationRequest & { op: "replay"; maxNewTokens: number; temperature?: number; seed?: number })
   | (ConversationRequest & { op: "score"; continuation: string })
-  | (ConversationRequest & { op: "capture"; layers: number[]; positions?: number[] })
+  | (ConversationRequest & { op: "capture"; layers: number[]; positions?: number[]; stages?: GemmaResearchStage[] })
   | (ConversationRequest & {
     op: "patch"; layer: number; tokenPosition?: number; mode: "replace" | "add"; amount: number;
     vector: number[]; sourceArtifactIds: string[]; continuation?: string; maxNewTokens?: number;
     temperature?: number; seed?: number;
+    stage?: Exclude<GemmaResearchStage, "layer-input">;
   })
   | { op: "inspectWeights"; id: string; slice: WeightSliceRequest }
   | { op: "compare"; id: string; artifactIds: string[] }
@@ -108,6 +124,25 @@ function validateRequest(request: ExperimentRequest): void {
     if (request.assistantPrefix !== undefined && typeof request.assistantPrefix !== "string") throw new Error("Invalid assistant prefix");
   }
   switch (request.op) {
+    case "pairedReplay":
+      if (!["fixed-prefix", "conversation"].includes(request.protocol) || request.assistantPrefix ||
+          !Array.isArray(request.playerTurns) || !request.playerTurns.length || request.playerTurns.length > 6 ||
+          request.playerTurns.some((t) => typeof t !== "string" || !t.trim() || t.length > 4000) ||
+          (request.protocol === "fixed-prefix" && request.playerTurns.length !== 1)) throw new Error("Invalid paired replay protocol or script");
+      if (!Array.isArray(request.arms) || request.arms.length < 2 || request.arms.length > 3 ||
+          new Set(request.arms.map((a) => a.id)).size !== request.arms.length ||
+          request.arms.some((a) => !a.id || typeof a.label !== "string")) throw new Error("Paired replay needs 2..3 uniquely identified arms");
+      for (const arm of request.arms) {
+        if ((arm.overlays?.length ?? 0) > 4) throw new Error("At most four residual steering sites");
+        for (const overlay of arm.overlays ?? []) {
+          if (!Number.isInteger(overlay.layer) || overlay.layer < 0 || overlay.layer >= 35 ||
+              !numbers(overlay.a) || !numbers(overlay.b) || overlay.a.length !== 1536 || overlay.b.length !== 1536 ||
+              !Number.isFinite(overlay.coefficient) || Math.abs(overlay.coefficient) > 1) throw new Error("Invalid paired residual steering overlay");
+        }
+      }
+      if (request.arms[0].overlays?.length) throw new Error("First arm must be an unmodified matched baseline");
+      if (!Number.isInteger(request.maxNewTokens) || request.maxNewTokens < 1 || request.maxNewTokens > 128) throw new Error("Invalid paired output budget");
+      break;
     case "replay":
       if (!Number.isInteger(request.maxNewTokens) || request.maxNewTokens < 1 || request.maxNewTokens > 128) {
         throw new Error("Workbench reply budget must be 1..128 tokens");
@@ -251,7 +286,63 @@ export class ResearchWorkbench {
     try {
       await this.store.put(artifact);
       let result: unknown;
-      if (request.op === "inspectWeights") {
+      if (request.op === "pairedReplay") {
+        const histories = request.arms.map(() => structuredClone(request.messages));
+        const arms = request.arms.map((arm) => ({
+          id: arm.id, label: arm.label, intervention: arm.overlays?.length ? "historical-residual-steering" : "none",
+          turns: [] as { player: string; text: string; tokenIds: number[]; tokenLogProbs: number[]; stopReason: string; promptHash: string; milliseconds: number }[],
+        }));
+        for (let turn = 0; turn < request.playerTurns.length; turn += 1) {
+          for (let index = 0; index < request.arms.length; index += 1) {
+            if (controller.signal.aborted) throw controller.signal.reason;
+            const history = histories[index];
+            history.push({ role: "user", content: request.playerTurns[turn] });
+            const { promptTokenIds } = this.backend.researchTokenize(history);
+            const upperPositions = promptTokenIds.length + request.maxNewTokens - 1;
+            this.reserve({ evaluatedPositions: upperPositions, generatedTokens: request.maxNewTokens, episodes: 1, diagnostics: 0 });
+            this.used.episodes += 1;
+            usage.episodes += 1;
+            const previous = { ...usage };
+            await this.store.put({ ...artifact, usage: {
+              ...usage, evaluatedPositions: previous.evaluatedPositions + upperPositions,
+              generatedTokens: previous.generatedTokens + request.maxNewTokens,
+            } });
+            const overlays: GemmaResearchOverlay[] = (request.arms[index].overlays ?? []).map((o) => ({
+              site: { layer: o.layer }, a: Float32Array.from(o.a), b: Float32Array.from(o.b), coefficient: o.coefficient,
+            }));
+            const evaluated = await this.backend.researchEvaluate({
+              promptTokenIds, overlays,
+              generate: { maxNewTokens: request.maxNewTokens, temperature: request.temperature ?? 0, seed: (request.seed ?? 23) + turn },
+              signal: controller.signal,
+              onProgress: (progress) => {
+                const nextPositions = previous.evaluatedPositions + progress.evaluatedPositions;
+                const nextTokens = previous.generatedTokens + progress.generatedTokens;
+                this.used.evaluatedPositions += nextPositions - usage.evaluatedPositions;
+                this.used.generatedTokens += nextTokens - usage.generatedTokens;
+                usage.evaluatedPositions = nextPositions;
+                usage.generatedTokens = nextTokens;
+                this.onProgress({ id, phase: `arm ${index + 1}/${arms.length}, turn ${turn + 1}/${request.playerTurns.length}`, completed: progress.evaluatedPositions, total: upperPositions });
+              },
+            });
+            arms[index].turns.push({
+              player: request.playerTurns[turn], text: evaluated.text, tokenIds: evaluated.tokenIds,
+              tokenLogProbs: evaluated.tokenLogProbs, stopReason: evaluated.stopReason,
+              promptHash: await hashJson(promptTokenIds), milliseconds: evaluated.milliseconds,
+            });
+            history.push({ role: "assistant", content: evaluated.text });
+            // Partial paired results survive cancellation and are explicitly not a completed comparison.
+            artifact.result = { kind: "paired-replay", protocol: request.protocol, arms, complete: false };
+            await this.store.put(artifact);
+          }
+        }
+        result = {
+          kind: "paired-replay", protocol: request.protocol, arms, complete: true,
+          caveat: request.protocol === "conversation"
+            ? "Same player script and per-turn seeds; each arm keeps its own NPC history. Later prompts intentionally diverge."
+            : "Same frozen prefix, player turn, decoding, seed and full-logit path. Residual steering is not a native weight repair.",
+          automatedQualityJudgment: "not performed",
+        };
+      } else if (request.op === "inspectWeights") {
         result = await this.backend.researchInspectWeights(request.slice, controller.signal);
       } else if (request.op === "compare") {
         const artifacts = await Promise.all(request.artifactIds.map((key) => this.artifact(key)));
@@ -316,10 +407,12 @@ export class ResearchWorkbench {
         }
         if (request.op === "capture") evaluation.capture = {
           layers: request.layers, positions: request.positions ?? [tokens.promptTokenIds.length - 1],
+          stages: request.stages,
         };
         if (request.op === "patch") evaluation.patch = {
           layer: request.layer, tokenPosition: request.tokenPosition ?? tokens.promptTokenIds.length - 1,
           vector: Float32Array.from(request.vector), mode: request.mode, amount: request.amount,
+          stage: request.stage,
         };
         // Reserve worst-case work durably. A crashed tab conservatively consumes the reservation.
         await this.store.put({ ...artifact, usage: { ...usage, evaluatedPositions: maxPositions, generatedTokens: maxNew } });
@@ -332,7 +425,7 @@ export class ResearchWorkbench {
           continuationPieces: tokens.pieces.slice(tokens.promptTokenIds.length),
           captures: measured.captures.map((capture) => ({
             ...capture, dtype: "f32", shape: [1536],
-            semantics: "post-layer residual, after any token-local activation patch",
+            semantics: `residual at ${capture.stage ?? "layer-output"}, after any patch at that boundary; not an isolated component output`,
             values: Array.from(capture.values),
           })),
         };

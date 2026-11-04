@@ -55,3 +55,6 @@ __pycache__/
 /research-results/mechanistic-repair/**/artifacts.json
 /research-results/mechanistic-repair/**/patch-requests.json
 /research-results/mechanistic-repair/**/events.jsonl
+/research-results/component-localization/**/artifacts.json
+/research-results/component-localization/**/events.jsonl
+/research-results/component-localization/*-requests.json

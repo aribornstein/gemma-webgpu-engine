@@ -1,0 +1,86 @@
+{
+  "76f34b1224f3": {
+    "exampleId": "dev-market-apples-01:B2:23",
+    "order": "forward",
+    "A": "raw_base",
+    "B": "agent_p6"
+  },
+  "c7d3bd3c06c9": {
+    "exampleId": "dev-market-apples-01:B2:23",
+    "order": "reverse",
+    "A": "agent_p6",
+    "B": "raw_base"
+  },
+  "98d26696210e": {
+    "exampleId": "dev-market-apples-01:B2:23",
+    "order": "duplicate",
+    "A": "raw_base",
+    "B": "agent_p6"
+  },
+  "a1f2c96b62df": {
+    "exampleId": "dev-cafe-tea-01:B2:23",
+    "order": "forward",
+    "A": "raw_base",
+    "B": "agent_p6"
+  },
+  "839cfbc302d6": {
+    "exampleId": "dev-cafe-tea-01:B2:23",
+    "order": "reverse",
+    "A": "agent_p6",
+    "B": "raw_base"
+  },
+  "4f82a222ef8f": {
+    "exampleId": "dev-cafe-tea-01:B2:23",
+    "order": "duplicate",
+    "A": "raw_base",
+    "B": "agent_p6"
+  },
+  "a12936ef5753": {
+    "exampleId": "dev-pharmacy-pills-01:B2:23",
+    "order": "forward",
+    "A": "raw_base",
+    "B": "agent_p6"
+  },
+  "1ea071caa7db": {
+    "exampleId": "dev-pharmacy-pills-01:B2:23",
+    "order": "reverse",
+    "A": "agent_p6",
+    "B": "raw_base"
+  },
+  "a1f44e798b6d": {
+    "exampleId": "dev-bus-ticket-01:B2:23",
+    "order": "forward",
+    "A": "raw_base",
+    "B": "agent_p6"
+  },
+  "5a5399163020": {
+    "exampleId": "dev-bus-ticket-01:B2:23",
+    "order": "reverse",
+    "A": "agent_p6",
+    "B": "raw_base"
+  },
+  "e7b61c842b63": {
+    "exampleId": "dev-hotel-checkin-01:B2:23",
+    "order": "forward",
+    "A": "raw_base",
+    "B": "agent_p6"
+  },
+  "b3248c7368a1": {
+    "exampleId": "dev-hotel-checkin-01:B2:23",
+    "order": "reverse",
+    "A": "agent_p6",
+    "B": "raw_base"
+  },
+  "e622daf6e844": {
+    "exampleId": "dev-lost-wallet-01:B2:23",
+    "order": "forward",
+    "A": "raw_base",
+    "B": "agent_p6"
+  },
+  "d7d90a3d9246": {
+    "exampleId": "dev-lost-wallet-01:B2:23",
+    "order": "reverse",
+    "A": "agent_p6",
+    "B": "raw_base"
+  }
+}

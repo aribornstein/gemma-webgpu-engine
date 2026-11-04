@@ -1,0 +1,146 @@
+[
+  {
+    "caseId": "shirt-order-numeral",
+    "layer": 28,
+    "stage": "attention",
+    "deltaNorm": 1.9372819550074736,
+    "recipientNorm": 76.87831080469508,
+    "ratio": 0.025199330405802318
+  },
+  {
+    "caseId": "shirt-order-numeral",
+    "layer": 28,
+    "stage": "mlp",
+    "deltaNorm": 11.8478708026947,
+    "recipientNorm": 95.74387044214193,
+    "ratio": 0.1237454757989377
+  },
+  {
+    "caseId": "shirt-order-numeral",
+    "layer": 28,
+    "stage": "layer-output",
+    "deltaNorm": 3.462132508527534,
+    "recipientNorm": 81.71864031197094,
+    "ratio": 0.04236649674187453
+  },
+  {
+    "caseId": "shirt-order-numeral",
+    "layer": 32,
+    "stage": "attention",
+    "deltaNorm": 1.2124095840360838,
+    "recipientNorm": 83.1520102937963,
+    "ratio": 0.014580640681474154
+  },
+  {
+    "caseId": "shirt-order-numeral",
+    "layer": 32,
+    "stage": "mlp",
+    "deltaNorm": 6.2387629348690945,
+    "recipientNorm": 88.19952438267099,
+    "ratio": 0.07073465507365997
+  },
+  {
+    "caseId": "shirt-order-numeral",
+    "layer": 32,
+    "stage": "layer-output",
+    "deltaNorm": 3.3961475568044093,
+    "recipientNorm": 80.30615624320482,
+    "ratio": 0.042290002606017854
+  },
+  {
+    "caseId": "shirt-order-numeral",
+    "layer": 34,
+    "stage": "attention",
+    "deltaNorm": 4.871231003403573,
+    "recipientNorm": 63.927269937390435,
+    "ratio": 0.07619957817961562
+  },
+  {
+    "caseId": "shirt-order-numeral",
+    "layer": 34,
+    "stage": "mlp",
+    "deltaNorm": 15.155053781298365,
+    "recipientNorm": 98.80810273480955,
+    "ratio": 0.15337865379292748
+  },
+  {
+    "caseId": "shirt-order-numeral",
+    "layer": 34,
+    "stage": "layer-output",
+    "deltaNorm": 17.928572939008276,
+    "recipientNorm": 25.306585745808206,
+    "ratio": 0.7084548314455249
+  },
+  {
+    "caseId": "book-order-numeral",
+    "layer": 28,
+    "stage": "attention",
+    "deltaNorm": 2.427217392307594,
+    "recipientNorm": 76.31709145728664,
+    "ratio": 0.0318043749566382
+  },
+  {
+    "caseId": "book-order-numeral",
+    "layer": 28,
+    "stage": "mlp",
+    "deltaNorm": 13.669311892855774,
+    "recipientNorm": 94.02638322103012,
+    "ratio": 0.14537740817620293
+  },
+  {
+    "caseId": "book-order-numeral",
+    "layer": 28,
+    "stage": "layer-output",
+    "deltaNorm": 4.046868966129108,
+    "recipientNorm": 80.45418163995848,
+    "ratio": 0.05030029370305825
+  },
+  {
+    "caseId": "book-order-numeral",
+    "layer": 32,
+    "stage": "attention",
+    "deltaNorm": 1.87787282198008,
+    "recipientNorm": 84.46476732897847,
+    "ratio": 0.022232616999535767
+  },
+  {
+    "caseId": "book-order-numeral",
+    "layer": 32,
+    "stage": "mlp",
+    "deltaNorm": 6.456856476639116,
+    "recipientNorm": 89.3348215192478,
+    "ratio": 0.07227704009290423
+  },
+  {
+    "caseId": "book-order-numeral",
+    "layer": 32,
+    "stage": "layer-output",
+    "deltaNorm": 3.7104712194093983,
+    "recipientNorm": 81.29407197572583,
+    "ratio": 0.045642580439534806
+  },
+  {
+    "caseId": "book-order-numeral",
+    "layer": 34,
+    "stage": "attention",
+    "deltaNorm": 5.5026117039331774,
+    "recipientNorm": 64.45738335776315,
+    "ratio": 0.08536821411740493
+  },
+  {
+    "caseId": "book-order-numeral",
+    "layer": 34,
+    "stage": "mlp",
+    "deltaNorm": 12.564950166703895,
+    "recipientNorm": 104.76267711670712,
+    "ratio": 0.11993727644728246
+  },
+  {
+    "caseId": "book-order-numeral",
+    "layer": 34,
+    "stage": "layer-output",
+    "deltaNorm": 16.15758675658523,
+    "recipientNorm": 26.8674316428802,
+    "ratio": 0.6013818876084104
+  }
+]

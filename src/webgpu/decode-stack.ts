@@ -353,24 +353,31 @@ export function encodeGemmaDecodeStackPass(
   }
   const researchEdits = resources.researchEdits;
   for (let layerIndex = 0; layerIndex < LAYER_COUNT; layerIndex += 1) {
+    const visit = (stage: "layer-input" | "attention" | "mlp" | "layer-output") => {
+      if (resources.researchPatch?.layerIndex === layerIndex &&
+          (resources.researchPatch.stage ?? "layer-output") === stage) {
+        encodeResearchActivationPatch(pass, resources.researchPatch);
+      }
+      for (const capture of resources.researchCaptures ?? []) {
+        if (capture.layerIndex === layerIndex && (capture.stage ?? "layer-output") === stage) {
+          encodeResearchResidualCapturePass(pass, capture);
+        }
+      }
+    };
+    const instrumented = Boolean(resources.researchPatch || resources.researchCaptures?.length);
+    if (instrumented) visit("layer-input");
     encodeGemmaDecodeLayerPass(
       pass,
       resources.pipelines[layerIndex],
       resources.layers[layerIndex],
+      instrumented ? { afterAttention: () => visit("attention"), afterMlp: () => visit("mlp") } : undefined,
     );
     if (researchEdits) {
       for (const edit of researchEdits) {
         if (edit.layerIndex === layerIndex) encodeResearchResidualEditPass(pass, edit);
       }
     }
-    if (resources.researchPatch?.layerIndex === layerIndex) {
-      encodeResearchActivationPatch(pass, resources.researchPatch);
-    }
-    if (resources.researchCaptures) {
-      for (const capture of resources.researchCaptures) {
-        if (capture.layerIndex === layerIndex) encodeResearchResidualCapturePass(pass, capture);
-      }
-    }
+    if (instrumented) visit("layer-output");
   }
 }
 

@@ -1,5 +1,7 @@
 import "./style.css";
 import { loadGemmaGenerationSession } from "../../runtime/gemma-session";
+import { mountComparisonDemo } from "./comparison-demo";
+import { mountEvidenceDashboard } from "./evidence-dashboard";
 import { DurableArtifactStore, hashJson, IndexedArtifactStore, ResearchWorkbench, type Artifact, type ExperimentRequest, type ResearchProvenance } from "./runner";
 
 const root = document.querySelector<HTMLDivElement>("#workbench");
@@ -9,6 +11,8 @@ root.innerHTML = `
 <p>Inspect a failure. Test a cause. Preserve what works.</p></div><a href="./index.html">Generation console</a></header>
 <section class="notice"><strong>Research only.</strong> Activation patches are diagnostics, not weight repairs.
 No candidate is promoted without every required criterion at 9/10, preservation tests, and fresh evaluation.</section>
+<details id="comparison-demo" open><summary>Before / after comparison studio</summary><div id="comparison-root"></div></details>
+<details id="evidence-dashboard" open><summary>Paired statistics, judge checks and causal maps</summary><div id="evidence-root"></div></details>
 <section class="toolbar" aria-label="Session controls">
 <label>Weights<select id="source"><option value="local">Local pinned checkpoint</option><option value="cache">Existing browser cache</option></select></label>
 <label>Run ID<input id="run-id" value="interactive" pattern="[a-zA-Z0-9._-]+"></label>
@@ -21,6 +25,7 @@ No candidate is promoted without every required criterion at 9/10, preservation 
 <main><section class="request-panel"><h2>Experiment</h2>
 <label>Operation<select id="operation">
 <option value="replay">Replay conversation</option><option value="score">Score continuation</option>
+<option value="pairedReplay">Matched multi-arm replay</option>
 <option value="capture">Capture decision states</option><option value="inspectWeights">Inspect selected weights</option>
 <option value="patch">Token-local activation patch</option><option value="compare">Compare artifacts</option>
 </select></label>
@@ -63,9 +68,13 @@ function example(op: string): unknown {
   switch (op) {
     case "replay": return { id, op, messages, maxNewTokens: 48, temperature: 0, seed: 23 };
     case "score": return { id, op, messages, continuation: "שני תפוחים עולים עשרה שקלים." };
-    case "capture": return { id, op, messages, layers: [12, 20, 28, 34] };
+    case "capture": return { id, op, messages, layers: [20, 34], stages: ["layer-input", "attention", "mlp", "layer-output"] };
+    case "pairedReplay": return { id, op, protocol: "fixed-prefix", messages: messages.slice(0, 1),
+      playerTurns: [messages[1].content], arms: [{ id: "base", label: "Baseline" },
+        { id: "zero", label: "Zero-overlay parity control", overlays: [{ layer: 20, a: Array(1536).fill(0), b: Array(1536).fill(0), coefficient: 0.1 }] }],
+      maxNewTokens: 48, temperature: 0, seed: 23 };
     case "inspectWeights": return { id, op, slice: { layer: 20, projection: "down", rowStart: 0, rowCount: 4, columnStart: 0, columnCount: 32 } };
-    case "patch": return { id, op, messages, layer: 20, amount: 1, mode: "replace", vector: [], sourceArtifactIds: [], continuation: "שני תפוחים עולים עשרה שקלים." };
+    case "patch": return { id, op, messages, layer: 20, stage: "layer-output", amount: 1, mode: "replace", vector: [], sourceArtifactIds: [], continuation: "שני תפוחים עולים עשרה שקלים." };
     case "compare": return { id, op, artifactIds: records.filter((r) => r.status === "completed").slice(-2).map((r) => r.id) };
     default: throw new Error("Unsupported example operation");
   }
@@ -122,18 +131,20 @@ function inspect(artifact: Artifact): void {
       [String(row.text), Number(row.logProbability).toFixed(4), Number(row.rawLogit).toFixed(4)]));
   }
   if (object(result) && Array.isArray(result.captures)) {
-    table(element("captures"), ["Site", "Position", "Values", "L2 norm"], result.captures.filter(object).map((row) => {
+    table(element("captures"), ["Site", "Stage", "Position", "Values", "L2 norm"], result.captures.filter(object).map((row) => {
       const values = Array.isArray(row.values) ? row.values : [];
-      return [JSON.stringify(row.site), String(row.tokenPosition), String(values.length), Math.sqrt(values.reduce((sum, v) => sum + Number(v) ** 2, 0)).toFixed(4)];
+      return [JSON.stringify(row.site), String(row.stage ?? "layer-output"), String(row.tokenPosition), String(values.length), Math.sqrt(values.reduce((sum, v) => sum + Number(v) ** 2, 0)).toFixed(4)];
     }));
     for (const capture of result.captures.filter(object)) {
       if (!object(capture.site) || typeof capture.site.residual !== "number" || !Array.isArray(capture.values)) continue;
       const layer = capture.site.residual;
+      const stage = capture.stage ?? "layer-output";
+      if (!["attention", "mlp", "layer-output"].includes(String(stage))) continue;
       const button = document.createElement("button");
-      button.textContent = `Use layer ${capture.site.residual} as diagnostic donor`;
+      button.textContent = `Use layer ${capture.site.residual} ${stage} as diagnostic donor`;
       button.addEventListener("click", () => {
         editor.value = JSON.stringify({
-          id: `patch-${nextId++}`, op: "patch", messages, layer,
+          id: `patch-${nextId++}`, op: "patch", messages, layer, stage,
           mode: "replace", amount: 1, vector: capture.values, sourceArtifactIds: [artifact.id],
           continuation: "שני תפוחים עולים עשרה שקלים.",
         }, null, 2);
@@ -322,3 +333,5 @@ window.researchWorkbench = {
     }
   },
 };
+void mountComparisonDemo(element("comparison-root"), run);
+void mountEvidenceDashboard(element("evidence-root"));

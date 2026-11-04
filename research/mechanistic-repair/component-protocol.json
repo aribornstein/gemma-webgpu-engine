@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "study": "component-localization-v1",
+  "status": "approved-exploratory",
+  "baselineCommit": "88e98f82487a0dda548feb682f679f18d002b970",
+  "question": "Can the learner-dependent numeral error be localized more specifically than post-layer answer-state transfer?",
+  "cases": {
+    "targets": ["shirt-order-numeral", "book-order-numeral"],
+    "preservation": ["library-operation-verb"],
+    "split": "all discovery; no held-out claim",
+    "assistantPrefixes": "Use the already recorded actual common token prefix before each target fork, not a supplied corrected numeral"
+  },
+  "path": {"backend": "owned-webgpu", "prefill": "fresh sequential", "selection": "full-logit CPU", "temperature": 0},
+  "initialLayers": [28, 32, 34],
+  "captureStages": ["layer-input", "attention", "mlp", "layer-output"],
+  "captureSemantics": {
+    "attentionMinusInput": "attention contribution after output projection, its output quantization and post-attention RMS norm",
+    "mlpMinusAttention": "MLP contribution after down projection, output quantization and post-FFN RMS norm",
+    "outputMinusMlp": "combined PLE and layer-scalar effect; not isolated PLE output",
+    "patch": "activation diagnostic, never automatically equivalent to a native weight update"
+  },
+  "screening": {
+    "conditions": ["donor-contribution-delta", "zero", "reverse-sign"],
+    "scoreAlternatives": ["correct", "incorrect"],
+    "freeRunsPerCondition": 1,
+    "selectionRule": "For each target choose at most one stage/site showing the largest positive donor-minus-zero fork-margin effect with a complete grammatical target phrase in the free continuation and preserved stated entity/price. If no site qualifies, stop that target.",
+    "candidateSites": "all three boundary stages at each of the three predeclared layers; exploratory search, not independent hypothesis tests"
+  },
+  "followup": {
+    "randomControlSeeds": [101, 307, 503, 701, 907, 1103, 1301, 1501, 1709, 1901, 2111, 2309, 2503, 2707, 2903],
+    "norm": "Each random perturbation is matched to the selected donor-contribution delta L2 norm",
+    "upperTailTest": "(1 + controls >= observed)/(1 + n), reported with floor 1/16; not a 0.05 significance test",
+    "transfer": "Apply the same donor-derived delta to the other target and preservation case without using their correct-context donor",
+    "budget": "At most one selected component per target; no expanding into a weight sweep"
+  },
+  "promotion": {
+    "minimumAllJudgedCriteria": 9,
+    "requireSpecificityAndTransfer": true,
+    "criticalFactFailuresAllowed": 0,
+    "freshEvaluationOnlyAfterDevelopmentPass": true,
+    "humanCalibration": false,
+    "doNotRelaxAfterResults": true
+  },
+  "bounds": {"diagnosticJobs": 400, "generatedTokens": 20000, "evaluatedPositions": 200000, "gpuSessions": 1},
+  "stop": "No specific transferable rescue or failed numerical gate means no native weight repair; retain negative and invalidated evidence."
+}

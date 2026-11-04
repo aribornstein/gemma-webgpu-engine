@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "archive": "component-evidence.tar.gz",
+  "storage": "Local Copilot session files directory; raw evidence also retained in research-results/component-localization",
+  "sha256": "ff588700ca1566d9d6975064f534c3868cfc20dbb9e598b71f1defafb307fb26",
+  "contents": [
+    "All 237 raw completed artifacts, including captures and patch vectors",
+    "Full baseline/screen/control request arrays and event stream",
+    "Compact analysis, reports, judge items/key/ratings and protocol snapshot",
+    "Public recorded comparison/statistics/component data",
+    "frozen-runtime.tar.gz containing the exact source used by the model jobs"
+  ],
+  "frozenRuntimeArchiveSha256": "471c13c7d46aac6ce0e111e25ccfa1b7e9dd1b158504c3cc2f378e5e370efd52",
+  "runtimeFingerprint": "e355e96b7e8ff6891a5be8e3a7cdbc72fff5dd54fe3d0acd80ea8dffa0a244aa",
+  "checkpointSha256": "efab429012b97ab986c4d4838a46ff3ad95d618b42ce514771ca40fadc76a9a4",
+  "checkpointIncluded": false,
+  "selfExcludedFromArchive": true,
+  "analysisCorrection": "Complete numeric-token matching replaced substring matching after inference; the selected-site JSON remained byte-identical.",
+  "selectedJsonSha256BeforeAndAfter": "9b696fde180d69920e18bfc0be64e5745e0b2fa6f85bd1bda0ac3af23a367f64",
+  "reproduction": "Use the frozen runtime in a separate checkout with the pinned checkpoint to resume this exact run. Current sources include later UI/reporting fixes; use a new run ID and matched baselines for new runs."
+}

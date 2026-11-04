@@ -54,6 +54,13 @@ export interface GroundingResult {
   coverage: "adjudicated-claims" | "unadjudicated";
 }
 
+/** Numeric presence only, never a semantic grounding verdict. Commas are decimal separators. */
+export function hasNumericAmount(text: string, amount: number): boolean {
+  if (!Number.isFinite(amount) || amount < 0) throw new Error("Expected a finite nonnegative amount");
+  return (text.match(/[+-]?(?:\d+(?:[.,]\d+)*|[.,]\d+)/g) ?? [])
+    .some((value) => Number(value.replace(",", ".")) === amount);
+}
+
 /** Semantic claim extraction is supplied by a separate assessor, never inferred from a number bag. */
 export function checkGrounding(
   world: WorldContract,

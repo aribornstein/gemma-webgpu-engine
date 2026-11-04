@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { defineConfig, type Plugin } from "vite";
 
 const STATIC_DIRECTORIES = [
+  ["public/research", "research"],
   ["public/examples", "examples"],
   ["public/models/gemma-4-e2b-tokenizer", "models/gemma-4-e2b-tokenizer"],
 ] as const;

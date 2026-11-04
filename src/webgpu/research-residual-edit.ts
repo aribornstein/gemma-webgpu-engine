@@ -1,3 +1,5 @@
+import type { GemmaResearchStage } from "../research/engine-types";
+
 /**
  * Research-only residual edit applied after one decoder layer:
  *
@@ -178,6 +180,7 @@ export interface ResearchResidualCapture {
   pipeline: GPUComputePipeline;
   bindGroup: GPUBindGroup;
   buffer: GPUBuffer;
+  stage?: GemmaResearchStage;
 }
 
 const capturePipelineCache = new WeakMap<GPUDevice, Promise<GPUComputePipeline>>();
@@ -211,6 +214,7 @@ export function createResearchResidualCapture(
   pipeline: GPUComputePipeline,
   layerIndex: number,
   hidden: GPUBuffer,
+  stage?: GemmaResearchStage,
 ): ResearchResidualCapture {
   const buffer = device.createBuffer({
     label: `Research residual capture after layer ${layerIndex}`,
@@ -224,7 +228,7 @@ export function createResearchResidualCapture(
       { binding: 1, resource: { buffer } },
     ],
   });
-  return { layerIndex, pipeline, bindGroup, buffer };
+  return { layerIndex, pipeline, bindGroup, buffer, stage };
 }
 
 export function encodeResearchResidualCapturePass(

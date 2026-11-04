@@ -77,6 +77,7 @@ export function encodeGemmaDecodeLayerPass(
   pass: GPUComputePassEncoder,
   pipelines: GemmaDecodeLayerPipelines,
   resources: GemmaDecodeLayerResources,
+  hooks?: { afterAttention: () => void; afterMlp: () => void },
 ): void {
   if (pipelines.profile !== pipelines.attention.profile ||
       pipelines.attention.headDim !== resources.attention.cache.headDim ||
@@ -84,7 +85,8 @@ export function encodeGemmaDecodeLayerPass(
     throw new Error("Gemma decode layer pipeline geometry is inconsistent");
   }
   encodeDecodeAttentionBlockPass(pass, pipelines.attention, resources.attention);
-  encodeDecodeMlpPleBlockPass(pass, pipelines.mlp, resources.mlp);
+  hooks?.afterAttention();
+  encodeDecodeMlpPleBlockPass(pass, pipelines.mlp, resources.mlp, hooks?.afterMlp);
 }
 
 export function gemmaDecodeLayerDispatchCount(

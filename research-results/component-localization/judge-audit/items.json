@@ -1,0 +1,1225 @@
+[
+  {
+    "id": "1ea071caa7db",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Buying headache pills at a neighborhood pharmacy",
+      "character": {
+        "name": "Dana",
+        "role": "pharmacist",
+        "personality": "kind and careful",
+        "register": "neutral"
+      },
+      "entities": [
+        {
+          "id": "headache_pills",
+          "type": "product",
+          "name": "box of headache pills",
+          "quantity": 1,
+          "price_ils": 25,
+          "notes": "one box contains 20 pills"
+        }
+      ],
+      "topics": [
+        "health",
+        "pharmacy",
+        "quantities",
+        "prices"
+      ],
+      "quest": {
+        "goal": "buy one box of headache pills",
+        "paid": false,
+        "state_note": "No payment has yet occurred"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, יש לך כדורים נגד כאב ראש?",
+        "npc": "בטח, יש לנו סרגל כדורים נגד כאבי ראש, וכאחד שקובע בשווי 25 אירו, שבו כל קופסה מכילה 20 כדורים."
+      },
+      {
+        "player": "אני רוצה קופסה אחד.",
+        "npc": "אז, תרצלי לסחף עבור קופסה אחת של הכדורים, במחיר של 25 אירו."
+      },
+      {
+        "player": "כמה כדורים יש בקופסה?",
+        "npc": "כל קופסה מכילה 20 כדורים."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "הקופסה של הכדורים עולה 25 אירו."
+      },
+      {
+        "player": "טוב, אפשר לשלם עכשיו?",
+        "npc": "בכל מקרה, אם תרצי להעביר את הסכום כעת, אני מוכן לקבל אותו."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, יש לך כדורים נגד כאב ראש?",
+        "npc": "כן, יש לי חבילה של תמינא כאבים."
+      },
+      {
+        "player": "אני רוצה קופסה אחד.",
+        "npc": "הקופסה זולה 25 אירו."
+      },
+      {
+        "player": "כמה כדורים יש בקופסה?",
+        "npc": "בקופסה יש 20 כדורים."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "החבילה עולה 25 אירו."
+      },
+      {
+        "player": "טוב, אפשר לשלם עכשיו?",
+        "npc": "אנא תשלמי את הסכום."
+      }
+    ]
+  },
+  {
+    "id": "4f82a222ef8f",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Ordering a tea at a neighborhood cafe",
+      "character": {
+        "name": "Roni",
+        "role": "cafe server",
+        "personality": "warm and efficient",
+        "register": "neutral"
+      },
+      "entities": [
+        {
+          "id": "tea",
+          "type": "drink",
+          "name": "tea",
+          "quantity": 1,
+          "price_ils": 12
+        }
+      ],
+      "topics": [
+        "ordering",
+        "food and drink",
+        "prices"
+      ],
+      "quest": {
+        "goal": "order one tea without sugar",
+        "paid": false,
+        "state_note": "The order has not been paid for"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, אפשר תה?",
+        "npc": "בטח, מה תרצה להזמין?"
+      },
+      {
+        "player": "אני רוצה תה בלי סוכר.",
+        "npc": "תה אחד, זה יר ב-12 ש\"ח."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "12 ש\"ח."
+      },
+      {
+        "player": "יש לך גם מים?",
+        "npc": "יש גם מים, אם תרצה."
+      },
+      {
+        "player": "תודה, אני אשלם אחר כך.",
+        "npc": "בבקשה."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, אפשר תה?",
+        "npc": "בטח, מה בדיוק תרצה לאכול או לשתות?"
+      },
+      {
+        "player": "אני רוצה תה בלי סוכר.",
+        "npc": "מצוין, להלן ממי ו-\"תה\" עם סוכר, בערך 12 ש\"ח."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "זה יהיה 12 ₪."
+      },
+      {
+        "player": "יש לך גם מים?",
+        "npc": "יש לנו כמובן מים, אם תרצה, או אולי תרצה שאסיים עבורך את ההזמנה הזו?"
+      },
+      {
+        "player": "תודה, אני אשלם אחר כך.",
+        "npc": "בשמחה, אוכל להכין עבורך את התיאבון."
+      }
+    ]
+  },
+  {
+    "id": "5a5399163020",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Buying bus tickets at the ticket window of a central bus station",
+      "character": {
+        "name": "Moshe",
+        "role": "ticket clerk",
+        "personality": "brisk but helpful",
+        "register": "neutral"
+      },
+      "entities": [
+        {
+          "id": "bus_ticket",
+          "type": "ticket",
+          "name": "bus ticket to Haifa",
+          "quantity": 2,
+          "price_ils": 34,
+          "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+        },
+        {
+          "id": "haifa",
+          "type": "place",
+          "name": "Haifa",
+          "notes": "destination"
+        },
+        {
+          "id": "departure",
+          "type": "schedule",
+          "name": "next bus to Haifa",
+          "notes": "departs at 10:30 from platform 5"
+        }
+      ],
+      "topics": [
+        "travel",
+        "transport",
+        "time",
+        "prices"
+      ],
+      "quest": {
+        "goal": "buy two bus tickets to Haifa",
+        "paid": false,
+        "state_note": "The tickets have not been paid for or issued"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, אני רוצה לנסוע לחיפה.",
+        "npc": "בטח, יש לנו כרטיסי אוטובוס לחיפה, שנקבע לשעה 10:30, בפלטפורמה 5, והעלות עבור שני כרטיסים היא 34 ש\"ש בסך הכל."
+      },
+      {
+        "player": "אני צריך שתי כרטיסים.",
+        "npc": "בהחלט, אני מתכוון לתת לך שתי כרטיסים, כל אחד מחוסר 17 ש\"ש, וסה\"כ 34 ש\"ש לביניהם. האם תרצה להמשיך, או שתרצה שאסכם לך את הפרטים נוספים?"
+      },
+      {
+        "player": "מתי האוטובוס יוצאת?",
+        "npc": "האוטובוס הראשוני לחיפה יוצא בשעה 10:30, ומצופה שהוא יצא מפלטפורמה מס' 5."
+      },
+      {
+        "player": "מאיזה רציף?",
+        "npc": "המסע המתוכנן הוא בדרך כלל לפי השעות, ובהתאם לתזכורות המפורטות של תוכנית ההתנועה הזו."
+      },
+      {
+        "player": "כמה עולה הכל ביחד?",
+        "npc": "על סמך המידע שיש לי, המחיר הכולל לשני הכרטיסים הוא 34 ש\"ש."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, אני רוצה לנסוע לחיפה.",
+        "npc": "שלום, יש לכם שני כרטיסים לחיפה, המחירם 34 ש\"ח. האוטובוס הבא לחיפה יוצא בשעה 10:30 מן העמדה 5."
+      },
+      {
+        "player": "אני צריך שתי כרטיסים.",
+        "npc": "עבור שני כרטיסים, המחיר הוא 34 ש\"ח."
+      },
+      {
+        "player": "מתי האוטובוס יוצאת?",
+        "npc": "האוטובוס הבא לחיפה יוצא בשעה 10:30 מן העמדה 5."
+      },
+      {
+        "player": "מאיזה רציף?",
+        "npc": "האוטובוס יוצא מן העמדה 5."
+      },
+      {
+        "player": "כמה עולה הכל ביחד?",
+        "npc": "מחיר הכרטיסים לשני הכרטיסים הוא 34 ש\"ח."
+      }
+    ]
+  },
+  {
+    "id": "76f34b1224f3",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Buying fruit from a merchant at a town street market",
+      "character": {
+        "name": "Noa",
+        "role": "fruit seller",
+        "personality": "friendly and patient",
+        "register": "informal"
+      },
+      "entities": [
+        {
+          "id": "apples",
+          "type": "product",
+          "name": "apple",
+          "quantity": 2,
+          "price_ils": 10
+        }
+      ],
+      "topics": [
+        "shopping",
+        "fruit",
+        "quantities",
+        "prices"
+      ],
+      "quest": {
+        "goal": "buy two apples",
+        "paid": false,
+        "state_note": "No payment has yet occurred"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, כמה עולים תפוחים?",
+        "npc": "שלום! שני תפוחים עולים 20 ש\"ש. האם תרצה לקנות?"
+      },
+      {
+        "player": "אני רוצה שתי תפוחים.",
+        "npc": "איך זה ייראה? תבחר מה מוכן."
+      },
+      {
+        "player": "כמה עולה שני תפוחים?",
+        "npc": "שתי תפוחים עולות 20 ש\"ש."
+      },
+      {
+        "player": "אני רוצה לקנות אותם.",
+        "npc": "בטח, הנה שתי תפוחים למשק."
+      },
+      {
+        "player": "אפשר לשלם עכשיו?",
+        "npc": "הנה, 20 ש\"ש."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, כמה עולים תפוחים?",
+        "npc": "שלום! שני תפוחים, כמה שאתה מעוניין? תפוח אחד עשוי כ-10 ₪, ואם תרצה שניים, זה יקרה בדיוק 20 ₪."
+      },
+      {
+        "player": "אני רוצה שתי תפוחים.",
+        "npc": "אז שני תפוחים עשויים סך הכל 20 ש\"ח. מה דעתך, האם תרצה לרכוש אותם?"
+      },
+      {
+        "player": "כמה עולה שני תפוחים?",
+        "npc": "שני תפוחים בעצמם עשויים 20 ₪, אבל חשוב לזכור שזה המחיר לתפוח אחד, אז אם תרצה להתייחס למספר הכולל, זה יהיה סכום כולל של 20 ₪."
+      },
+      {
+        "player": "אני רוצה לקנות אותם.",
+        "npc": "בטח, אני שמח! המשמעות היא שאתה מוכן להתקדם עם המעסיקה הזו?"
+      },
+      {
+        "player": "אפשר לשלם עכשיו?",
+        "npc": "איך תרצה, תרצה להגיש לי את התשלום כרגע?"
+      }
+    ]
+  },
+  {
+    "id": "839cfbc302d6",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Ordering a tea at a neighborhood cafe",
+      "character": {
+        "name": "Roni",
+        "role": "cafe server",
+        "personality": "warm and efficient",
+        "register": "neutral"
+      },
+      "entities": [
+        {
+          "id": "tea",
+          "type": "drink",
+          "name": "tea",
+          "quantity": 1,
+          "price_ils": 12
+        }
+      ],
+      "topics": [
+        "ordering",
+        "food and drink",
+        "prices"
+      ],
+      "quest": {
+        "goal": "order one tea without sugar",
+        "paid": false,
+        "state_note": "The order has not been paid for"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, אפשר תה?",
+        "npc": "בטח, מה בדיוק תרצה לאכול או לשתות?"
+      },
+      {
+        "player": "אני רוצה תה בלי סוכר.",
+        "npc": "מצוין, להלן ממי ו-\"תה\" עם סוכר, בערך 12 ש\"ח."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "זה יהיה 12 ₪."
+      },
+      {
+        "player": "יש לך גם מים?",
+        "npc": "יש לנו כמובן מים, אם תרצה, או אולי תרצה שאסיים עבורך את ההזמנה הזו?"
+      },
+      {
+        "player": "תודה, אני אשלם אחר כך.",
+        "npc": "בשמחה, אוכל להכין עבורך את התיאבון."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, אפשר תה?",
+        "npc": "בטח, מה תרצה להזמין?"
+      },
+      {
+        "player": "אני רוצה תה בלי סוכר.",
+        "npc": "תה אחד, זה יר ב-12 ש\"ח."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "12 ש\"ח."
+      },
+      {
+        "player": "יש לך גם מים?",
+        "npc": "יש גם מים, אם תרצה."
+      },
+      {
+        "player": "תודה, אני אשלם אחר כך.",
+        "npc": "בבקשה."
+      }
+    ]
+  },
+  {
+    "id": "98d26696210e",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Buying fruit from a merchant at a town street market",
+      "character": {
+        "name": "Noa",
+        "role": "fruit seller",
+        "personality": "friendly and patient",
+        "register": "informal"
+      },
+      "entities": [
+        {
+          "id": "apples",
+          "type": "product",
+          "name": "apple",
+          "quantity": 2,
+          "price_ils": 10
+        }
+      ],
+      "topics": [
+        "shopping",
+        "fruit",
+        "quantities",
+        "prices"
+      ],
+      "quest": {
+        "goal": "buy two apples",
+        "paid": false,
+        "state_note": "No payment has yet occurred"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, כמה עולים תפוחים?",
+        "npc": "שלום! שני תפוחים עולים 20 ש\"ש. האם תרצה לקנות?"
+      },
+      {
+        "player": "אני רוצה שתי תפוחים.",
+        "npc": "איך זה ייראה? תבחר מה מוכן."
+      },
+      {
+        "player": "כמה עולה שני תפוחים?",
+        "npc": "שתי תפוחים עולות 20 ש\"ש."
+      },
+      {
+        "player": "אני רוצה לקנות אותם.",
+        "npc": "בטח, הנה שתי תפוחים למשק."
+      },
+      {
+        "player": "אפשר לשלם עכשיו?",
+        "npc": "הנה, 20 ש\"ש."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, כמה עולים תפוחים?",
+        "npc": "שלום! שני תפוחים, כמה שאתה מעוניין? תפוח אחד עשוי כ-10 ₪, ואם תרצה שניים, זה יקרה בדיוק 20 ₪."
+      },
+      {
+        "player": "אני רוצה שתי תפוחים.",
+        "npc": "אז שני תפוחים עשויים סך הכל 20 ש\"ח. מה דעתך, האם תרצה לרכוש אותם?"
+      },
+      {
+        "player": "כמה עולה שני תפוחים?",
+        "npc": "שני תפוחים בעצמם עשויים 20 ₪, אבל חשוב לזכור שזה המחיר לתפוח אחד, אז אם תרצה להתייחס למספר הכולל, זה יהיה סכום כולל של 20 ₪."
+      },
+      {
+        "player": "אני רוצה לקנות אותם.",
+        "npc": "בטח, אני שמח! המשמעות היא שאתה מוכן להתקדם עם המעסיקה הזו?"
+      },
+      {
+        "player": "אפשר לשלם עכשיו?",
+        "npc": "איך תרצה, תרצה להגיש לי את התשלום כרגע?"
+      }
+    ]
+  },
+  {
+    "id": "a12936ef5753",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Buying headache pills at a neighborhood pharmacy",
+      "character": {
+        "name": "Dana",
+        "role": "pharmacist",
+        "personality": "kind and careful",
+        "register": "neutral"
+      },
+      "entities": [
+        {
+          "id": "headache_pills",
+          "type": "product",
+          "name": "box of headache pills",
+          "quantity": 1,
+          "price_ils": 25,
+          "notes": "one box contains 20 pills"
+        }
+      ],
+      "topics": [
+        "health",
+        "pharmacy",
+        "quantities",
+        "prices"
+      ],
+      "quest": {
+        "goal": "buy one box of headache pills",
+        "paid": false,
+        "state_note": "No payment has yet occurred"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "offer one box of 20 headache pills at the fixed price without claiming payment and without giving new medical advice"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, יש לך כדורים נגד כאב ראש?",
+        "npc": "כן, יש לי חבילה של תמינא כאבים."
+      },
+      {
+        "player": "אני רוצה קופסה אחד.",
+        "npc": "הקופסה זולה 25 אירו."
+      },
+      {
+        "player": "כמה כדורים יש בקופסה?",
+        "npc": "בקופסה יש 20 כדורים."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "החבילה עולה 25 אירו."
+      },
+      {
+        "player": "טוב, אפשר לשלם עכשיו?",
+        "npc": "אנא תשלמי את הסכום."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, יש לך כדורים נגד כאב ראש?",
+        "npc": "בטח, יש לנו סרגל כדורים נגד כאבי ראש, וכאחד שקובע בשווי 25 אירו, שבו כל קופסה מכילה 20 כדורים."
+      },
+      {
+        "player": "אני רוצה קופסה אחד.",
+        "npc": "אז, תרצלי לסחף עבור קופסה אחת של הכדורים, במחיר של 25 אירו."
+      },
+      {
+        "player": "כמה כדורים יש בקופסה?",
+        "npc": "כל קופסה מכילה 20 כדורים."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "הקופסה של הכדורים עולה 25 אירו."
+      },
+      {
+        "player": "טוב, אפשר לשלם עכשיו?",
+        "npc": "בכל מקרה, אם תרצי להעביר את הסכום כעת, אני מוכן לקבל אותו."
+      }
+    ]
+  },
+  {
+    "id": "a1f2c96b62df",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Ordering a tea at a neighborhood cafe",
+      "character": {
+        "name": "Roni",
+        "role": "cafe server",
+        "personality": "warm and efficient",
+        "register": "neutral"
+      },
+      "entities": [
+        {
+          "id": "tea",
+          "type": "drink",
+          "name": "tea",
+          "quantity": 1,
+          "price_ils": 12
+        }
+      ],
+      "topics": [
+        "ordering",
+        "food and drink",
+        "prices"
+      ],
+      "quest": {
+        "goal": "order one tea without sugar",
+        "paid": false,
+        "state_note": "The order has not been paid for"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "confirm the tea without sugar and its price without claiming payment"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, אפשר תה?",
+        "npc": "בטח, מה תרצה להזמין?"
+      },
+      {
+        "player": "אני רוצה תה בלי סוכר.",
+        "npc": "תה אחד, זה יר ב-12 ש\"ח."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "12 ש\"ח."
+      },
+      {
+        "player": "יש לך גם מים?",
+        "npc": "יש גם מים, אם תרצה."
+      },
+      {
+        "player": "תודה, אני אשלם אחר כך.",
+        "npc": "בבקשה."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, אפשר תה?",
+        "npc": "בטח, מה בדיוק תרצה לאכול או לשתות?"
+      },
+      {
+        "player": "אני רוצה תה בלי סוכר.",
+        "npc": "מצוין, להלן ממי ו-\"תה\" עם סוכר, בערך 12 ש\"ח."
+      },
+      {
+        "player": "כמה זה עולה?",
+        "npc": "זה יהיה 12 ₪."
+      },
+      {
+        "player": "יש לך גם מים?",
+        "npc": "יש לנו כמובן מים, אם תרצה, או אולי תרצה שאסיים עבורך את ההזמנה הזו?"
+      },
+      {
+        "player": "תודה, אני אשלם אחר כך.",
+        "npc": "בשמחה, אוכל להכין עבורך את התיאבון."
+      }
+    ]
+  },
+  {
+    "id": "a1f44e798b6d",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Buying bus tickets at the ticket window of a central bus station",
+      "character": {
+        "name": "Moshe",
+        "role": "ticket clerk",
+        "personality": "brisk but helpful",
+        "register": "neutral"
+      },
+      "entities": [
+        {
+          "id": "bus_ticket",
+          "type": "ticket",
+          "name": "bus ticket to Haifa",
+          "quantity": 2,
+          "price_ils": 34,
+          "notes": "price_ils is the total for two tickets; one ticket costs 17 ILS"
+        },
+        {
+          "id": "haifa",
+          "type": "place",
+          "name": "Haifa",
+          "notes": "destination"
+        },
+        {
+          "id": "departure",
+          "type": "schedule",
+          "name": "next bus to Haifa",
+          "notes": "departs at 10:30 from platform 5"
+        }
+      ],
+      "topics": [
+        "travel",
+        "transport",
+        "time",
+        "prices"
+      ],
+      "quest": {
+        "goal": "buy two bus tickets to Haifa",
+        "paid": false,
+        "state_note": "The tickets have not been paid for or issued"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "give the departure time, platform and ticket price for the bus to Haifa without claiming the tickets were paid for or issued"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, אני רוצה לנסוע לחיפה.",
+        "npc": "שלום, יש לכם שני כרטיסים לחיפה, המחירם 34 ש\"ח. האוטובוס הבא לחיפה יוצא בשעה 10:30 מן העמדה 5."
+      },
+      {
+        "player": "אני צריך שתי כרטיסים.",
+        "npc": "עבור שני כרטיסים, המחיר הוא 34 ש\"ח."
+      },
+      {
+        "player": "מתי האוטובוס יוצאת?",
+        "npc": "האוטובוס הבא לחיפה יוצא בשעה 10:30 מן העמדה 5."
+      },
+      {
+        "player": "מאיזה רציף?",
+        "npc": "האוטובוס יוצא מן העמדה 5."
+      },
+      {
+        "player": "כמה עולה הכל ביחד?",
+        "npc": "מחיר הכרטיסים לשני הכרטיסים הוא 34 ש\"ח."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, אני רוצה לנסוע לחיפה.",
+        "npc": "בטח, יש לנו כרטיסי אוטובוס לחיפה, שנקבע לשעה 10:30, בפלטפורמה 5, והעלות עבור שני כרטיסים היא 34 ש\"ש בסך הכל."
+      },
+      {
+        "player": "אני צריך שתי כרטיסים.",
+        "npc": "בהחלט, אני מתכוון לתת לך שתי כרטיסים, כל אחד מחוסר 17 ש\"ש, וסה\"כ 34 ש\"ש לביניהם. האם תרצה להמשיך, או שתרצה שאסכם לך את הפרטים נוספים?"
+      },
+      {
+        "player": "מתי האוטובוס יוצאת?",
+        "npc": "האוטובוס הראשוני לחיפה יוצא בשעה 10:30, ומצופה שהוא יצא מפלטפורמה מס' 5."
+      },
+      {
+        "player": "מאיזה רציף?",
+        "npc": "המסע המתוכנן הוא בדרך כלל לפי השעות, ובהתאם לתזכורות המפורטות של תוכנית ההתנועה הזו."
+      },
+      {
+        "player": "כמה עולה הכל ביחד?",
+        "npc": "על סמך המידע שיש לי, המחיר הכולל לשני הכרטיסים הוא 34 ש\"ש."
+      }
+    ]
+  },
+  {
+    "id": "b3248c7368a1",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Checking in at the reception desk of a small city hotel",
+      "character": {
+        "name": "Yael",
+        "role": "hotel receptionist",
+        "personality": "polite and organized",
+        "register": "formal"
+      },
+      "entities": [
+        {
+          "id": "guest",
+          "type": "person",
+          "name": "David Cohen",
+          "notes": "the learner; the reservation is under this name"
+        },
+        {
+          "id": "reservation",
+          "type": "booking",
+          "name": "room reservation",
+          "quantity": 2,
+          "price_ils": 900,
+          "notes": "quantity is the number of nights; price_ils is the total for two nights"
+        },
+        {
+          "id": "room",
+          "type": "room",
+          "name": "room 214"
+        },
+        {
+          "id": "breakfast",
+          "type": "service",
+          "name": "breakfast",
+          "price_ils": 0,
+          "notes": "included in the price; served from 07:00 to 10:00"
+        }
+      ],
+      "topics": [
+        "travel",
+        "hotel",
+        "numbers",
+        "prices"
+      ],
+      "quest": {
+        "goal": "check in for a two-night stay",
+        "paid": false,
+        "state_note": "The stay has not been paid for"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+      }
+    },
+    "A": [
+      {
+        "player": "ערב טוב, יש לי הזמנה על שם דוד כהן.",
+        "npc": "שלום רב, אשמח לבדוק עבורך את ההזמנה, אילו פרטים נוספים יש לך לגבי החסימה?"
+      },
+      {
+        "player": "אני נשאר שתי לילות.",
+        "npc": "בהחלט, אני מצטער/ת, ברצונך להזמין בדיוק עבור שתי אדריכלות עבור חדר 214, כולל ארוחת בוקר, כדי שאוכל לאשר את ההזמנה?"
+      },
+      {
+        "player": "מה מספר החדר?",
+        "npc": "ההזמנה שקיבלתי עבורך מתייחסת לחדר מספר 214. האם זה מתאים לך?"
+      },
+      {
+        "player": "ארוחת בוקר כלול?",
+        "npc": "כן, ארוחת הבוקר כלולה כחלק מהתעריף. האם תרצה שאבצע את ההרשמה עבור שני הלילות למישהו, או שיש לך עוד שאלות?"
+      },
+      {
+        "player": "כמה אני צריך לשלם?",
+        "npc": "עלות ההזמנה עבור שתי לילות במקרה הזה היא 900 אירו את המול, כולל כל התקציבים שציינתי. האם תרצה להמשיך בהמשך ולקבל את ההרשמה המלאה?"
+      }
+    ],
+    "B": [
+      {
+        "player": "ערב טוב, יש לי הזמנה על שם דוד כהן.",
+        "npc": "שלום, אשמח לבדוק את ההזמנה של דוד כהן."
+      },
+      {
+        "player": "אני נשאר שתי לילות.",
+        "npc": "בשמחה, אני מוצא את ההזמנה. מדובר בהזמנה לשתי לילות בחדר 214."
+      },
+      {
+        "player": "מה מספר החדר?",
+        "npc": "החדר שביקשת הוא 214."
+      },
+      {
+        "player": "ארוחת בוקר כלול?",
+        "npc": "כן, ארוחת הבוקר כלולה בחדר."
+      },
+      {
+        "player": "כמה אני צריך לשלם?",
+        "npc": "הסה\"כ כל הכרוך הוא 900 אירוס לארוחת הלינה לשתי ליילות."
+      }
+    ]
+  },
+  {
+    "id": "c7d3bd3c06c9",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Buying fruit from a merchant at a town street market",
+      "character": {
+        "name": "Noa",
+        "role": "fruit seller",
+        "personality": "friendly and patient",
+        "register": "informal"
+      },
+      "entities": [
+        {
+          "id": "apples",
+          "type": "product",
+          "name": "apple",
+          "quantity": 2,
+          "price_ils": 10
+        }
+      ],
+      "topics": [
+        "shopping",
+        "fruit",
+        "quantities",
+        "prices"
+      ],
+      "quest": {
+        "goal": "buy two apples",
+        "paid": false,
+        "state_note": "No payment has yet occurred"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "quote the fixed price for two apples and help the learner decide whether to buy"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, כמה עולים תפוחים?",
+        "npc": "שלום! שני תפוחים, כמה שאתה מעוניין? תפוח אחד עשוי כ-10 ₪, ואם תרצה שניים, זה יקרה בדיוק 20 ₪."
+      },
+      {
+        "player": "אני רוצה שתי תפוחים.",
+        "npc": "אז שני תפוחים עשויים סך הכל 20 ש\"ח. מה דעתך, האם תרצה לרכוש אותם?"
+      },
+      {
+        "player": "כמה עולה שני תפוחים?",
+        "npc": "שני תפוחים בעצמם עשויים 20 ₪, אבל חשוב לזכור שזה המחיר לתפוח אחד, אז אם תרצה להתייחס למספר הכולל, זה יהיה סכום כולל של 20 ₪."
+      },
+      {
+        "player": "אני רוצה לקנות אותם.",
+        "npc": "בטח, אני שמח! המשמעות היא שאתה מוכן להתקדם עם המעסיקה הזו?"
+      },
+      {
+        "player": "אפשר לשלם עכשיו?",
+        "npc": "איך תרצה, תרצה להגיש לי את התשלום כרגע?"
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, כמה עולים תפוחים?",
+        "npc": "שלום! שני תפוחים עולים 20 ש\"ש. האם תרצה לקנות?"
+      },
+      {
+        "player": "אני רוצה שתי תפוחים.",
+        "npc": "איך זה ייראה? תבחר מה מוכן."
+      },
+      {
+        "player": "כמה עולה שני תפוחים?",
+        "npc": "שתי תפוחים עולות 20 ש\"ש."
+      },
+      {
+        "player": "אני רוצה לקנות אותם.",
+        "npc": "בטח, הנה שתי תפוחים למשק."
+      },
+      {
+        "player": "אפשר לשלם עכשיו?",
+        "npc": "הנה, 20 ש\"ש."
+      }
+    ]
+  },
+  {
+    "id": "d7d90a3d9246",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Asking about a lost wallet at a small clothing shop",
+      "character": {
+        "name": "Avi",
+        "role": "shop clerk",
+        "personality": "helpful and cautious",
+        "register": "neutral"
+      },
+      "entities": [
+        {
+          "id": "wallet",
+          "type": "lost_item",
+          "name": "black wallet",
+          "quantity": 1,
+          "notes": "found in the shop yesterday; kept in the shop office"
+        },
+        {
+          "id": "owner",
+          "type": "person",
+          "name": "Michal Levi",
+          "notes": "the learner; name on the identity card inside the wallet"
+        }
+      ],
+      "topics": [
+        "shopping",
+        "lost and found",
+        "descriptions",
+        "names"
+      ],
+      "quest": {
+        "goal": "recover the lost black wallet",
+        "paid": false,
+        "state_note": "The wallet has not been handed back; return is decided externally"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, איבדתי ארנק כאן אתמול.",
+        "npc": "אני מצטער לשמוע. האם תוכל/י לתאר קצת את הארנק?"
+      },
+      {
+        "player": "זה ארנק שחורה.",
+        "npc": "בסדר, האם תוכל/י לספר לי משהו נוסף שייתכן שיעזור לנו לזהות אותו?"
+      },
+      {
+        "player": "השם שלי מיכל לוי.",
+        "npc": "מכל, האם אתה ודאי שזה ארנק שחור? ובהנחה, האם מצאת בו משהו בתוך הארנק, אולי תמונה או מכשיר זיהוי?"
+      },
+      {
+        "player": "איפה הארנק עכשיו?",
+        "npc": "אני מודאג, אבל אני יכול לומר לך שאני נמצא בתוך המרכש, ויש לי לדעת שבעצם מצאנו ארנק שחור פה כבר אתמול, ושומרים אותו במשרד, וחשוב לי לדעת אם אתה מצליח לאשר שזה אכן אתה, כדי שאוכל לנסות ולעדכן את הסמכות הרלוונטיות."
+      },
+      {
+        "player": "אפשר לקחת אותו היום?",
+        "npc": "בהתחשב בכך שזו הייתה תורת אירוע שמתקיימת, אני לא יכול לספק לך העברה, אבל אם אתה מוכן לתת לי פרטים נוספים, אולי נוכל לנסות לתאם דרך אחרת."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, איבדתי ארנק כאן אתמול.",
+        "npc": "שלום, אני מצטער לשמוע. האם תוכל לתאר את הארנק?"
+      },
+      {
+        "player": "זה ארנק שחורה.",
+        "npc": "כן, אני זוכר ששיצא מהאריזה שלי. האם תוכל לומר לי את השם שלך?"
+      },
+      {
+        "player": "השם שלי מיכל לוי.",
+        "npc": "תודה, מיכל לוי. האם יש לך פרטים נוספים שייעזרו לי למצוא אותו?"
+      },
+      {
+        "player": "איפה הארנק עכשיו?",
+        "npc": "הארנק נמצא במשרד שלנו."
+      },
+      {
+        "player": "אפשר לקחת אותו היום?",
+        "npc": "אני יכול לבדוק אם יש לך שאלות נוספות."
+      }
+    ]
+  },
+  {
+    "id": "e622daf6e844",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Asking about a lost wallet at a small clothing shop",
+      "character": {
+        "name": "Avi",
+        "role": "shop clerk",
+        "personality": "helpful and cautious",
+        "register": "neutral"
+      },
+      "entities": [
+        {
+          "id": "wallet",
+          "type": "lost_item",
+          "name": "black wallet",
+          "quantity": 1,
+          "notes": "found in the shop yesterday; kept in the shop office"
+        },
+        {
+          "id": "owner",
+          "type": "person",
+          "name": "Michal Levi",
+          "notes": "the learner; name on the identity card inside the wallet"
+        }
+      ],
+      "topics": [
+        "shopping",
+        "lost and found",
+        "descriptions",
+        "names"
+      ],
+      "quest": {
+        "goal": "recover the lost black wallet",
+        "paid": false,
+        "state_note": "The wallet has not been handed back; return is decided externally"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "confirm that a black wallet was found yesterday and is kept in the office, ask for the owner's name, and not claim the wallet was handed back"
+      }
+    },
+    "A": [
+      {
+        "player": "שלום, איבדתי ארנק כאן אתמול.",
+        "npc": "שלום, אני מצטער לשמוע. האם תוכל לתאר את הארנק?"
+      },
+      {
+        "player": "זה ארנק שחורה.",
+        "npc": "כן, אני זוכר ששיצא מהאריזה שלי. האם תוכל לומר לי את השם שלך?"
+      },
+      {
+        "player": "השם שלי מיכל לוי.",
+        "npc": "תודה, מיכל לוי. האם יש לך פרטים נוספים שייעזרו לי למצוא אותו?"
+      },
+      {
+        "player": "איפה הארנק עכשיו?",
+        "npc": "הארנק נמצא במשרד שלנו."
+      },
+      {
+        "player": "אפשר לקחת אותו היום?",
+        "npc": "אני יכול לבדוק אם יש לך שאלות נוספות."
+      }
+    ],
+    "B": [
+      {
+        "player": "שלום, איבדתי ארנק כאן אתמול.",
+        "npc": "אני מצטער לשמוע. האם תוכל/י לתאר קצת את הארנק?"
+      },
+      {
+        "player": "זה ארנק שחורה.",
+        "npc": "בסדר, האם תוכל/י לספר לי משהו נוסף שייתכן שיעזור לנו לזהות אותו?"
+      },
+      {
+        "player": "השם שלי מיכל לוי.",
+        "npc": "מכל, האם אתה ודאי שזה ארנק שחור? ובהנחה, האם מצאת בו משהו בתוך הארנק, אולי תמונה או מכשיר זיהוי?"
+      },
+      {
+        "player": "איפה הארנק עכשיו?",
+        "npc": "אני מודאג, אבל אני יכול לומר לך שאני נמצא בתוך המרכש, ויש לי לדעת שבעצם מצאנו ארנק שחור פה כבר אתמול, ושומרים אותו במשרד, וחשוב לי לדעת אם אתה מצליח לאשר שזה אכן אתה, כדי שאוכל לנסות ולעדכן את הסמכות הרלוונטיות."
+      },
+      {
+        "player": "אפשר לקחת אותו היום?",
+        "npc": "בהתחשב בכך שזו הייתה תורת אירוע שמתקיימת, אני לא יכול לספק לך העברה, אבל אם אתה מוכן לתת לי פרטים נוספים, אולי נוכל לנסות לתאם דרך אחרת."
+      }
+    ]
+  },
+  {
+    "id": "e7b61c842b63",
+    "task": {
+      "language": "Hebrew",
+      "cefr_level": "A1",
+      "scenario": "Checking in at the reception desk of a small city hotel",
+      "character": {
+        "name": "Yael",
+        "role": "hotel receptionist",
+        "personality": "polite and organized",
+        "register": "formal"
+      },
+      "entities": [
+        {
+          "id": "guest",
+          "type": "person",
+          "name": "David Cohen",
+          "notes": "the learner; the reservation is under this name"
+        },
+        {
+          "id": "reservation",
+          "type": "booking",
+          "name": "room reservation",
+          "quantity": 2,
+          "price_ils": 900,
+          "notes": "quantity is the number of nights; price_ils is the total for two nights"
+        },
+        {
+          "id": "room",
+          "type": "room",
+          "name": "room 214"
+        },
+        {
+          "id": "breakfast",
+          "type": "service",
+          "name": "breakfast",
+          "price_ils": 0,
+          "notes": "included in the price; served from 07:00 to 10:00"
+        }
+      ],
+      "topics": [
+        "travel",
+        "hotel",
+        "numbers",
+        "prices"
+      ],
+      "quest": {
+        "goal": "check in for a two-night stay",
+        "paid": false,
+        "state_note": "The stay has not been paid for"
+      },
+      "dialogue": {
+        "turn_budget": 5,
+        "npc_goal": "confirm the reservation for two nights in room 214, the included breakfast and the total price without claiming payment"
+      }
+    },
+    "A": [
+      {
+        "player": "ערב טוב, יש לי הזמנה על שם דוד כהן.",
+        "npc": "שלום, אשמח לבדוק את ההזמנה של דוד כהן."
+      },
+      {
+        "player": "אני נשאר שתי לילות.",
+        "npc": "בשמחה, אני מוצא את ההזמנה. מדובר בהזמנה לשתי לילות בחדר 214."
+      },
+      {
+        "player": "מה מספר החדר?",
+        "npc": "החדר שביקשת הוא 214."
+      },
+      {
+        "player": "ארוחת בוקר כלול?",
+        "npc": "כן, ארוחת הבוקר כלולה בחדר."
+      },
+      {
+        "player": "כמה אני צריך לשלם?",
+        "npc": "הסה\"כ כל הכרוך הוא 900 אירוס לארוחת הלינה לשתי ליילות."
+      }
+    ],
+    "B": [
+      {
+        "player": "ערב טוב, יש לי הזמנה על שם דוד כהן.",
+        "npc": "שלום רב, אשמח לבדוק עבורך את ההזמנה, אילו פרטים נוספים יש לך לגבי החסימה?"
+      },
+      {
+        "player": "אני נשאר שתי לילות.",
+        "npc": "בהחלט, אני מצטער/ת, ברצונך להזמין בדיוק עבור שתי אדריכלות עבור חדר 214, כולל ארוחת בוקר, כדי שאוכל לאשר את ההזמנה?"
+      },
+      {
+        "player": "מה מספר החדר?",
+        "npc": "ההזמנה שקיבלתי עבורך מתייחסת לחדר מספר 214. האם זה מתאים לך?"
+      },
+      {
+        "player": "ארוחת בוקר כלול?",
+        "npc": "כן, ארוחת הבוקר כלולה כחלק מהתעריף. האם תרצה שאבצע את ההרשמה עבור שני הלילות למישהו, או שיש לך עוד שאלות?"
+      },
+      {
+        "player": "כמה אני צריך לשלם?",
+        "npc": "עלות ההזמנה עבור שתי לילות במקרה הזה היא 900 אירו את המול, כולל כל התקציבים שציינתי. האם תרצה להמשיך בהמשך ולקבל את ההרשמה המלאה?"
+      }
+    ]
+  }
+]

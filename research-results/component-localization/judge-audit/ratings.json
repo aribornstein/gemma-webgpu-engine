@@ -1,0 +1,384 @@
+[
+  {
+    "id": "1ea071caa7db",
+    "winner": "B",
+    "A": {
+      "grammar": 5,
+      "naturalness": 4,
+      "evidence": [
+        "וכאחד שקובע בשווי 25 אירו",
+        "תרצלי לסחף",
+        "כל קופסה מכילה 20 כדורים."
+      ]
+    },
+    "B": {
+      "grammar": 7,
+      "naturalness": 6,
+      "evidence": [
+        "חבילה של תמינא כאבים",
+        "הקופסה זולה 25 אירו.",
+        "בקופסה יש 20 כדורים.",
+        "החבילה עולה 25 אירו."
+      ]
+    },
+    "rationale": "B has more consistently intelligible sentence construction, although I cannot identify the intended expression in תמינא כאבים, and זולה followed directly by the price is defective here. A has two clear factual sentences, but its opening clause connection and תרצלי לסחף substantially disrupt the Hebrew. B wins on language, not brevity. The shared wrong currency is a task-fidelity issue, not a Hebrew grammar error.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "4f82a222ef8f",
+    "winner": "A",
+    "A": {
+      "grammar": 8,
+      "naturalness": 8,
+      "evidence": [
+        "תה אחד, זה יר ב-12 ש\"ח.",
+        "12 ש\"ח.",
+        "יש גם מים, אם תרצה.",
+        "בבקשה."
+      ]
+    },
+    "B": {
+      "grammar": 7,
+      "naturalness": 5,
+      "evidence": [
+        "להלן ממי ו-\"תה\"",
+        "זה יהיה 12 ₪.",
+        "אוכל להכין עבורך את התיאבון."
+      ]
+    },
+    "rationale": "A's זה יר is a substantive malformed expression, but the remaining replies are ordinary, useful Hebrew; the short price and closing need no elaboration. B has a clear price sentence, but I cannot recover a clear intended meaning from להלן ממי, and preparing the customer's appetite is an unnatural collocation here despite its grammatical surface. The sugar contradiction is not counted as a grammar error.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "5a5399163020",
+    "winner": "B",
+    "A": {
+      "grammar": 5,
+      "naturalness": 4,
+      "evidence": [
+        "שתי כרטיסים",
+        "כל אחד מחוסר 17 ש\"ש",
+        "את הפרטים נוספים",
+        "האוטובוס הראשוני לחיפה",
+        "המסע המתוכנן הוא בדרך כלל לפי השעות"
+      ]
+    },
+    "B": {
+      "grammar": 8,
+      "naturalness": 7,
+      "evidence": [
+        "המחירם 34 ש\"ח",
+        "עבור שני כרטיסים, המחיר הוא 34 ש\"ח.",
+        "מן העמדה 5",
+        "מחיר הכרטיסים לשני הכרטיסים"
+      ]
+    },
+    "rationale": "B is predominantly grammatical and readily understandable. המחירם is malformed, the platform wording is less idiomatic than מרציף 5, and the final price phrase is needlessly repetitive. A has a clear numeral-gender error in שתי כרטיסים, a definiteness mismatch in הפרטים נוספים, and several unnatural lexical choices, notably מחוסר as a price predicate. Its platform reply also lacks a clear conversational meaning. B's advantage is linguistic, not its shorter length.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "76f34b1224f3",
+    "winner": "tie",
+    "A": {
+      "grammar": 5,
+      "naturalness": 5,
+      "evidence": [
+        "שני תפוחים עולים",
+        "שתי תפוחים עולות",
+        "הנה שתי תפוחים למשק",
+        "תבחר מה מוכן."
+      ]
+    },
+    "B": {
+      "grammar": 6,
+      "naturalness": 4,
+      "evidence": [
+        "שני תפוחים, כמה שאתה מעוניין?",
+        "תפוח אחד עשוי כ-10 ₪",
+        "שני תפוחים עשויים סך הכל 20 ש\"ח.",
+        "להתקדם עם המעסיקה הזו",
+        "תרצה להגיש לי את התשלום כרגע?"
+      ]
+    },
+    "rationale": "A starts with correct agreement but repeatedly switches to the incorrect feminine שתי and עולות with תפוחים; למשק is also puzzling in this purchase. B maintains the masculine numeral and plural forms, but repeatedly uses עשוי or עשויים as an unnatural price predicate and introduces המעסיקה, an employer rather than a purchase. Both remain partly understandable with substantial problems. A's somewhat better naturalness balances B's somewhat better grammar; there is no clear combined winner. External price accuracy is not scored.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "839cfbc302d6",
+    "winner": "B",
+    "A": {
+      "grammar": 7,
+      "naturalness": 5,
+      "evidence": [
+        "להלן ממי ו-\"תה\"",
+        "זה יהיה 12 ₪.",
+        "אוכל להכין עבורך את התיאבון."
+      ]
+    },
+    "B": {
+      "grammar": 8,
+      "naturalness": 8,
+      "evidence": [
+        "תה אחד, זה יר ב-12 ש\"ח.",
+        "12 ש\"ח.",
+        "יש גם מים, אם תרצה.",
+        "בבקשה."
+      ]
+    },
+    "rationale": "B's זה יר is a substantive malformed expression, but its other replies are natural, grammatical short responses. A's price sentence is clear, while להלן ממי has no clear intended meaning that I can identify, and להכין עבורך את התיאבון is an unnatural collocation in this exchange. B is preferred for the quality of its Hebrew, not concision itself. The sugar contradiction is separate from the language judgment.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "98d26696210e",
+    "winner": "tie",
+    "A": {
+      "grammar": 5,
+      "naturalness": 5,
+      "evidence": [
+        "שני תפוחים עולים",
+        "שתי תפוחים עולות",
+        "הנה שתי תפוחים למשק",
+        "תבחר מה מוכן."
+      ]
+    },
+    "B": {
+      "grammar": 6,
+      "naturalness": 4,
+      "evidence": [
+        "שני תפוחים, כמה שאתה מעוניין?",
+        "תפוח אחד עשוי כ-10 ₪",
+        "שני תפוחים עשויים סך הכל 20 ש\"ח.",
+        "להתקדם עם המעסיקה הזו",
+        "תרצה להגיש לי את התשלום כרגע?"
+      ]
+    },
+    "rationale": "A contains repeated numeral and verb gender errors with תפוחים, despite correct agreement in its opening. Its למשק phrase is also unnatural here. B has better agreement but substantially worse lexical choices: עשוי and עשויים do not naturally express these prices, and המעסיקה does not describe the transaction. Neither is reliably natural. The grammar/naturalness trade-off supports a tie, without rewarding B's elaboration or treating A's shortness as a fault. External price accuracy is not scored.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "a12936ef5753",
+    "winner": "A",
+    "A": {
+      "grammar": 7,
+      "naturalness": 6,
+      "evidence": [
+        "חבילה של תמינא כאבים",
+        "הקופסה זולה 25 אירו.",
+        "בקופסה יש 20 כדורים.",
+        "החבילה עולה 25 אירו."
+      ]
+    },
+    "B": {
+      "grammar": 5,
+      "naturalness": 4,
+      "evidence": [
+        "וכאחד שקובע בשווי 25 אירו",
+        "תרצלי לסחף",
+        "כל קופסה מכילה 20 כדורים."
+      ]
+    },
+    "rationale": "A has substantial faults in תמינא כאבים, whose intended wording I cannot identify, and the price expression הקופסה זולה 25 אירו. Nevertheless, its other sentences are straightforward Hebrew. B's disconnected opening construction and תרצלי לסחף are more disruptive, although its pill-count reply is fully natural. A has the better combined language quality. Both use the wrong currency, which is not itself a Hebrew grammar error.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "a1f2c96b62df",
+    "winner": "A",
+    "A": {
+      "grammar": 8,
+      "naturalness": 8,
+      "evidence": [
+        "תה אחד, זה יר ב-12 ש\"ח.",
+        "12 ש\"ח.",
+        "יש גם מים, אם תרצה.",
+        "בבקשה."
+      ]
+    },
+    "B": {
+      "grammar": 7,
+      "naturalness": 5,
+      "evidence": [
+        "להלן ממי ו-\"תה\"",
+        "זה יהיה 12 ₪.",
+        "אוכל להכין עבורך את התיאבון."
+      ]
+    },
+    "rationale": "A has one conspicuous malformed expression, זה יר, but otherwise uses natural everyday replies. Its brief price and closing are sufficient Hebrew. B's syntax is often intact, yet להלן ממי has no clear intended meaning that I can identify, and preparing someone's appetite is not a natural expression for preparing an order. These language issues, rather than verbosity or the separate sugar mismatch, determine the preference.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "a1f44e798b6d",
+    "winner": "A",
+    "A": {
+      "grammar": 8,
+      "naturalness": 7,
+      "evidence": [
+        "המחירם 34 ש\"ח",
+        "עבור שני כרטיסים, המחיר הוא 34 ש\"ח.",
+        "מן העמדה 5",
+        "מחיר הכרטיסים לשני הכרטיסים"
+      ]
+    },
+    "B": {
+      "grammar": 5,
+      "naturalness": 4,
+      "evidence": [
+        "שתי כרטיסים",
+        "כל אחד מחוסר 17 ש\"ש",
+        "את הפרטים נוספים",
+        "האוטובוס הראשוני לחיפה",
+        "המסע המתוכנן הוא בדרך כלל לפי השעות"
+      ]
+    },
+    "rationale": "A is mostly clear Hebrew, with the malformed המחירם, less idiomatic platform wording, and a repetitive final noun phrase. B has the more serious numeral-gender error שתי כרטיסים and definiteness mismatch הפרטים נוספים. Its מחוסר price expression and vague platform response further reduce naturalness. A therefore wins on grammar and naturalness, without any bonus for shorter replies.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "b3248c7368a1",
+    "winner": "B",
+    "A": {
+      "grammar": 5,
+      "naturalness": 4,
+      "evidence": [
+        "פרטים נוספים יש לך לגבי החסימה",
+        "עבור שתי אדריכלות",
+        "ארוחת הבוקר כלולה כחלק מהתעריף.",
+        "עבור שתי לילות",
+        "900 אירו את המול"
+      ]
+    },
+    "B": {
+      "grammar": 6,
+      "naturalness": 6,
+      "evidence": [
+        "אשמח לבדוק את ההזמנה של דוד כהן.",
+        "בהזמנה לשתי לילות בחדר 214.",
+        "החדר שביקשת הוא 214.",
+        "הסה\"כ כל הכרוך הוא 900 אירוס לארוחת הלינה לשתי ליילות."
+      ]
+    },
+    "rationale": "Both use the wrong numeral gender with לילות. B's final sentence is severely awkward, including the total-price construction, אירוס as currency wording, and ארוחת הלינה, but its preceding replies are substantially clearer. A additionally substitutes החסימה and אדריכלות into reservation language and ends with את המול, whose intended meaning I cannot determine. A's correct breakfast clause does not offset these repeated breakdowns. B wins overall; the currency's factual identity is not separately scored.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "c7d3bd3c06c9",
+    "winner": "tie",
+    "A": {
+      "grammar": 6,
+      "naturalness": 4,
+      "evidence": [
+        "שני תפוחים, כמה שאתה מעוניין?",
+        "תפוח אחד עשוי כ-10 ₪",
+        "שני תפוחים עשויים סך הכל 20 ש\"ח.",
+        "להתקדם עם המעסיקה הזו",
+        "תרצה להגיש לי את התשלום כרגע?"
+      ]
+    },
+    "B": {
+      "grammar": 5,
+      "naturalness": 5,
+      "evidence": [
+        "שני תפוחים עולים",
+        "שתי תפוחים עולות",
+        "הנה שתי תפוחים למשק",
+        "תבחר מה מוכן."
+      ]
+    },
+    "rationale": "A has more consistent masculine agreement but repeatedly misuses עשוי or עשויים in price statements and refers to המעסיקה in a purchase conversation. B has a more ordinary opening price construction, then repeated feminine numeral and verb agreement with תפוחים, plus the puzzling למשק. Both have substantial language problems. A's modest grammar advantage is balanced by B's modest naturalness advantage, so the combined judgment is a tie. Length and external price accuracy are not the criteria.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "d7d90a3d9246",
+    "winner": "B",
+    "A": {
+      "grammar": 5,
+      "naturalness": 4,
+      "evidence": [
+        "האם תוכל/י לתאר קצת את הארנק?",
+        "האם אתה ודאי",
+        "בתוך המרכש",
+        "ויש לי לדעת",
+        "זו הייתה תורת אירוע שמתקיימת"
+      ]
+    },
+    "B": {
+      "grammar": 7,
+      "naturalness": 6,
+      "evidence": [
+        "ששיצא מהאריזה שלי",
+        "פרטים נוספים שייעזרו לי למצוא אותו",
+        "הארנק נמצא במשרד שלנו.",
+        "אני יכול לבדוק אם יש לך שאלות נוספות."
+      ]
+    },
+    "rationale": "B has malformed ששיצא and uses שייעזרו where details helping the clerk calls for שיעזרו. Its packaging remark and final offer are conversationally awkward, but its location sentence and much of its phrasing are clear. A begins well, then deteriorates into unnatural האם אתה ודאי and ויש לי לדעת constructions and an opaque תורת אירוע phrase. I cannot identify the intended word המרכש. B's linguistic advantage does not depend on which arm reports more required facts.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "e622daf6e844",
+    "winner": "A",
+    "A": {
+      "grammar": 7,
+      "naturalness": 6,
+      "evidence": [
+        "ששיצא מהאריזה שלי",
+        "פרטים נוספים שייעזרו לי למצוא אותו",
+        "הארנק נמצא במשרד שלנו.",
+        "אני יכול לבדוק אם יש לך שאלות נוספות."
+      ]
+    },
+    "B": {
+      "grammar": 5,
+      "naturalness": 4,
+      "evidence": [
+        "האם תוכל/י לתאר קצת את הארנק?",
+        "האם אתה ודאי",
+        "בתוך המרכש",
+        "ויש לי לדעת",
+        "זו הייתה תורת אירוע שמתקיימת"
+      ]
+    },
+    "rationale": "A is imperfect: ששיצא is malformed, שייעזרו does not express the intended active helping as שיעזרו would, and the packaging and final-check remarks sound awkward in context. Still, most of A is understandable everyday Hebrew. B has good opening questions but then several disrupted expressions, including האם אתה ודאי, ויש לי לדעת, and תורת אירוע. I cannot identify the intended word המרכש. A wins on language quality rather than length or factual coverage.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  },
+  {
+    "id": "e7b61c842b63",
+    "winner": "A",
+    "A": {
+      "grammar": 6,
+      "naturalness": 6,
+      "evidence": [
+        "אשמח לבדוק את ההזמנה של דוד כהן.",
+        "בהזמנה לשתי לילות בחדר 214.",
+        "החדר שביקשת הוא 214.",
+        "הסה\"כ כל הכרוך הוא 900 אירוס לארוחת הלינה לשתי ליילות."
+      ]
+    },
+    "B": {
+      "grammar": 5,
+      "naturalness": 4,
+      "evidence": [
+        "פרטים נוספים יש לך לגבי החסימה",
+        "עבור שתי אדריכלות",
+        "ארוחת הבוקר כלולה כחלק מהתעריף.",
+        "עבור שתי לילות",
+        "900 אירו את המול"
+      ]
+    },
+    "rationale": "A's numeral gender with לילות is wrong, and its final total-price sentence has major lexical and construction problems, especially אירוס and ארוחת הלינה. Its first four replies nevertheless convey their meaning much more naturally overall. B shares the numeral error and repeatedly introduces inappropriate reservation vocabulary, including החסימה and אדריכלות. I cannot determine the intended meaning of את המול. B's natural breakfast clause is insufficient to outweigh those problems. The preference concerns Hebrew, not factual currency compliance.",
+    "judgeId": "c-judge-audit",
+    "humanCalibrated": false
+  }
+]

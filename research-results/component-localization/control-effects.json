@@ -1,0 +1,308 @@
+{
+  "exploratory": true,
+  "selectedOnSameCases": true,
+  "results": [
+    {
+      "caseId": "shirt-order-numeral",
+      "layer": 34,
+      "stage": "attention",
+      "effect": 1.4625591968060654,
+      "donor": {
+        "id": "shirt-order-numeral.L34.attention.donor",
+        "family": "shirt_shop",
+        "logOdds": 1.2691755407615837,
+        "sequenceLogOdds": -4.601405846366262,
+        "text": "שתי חולצות יהיו בסך 110 שקלים.",
+        "stopReason": "end-token",
+        "identicalToBaseline": false,
+        "targetPhrasePresent": true,
+        "statedTotalPresent": true,
+        "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+        "freeArtifact": "components:shirt-order-numeral.L34.attention.donor.free"
+      },
+      "random": [
+        {
+          "id": "shirt-order-numeral.L34.attention.random101",
+          "family": "shirt_shop",
+          "logOdds": 0.10694405307034671,
+          "sequenceLogOdds": -5.763637334057499,
+          "text": "שתי חולצות יהיו בסך 110 שקלים.",
+          "stopReason": "end-token",
+          "identicalToBaseline": false,
+          "targetPhrasePresent": true,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random101.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random307",
+          "family": "shirt_shop",
+          "logOdds": -0.7640791049435727,
+          "sequenceLogOdds": -6.6346604920714185,
+          "text": "שני חולצות יהיו בסך 110 ש\"ח.",
+          "stopReason": "end-token",
+          "identicalToBaseline": true,
+          "targetPhrasePresent": false,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random307.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random503",
+          "family": "shirt_shop",
+          "logOdds": 0.3162825559151621,
+          "sequenceLogOdds": -5.554298831212684,
+          "text": "שתי חולצות יהיו בסך 110 שקלים.",
+          "stopReason": "end-token",
+          "identicalToBaseline": false,
+          "targetPhrasePresent": true,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random503.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random701",
+          "family": "shirt_shop",
+          "logOdds": 0.17769661522159552,
+          "sequenceLogOdds": -5.69288477190625,
+          "text": "שתי חולצות יהיו בסך 110 שקלים.",
+          "stopReason": "end-token",
+          "identicalToBaseline": false,
+          "targetPhrasePresent": true,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random701.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random907",
+          "family": "shirt_shop",
+          "logOdds": 0.17340709225201323,
+          "sequenceLogOdds": -5.697174294875829,
+          "text": "שתי חולצות יהיו בסך 110 שקלים.",
+          "stopReason": "end-token",
+          "identicalToBaseline": false,
+          "targetPhrasePresent": true,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random907.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random1103",
+          "family": "shirt_shop",
+          "logOdds": -0.3263508635202754,
+          "sequenceLogOdds": -6.196932250648118,
+          "text": "שני חולצות יהיו בסך 110 ש\"ח.",
+          "stopReason": "end-token",
+          "identicalToBaseline": true,
+          "targetPhrasePresent": false,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random1103.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random1301",
+          "family": "shirt_shop",
+          "logOdds": -0.4104924743855598,
+          "sequenceLogOdds": -6.281073861513406,
+          "text": "שני חולצות יהיו בסך 110 ש\"ח.",
+          "stopReason": "end-token",
+          "identicalToBaseline": true,
+          "targetPhrasePresent": false,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random1301.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random1501",
+          "family": "shirt_shop",
+          "logOdds": 0.003782429384401098,
+          "sequenceLogOdds": -5.866798957743441,
+          "text": "שתי חולצות יהיו בסך 110 שקלים.",
+          "stopReason": "end-token",
+          "identicalToBaseline": false,
+          "targetPhrasePresent": true,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random1501.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random1709",
+          "family": "shirt_shop",
+          "logOdds": 0.30329258876427545,
+          "sequenceLogOdds": -5.567288798363563,
+          "text": "שתי חולצות יהיו בסך 110 שקלים.",
+          "stopReason": "end-token",
+          "identicalToBaseline": false,
+          "targetPhrasePresent": true,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random1709.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random1901",
+          "family": "shirt_shop",
+          "logOdds": -0.4439752665348422,
+          "sequenceLogOdds": -6.3145566536626845,
+          "text": "שני חולצות יהיו בסך 110 ש\"ח.",
+          "stopReason": "end-token",
+          "identicalToBaseline": true,
+          "targetPhrasePresent": false,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random1901.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random2111",
+          "family": "shirt_shop",
+          "logOdds": -0.7168659122522705,
+          "sequenceLogOdds": -6.587447299380116,
+          "text": "שני חולצות יהיו בסך 110 ש\"ח.",
+          "stopReason": "end-token",
+          "identicalToBaseline": true,
+          "targetPhrasePresent": false,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random2111.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random2309",
+          "family": "shirt_shop",
+          "logOdds": 0.3749414796312678,
+          "sequenceLogOdds": -5.495639907496582,
+          "text": "שתי חולצות יהיו בסך 110 שקלים.",
+          "stopReason": "end-token",
+          "identicalToBaseline": false,
+          "targetPhrasePresent": true,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random2309.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random2503",
+          "family": "shirt_shop",
+          "logOdds": -0.39590613994537094,
+          "sequenceLogOdds": -6.26648752707321,
+          "text": "שני חולצות יהיו בסך 110 ש\"ח.",
+          "stopReason": "end-token",
+          "identicalToBaseline": true,
+          "targetPhrasePresent": false,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random2503.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random2707",
+          "family": "shirt_shop",
+          "logOdds": 0.10269402311488562,
+          "sequenceLogOdds": -5.767887364012957,
+          "text": "שתי חולצות יהיו בסך 110 שקלים.",
+          "stopReason": "end-token",
+          "identicalToBaseline": false,
+          "targetPhrasePresent": true,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random2707.free"
+        },
+        {
+          "id": "shirt-order-numeral.L34.attention.random2903",
+          "family": "shirt_shop",
+          "logOdds": -0.382038808243955,
+          "sequenceLogOdds": -6.252620195371797,
+          "text": "שני חולצות יהיו בסך 110 ש\"ח.",
+          "stopReason": "end-token",
+          "identicalToBaseline": true,
+          "targetPhrasePresent": false,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.random2903.free"
+        }
+      ],
+      "transfer": [
+        {
+          "recipient": "book-order-numeral",
+          "baseline": "שתי גילידים. המחיר הכולל יהיה 48 שקלים.",
+          "id": "shirt-order-numeral.L34.attention.transfer-book-order-numeral",
+          "family": "bookshop",
+          "logOdds": -3.5224706350266963,
+          "sequenceLogOdds": -0.9340195409572409,
+          "text": "שתי גילידים. המחיר הכולל יהיה 48 שקלים.",
+          "stopReason": "end-token",
+          "identicalToBaseline": true,
+          "targetPhrasePresent": false,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.transfer-book-order-numeral.free"
+        },
+        {
+          "recipient": "library-operation-verb",
+          "baseline": "העמדות פועלות כרגע. אני יכול לאשר את ההזמנה עבור שעה אחת. המחיר הכולל יהיה 20 שקלים. האם תרצה להמשיך?",
+          "id": "shirt-order-numeral.L34.attention.transfer-library-operation-verb",
+          "family": "library_workstation_booking",
+          "logOdds": 6.9097752552737575,
+          "sequenceLogOdds": 0.17106755623456138,
+          "text": "העמדות פועלות כרגע. אני יכול לאשר את ההזמנה עבור שעה אחת. המחיר הכולל יהיה 20 שקלים. האם תרצה להמשיך?",
+          "stopReason": "end-token",
+          "identicalToBaseline": true,
+          "targetPhrasePresent": true,
+          "statedTotalPresent": true,
+          "caveat": "Phrase and numeral presence alone are not quality, semantic correctness or a 9/10 pass",
+          "freeArtifact": "components:shirt-order-numeral.L34.attention.transfer-library-operation-verb.free"
+        }
+      ],
+      "randomControl": {
+        "n": 15,
+        "mean": 0.06800580721302178,
+        "sd": 0.3829382201908052,
+        "rank": 1,
+        "pValue": 0.0625,
+        "min": -0.570695448899091,
+        "max": 0.5683251356757495,
+        "metadata": {
+          "interpretation": "Descriptive control distribution and one-sided empirical rank, including ties. Not parametric significance; inferential use requires exchangeable, appropriately matched random controls."
+        }
+      },
+      "targetOnlyOutcomeCounts": {
+        "caseCount": 15,
+        "observedPairs": 15,
+        "familyCount": 1,
+        "fixed": 8,
+        "broken": 0,
+        "unchangedCorrect": 0,
+        "unchangedWrong": 7,
+        "unknown": 0
+      }
+    }
+  ],
+  "holmAdjustedEmpiricalP": [
+    0.0625
+  ],
+  "familyEffects": {
+    "caseCount": 1,
+    "familyCount": 1,
+    "familyEffects": [
+      {
+        "family": "shirt_shop",
+        "caseCount": 1,
+        "meanDelta": 1.4625591968060654
+      }
+    ],
+    "meanDelta": 1.4625591968060654,
+    "confidenceInterval95": null,
+    "pValue": 1,
+    "exact": true,
+    "lowPower": true,
+    "seed": 1592594996,
+    "replicates": {
+      "bootstrap": 0,
+      "signFlip": 2
+    },
+    "metadata": {
+      "unit": "family",
+      "alternative": "two-sided",
+      "confidenceLevel": 0.95,
+      "bootstrapMethod": "percentile",
+      "interpretation": "Equal-weight family effects; bootstrap intervals assume independent, representative families. Sign-flip p-values assume independent family effects symmetric about zero under the null. Exact enumeration is a symmetry test, not automatically a valid randomization test. Few families imply discrete p-values and unstable intervals; rows within a family are not independent replicates."
+    }
+  },
+  "note": "Selected sites and two discovery families do not supply confirmatory significance. No quality promotion from log-odds or phrase matches."
+}

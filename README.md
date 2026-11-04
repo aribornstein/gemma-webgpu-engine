@@ -6,6 +6,20 @@ The engine optimizes the complete generation runtime, not a greedy-only benchmar
 
 See [PROJECT.md](PROJECT.md) for architecture, correctness gates, model provenance, and the kernel roadmap.
 
+## Research comparison demo
+
+Open [`research.html`](research.html) on the dev server (or
+[`build/research.html`](build/research.html) on static hosting) for recorded
+before/after Hebrew conversations, original judge evidence, paired repair/damage
+statistics, and clickable token/layer/component diagnostics. Recorded playback
+needs no weights or GPU. Live baseline-versus-steering replay requires a loaded
+research session and uses matched inference settings and request-local overlays.
+
+The historical steering candidate regressed language quality; the new component
+rescue has not transferred to the second target. **No intervention has passed the
+all-criteria 9/10 gate.** See the [usage and protocols](research/mechanistic-repair/COMPARISON.md)
+and [component investigation report](research-results/component-localization/REPORT.md).
+
 ## Start
 
 ```bash

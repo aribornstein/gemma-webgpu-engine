@@ -20,6 +20,7 @@ import type {
   GemmaResearchEvaluationRequest,
   GemmaResearchEvaluationResult,
 } from "../research/engine-types";
+import { GEMMA_RESEARCH_STAGES } from "../research/engine-types";
 import { inspectWeightSlice, type WeightSliceRequest, type WeightSlice } from "../research/workbench/weights";
 import {
   createResearchActivationPatch,
@@ -1963,7 +1964,9 @@ export class GemmaGenerationSession {
     if (maxPositions > this.cacheCapacity) throw new Error("Research request exceeds cache capacity");
     const positions = new Set(request.capture?.positions ?? []);
     const layers = [...new Set(request.capture?.layers ?? [])];
-    if (positions.size * layers.length > 256 || layers.length > 8) throw new Error("Capture limited to 256 vectors and 8 layers per request");
+    const stages = [...new Set(request.capture?.stages ?? ["layer-output" as const])];
+    if (stages.some((stage) => !GEMMA_RESEARCH_STAGES.includes(stage))) throw new Error("Unsupported component stage");
+    if (positions.size * layers.length * stages.length > 256 || layers.length > 8) throw new Error("Capture limited to 256 vectors and 8 layers per request");
     for (const position of positions) {
       if (!Number.isInteger(position) || position < 0 || position >= maxPositions) throw new Error("Invalid capture position");
     }
@@ -1972,7 +1975,17 @@ export class GemmaGenerationSession {
     if (patch && (!Number.isInteger(patch.layer) || patch.layer < 0 || patch.layer >= 35 ||
       !Number.isInteger(patch.tokenPosition) || patch.tokenPosition < 0 || patch.tokenPosition >= maxPositions ||
       patch.vector.length !== 1536 || !patch.vector.every(Number.isFinite) || !Number.isFinite(patch.amount) ||
-      Math.abs(patch.amount) > 2 || !["replace", "add"].includes(patch.mode))) throw new Error("Invalid token-local patch");
+      Math.abs(patch.amount) > 2 || !["replace", "add"].includes(patch.mode) ||
+      !["attention", "mlp", "layer-output"].includes(patch.stage ?? "layer-output"))) throw new Error("Invalid token-local patch");
+    if (request.overlays?.length && patch) throw new Error("Do not mix residual steering and token-local causal diagnostics");
+    if ((request.overlays?.length ?? 0) > 4) throw new Error("At most four request-local steering overlays");
+    for (const overlay of request.overlays ?? []) {
+      if (overlay.site === "final" || !Number.isInteger(overlay.site.layer) || overlay.site.layer < 0 ||
+          overlay.site.layer >= 35 || overlay.a.length !== 1536 || overlay.b.length !== 1536 ||
+          !overlay.a.every(Number.isFinite) || !overlay.b.every(Number.isFinite) || !Number.isFinite(overlay.coefficient)) {
+        throw new Error("Paired replay requires finite, bounded residual-site overlays");
+      }
+    }
     const config = resolveGemmaGenerationConfig({
       temperature: request.generate?.temperature ?? 0,
       seed: request.generate?.seed ?? 23,
@@ -1985,6 +1998,7 @@ export class GemmaGenerationSession {
       const started = performance.now();
       const captures: GemmaResearchActivationCapture[] = [];
       const slots: ReturnType<typeof createResearchResidualCapture>[] = [];
+      const localEdits: ReturnType<typeof createResearchResidualEditResources>[] = [];
       let patchResources: ResearchActivationPatch | null = null;
       let evaluatedPositions = 0;
       const tokenIds: number[] = [];
@@ -1992,14 +2006,31 @@ export class GemmaGenerationSession {
       try {
         if (layers.length) {
           const pipeline = await getResearchResidualCapturePipeline(this.device);
-          for (const layer of layers) slots.push(createResearchResidualCapture(this.device, pipeline, layer, this.resources.stack.layers[layer].mlp.hidden));
+          for (const layer of layers) {
+            for (const stage of stages) slots.push(createResearchResidualCapture(this.device, pipeline, layer, this.resources.stack.layers[layer].mlp.hidden, stage));
+          }
         }
+        for (const overlay of request.overlays ?? []) {
+          if (overlay.site === "final") throw new Error("Final steering site is not supported in paired replay");
+          if (overlay.coefficient === 0) continue;
+          const mlp = this.resources.stack.layers[overlay.site.layer].mlp;
+          localEdits.push(createResearchResidualEditResources(this.device,
+            await getResearchResidualEditPipeline(this.device), overlay.site.layer, {
+              hidden: mlp.hidden, nextInput: mlp.nextInput, nextSum: mlp.nextSum,
+              normWeightsAndScale: mlp.modelWeights.postPleNextInputNormAndLayerScale,
+              inScale: mlp.modelScales.nextInput,
+            }, overlay.a, overlay.b, overlay.coefficient));
+        }
+        this.resources.stack.researchEdits = localEdits.length ? localEdits : null;
         if (patch) {
-          const mlp = this.resources.stack.layers[patch.layer].mlp;
-          patchResources = createResearchActivationPatch(this.device, await getResearchActivationPatchPipeline(this.device), {
-            hidden: mlp.hidden, nextInput: mlp.nextInput, nextSum: mlp.nextSum,
-            normWeightsAndScale: mlp.modelWeights.postPleNextInputNormAndLayerScale,
-            inScale: mlp.modelScales.nextInput,
+          const { mlp, attention } = this.resources.stack.layers[patch.layer];
+          const atAttention = patch.stage === "attention";
+          patchResources = createResearchActivationPatch(this.device, await getResearchActivationPatchPipeline(this.device, patch.stage), {
+            hidden: mlp.hidden,
+            nextInput: atAttention ? attention.ffnInputBuffer : mlp.nextInput,
+            nextSum: atAttention ? attention.ffnInputSumBuffer : mlp.nextSum,
+            normWeightsAndScale: atAttention ? attention.modelWeights.postAttentionAndPreFeedforwardNorm : mlp.modelWeights.postPleNextInputNormAndLayerScale,
+            inScale: atAttention ? attention.modelScales.preMlpInput : mlp.modelScales.nextInput,
           }, patch);
         }
         this.reset();
@@ -2011,6 +2042,7 @@ export class GemmaGenerationSession {
           if (positions.has(evaluatedPositions)) {
             for (const slot of slots) captures.push({
               site: { residual: slot.layerIndex }, tokenPosition: evaluatedPositions,
+              stage: slot.stage,
               values: await this.readResearchVector(slot.buffer),
             });
           }
@@ -2055,11 +2087,13 @@ export class GemmaGenerationSession {
       } finally {
         this.resources.stack.researchPatch = null;
         this.resources.stack.researchCaptures = null;
+        this.resources.stack.researchEdits = null;
         try {
           await this.device.queue.onSubmittedWorkDone();
         } finally {
           for (const slot of slots) slot.buffer.destroy();
           for (const buffer of patchResources?.buffers ?? []) buffer.destroy();
+          for (const edit of localEdits) destroyResearchResidualEditResources(edit);
         }
       }
     });
